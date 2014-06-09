@@ -1,4 +1,4 @@
 supersim
 ========
 
-A flexible event-based cycle-accurate network simulator
+To be released soon :)
