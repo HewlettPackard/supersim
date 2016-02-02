@@ -1,0 +1,25 @@
+Winner take all switch allocation
+-packet based, implement in crossbar scheduler
+
+Traditional multi-VC 1x input speedup allocation
+-allocator different (how to make general policy?)
+
+Variable crossbar input speedup
+-pre(or) and port(arb&and) processing of core allocator
+
+Variable crossbar output speedup
+-HOW TO WIRE THIS UP?
+
+Multi-frequency designs
+-speedup via frequency
+
+Automatic VC quantity calculation
+-packet/protocol class
+-routing class
+-virtual links
+
+Adaptive Routing
+-routing bits in packet
+-move "routing" in JSON to "network"
+-interface routing function, or option in regular one
+-router provides link congestion state

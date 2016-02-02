@@ -4,10 +4,17 @@
 *.o
 *.obj
 
+# Precompiled Headers
+*.gch
+*.pch
+
 # Compiled Dynamic libraries
 *.so
 *.dylib
 *.dll
+
+# Fortran module files
+*.mod
 
 # Compiled Static libraries
 *.lai
@@ -19,3 +26,15 @@
 *.exe
 *.out
 *.app
+
+# Build and binary directories
+bld/
+bin/
+
+# Simulator outputs
+*.log
+*.log.gz
+*.mpf
+*.mpf.gz
+*.csv
+*.csv.gz

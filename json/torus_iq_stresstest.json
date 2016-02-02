@@ -1,0 +1,102 @@
+{
+  "simulator": {
+    "cycle_time": 1000,  // picoseconds
+    "print_progress": true,
+    "print_interval": 1.0,  // seconds
+    "random_seed": 12345678
+  },
+  "network": {
+    "topology": "torus",
+    "num_vcs": 4,
+    "dimensions": [4, 3, 2],
+    "concentration": 1,
+    "internal_channel": {
+      "latency": 1  // cycles
+    },
+    "external_channel": {
+      "latency": 1  // cycles
+    },
+    "channel_log": {
+      "file": "/dev/null"  // "channels.csv"
+    },
+    "interface": {
+      "type": "standard",
+      "crossbar_scheduler": {
+        "allocator": {
+          "type": "r_separable",
+          "slip_latch": true,
+          "resource_arbiter": {
+            "type": "comparing",
+            "greater": false
+          }
+        }
+      },
+      "init_credits": 16,
+      "crossbar": {
+        "latency": 1  // cycles
+      }
+    },
+    "router": {
+      "architecture": "input_queued",
+      "routing": {
+        "algorithm": "dimension_ordered",
+        "latency": 1  // cycles
+      },
+      "input_queue_depth": 16,
+      "crossbar": {
+        "latency": 1  // cycles
+      },
+      "vc_scheduler": {
+        "allocator": {
+          "type": "rc_separable",
+          "slip_latch": true,
+          "iterations": 1,
+          "resource_arbiter": {
+            "type": "comparing",
+            "greater": false
+          },
+          "client_arbiter": {
+            "type": "lslp"
+          }
+        }
+      },
+      "crossbar_scheduler": {
+        "allocator": {
+          "type": "r_separable",
+          "slip_latch": true,
+          "resource_arbiter": {
+            "type": "comparing",
+            "greater": false
+          }
+        }
+      }
+    }
+  },
+  "application": {
+    "type": "stress_test",
+    "max_injection_rate": 0.25,
+    "warmup_threshold": 0.99,
+    "blast_terminal": {
+      "num_messages": 500,
+      "min_message_size": 1,
+      "max_message_size": 64,
+      "max_packet_size": 16,
+      "warmup_interval": 200,  // delivered flits
+      "warmup_window": 15,
+      "warmup_attempts": 20,
+      "traffic_pattern": {
+        "type": "uniform_random"
+      }
+    },
+    "message_log": {
+      "file": "/dev/null"  // "data.mpf.gz"
+    },
+    "rate_log": {
+      "file": "/dev/null"  // "rates.csv"
+    }
+  },
+  "metadata_handler": {
+    "type": "zero"
+  },
+  "debug": []
+}
