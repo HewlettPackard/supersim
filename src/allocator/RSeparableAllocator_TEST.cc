@@ -19,7 +19,7 @@
 #include <gtest/gtest.h>
 #include <prim/prim.h>
 
-#include "settings/Settings.h"
+#include "settings/settings.h"
 
 #include "allocator/Allocator_TEST.h"
 
@@ -36,7 +36,7 @@ TEST(RSeparableAllocator, lslp) {
   allocSettings["resource_arbiter"] = arbSettings;
   allocSettings["slip_latch"] = true;
   allocSettings["type"] = "r_separable";
-  // printf("%s\n", Settings::toString(&allocSettings).c_str());
+  // printf("%s\n", toString(&allocSettings).c_str());
 
   // test
   AllocatorTest(allocSettings, verify, true);
@@ -51,7 +51,7 @@ TEST(RSeparableAllocator, greater) {
   allocSettings["resource_arbiter"] = arbSettings;
   allocSettings["slip_latch"] = true;
   allocSettings["type"] = "r_separable";
-  // printf("%s\n", Settings::toString(&allocSettings).c_str());
+  // printf("%s\n", toString(&allocSettings).c_str());
 
   // test
   AllocatorTest(allocSettings, verify, true);
@@ -66,7 +66,7 @@ TEST(RSeparableAllocator, lesser) {
   allocSettings["resource_arbiter"] = arbSettings;
   allocSettings["slip_latch"] = true;
   allocSettings["type"] = "r_separable";
-  // printf("%s\n", Settings::toString(&allocSettings).c_str());
+  // printf("%s\n", toString(&allocSettings).c_str());
 
   // test
   AllocatorTest(allocSettings, verify, true);
@@ -80,7 +80,7 @@ TEST(RSeparableAllocator, random) {
   allocSettings["resource_arbiter"] = arbSettings;
   allocSettings["slip_latch"] = true;
   allocSettings["type"] = "r_separable";
-  // printf("%s\n", Settings::toString(&allocSettings).c_str());
+  // printf("%s\n", toString(&allocSettings).c_str());
 
   // test
   AllocatorTest(allocSettings, verify, true);

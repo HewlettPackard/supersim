@@ -19,7 +19,7 @@
 #include <gtest/gtest.h>
 #include <prim/prim.h>
 
-#include "settings/Settings.h"
+#include "settings/settings.h"
 
 #include "allocator/Allocator_TEST.h"
 
@@ -38,7 +38,7 @@ TEST(CrSeparableAllocator, lslp) {
   allocSettings["iterations"] = 3;
   allocSettings["slip_latch"] = true;
   allocSettings["type"] = "cr_separable";
-  // printf("%s\n", Settings::toString(&allocSettings).c_str());
+  // printf("%s\n", toString(&allocSettings).c_str());
 
   // test
   AllocatorTest(allocSettings, verify, false);
@@ -55,7 +55,7 @@ TEST(CrSeparableAllocator, greater) {
   allocSettings["iterations"] = 2;
   allocSettings["slip_latch"] = true;
   allocSettings["type"] = "cr_separable";
-  // printf("%s\n", Settings::toString(&allocSettings).c_str());
+  // printf("%s\n", toString(&allocSettings).c_str());
 
   // test
   AllocatorTest(allocSettings, verify, false);
@@ -72,7 +72,7 @@ TEST(CrSeparableAllocator, lesser) {
   allocSettings["iterations"] = 1;
   allocSettings["slip_latch"] = true;
   allocSettings["type"] = "cr_separable";
-  // printf("%s\n", Settings::toString(&allocSettings).c_str());
+  // printf("%s\n", toString(&allocSettings).c_str());
 
   // test
   AllocatorTest(allocSettings, verify, false);
@@ -88,7 +88,7 @@ TEST(CrSeparableAllocator, random) {
   allocSettings["iterations"] = 1;
   allocSettings["slip_latch"] = true;
   allocSettings["type"] = "cr_separable";
-  // printf("%s\n", Settings::toString(&allocSettings).c_str());
+  // printf("%s\n", toString(&allocSettings).c_str());
 
   // test
   AllocatorTest(allocSettings, verify, false);

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 #include <jsoncpp/json/json.h>
-#include <settings/Settings.h>
+#include <settings/settings.h>
 
 #include <cstdio>
 #include <cassert>
@@ -40,8 +40,8 @@ s32 main(s32 _argc, char** _argv) {
 
   // get JSON settings
   Json::Value settings;
-  settings::Settings::commandLine(_argc, _argv, &settings);
-  printf("%s\n", settings::Settings::toString(settings).c_str());
+  settings::commandLine(_argc, _argv, &settings);
+  printf("%s\n", settings::toString(settings).c_str());
 
   // enable debugging on select components
   for (u32 i = 0; i < settings["debug"].size(); i++) {

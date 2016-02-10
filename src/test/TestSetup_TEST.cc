@@ -16,7 +16,7 @@
 #include "test/TestSetup_TEST.h"
 
 #include <jsoncpp/json/json.h>
-#include <settings/Settings.h>
+#include <settings/settings.h>
 
 #include <string>
 
@@ -36,7 +36,7 @@ TestSetup::TestSetup(u64 _cycleTime, u64 _randomSeed) {
       std::string();
 
   Json::Value settings;
-  settings::Settings::initString(str.c_str(), &settings);
+  settings::initString(str.c_str(), &settings);
 
   gSim = new VectorQueue(settings["simulator"]);
 }
