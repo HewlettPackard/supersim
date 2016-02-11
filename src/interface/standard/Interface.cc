@@ -107,6 +107,8 @@ void Interface::receiveMessage(Message* _message) {
 }
 
 void Interface::receiveFlit(u32 _port, Flit* _flit) {
+  dbgprintf("port = %u", _port);
+
   assert(_port == 0);
   assert(_flit != nullptr);
 
@@ -147,6 +149,7 @@ void Interface::receiveControl(u32 _port, Control* _control) {
   assert(cred);
   while (cred->more()) {
     u32 vc = cred->getNum();
+    dbgprintf("port = %u, vc = %u", _port, vc);
     crossbarScheduler_->incrementCreditCount(vc);
   }
   delete _control;
