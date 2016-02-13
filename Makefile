@@ -42,4 +42,4 @@ CXX_FLAGS     += -march=native -g -O3 -flto
 LINK_FLAGS    := -lz
 
 #--------------------- Auto Makefile ------------------------------------------#
-include ~/.makeccpp/auto_bin.mk
+include $(HOME)/.makeccpp/auto_bin.mk
