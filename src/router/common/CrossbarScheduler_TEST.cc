@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <gtest/gtest.h>
 #include <prim/prim.h>
 #include <strop/strop.h>

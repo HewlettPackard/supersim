@@ -16,7 +16,7 @@
 #ifndef STATS_FILELOG_H_
 #define STATS_FILELOG_H_
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <zlib.h>
 
 #include <string>

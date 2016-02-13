@@ -16,7 +16,7 @@
 #ifndef INTERFACE_STANDARD_INTERFACE_H_
 #define INTERFACE_STANDARD_INTERFACE_H_
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <string>
 #include <tuple>
 #include <vector>

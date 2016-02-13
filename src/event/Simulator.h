@@ -16,7 +16,7 @@
 #ifndef EVENT_SIMULATOR_H_
 #define EVENT_SIMULATOR_H_
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <prim/prim.h>
 #include <rnd/Random.h>
 

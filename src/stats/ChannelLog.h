@@ -16,7 +16,7 @@
 #ifndef STATS_CHANNELLOG_H_
 #define STATS_CHANNELLOG_H_
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <prim/prim.h>
 
 #include <sstream>

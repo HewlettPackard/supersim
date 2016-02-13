@@ -16,7 +16,7 @@
 #ifndef INTERFACE_INTERFACEFACTORY_H_
 #define INTERFACE_INTERFACEFACTORY_H_
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>

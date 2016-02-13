@@ -16,7 +16,7 @@
 #ifndef APPLICATION_APPLICATIONFACTORY_H_
 #define APPLICATION_APPLICATIONFACTORY_H_
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <string>
 
 #include "event/Component.h"

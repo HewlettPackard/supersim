@@ -15,7 +15,7 @@
  */
 #include "test/TestSetup_TEST.h"
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <settings/settings.h>
 
 #include <string>

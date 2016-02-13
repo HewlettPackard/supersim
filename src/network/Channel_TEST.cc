@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 #include <gtest/gtest.h>
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <prim/prim.h>
 
 #include <cmath>

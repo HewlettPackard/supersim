@@ -16,7 +16,7 @@
 #ifndef ALLOCATOR_RSEPARABLEALLOCATOR_H_
 #define ALLOCATOR_RSEPARABLEALLOCATOR_H_
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>

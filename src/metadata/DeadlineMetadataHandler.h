@@ -16,7 +16,7 @@
 #ifndef METADATA_DEADLINEMETADATAHANDLER_H_
 #define METADATA_DEADLINEMETADATAHANDLER_H_
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <prim/prim.h>
 
 #include <unordered_map>

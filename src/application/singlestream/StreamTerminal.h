@@ -16,7 +16,7 @@
 #ifndef APPLICATION_SINGLESTREAM_STREAMTERMINAL_H_
 #define APPLICATION_SINGLESTREAM_STREAMTERMINAL_H_
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>

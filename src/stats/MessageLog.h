@@ -16,7 +16,7 @@
 #ifndef STATS_MESSAGELOG_H_
 #define STATS_MESSAGELOG_H_
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 
 #include "stats/FileLog.h"
 #include "types/Message.h"

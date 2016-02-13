@@ -16,7 +16,7 @@
 #ifndef ALLOCATOR_ALLOCATOR_TEST_H_
 #define ALLOCATOR_ALLOCATOR_TEST_H_
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <prim/prim.h>
 
 typedef void(*AllocatorVerifier)(u32 _numClients, u32 _numResources,

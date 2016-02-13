@@ -16,7 +16,7 @@
 #ifndef TRAFFIC_BITCOMPLEMENTTRAFFICPATTERN_H_
 #define TRAFFIC_BITCOMPLEMENTTRAFFICPATTERN_H_
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>

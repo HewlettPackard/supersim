@@ -15,7 +15,7 @@
  */
 #include "traffic/BitRotateTrafficPattern.h"
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <gtest/gtest.h>
 #include <bits/bits.h>
 #include <prim/prim.h>

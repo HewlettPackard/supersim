@@ -16,7 +16,7 @@
 #ifndef ROUTER_INPUTQUEUED_ROUTER_H_
 #define ROUTER_INPUTQUEUED_ROUTER_H_
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>

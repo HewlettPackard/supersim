@@ -16,7 +16,7 @@
 #ifndef ARBITER_ARBITERFACTORY_H_
 #define ARBITER_ARBITERFACTORY_H_
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>

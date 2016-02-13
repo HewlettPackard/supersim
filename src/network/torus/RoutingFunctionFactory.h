@@ -16,7 +16,7 @@
 #ifndef NETWORK_TORUS_ROUTINGFUNCTIONFACTORY_H_
 #define NETWORK_TORUS_ROUTINGFUNCTIONFACTORY_H_
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>

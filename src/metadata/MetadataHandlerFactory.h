@@ -16,7 +16,7 @@
 #ifndef METADATA_METADATAHANDLERFACTORY_H_
 #define METADATA_METADATAHANDLERFACTORY_H_
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 
 #include "metadata/MetadataHandler.h"
 

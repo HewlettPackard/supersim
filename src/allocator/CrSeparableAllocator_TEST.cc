@@ -15,7 +15,7 @@
  */
 #include "allocator/CrSeparableAllocator.h"
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <gtest/gtest.h>
 #include <prim/prim.h>
 

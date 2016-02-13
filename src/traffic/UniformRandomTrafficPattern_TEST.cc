@@ -15,7 +15,7 @@
  */
 #include "traffic/UniformRandomTrafficPattern.h"
 
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <gtest/gtest.h>
 #include <mut/mut.h>
 #include <prim/prim.h>
