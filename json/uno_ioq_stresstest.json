@@ -96,7 +96,8 @@
       "warmup_window": 15,
       "warmup_attempts": 20,
       "traffic_pattern": {
-        "type": "uniform_random"
+        "type": "uniform_random",
+        "send_to_self": false
       }
     },
     "message_log": {
