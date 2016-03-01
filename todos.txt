@@ -23,3 +23,6 @@ Adaptive Routing
 -move "routing" in JSON to "network"
 -interface routing function, or option in regular one
 -router provides link congestion state
+
+CustomPermutationTrafficPattern
+-take a mapping from the config file (external tool for generation)
