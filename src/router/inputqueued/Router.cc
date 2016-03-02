@@ -31,6 +31,11 @@ Router::Router(
   u32 inputQueueDepth = _settings["input_queue_depth"].asUInt();
   assert(inputQueueDepth > 0);
 
+  // create a congestion status device
+  congestionStatus_ = new CongestionStatus(
+      "CongestionStatus", this, numPorts_ * numVcs_,
+      _settings["congestion_status"]);
+
   // create the crossbar and schedulers
   crossbar_ = new Crossbar("Crossbar", this, numPorts_ * numVcs_, numPorts_,
                            _settings["crossbar"]);
@@ -92,6 +97,7 @@ Router::Router(
 }
 
 Router::~Router() {
+  delete congestionStatus_;
   delete crossbar_;
   delete vcScheduler_;
   delete crossbarScheduler_;
@@ -146,14 +152,8 @@ void Router::sendFlit(u32 _port, Flit* _flit) {
   outputChannels_.at(_port)->setNextFlit(_flit);
 }
 
-u32 Router::vcIndex(u32 _port, u32 _vc) const {
-  return (_port * numVcs_) + _vc;
-}
-
-void Router::vcIndexRev(u32 _index, u32* _port, u32* _vc) const {
-  assert(_index < (numPorts_ * numVcs_));
-  *_port = _index / numVcs_;
-  *_vc = _index % numVcs_;
+f64 Router::congestionStatus(u32 _vcIdx) const {
+  return congestionStatus_->status(_vcIdx);
 }
 
 }  // namespace InputQueued

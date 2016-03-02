@@ -26,6 +26,7 @@
 #include "network/Channel.h"
 #include "network/RoutingFunction.h"
 #include "network/RoutingFunctionFactory.h"
+#include "router/common/CongestionStatus.h"
 #include "router/common/Crossbar.h"
 #include "router/common/CrossbarScheduler.h"
 #include "router/common/VcScheduler.h"
@@ -56,12 +57,12 @@ class Router : public ::Router {
   void sendCredit(u32 _port, u32 _vc) override;
   void sendFlit(u32 _port, Flit* _flit) override;
 
-  u32 vcIndex(u32 _port, u32 _vc) const;
-  void vcIndexRev(u32 _index, u32* _port, u32* _vc) const;
+  f64 congestionStatus(u32 _vcIdx) const override;
 
  private:
   std::vector<InputQueue*> inputQueues_;
   std::vector<RoutingFunction*> routingFunctions_;
+  CongestionStatus* congestionStatus_;
   Crossbar* crossbar_;
   CrossbarScheduler* crossbarScheduler_;
   VcScheduler* vcScheduler_;

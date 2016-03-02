@@ -113,7 +113,7 @@ void InputQueue::vcSchedulerResponse(u32 _vc) {
   if (_vc != U32_MAX) {
     // granted
     vca_.fsm = ePipelineFsm::kReadyToAdvance;
-    router_->vcIndexRev(_vc, &vca_.allocatedPort, &vca_.allocatedVc);
+    router_->vcIndexInv(_vc, &vca_.allocatedPort, &vca_.allocatedVc);
     // dbgprintf("VcSch p=%u v=%u", vca_.allocatedPort, vca_.allocatedVc);
   } else {
     // denied

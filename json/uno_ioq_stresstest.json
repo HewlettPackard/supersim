@@ -44,6 +44,9 @@
         "latency": 1,  // cycles
         "all_vcs": true
       },
+      "congestion_status": {
+        "latency": 1
+      },
       "input_queue_depth": 16,
       "output_queue_depth": 16,
       "crossbar": {

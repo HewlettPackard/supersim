@@ -41,8 +41,13 @@ class Router : public Component, public FlitSender, public FlitReceiver,
   void setAddress(const std::vector<u32>& _address);
   const std::vector<u32>& getAddress() const;
 
+  u32 vcIndex(u32 _port, u32 _vc) const;
+  void vcIndexInv(u32 _index, u32* _port, u32* _vc) const;
+
   virtual void setInputChannel(u32 _port, Channel* _channel) = 0;
   virtual void setOutputChannel(u32 port, Channel* _channel) = 0;
+
+  virtual f64 congestionStatus(u32 _vcIdx) const;
 
  protected:
   const u32 numPorts_;

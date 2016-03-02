@@ -43,3 +43,17 @@ void Router::setAddress(const std::vector<u32>& _address) {
 const std::vector<u32>& Router::getAddress() const {
   return address_;
 }
+
+u32 Router::vcIndex(u32 _port, u32 _vc) const {
+  return (_port * numVcs_) + _vc;
+}
+
+void Router::vcIndexInv(u32 _vcIdx, u32* _port, u32* _vc) const {
+  assert(_vcIdx < (numPorts_ * numVcs_));
+  *_port = _vcIdx / numVcs_;
+  *_vc = _vcIdx % numVcs_;
+}
+
+f64 Router::congestionStatus(u32 _vcIdx) const {
+  assert(false);  // subclasses should override this if it needs to be supported
+}
