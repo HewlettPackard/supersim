@@ -182,6 +182,7 @@ void Router::receiveCredit(u32 _port, Credit* _credit) {
 
 void Router::sendCredit(u32 _port, u32 _vc) {
   // ensure there is an outgoing credit for the next time slot
+  assert(_vc < numVcs_);
   Credit* credit = inputChannels_.at(_port)->getNextCredit();
   if (credit == nullptr) {
     credit = new Credit(numVcs_);

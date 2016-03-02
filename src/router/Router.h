@@ -25,9 +25,12 @@
 #include "event/Component.h"
 #include "network/Channel.h"
 #include "types/FlitReceiver.h"
+#include "types/FlitSender.h"
 #include "types/CreditReceiver.h"
+#include "types/CreditSender.h"
 
-class Router : public Component, public FlitReceiver, public CreditReceiver {
+class Router : public Component, public FlitSender, public FlitReceiver,
+               public CreditSender, public CreditReceiver {
  public:
   Router(const std::string& _name, const Component* _parent,
          Json::Value _settings);

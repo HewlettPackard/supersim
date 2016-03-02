@@ -25,7 +25,7 @@
 #include "event/Simulator.h"
 
 #define FLIT 0xBE
-#define CTRL 0xEF
+#define CRDT 0xEF
 
 Channel::Channel(const std::string& _name, const Component* _parent,
                  Json::Value _settings)
@@ -91,10 +91,10 @@ void Channel::processEvent(void* _event, s32 _type) {
         sink_->receiveFlit(sinkPort_, flit);
       }
       break;
-    case CTRL:
+    case CRDT:
       {
-        source_->receiveCredit(sourcePort_,
-                               reinterpret_cast<Credit*>(_event));
+        Credit* credit = reinterpret_cast<Credit*>(_event);
+        source_->receiveCredit(sourcePort_, credit);
       }
       break;
     default:
@@ -161,7 +161,7 @@ u64 Channel::setNextCredit(Credit* _credit) {
 
   // add the event of when the credit will arrive on the other end
   u64 nextTime = gSim->futureCycle(latency_);
-  addEvent(nextTime, 1, _credit, CTRL);
+  addEvent(nextTime, 1, _credit, CRDT);
 
   // return the injection time
   return nextCreditTime_;

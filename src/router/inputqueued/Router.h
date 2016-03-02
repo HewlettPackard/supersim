@@ -52,8 +52,8 @@ class Router : public ::Router {
   void receiveFlit(u32 _port, Flit* _flit) override;
   void receiveCredit(u32 _port, Credit* _credit) override;
 
-  void sendCredit(u32 _port, u32 _vc);  // called by InputQueue
-  void sendFlit(u32 _port, Flit* _flit);  // called by Ejector
+  void sendCredit(u32 _port, u32 _vc) override;
+  void sendFlit(u32 _port, Flit* _flit) override;
 
   u32 vcIndex(u32 _port, u32 _vc) const;
   void vcIndexRev(u32 _index, u32* _port, u32* _vc) const;

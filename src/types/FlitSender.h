@@ -13,27 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "interface/standard/Ejector.h"
+#ifndef TYPES_FLITSENDER_H_
+#define TYPES_FLITSENDER_H_
 
-#include <cassert>
+#include <prim/prim.h>
 
-#include "interface/standard/Interface.h"
+#include "types/Flit.h"
 
-namespace Standard {
+class FlitSender {
+ public:
+  FlitSender();
+  virtual ~FlitSender();
+  virtual void sendFlit(u32 _port, Flit* _flit) = 0;
+};
 
-Ejector::Ejector(const std::string& _name, Interface* _interface)
-    : Component(_name, _interface), interface_(_interface) {
-  lastSetTime_ = U32_MAX;
-}
-
-Ejector::~Ejector() {}
-
-void Ejector::receiveFlit(u32 _port, Flit* _flit) {
-  // this is overkill checking!
-  u64 nextTime = gSim->futureCycle(1);
-  assert((lastSetTime_ != nextTime) || (lastSetTime_ == U32_MAX));
-  interface_->sendFlit(0, _flit);
-  lastSetTime_ = nextTime;
-}
-
-}  // namespace Standard
+#endif  // TYPES_FLITSENDER_H_

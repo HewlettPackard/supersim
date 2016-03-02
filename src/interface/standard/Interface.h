@@ -52,9 +52,11 @@ class Interface : public ::Interface, public InjectionFunction::Client {
   void receiveMessage(Message* _message) override;
   void injectionFunctionResponse(
       Message* _message, InjectionFunction::Response* _response) override;
+
+  void sendFlit(u32 _port, Flit* _flit) override;
   void receiveFlit(u32 _port, Flit* _flit) override;
+  void sendCredit(u32 _port, u32 _vc) override;
   void receiveCredit(u32 _port, Credit* _credit) override;
-  void sendFlit(Flit* _flit);
 
  private:
   Channel* inputChannel_;

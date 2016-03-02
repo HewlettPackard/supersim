@@ -137,19 +137,18 @@ void Interface::injectionFunctionResponse(
   delete _response;
 }
 
-void Interface::receiveFlit(u32 _port, Flit* _flit) {
-  dbgprintf("port = %u", _port);
+void Interface::sendFlit(u32 _port, Flit* _flit) {
+  assert(_port == 0);
+  assert(outputChannel_->getNextFlit() == nullptr);
+  outputChannel_->setNextFlit(_flit);
+}
 
+void Interface::receiveFlit(u32 _port, Flit* _flit) {
   assert(_port == 0);
   assert(_flit != nullptr);
 
-  // send credit
-  Credit* credit = inputChannel_->getNextCredit();
-  if (credit == nullptr) {
-    credit = new Credit(numVcs_);
-    inputChannel_->setNextCredit(credit);
-  }
-  credit->putNum(_flit->getVc());
+  // send a credit back
+  sendCredit(_port, _flit->getVc());
 
   // check destination is correct
   u32 dest = _flit->getPacket()->getMessage()->getDestinationId();
@@ -170,6 +169,19 @@ void Interface::receiveFlit(u32 _port, Flit* _flit) {
   }
 }
 
+void Interface::sendCredit(u32 _port, u32 _vc) {
+  assert(_port == 0);
+  assert(_vc < numVcs_);
+
+  // send credit
+  Credit* credit = inputChannel_->getNextCredit();
+  if (credit == nullptr) {
+    credit = new Credit(numVcs_);
+    inputChannel_->setNextCredit(credit);
+  }
+  credit->putNum(_vc);
+}
+
 void Interface::receiveCredit(u32 _port, Credit* _credit) {
   assert(_port == 0);
   while (_credit->more()) {
@@ -178,11 +190,6 @@ void Interface::receiveCredit(u32 _port, Credit* _credit) {
     crossbarScheduler_->incrementCreditCount(vc);
   }
   delete _credit;
-}
-
-void Interface::sendFlit(Flit* _flit) {
-  assert(outputChannel_->getNextFlit() == nullptr);
-  outputChannel_->setNextFlit(_flit);
 }
 
 }  // namespace Standard
