@@ -16,7 +16,6 @@
 #include <json/json.h>
 #include <gtest/gtest.h>
 #include <prim/prim.h>
-#include <strop/strop.h>
 
 #include <string>
 #include <unordered_map>

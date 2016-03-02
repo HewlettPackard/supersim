@@ -30,7 +30,7 @@ namespace Torus {
 class DimOrderRoutingFunction : public RoutingFunction {
  public:
   DimOrderRoutingFunction(const std::string& _name, const Component* _parent,
-                          u64 _latency, Router* _router, u32 _numVcs,
+                          Router* _router, u64 _latency,
                           std::vector<u32> _dimensionWidths,
                           u32 _concentration, u32 _inputPort);
   ~DimOrderRoutingFunction();
@@ -40,14 +40,11 @@ class DimOrderRoutingFunction : public RoutingFunction {
       Flit* _flit, RoutingFunction::Response* _response) override;
 
  private:
-  Router* router_;
-  u32 numVcs_;
-  u32 numPorts_;
-  std::vector<u32> dimensionWidths_;
-  u32 concentration_;
-  u32 inputPort_;
-  bool isTerminalPort_;
-  u32 inputPortDim_;
+  const std::vector<u32> dimensionWidths_;
+  const u32 concentration_;
+  const u32 inputPort_;
+  const bool isTerminalPort_;
+  const u32 inputPortDim_;
 };
 
 }  // namespace Torus

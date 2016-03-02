@@ -24,12 +24,11 @@
 namespace FoldedClos {
 
 LcaRoutingFunction::LcaRoutingFunction(
-    const std::string& _name, const Component* _parent, u64 _latency,
-    Router* _router, u32 _numVcs, u32 _numPorts, u32 _numLevels, u32 _level,
-    u32 _inputPort, bool _allVcs)
-    : RoutingFunction(_name, _parent, _latency), router_(_router),
-      numVcs_(_numVcs), numPorts_(_numPorts), numLevels_(_numLevels),
-      level_(_level), inputPort_(_inputPort), allVcs_(_allVcs) {}
+    const std::string& _name, const Component* _parent, Router* _router,
+    u64 _latency, u32 _numLevels, u32 _level, u32 _inputPort)
+    : RoutingFunction(_name, _parent, _router, _latency),
+      numVcs_(_router->numVcs()), numPorts_(_router->numPorts()),
+      numLevels_(_numLevels), level_(_level), inputPort_(_inputPort) {}
 
 LcaRoutingFunction::~LcaRoutingFunction() {}
 
@@ -80,14 +79,9 @@ void LcaRoutingFunction::processRequest(Flit* _flit,
     outputPort = destinationAddress->at(level_);
   }
 
-  if (allVcs_) {
-    // select all VCs in the output port
-    for (u32 vc = 0; vc < numVcs_; vc++) {
-      _response->add(outputPort, vc);
-    }
-  } else {
-    // use the current VC
-    _response->add(outputPort, _flit->getVc());
+  // select all VCs in the output port
+  for (u32 vc = 0; vc < numVcs_; vc++) {
+    _response->add(outputPort, vc);
   }
 }
 

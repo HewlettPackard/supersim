@@ -22,6 +22,11 @@
     },
     "interface": {
       "type": "standard",
+      "injection": {
+        "algorithm": "any",
+        "latency": 1
+      },
+      "fixed_msg_vc": false,
       "crossbar_scheduler": {
         "allocator": {
           "type": "r_separable",

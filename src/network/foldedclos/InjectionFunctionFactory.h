@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_TORUS_ROUTINGFUNCTIONFACTORY_H_
-#define NETWORK_TORUS_ROUTINGFUNCTIONFACTORY_H_
+#ifndef NETWORK_FOLDEDCLOS_INJECTIONFUNCTIONFACTORY_H_
+#define NETWORK_FOLDEDCLOS_INJECTIONFUNCTIONFACTORY_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -23,25 +23,20 @@
 #include <vector>
 
 #include "event/Component.h"
-#include "network/RoutingFunctionFactory.h"
-#include "router/Router.h"
+#include "interface/Interface.h"
+#include "network/InjectionFunctionFactory.h"
 
-namespace Torus {
+namespace FoldedClos {
 
-class RoutingFunctionFactory : public ::RoutingFunctionFactory {
+class InjectionFunctionFactory : public ::InjectionFunctionFactory {
  public:
-  RoutingFunctionFactory(std::vector<u32> _dimensionWidths,
-                         u32 _concentration);
-  ~RoutingFunctionFactory();
-  RoutingFunction* createRoutingFunction(
-      const std::string& _name, const Component* _parent, Router* _router,
-      u32 inputPort, Json::Value _settings);
-
- private:
-  std::vector<u32> dimensionWidths_;
-  u32 concentration_;
+  InjectionFunctionFactory();
+  ~InjectionFunctionFactory();
+  InjectionFunction* createInjectionFunction(
+      const std::string& _name, const Component* _parent, Interface* _interface,
+      Json::Value _settings);
 };
 
-}  // namespace Torus
+}  // namespace FoldedClos
 
-#endif  // NETWORK_TORUS_ROUTINGFUNCTIONFACTORY_H_
+#endif  // NETWORK_FOLDEDCLOS_INJECTIONFUNCTIONFACTORY_H_

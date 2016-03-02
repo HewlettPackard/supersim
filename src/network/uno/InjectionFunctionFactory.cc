@@ -13,31 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "network/uno/RoutingFunctionFactory.h"
+#include "network/uno/InjectionFunctionFactory.h"
 
 #include <cassert>
 
-#include "network/uno/DirectRoutingFunction.h"
-#include "network/RoutingFunction.h"
+#include "network/uno/AnyInjectionFunction.h"
+#include "network/InjectionFunction.h"
 
 namespace Uno {
 
-RoutingFunctionFactory::RoutingFunctionFactory(u32 _concentration)
-    : ::RoutingFunctionFactory(), concentration_(_concentration) {}
+InjectionFunctionFactory::InjectionFunctionFactory()
+    : ::InjectionFunctionFactory() {}
 
-RoutingFunctionFactory::~RoutingFunctionFactory() {}
+InjectionFunctionFactory::~InjectionFunctionFactory() {}
 
-RoutingFunction* RoutingFunctionFactory::createRoutingFunction(
-    const std::string& _name, const Component* _parent, Router* _router,
-    u32 _inputPort, Json::Value _settings) {
+InjectionFunction* InjectionFunctionFactory::createInjectionFunction(
+    const std::string& _name, const Component* _parent, Interface* _interface,
+    Json::Value _settings) {
   std::string algorithm = _settings["algorithm"].asString();
   u32 latency = _settings["latency"].asUInt();
 
-  if (algorithm == "direct") {
-    return new Uno::DirectRoutingFunction(
-        _name, _parent, _router, latency, concentration_);
+  if (algorithm == "any") {
+    return new Uno::AnyInjectionFunction(
+        _name, _parent, _interface, latency);
   } else {
-    fprintf(stderr, "Unknown routing algorithm: '%s'\n", algorithm.c_str());
+    fprintf(stderr, "Unknown injection algorithm: '%s'\n", algorithm.c_str());
     assert(false);
   }
 }

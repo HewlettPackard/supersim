@@ -19,6 +19,7 @@
 #include <cmath>
 
 #include "interface/InterfaceFactory.h"
+#include "network/foldedclos/InjectionFunctionFactory.h"
 #include "network/foldedclos/RoutingFunctionFactory.h"
 #include "router/RouterFactory.h"
 
@@ -77,7 +78,7 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // create a routing function factory
       RoutingFunctionFactory* routingFunctionFactory =
-          new RoutingFunctionFactory(numVcs_, routerRadix_, numLevels_, row);
+          new RoutingFunctionFactory(numLevels_, row);
 
       // make router
       routers_.at(row).at(col) = RouterFactory::createRouter(
@@ -143,6 +144,9 @@ Network::Network(const std::string& _name, const Component* _parent,
     }
   }
 
+  InjectionFunctionFactory* injectionFunctionFactory =
+      new InjectionFunctionFactory();
+
   // create interfaces, external channels, link together
   u32 interfaceId = 0;
   interfaces_.resize(rowRouters_);
@@ -172,7 +176,8 @@ Network::Network(const std::string& _name, const Component* _parent,
       std::string interfaceName = "Interface_" + std::to_string(c) + ":" +
           std::to_string(p);
       Interface* interface = InterfaceFactory::createInterface(
-          interfaceName, this, interfaceId, _settings["interface"]);
+          interfaceName, this, interfaceId, injectionFunctionFactory,
+          _settings["interface"]);
       interfaces_.at(c).at(p) = interface;
       interfaceId++;
 
@@ -181,6 +186,8 @@ Network::Network(const std::string& _name, const Component* _parent,
       interface->setOutputChannel(inChannel);
     }
   }
+
+  delete injectionFunctionFactory;
 
   for (u32 id = 0; id < numInterfaces(); id++) {
     assert(getInterface(id) != nullptr);

@@ -13,22 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "interface/InterfaceFactory.h"
+#ifndef NETWORK_INJECTIONFUNCTIONFACTORY_H_
+#define NETWORK_INJECTIONFUNCTIONFACTORY_H_
 
-#include <cassert>
+#include <json/json.h>
+#include <prim/prim.h>
 
-#include "interface/standard/Interface.h"
+#include <string>
 
-Interface* InterfaceFactory::createInterface(
-    const std::string& _name, const Component* _parent, u32 _id,
-    InjectionFunctionFactory* _injectionFunctionFactory,
-    Json::Value _settings) {
-  std::string type = _settings["type"].asString();
-  if (type == "standard") {
-    return new Standard::Interface(
-        _name, _parent, _id, _injectionFunctionFactory, _settings);
-  } else {
-    fprintf(stderr, "unknown interface type: %s\n", type.c_str());
-    assert(false);
-  }
-}
+class Component;
+class Interface;
+class Router;
+class InjectionFunction;
+
+class InjectionFunctionFactory {
+ public:
+  InjectionFunctionFactory();
+  virtual ~InjectionFunctionFactory();
+  virtual InjectionFunction* createInjectionFunction(
+      const std::string& _name, const Component* _parent, Interface* _interface,
+      Json::Value _settings) = 0;
+};
+
+#endif  // NETWORK_INJECTIONFUNCTIONFACTORY_H_

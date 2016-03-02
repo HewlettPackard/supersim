@@ -15,8 +15,6 @@
  */
 #include "network/hyperx/DimOrderRoutingFunction.h"
 
-#include <strop/strop.h>
-
 #include <cassert>
 
 #include <unordered_set>
@@ -27,14 +25,12 @@
 namespace HyperX {
 
 DimOrderRoutingFunction::DimOrderRoutingFunction(
-    const std::string& _name, const Component* _parent, u64 _latency,
-    Router* _router, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
-    const std::vector<u32>& _dimensionWeights, u32 _concentration, bool _allVcs)
-    : RoutingFunction(_name, _parent, _latency), router_(_router),
-      numVcs_(_numVcs), dimensionWidths_(_dimensionWidths),
-      dimensionWeights_(_dimensionWeights), concentration_(_concentration),
-      allVcs_(_allVcs) {
-}
+    const std::string& _name, const Component* _parent, Router* _router,
+    u64 _latency, const std::vector<u32>& _dimensionWidths,
+    const std::vector<u32>& _dimensionWeights, u32 _concentration)
+    : RoutingFunction(_name, _parent, _router, _latency),
+      numVcs_(router_->numVcs()), dimensionWidths_(_dimensionWidths),
+      dimensionWeights_(_dimensionWeights), concentration_(_concentration) {}
 
 DimOrderRoutingFunction::~DimOrderRoutingFunction() {}
 
@@ -83,14 +79,9 @@ void DimOrderRoutingFunction::processRequest(
   assert(outputPorts.size() > 0);
   for (auto it = outputPorts.cbegin(); it != outputPorts.cend(); ++it) {
     u32 outputPort = *it;
-    if (allVcs_) {
-      // select all VCs in the output port
-      for (u32 vc = 0; vc < numVcs_; vc++) {
-        _response->add(outputPort, vc);
-      }
-    } else {
-      // use the current VC
-      _response->add(outputPort, _flit->getVc());
+    // select all VCs in the output port
+    for (u32 vc = 0; vc < numVcs_; vc++) {
+      _response->add(outputPort, vc);
     }
   }
 }

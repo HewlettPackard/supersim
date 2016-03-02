@@ -29,16 +29,14 @@ namespace Uno {
 
 class RoutingFunctionFactory : public ::RoutingFunctionFactory {
  public:
-  RoutingFunctionFactory(u32 _numVcs, u32 _concentration);
+  explicit RoutingFunctionFactory(u32 _concentration);
   ~RoutingFunctionFactory();
   RoutingFunction* createRoutingFunction(
       const std::string& _name, const Component* _parent, Router* _router,
       u32 inputPort, Json::Value _settings);
 
  private:
-  u32 numVcs_;
-  std::vector<u32> dimensionWidths_;
-  u32 concentration_;
+  const u32 concentration_;
 };
 
 }  // namespace Uno

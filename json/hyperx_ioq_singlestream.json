@@ -22,6 +22,11 @@
     },
     "interface": {
       "type": "standard",
+      "injection": {
+        "algorithm": "any",
+        "latency": 1
+      },
+      "fixed_msg_vc": false,
       "crossbar_scheduler": {
         "allocator": {
           "type": "r_separable",
@@ -93,9 +98,9 @@
     "max_injection_rate": 1.0,
     "terminal": {
       "num_messages": 100,
-      "min_message_size": 10000,
-      "max_message_size": 10000,
-      "max_packet_size": 10000
+      "min_message_size": 3000,
+      "max_message_size": 3000,
+      "max_packet_size": 3000
     },
     "message_log": {
       "file": "/dev/null"  // "data.mpf.gz"

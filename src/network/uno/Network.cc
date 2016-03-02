@@ -19,6 +19,7 @@
 #include <cmath>
 
 #include "interface/InterfaceFactory.h"
+#include "network/uno/InjectionFunctionFactory.h"
 #include "network/uno/RoutingFunctionFactory.h"
 #include "router/RouterFactory.h"
 
@@ -41,7 +42,7 @@ Network::Network(const std::string& _name, const Component* _parent,
 
   // create a routing function factory to give to the routers
   RoutingFunctionFactory* routingFunctionFactory = new RoutingFunctionFactory(
-      numVcs_, concentration_);
+      concentration_);
 
   // create the router
   router_ = RouterFactory::createRouter(
@@ -49,13 +50,18 @@ Network::Network(const std::string& _name, const Component* _parent,
   router_->setAddress(std::vector<u32>());  // empty
   delete routingFunctionFactory;
 
+  // create an injection function factory to give to the interfaces
+  InjectionFunctionFactory* injectionFunctionFactory =
+      new InjectionFunctionFactory();
+
   // create the interfaces and external channels
   interfaces_.resize(concentration_, nullptr);
   for (u32 id = 0; id < concentration_; id++) {
     // create the interface
     std::string interfaceName = "Interface_" + std::to_string(id);
     Interface* interface = InterfaceFactory::createInterface(
-        interfaceName, this, id, _settings["interface"]);
+        interfaceName, this, id, injectionFunctionFactory,
+        _settings["interface"]);
     interfaces_.at(id) = interface;
 
     // create the channels
@@ -74,6 +80,8 @@ Network::Network(const std::string& _name, const Component* _parent,
     interface->setInputChannel(outChannel);
     interface->setOutputChannel(inChannel);
   }
+
+  delete injectionFunctionFactory;
 }
 
 Network::~Network() {

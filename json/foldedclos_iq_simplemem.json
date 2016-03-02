@@ -20,6 +20,11 @@
     },
     "interface": {
       "type": "standard",
+      "injection": {
+        "algorithm": "any",
+        "latency": 1
+      },
+      "fixed_msg_vc": false,
       "crossbar_scheduler": {
         "allocator": {
           "type": "r_separable",
@@ -39,9 +44,8 @@
       "architecture": "input_queued",
       "num_ports": 6,
       "routing": {
-        "algorithm": "least_common_ancestor",
-        "latency": 1,  // cycles
-        "all_vcs": true
+        "algorithm": "most_common_ancestor",
+        "latency": 1  // cycles
       },
       "input_queue_depth": 16,
       "crossbar": {

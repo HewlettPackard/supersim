@@ -21,6 +21,11 @@
     },
     "interface": {
       "type": "standard",
+      "injection": {
+        "algorithm": "dimension_ordered",
+        "latency": 1  // cycles
+      },
+      "fixed_msg_vc": true,
       "crossbar_scheduler": {
         "allocator": {
           "type": "r_separable",

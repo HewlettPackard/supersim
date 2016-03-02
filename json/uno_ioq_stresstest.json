@@ -8,7 +8,7 @@
   "network": {
     "topology": "uno",
     "num_vcs": 2,
-    "concentration": 64,
+    "concentration": 16,
     "external_channel": {
       "latency": 1
     },
@@ -17,6 +17,11 @@
     },
     "interface": {
       "type": "standard",
+      "injection": {
+        "algorithm": "any",
+        "latency": 1
+      },
+      "fixed_msg_vc": false,
       "crossbar_scheduler": {
         "allocator": {
           "type": "r_separable",
@@ -88,7 +93,7 @@
     "max_injection_rate": 0.5,
     "warmup_threshold": 0.99,
     "blast_terminal": {
-      "num_messages": 300,
+      "num_messages": 3000,
       "min_message_size": 1,
       "max_message_size": 64,
       "max_packet_size": 16,

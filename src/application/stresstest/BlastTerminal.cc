@@ -253,16 +253,11 @@ void BlastTerminal::sendNextMessage() {
     Packet* packet = new Packet(p, packetLength, message);
     message->setPacket(p, packet);
 
-    // pick a random starting VC
-    u32 numVcs = gSim->getNetwork()->numVcs();
-    u32 vc = gSim->rnd.nextU64(0, numVcs - 1);
-
     // create flits
     for (u32 f = 0; f < packetLength; f++) {
       bool headFlit = f == 0;
       bool tailFlit = f == (packetLength - 1);
       Flit* flit = new Flit(f, headFlit, tailFlit, packet);
-      flit->setVc(vc);
       packet->setFlit(f, flit);
     }
     flitsLeft -= packetLength;

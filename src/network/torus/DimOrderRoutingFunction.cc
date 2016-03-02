@@ -15,8 +15,6 @@
  */
 #include "network/torus/DimOrderRoutingFunction.h"
 
-#include <strop/strop.h>
-
 #include <cassert>
 
 #include "types/Message.h"
@@ -24,38 +22,49 @@
 
 namespace Torus {
 
-DimOrderRoutingFunction::DimOrderRoutingFunction(
-    const std::string& _name, const Component* _parent, u64 _latency,
-    Router* _router, u32 _numVcs, std::vector<u32> _dimensionWidths,
-    u32 _concentration, u32 _inputPort)
-    : RoutingFunction(_name, _parent, _latency), router_(_router),
-      numVcs_(_numVcs), dimensionWidths_(_dimensionWidths),
-      concentration_(_concentration), inputPort_(_inputPort) {
-  // determine if this input port is directly connected to a terminal
-  isTerminalPort_ = inputPort_ < concentration_;
+// I use this function so that I can make the inputPortDim_ field a const
+namespace {
+u32 computeInputPortDim(const std::vector<u32>& _dimensionWidths,
+                        u32 _concentration, u32 _inputPort,
+                        bool _isTerminalPort) {
   // determine which network dimension this port is attached to
-  inputPortDim_ = U32_MAX;  // invalid
-  if (!isTerminalPort_) {
-    u32 port = inputPort_ - concentration_;
-    for (u32 dim = 0; dim < dimensionWidths_.size(); dim++) {
-      u32 dimWidth = dimensionWidths_.at(dim);
+  u32 inputPortDim = U32_MAX;  // invalid
+  if (!_isTerminalPort) {
+    u32 port = _inputPort - _concentration;
+    for (u32 dim = 0; dim < _dimensionWidths.size(); dim++) {
+      u32 dimWidth = _dimensionWidths.at(dim);
       u32 dimPorts = dimWidth == 2 ? 1 : 2;
       if (port <= dimPorts) {
-        inputPortDim_ = dim;
+        inputPortDim = dim;
         break;
       } else {
         port -= dimPorts;
       }
     }
-    assert(inputPortDim_ != U32_MAX);
+    assert(inputPortDim != U32_MAX);
   }
+  return inputPortDim;
 }
+}  // namespace
+
+DimOrderRoutingFunction::DimOrderRoutingFunction(
+    const std::string& _name, const Component* _parent, Router* _router,
+    u64 _latency, std::vector<u32> _dimensionWidths,
+    u32 _concentration, u32 _inputPort)
+    : RoutingFunction(_name, _parent, _router, _latency),
+      dimensionWidths_(_dimensionWidths),
+      concentration_(_concentration), inputPort_(_inputPort),
+      isTerminalPort_(inputPort_ < concentration_),
+      inputPortDim_(computeInputPortDim(dimensionWidths_, concentration_,
+                                        inputPort_, isTerminalPort_)) {}
 
 DimOrderRoutingFunction::~DimOrderRoutingFunction() {}
 
 void DimOrderRoutingFunction::processRequest(
     Flit* _flit, RoutingFunction::Response* _response) {
   u32 outputPort;
+
+  u32 numVcs = router_->numVcs();
 
   // ex: [x,y,z]
   const std::vector<u32>& routerAddress = router_->getAddress();
@@ -82,7 +91,7 @@ void DimOrderRoutingFunction::processRequest(
   if (dim == routerAddress.size()) {
     outputPort = destinationAddress->at(0);
     // use all VCs on egress
-    for (u32 i = 0; i < numVcs_; i++) {
+    for (u32 i = 0; i < numVcs; i++) {
       _response->add(outputPort, i);
     }
   } else {
@@ -132,7 +141,7 @@ void DimOrderRoutingFunction::processRequest(
     }
 
     // use VCs in the corresponding set
-    for (u32 vc = vcSet; vc < numVcs_; vc += 2) {
+    for (u32 vc = vcSet; vc < numVcs; vc += 2) {
       _response->add(outputPort, vc);
     }
   }

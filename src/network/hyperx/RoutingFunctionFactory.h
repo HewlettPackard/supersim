@@ -29,7 +29,7 @@ namespace HyperX {
 
 class RoutingFunctionFactory : public ::RoutingFunctionFactory {
  public:
-  RoutingFunctionFactory(u32 _numVcs, const std::vector<u32>& _dimensionWidths,
+  RoutingFunctionFactory(const std::vector<u32>& _dimensionWidths,
                          const std::vector<u32>& _dimensionWeights,
                          u32 _concentration);
   ~RoutingFunctionFactory();
@@ -38,10 +38,9 @@ class RoutingFunctionFactory : public ::RoutingFunctionFactory {
       u32 inputPort, Json::Value _settings);
 
  private:
-  u32 numVcs_;
   const std::vector<u32> dimensionWidths_;
   const std::vector<u32> dimensionWeights_;
-  u32 concentration_;
+  const u32 concentration_;
 };
 
 }  // namespace HyperX

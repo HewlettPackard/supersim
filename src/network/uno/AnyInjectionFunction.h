@@ -13,35 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_TORUS_ROUTINGFUNCTIONFACTORY_H_
-#define NETWORK_TORUS_ROUTINGFUNCTIONFACTORY_H_
+#ifndef NETWORK_UNO_ANYINJECTIONFUNCTION_H_
+#define NETWORK_UNO_ANYINJECTIONFUNCTION_H_
 
-#include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>
 #include <vector>
 
 #include "event/Component.h"
-#include "network/RoutingFunctionFactory.h"
-#include "router/Router.h"
+#include "network/InjectionFunction.h"
+#include "interface/Interface.h"
 
-namespace Torus {
+namespace Uno {
 
-class RoutingFunctionFactory : public ::RoutingFunctionFactory {
+class AnyInjectionFunction : public InjectionFunction {
  public:
-  RoutingFunctionFactory(std::vector<u32> _dimensionWidths,
-                         u32 _concentration);
-  ~RoutingFunctionFactory();
-  RoutingFunction* createRoutingFunction(
-      const std::string& _name, const Component* _parent, Router* _router,
-      u32 inputPort, Json::Value _settings);
+  AnyInjectionFunction(const std::string& _name, const Component* _parent,
+                       Interface* _interface, u64 _latency);
+  ~AnyInjectionFunction();
 
- private:
-  std::vector<u32> dimensionWidths_;
-  u32 concentration_;
+ protected:
+  void processRequest(
+      Message* _message, InjectionFunction::Response* _response) override;
 };
 
-}  // namespace Torus
+}  // namespace Uno
 
-#endif  // NETWORK_TORUS_ROUTINGFUNCTIONFACTORY_H_
+#endif  // NETWORK_UNO_ANYINJECTIONFUNCTION_H_

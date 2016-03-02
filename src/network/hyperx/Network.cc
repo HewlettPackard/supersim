@@ -21,6 +21,7 @@
 #include <cmath>
 
 #include "interface/InterfaceFactory.h"
+#include "network/hyperx/InjectionFunctionFactory.h"
 #include "network/hyperx/RoutingFunctionFactory.h"
 #include "router/RouterFactory.h"
 #include "util/DimensionIterator.h"
@@ -65,7 +66,7 @@ Network::Network(const std::string& _name, const Component* _parent,
 
   // create a routing function factory to give to the routers
   RoutingFunctionFactory* routingFunctionFactory = new RoutingFunctionFactory(
-      numVcs_, dimensionWidths_, dimensionWeights_, concentration_);
+      dimensionWidths_, dimensionWeights_, concentration_);
 
   // setup a router iterator for looping over the router dimensions
   DimensionIterator routerIterator(dimensionWidths_);
@@ -140,6 +141,10 @@ Network::Network(const std::string& _name, const Component* _parent,
   fullDimensionWidths.insert(fullDimensionWidths.begin() + 1,
                              dimensionWidths_.begin(), dimensionWidths_.end());
 
+  // create a injection function factory
+  InjectionFunctionFactory* injectionFunctionFactory =
+      new InjectionFunctionFactory();
+
   // create interfaces and link them with the routers
   interfaces_.setSize(fullDimensionWidths);
   u32 interfaceId = 0;
@@ -162,7 +167,8 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // create the interface
       Interface* interface = InterfaceFactory::createInterface(
-          interfaceName, this, interfaceId, _settings["interface"]);
+          interfaceName, this, interfaceId, injectionFunctionFactory,
+          _settings["interface"]);
       interfaces_.at(interfaceAddress) = interface;
       interfaceId++;
 
@@ -187,6 +193,8 @@ Network::Network(const std::string& _name, const Component* _parent,
       interface->setInputChannel(outChannel);
     }
   }
+
+  delete injectionFunctionFactory;
 }
 
 Network::~Network() {

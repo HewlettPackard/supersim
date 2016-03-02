@@ -100,7 +100,6 @@ void MemoryTerminal::sendMemoryResponse() {
   MemoryOp::eOp reqOp = memOpReq->op();
 
   Application* app = reinterpret_cast<Application*>(gSim->getApplication());
-  u32 numVcs = app->numVcs();
   u32 blockSize = app->blockSize();
   u32 bytesPerFlit = app->bytesPerFlit();
   u32 headerOverhead = app->headerOverhead();
@@ -143,12 +142,10 @@ void MemoryTerminal::sendMemoryResponse() {
     Packet* packet = new Packet(p, packetLength, response);
     response->setPacket(p, packet);
 
-    u32 vc = gSim->rnd.nextU64(0, numVcs - 1);
     for (u32 f = 0; f < packetLength; f++) {
       bool headFlit = f == 0;
       bool tailFlit = f == (packetLength - 1);
       Flit* flit = new Flit(f, headFlit, tailFlit, packet);
-      flit->setVc(vc);
       packet->setFlit(f, flit);
     }
     flitsLeft -= packetLength;

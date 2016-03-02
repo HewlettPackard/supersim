@@ -51,9 +51,11 @@ RoutingFunction::Client::~Client() {}
 
 /* RoutingFunction class */
 
-RoutingFunction::RoutingFunction(const std::string& _name,
-                                 const Component* _parent, u32 _latency)
-    : Component(_name, _parent), latency_(_latency) {
+RoutingFunction::RoutingFunction(
+    const std::string& _name, const Component* _parent, Router* _router,
+    u32 _latency)
+    : Component(_name, _parent), router_(_router), latency_(_latency) {
+  assert(router_ != nullptr);
   assert(latency_ > 0);
 }
 

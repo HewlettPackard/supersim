@@ -22,6 +22,7 @@
 #include <string>
 
 class Component;
+class Interface;
 class Router;
 class RoutingFunction;
 

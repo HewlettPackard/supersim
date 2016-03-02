@@ -30,8 +30,7 @@ namespace Uno {
 class DirectRoutingFunction : public RoutingFunction {
  public:
   DirectRoutingFunction(const std::string& _name, const Component* _parent,
-                        u64 _latency, Router* _router, u32 _numVcs,
-                        u32 _concentration, bool _allVcs);
+                        Router* _router, u64 _latency, u32 _concentration);
   ~DirectRoutingFunction();
 
  protected:
@@ -39,10 +38,8 @@ class DirectRoutingFunction : public RoutingFunction {
       Flit* _flit, RoutingFunction::Response* _response) override;
 
  private:
-  Router* router_;
-  u32 numVcs_;
-  u32 concentration_;
-  bool allVcs_;
+  const u32 numVcs_;
+  const u32 concentration_;
 };
 
 }  // namespace Uno

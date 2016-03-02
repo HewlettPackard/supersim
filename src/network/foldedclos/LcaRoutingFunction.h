@@ -29,8 +29,8 @@ namespace FoldedClos {
 class LcaRoutingFunction : public RoutingFunction {
  public:
   LcaRoutingFunction(const std::string& _name, const Component* _parent,
-                     u64 _latency, Router* _router, u32 _numVcs, u32 _numPorts,
-                     u32 _numLevels, u32 _level, u32 _inputPort, bool _allVcs);
+                     Router* _router, u64 _latency, u32 _numLevels, u32 _level,
+                     u32 _inputPort);
   ~LcaRoutingFunction();
 
  protected:
@@ -38,13 +38,11 @@ class LcaRoutingFunction : public RoutingFunction {
       Flit* _flit, RoutingFunction::Response* _response) override;
 
  private:
-  Router* router_;
-  u32 numVcs_;
-  u32 numPorts_;
-  u32 numLevels_;
-  u32 level_;
-  u32 inputPort_;
-  bool allVcs_;
+  const u32 numVcs_;
+  const u32 numPorts_;
+  const u32 numLevels_;
+  const u32 level_;
+  const u32 inputPort_;
 };
 
 }  // namespace FoldedClos

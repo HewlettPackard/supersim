@@ -22,11 +22,13 @@
 #include <string>
 
 #include "interface/Interface.h"
+#include "network/InjectionFunctionFactory.h"
 
 class InterfaceFactory {
  public:
   static Interface* createInterface(
       const std::string& _name, const Component* _parent, u32 _id,
+      InjectionFunctionFactory* _injectionFunctionFactory,
       Json::Value _settings);
 };
 

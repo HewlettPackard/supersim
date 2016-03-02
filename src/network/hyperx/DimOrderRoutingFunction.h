@@ -30,10 +30,10 @@ namespace HyperX {
 class DimOrderRoutingFunction : public RoutingFunction {
  public:
   DimOrderRoutingFunction(const std::string& _name, const Component* _parent,
-                          u64 _latency, Router* _router, u32 _numVcs,
+                          Router* _router, u64 _latency,
                           const std::vector<u32>& _dimensionWidths,
                           const std::vector<u32>& _dimensionWeights,
-                          u32 _concentration, bool _allVcs);
+                          u32 _concentration);
   ~DimOrderRoutingFunction();
 
  protected:
@@ -41,13 +41,10 @@ class DimOrderRoutingFunction : public RoutingFunction {
       Flit* _flit, RoutingFunction::Response* _response) override;
 
  private:
-  Router* router_;
-  u32 numVcs_;
-  u32 numPorts_;
+  const u32 numVcs_;
   const std::vector<u32> dimensionWidths_;
   const std::vector<u32> dimensionWeights_;
-  u32 concentration_;
-  bool allVcs_;
+  const u32 concentration_;
 };
 
 }  // namespace HyperX

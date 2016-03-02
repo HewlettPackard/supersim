@@ -23,6 +23,8 @@
 
 #include "interface/Interface.h"
 #include "network/Channel.h"
+#include "network/InjectionFunction.h"
+#include "network/InjectionFunctionFactory.h"
 #include "router/common/Crossbar.h"
 #include "router/common/CrossbarScheduler.h"
 #include "types/Control.h"
@@ -39,14 +41,17 @@ class Ejector;
 class PacketReassembler;
 class MessageReassembler;
 
-class Interface : public ::Interface {
+class Interface : public ::Interface, public InjectionFunction::Client {
  public:
   Interface(const std::string& _name, const Component* _parent, u32 _id,
+            InjectionFunctionFactory* _injectionFunctionFactory,
             Json::Value _settings);
   ~Interface();
   void setInputChannel(Channel* _channel) override;
   void setOutputChannel(Channel* _channel) override;
   void receiveMessage(Message* _message) override;
+  void injectionFunctionResponse(
+      Message* _message, InjectionFunction::Response* _response) override;
   void receiveFlit(u32 _port, Flit* _flit) override;
   void receiveControl(u32 _port, Control* _control) override;
   void sendFlit(Flit* _flit);
@@ -54,6 +59,9 @@ class Interface : public ::Interface {
  private:
   Channel* inputChannel_;
   Channel* outputChannel_;
+
+  InjectionFunction* injectionFunction_;
+  bool fixedMsgVc_;  // all pkts of a msg have same VC
 
   std::vector<InputQueue*> inputQueues_;
   Crossbar* crossbar_;

@@ -25,6 +25,8 @@
 #include "event/Component.h"
 #include "types/Flit.h"
 
+class Router;
+
 class RoutingFunction : public Component {
  public:
   /*
@@ -62,7 +64,7 @@ class RoutingFunction : public Component {
    *  must override the processRequest() function.
    */
   RoutingFunction(const std::string& _name, const Component* _parent,
-                  u32 _latency);
+                  Router* _router, u32 _latency);
   virtual ~RoutingFunction();
   u32 latency() const;
   void request(Client* _client, Flit* _flit, Response* _response);
@@ -70,6 +72,8 @@ class RoutingFunction : public Component {
 
  protected:
   virtual void processRequest(Flit* _flit, Response* _response) = 0;
+
+  Router* router_;
 
  private:
   class EventPackage {

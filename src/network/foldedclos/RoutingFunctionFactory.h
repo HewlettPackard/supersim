@@ -28,15 +28,13 @@ namespace FoldedClos {
 
 class RoutingFunctionFactory : public ::RoutingFunctionFactory {
  public:
-  RoutingFunctionFactory(u32 _numVcs, u32 _numPorts, u32 _numLevels, u32 level);
+  RoutingFunctionFactory(u32 _numLevels, u32 level);
   ~RoutingFunctionFactory();
   RoutingFunction* createRoutingFunction(
       const std::string& _name, const Component* _parent, Router* _router,
       u32 inputPort, Json::Value _settings);
 
  private:
-  u32 numVcs_;
-  u32 numPorts_;
   u32 numLevels_;
   u32 level_;
 };

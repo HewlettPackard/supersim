@@ -22,16 +22,24 @@
 #include "interface/standard/MessageReassembler.h"
 #include "interface/standard/Ejector.h"
 #include "interface/standard/PacketReassembler.h"
+#include "network/InjectionFunction.h"
 #include "types/MessageOwner.h"
 #include "types/Credit.h"
 
 namespace Standard {
 
-Interface::Interface(const std::string& _name, const Component* _parent,
-                     u32 _id, Json::Value _settings)
+Interface::Interface(
+    const std::string& _name, const Component* _parent, u32 _id,
+    InjectionFunctionFactory* _injectionFunctionFactory, Json::Value _settings)
     : ::Interface(_name, _parent, _id, _settings) {
+  injectionFunction_ = _injectionFunctionFactory->createInjectionFunction(
+      "InjectionFunction", this, this, _settings["injection"]);
+
   u32 initCredits = _settings["init_credits"].asUInt();
   assert(initCredits > 0);
+
+  assert(_settings.isMember("fixed_msg_vc"));
+  fixedMsgVc_ = _settings["fixed_msg_vc"].asBool();
 
   inputQueues_.resize(numVcs_);
   crossbar_ = new Crossbar("Crossbar", this, numVcs_, 1, _settings["crossbar"]);
@@ -67,6 +75,7 @@ Interface::Interface(const std::string& _name, const Component* _parent,
 }
 
 Interface::~Interface() {
+  delete injectionFunction_;
   delete ejector_;
   delete crossbarScheduler_;
   delete crossbar_;
@@ -92,18 +101,41 @@ void Interface::receiveMessage(Message* _message) {
   assert(_message != nullptr);
   u64 now = gSim->time();
 
-  // push all flits into the corresponding input queue
+  // mark all flit send times
   for (u32 p = 0; p < _message->numPackets(); p++) {
     Packet* packet = _message->getPacket(p);
-    u32 pktVc = packet->getFlit(0)->getVc();
     for (u32 f = 0; f < packet->numFlits(); f++) {
       Flit* flit = packet->getFlit(f);
       flit->setSendTime(now);
-      u32 vc = flit->getVc();
-      assert(vc == pktVc);
-      inputQueues_.at(vc)->receiveFlit(flit);
     }
   }
+
+  // issue an injection function request
+  InjectionFunction::Response* resp = new InjectionFunction::Response();
+  injectionFunction_->request(this, _message, resp);
+}
+
+void Interface::injectionFunctionResponse(
+    Message* _message, InjectionFunction::Response* _response) {
+  // push all flits into the corresponding input queue
+  u32 pktVc = U32_MAX;
+  for (u32 p = 0; p < _message->numPackets(); p++) {
+    Packet* packet = _message->getPacket(p);
+
+    // get the packet's VC
+    if (!fixedMsgVc_ || pktVc == U32_MAX) {
+      _response->get(gSim->rnd.nextU64(0, _response->size()-1), &pktVc);
+    }
+
+    // apply VC and inject
+    for (u32 f = 0; f < packet->numFlits(); f++) {
+      Flit* flit = packet->getFlit(f);
+      flit->setVc(pktVc);
+      inputQueues_.at(pktVc)->receiveFlit(flit);
+    }
+  }
+
+  delete _response;
 }
 
 void Interface::receiveFlit(u32 _port, Flit* _flit) {

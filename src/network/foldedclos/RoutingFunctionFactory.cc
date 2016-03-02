@@ -24,9 +24,8 @@
 namespace FoldedClos {
 
 RoutingFunctionFactory::RoutingFunctionFactory(
-    u32 _numVcs, u32 _numPorts, u32 _numLevels, u32 _level)
-    : ::RoutingFunctionFactory(), numVcs_(_numVcs), numPorts_(_numPorts),
-      numLevels_(_numLevels), level_(_level) {}
+    u32 _numLevels, u32 _level)
+    : ::RoutingFunctionFactory(), numLevels_(_numLevels), level_(_level) {}
 
 RoutingFunctionFactory::~RoutingFunctionFactory() {}
 
@@ -36,16 +35,13 @@ RoutingFunction* RoutingFunctionFactory::createRoutingFunction(
 
   std::string algorithm = _settings["algorithm"].asString();
   u32 latency = _settings["latency"].asUInt();
-  bool allVcs = _settings["all_vcs"].asBool();
 
   if (algorithm == "most_common_ancestor") {
-    return new McaRoutingFunction(_name, _parent, latency, _router,
-                                  numVcs_, numPorts_, numLevels_, level_,
-                                  _inputPort, allVcs);
+    return new McaRoutingFunction(_name, _parent, _router, latency,
+                                  numLevels_, level_, _inputPort);
   } else if (algorithm == "least_common_ancestor") {
-    return new LcaRoutingFunction(_name, _parent, latency, _router,
-                                  numVcs_, numPorts_, numLevels_, level_,
-                                  _inputPort, allVcs);
+    return new LcaRoutingFunction(_name, _parent, _router, latency,
+                                  numLevels_, level_, _inputPort);
   } else {
     fprintf(stderr, "Unknown routing algorithm: '%s'\n", algorithm.c_str());
     assert(false);
