@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef TYPES_CONTROLRECEIVER_H_
-#define TYPES_CONTROLRECEIVER_H_
+#ifndef TYPES_CREDITRECEIVER_H_
+#define TYPES_CREDITRECEIVER_H_
 
 #include <prim/prim.h>
 
-#include "types/Control.h"
+#include "types/Credit.h"
 
-class ControlReceiver {
+class CreditReceiver {
  public:
-  ControlReceiver();
-  virtual ~ControlReceiver();
-  virtual void receiveControl(u32 _port, Control* _control) = 0;
+  CreditReceiver();
+  virtual ~CreditReceiver();
+  virtual void receiveCredit(u32 _port, Credit* _credit) = 0;
 };
 
-#endif  // TYPES_CONTROLRECEIVER_H_
+#endif  // TYPES_CREDITRECEIVER_H_

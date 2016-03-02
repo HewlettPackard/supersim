@@ -30,7 +30,6 @@
 #include "router/common/CrossbarScheduler.h"
 #include "router/common/VcScheduler.h"
 #include "router/Router.h"
-#include "types/Control.h"
 #include "types/Credit.h"
 #include "types/Flit.h"
 
@@ -52,7 +51,7 @@ class Router : public ::Router {
   void setOutputChannel(u32 _index, Channel* _channel) override;
 
   void receiveFlit(u32 _port, Flit* _flit) override;
-  void receiveControl(u32 _port, Control* _control) override;
+  void receiveCredit(u32 _port, Credit* _credit) override;
 
   void sendCredit(u32 _port, u32 _vc);  // called by InputQueue
   void sendFlit(u32 _port, Flit* _flit);  // called by Ejector

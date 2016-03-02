@@ -13,13 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef TYPES_CONTROL_H_
-#define TYPES_CONTROL_H_
+#include "types/CreditReceiver.h"
 
-class Control {
- public:
-  Control();
-  virtual ~Control();
-};
+CreditReceiver::CreditReceiver() {}
 
-#endif  // TYPES_CONTROL_H_
+CreditReceiver::~CreditReceiver() {}

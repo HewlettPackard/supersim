@@ -24,7 +24,6 @@
 #include "interface/standard/PacketReassembler.h"
 #include "network/InjectionFunction.h"
 #include "types/MessageOwner.h"
-#include "types/Credit.h"
 
 namespace Standard {
 
@@ -145,16 +144,12 @@ void Interface::receiveFlit(u32 _port, Flit* _flit) {
   assert(_flit != nullptr);
 
   // send credit
-  Control* ctrl = inputChannel_->getNextControl();
-  Credit* cred;
-  if (ctrl == nullptr) {
-    cred = new Credit(numVcs_);
-    inputChannel_->setNextControl(cred);
-  } else {
-    cred = dynamic_cast<Credit*>(ctrl);
-    assert(cred);
+  Credit* credit = inputChannel_->getNextCredit();
+  if (credit == nullptr) {
+    credit = new Credit(numVcs_);
+    inputChannel_->setNextCredit(credit);
   }
-  cred->putNum(_flit->getVc());
+  credit->putNum(_flit->getVc());
 
   // check destination is correct
   u32 dest = _flit->getPacket()->getMessage()->getDestinationId();
@@ -175,16 +170,14 @@ void Interface::receiveFlit(u32 _port, Flit* _flit) {
   }
 }
 
-void Interface::receiveControl(u32 _port, Control* _control) {
+void Interface::receiveCredit(u32 _port, Credit* _credit) {
   assert(_port == 0);
-  Credit* cred = dynamic_cast<Credit*>(_control);
-  assert(cred);
-  while (cred->more()) {
-    u32 vc = cred->getNum();
+  while (_credit->more()) {
+    u32 vc = _credit->getNum();
     dbgprintf("port = %u, vc = %u", _port, vc);
     crossbarScheduler_->incrementCreditCount(vc);
   }
-  delete _control;
+  delete _credit;
 }
 
 void Interface::sendFlit(Flit* _flit) {

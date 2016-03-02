@@ -27,8 +27,8 @@
 #include "network/InjectionFunctionFactory.h"
 #include "router/common/Crossbar.h"
 #include "router/common/CrossbarScheduler.h"
-#include "types/Control.h"
-#include "types/ControlReceiver.h"
+#include "types/Credit.h"
+#include "types/CreditReceiver.h"
 #include "types/Flit.h"
 #include "types/FlitReceiver.h"
 #include "types/Message.h"
@@ -53,7 +53,7 @@ class Interface : public ::Interface, public InjectionFunction::Client {
   void injectionFunctionResponse(
       Message* _message, InjectionFunction::Response* _response) override;
   void receiveFlit(u32 _port, Flit* _flit) override;
-  void receiveControl(u32 _port, Control* _control) override;
+  void receiveCredit(u32 _port, Credit* _credit) override;
   void sendFlit(Flit* _flit);
 
  private:

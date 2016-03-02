@@ -18,9 +18,7 @@
 
 #include <prim/prim.h>
 
-#include "types/Control.h"
-
-class Credit : public Control {
+class Credit {
  public:
   explicit Credit(u32 _nums);
   ~Credit();

@@ -18,10 +18,9 @@
 #include <cassert>
 
 #include "network/RoutingFunctionFactory.h"
+#include "router/inputoutputqueued/Ejector.h"
 #include "router/inputoutputqueued/InputQueue.h"
 #include "router/inputoutputqueued/OutputQueue.h"
-#include "router/inputoutputqueued/Ejector.h"
-#include "types/Credit.h"
 
 namespace InputOutputQueued {
 
@@ -173,30 +172,24 @@ void Router::receiveFlit(u32 _port, Flit* _flit) {
   iq->receiveFlit(0, _flit);
 }
 
-void Router::receiveControl(u32 _port, Control* _control) {
-  Credit* cred = dynamic_cast<Credit*>(_control);
-  assert(cred);
-  while (cred->more()) {
-    u32 vc = cred->getNum();
+void Router::receiveCredit(u32 _port, Credit* _credit) {
+  while (_credit->more()) {
+    u32 vc = _credit->getNum();
     outputCrossbarSchedulers_.at(_port)->incrementCreditCount(vc);
   }
-  delete _control;
+  delete _credit;
 }
 
 void Router::sendCredit(u32 _port, u32 _vc) {
   // ensure there is an outgoing credit for the next time slot
-  Control* ctrl = inputChannels_.at(_port)->getNextControl();
-  Credit* cred;
-  if (ctrl == nullptr) {
-    cred = new Credit(numVcs_);
-    inputChannels_.at(_port)->setNextControl(cred);
-  } else {
-    cred = dynamic_cast<Credit*>(ctrl);
-    assert(cred);
+  Credit* credit = inputChannels_.at(_port)->getNextCredit();
+  if (credit == nullptr) {
+    credit = new Credit(numVcs_);
+    inputChannels_.at(_port)->setNextCredit(credit);
   }
 
   // mark the credit with the specified VC
-  cred->putNum(_vc);
+  credit->putNum(_vc);
 }
 
 void Router::sendFlit(u32 _port, Flit* _flit) {
