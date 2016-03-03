@@ -100,9 +100,9 @@ Network::Network(const std::string& _name, const Component* _parent,
         sourcePort = portBase;
         destinationPort = portBase;
         std::string channelName = "Channel_" +
-                                  strop::vecString<u32>(routerAddress) +
-                                  "-to-" +
-                                  strop::vecString<u32>(destinationAddress);
+            strop::vecString<u32>(routerAddress) +
+            "-to-" +
+            strop::vecString<u32>(destinationAddress);
 
         // create the channel
         Channel* channel = new Channel(channelName, this,
@@ -129,9 +129,9 @@ Network::Network(const std::string& _name, const Component* _parent,
 
         // create the channel
         std::string channelName = "Channel_"  +
-                                  strop::vecString<u32>(routerAddress) +
-                                  "-to-" +
-                                  strop::vecString<u32>(destinationAddress);
+            strop::vecString<u32>(routerAddress) +
+            "-to-" +
+            strop::vecString<u32>(destinationAddress);
         Channel* channel = new Channel(channelName, this,
                                        _settings["internal_channel"]);
         internalChannels_.push_back(channel);
@@ -147,13 +147,13 @@ Network::Network(const std::string& _name, const Component* _parent,
                                                          channel);
         // determine the destination router (going down)
         destinationAddress.at(dim) = (sourceAddress.at(dim) + dimWidth - 1) %
-                                     dimWidth;
+            dimWidth;
         sourcePort = portBase + 1;
         destinationPort = portBase;
         channelName = "Channel_" +
-                      strop::vecString<u32>(routerAddress) +
-                      "-to-" +
-                      strop::vecString<u32>(destinationAddress);
+            strop::vecString<u32>(routerAddress) +
+            "-to-" +
+            strop::vecString<u32>(destinationAddress);
         channel = new Channel(channelName, this, _settings["internal_channel"]);
         internalChannels_.push_back(channel);
 
@@ -218,7 +218,7 @@ Network::Network(const std::string& _name, const Component* _parent,
       Channel* inChannel = new Channel(inChannelName, this,
                                        _settings["external_channel"]);
       Channel* outChannel = new Channel(outChannelName, this,
-                                       _settings["external_channel"]);
+                                        _settings["external_channel"]);
       externalChannels_.push_back(inChannel);
       externalChannels_.push_back(outChannel);
 

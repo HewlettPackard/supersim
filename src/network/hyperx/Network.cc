@@ -104,7 +104,7 @@ Network::Network(const std::string& _name, const Component* _parent,
         // determine the destination router
         std::vector<u32> destinationAddress(sourceAddress);
         destinationAddress.at(dim) = (sourceAddress.at(dim) + offset) %
-                                      dimWidth;
+            dimWidth;
 
         for (u32 weight = 0; weight < dimWeight; weight++) {
           // create the channel
@@ -183,7 +183,7 @@ Network::Network(const std::string& _name, const Component* _parent,
       Channel* inChannel = new Channel(inChannelName, this,
                                        _settings["external_channel"]);
       Channel* outChannel = new Channel(outChannelName, this,
-                                       _settings["external_channel"]);
+                                        _settings["external_channel"]);
       externalChannels_.push_back(inChannel);
       externalChannels_.push_back(outChannel);
 

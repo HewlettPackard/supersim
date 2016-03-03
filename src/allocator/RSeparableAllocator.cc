@@ -52,13 +52,13 @@ RSeparableAllocator::~RSeparableAllocator() {
 }
 
 void RSeparableAllocator::setRequest(u32 _client, u32 _resource,
-                                      bool* _request) {
+                                     bool* _request) {
   requests_[index(_client, _resource)] = _request;
   resourceArbiters_[_resource]->setRequest(_client, _request);
 }
 
 void RSeparableAllocator::setMetadata(u32 _client, u32 _resource,
-                                       u64* _metadata) {
+                                      u64* _metadata) {
   metadatas_[index(_client, _resource)] = _metadata;
   resourceArbiters_[_resource]->setMetadata(_client, _metadata);
 }

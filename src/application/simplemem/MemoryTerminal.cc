@@ -112,7 +112,7 @@ void MemoryTerminal::sendMemoryResponse() {
 
   // create the response
   MemoryOp::eOp respOp = reqOp == MemoryOp::eOp::kReadReq ?
-                         MemoryOp::eOp::kReadResp : MemoryOp::eOp::kWriteResp;
+      MemoryOp::eOp::kReadResp : MemoryOp::eOp::kWriteResp;
   MemoryOp* memOpResp = new MemoryOp(respOp, address,
                                      (reqOp == MemoryOp::eOp::kReadReq ?
                                       blockSize : 0));

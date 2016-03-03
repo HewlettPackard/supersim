@@ -116,15 +116,8 @@ void Simulator::simulate() {
 
           f64 percentComplete = app_->percentComplete();
           f64 eventsPerSecond = intervalEvents / elapsedRealTime;
-          /*f64 eventsPerUnit = intervalEvents /
-            static_cast<f64>(elapsedSimTime);*/
           f64 unitsPerSecond = elapsedSimTime /
-                               static_cast<f64>(elapsedRealTime);
-
-          /*std::stringstream ss;
-          if (days > 0) {
-            ss << days
-            }*/
+              static_cast<f64>(elapsedRealTime);
 
           printf("%lu:%02lu:%02lu:%02lu [%lu%%] "
                  "%lu events : %lu units : %.2f events/sec : %.2f units/sec\n",

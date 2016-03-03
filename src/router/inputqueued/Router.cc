@@ -57,7 +57,7 @@ Router::Router(
 
       // create the name suffix
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
-                               std::to_string(vc);
+          std::to_string(vc);
 
       // routing algorithm
       std::string rfname = "RoutingAlgorithm" + nameSuffix;

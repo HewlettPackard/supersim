@@ -27,8 +27,8 @@ CrossbarScheduler::Client::~Client() {}
 CrossbarScheduler::CrossbarScheduler(
     const std::string& _name, const Component* _parent, u32 _numClients,
     u32 _numVcs, u32 _numPorts, Json::Value _settings)
-    : Component(_name, _parent), numClients_(_numClients), numVcs_(_numVcs),
-      numPorts_(_numPorts) {
+    : Component(_name, _parent), numClients_(_numClients),
+      numVcs_(_numVcs), numPorts_(_numPorts) {
   assert(numClients_ > 0 && numClients_ != U32_MAX);
   assert(numVcs_ > 0 && numVcs_ != U32_MAX);
   assert(numPorts_ > 0 && numPorts_ != U32_MAX);

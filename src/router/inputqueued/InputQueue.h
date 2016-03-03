@@ -86,12 +86,8 @@ class InputQueue : public Component, public FlitReceiver,
   u64 lastReceivedTime_;
 
   // state machine to represent a generic pipeline stage
-  enum class ePipelineFsm {
-    kEmpty,
-    kWaitingToRequest,
-    kWaitingForResponse,
-    kReadyToAdvance
-  };
+  enum class ePipelineFsm { kEmpty, kWaitingToRequest, kWaitingForResponse,
+      kReadyToAdvance };
 
   // remembers if an event is set to process the pipeline
   u64 eventTime_;

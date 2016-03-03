@@ -22,8 +22,8 @@
 Crossbar::Crossbar(const std::string& _name, const Component* _parent,
                    u32 _numInputs, u32 _numOutputs,
                    Json::Value _settings)
-    : Component(_name, _parent), numInputs_(_numInputs),
-      numOutputs_(_numOutputs) {
+    : Component(_name, _parent),
+      numInputs_(_numInputs), numOutputs_(_numOutputs) {
   latency_ = _settings["latency"].asUInt();  // latency is in cycles
   assert(latency_ > 0);
 

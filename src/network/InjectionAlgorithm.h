@@ -56,7 +56,7 @@ class InjectionAlgorithm : public Component {
     Client();
     virtual ~Client();
     virtual void injectionAlgorithmResponse(Message* _message,
-                                           Response* _response) = 0;
+                                            Response* _response) = 0;
   };
 
   /*
@@ -64,7 +64,7 @@ class InjectionAlgorithm : public Component {
    *  must override the processRequest() function.
    */
   InjectionAlgorithm(const std::string& _name, const Component* _parent,
-                    Interface* _interface, u32 _latency);
+                     Interface* _interface, u32 _latency);
   virtual ~InjectionAlgorithm();
   u32 latency() const;
   void request(Client* _client, Message* _message, Response* _response);

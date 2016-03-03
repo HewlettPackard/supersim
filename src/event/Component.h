@@ -58,13 +58,13 @@ class Component {
   static std::unordered_set<std::string> toBeDebugged_;
 };
 
-#define dbgprintf(...) (                                                \
-    (this->debug_) ?                                                    \
-    (this->debugPrint(__func__,                                         \
-                      __LINE__,                                         \
-                      this->fullName().c_str(),                         \
-                      gSim->time(),                                     \
-                      gSim->epsilon(),                                  \
+#define dbgprintf(...) (                        \
+    (this->debug_) ?                            \
+    (this->debugPrint(__func__,                 \
+                      __LINE__,                 \
+                      this->fullName().c_str(), \
+                      gSim->time(),             \
+                      gSim->epsilon(),          \
                       __VA_ARGS__)) : (0))
 
 #endif  // EVENT_COMPONENT_H_

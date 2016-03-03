@@ -62,7 +62,7 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // router name
       std::string rname = "Router_" + std::to_string(row) + "-" +
-                          std::to_string(col) + "_[";
+          std::to_string(col) + "_[";
       for (u32 i = 0; i < routerAddress.size(); i++) {
         if (routerAddress.at(i) == U32_MAX) {
           rname +=  "*";
@@ -122,17 +122,17 @@ Network::Network(const std::string& _name, const Component* _parent,
         u32 thatOffset = c - thatBase;
         assert(thatOffset == (c % thatGroupSize));
 
-        // u32 thisRow    = r;
-        // u32 thisColumn = c;
+        u32 thisRow    = r;
+        u32 thisColumn = c;
         u32 thisPort = halfRadix_ + p;
 
         u32 thatRow = r + 1;
         u32 thatColumn = thatBase + thisOffset + (p * thisGroupSize);
         u32 thatPort = thisGroup % halfRadix_;
 
-        /*printf("[R,C,P]: [%u,%u,%u] -> [%u,%u,%u]\n",
-               thisRow, thisColumn, thisPort,
-               thatRow, thatColumn, thatPort);*/
+        dbgprintf("[R,C,P]: [%u,%u,%u] -> [%u,%u,%u]\n",
+                  thisRow, thisColumn, thisPort,
+                  thatRow, thatColumn, thatPort);
 
         Router* thisRouter = routers_.at(r).at(c);
         Router* thatRouter = routers_.at(thatRow).at(thatColumn);

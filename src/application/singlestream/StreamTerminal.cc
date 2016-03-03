@@ -133,7 +133,7 @@ void StreamTerminal::sendNextMessage() {
   u32 flitsLeft = messageLength;
   for (u32 p = 0; p < numPackets; p++) {
     u32 packetLength = flitsLeft > maxPacketSize_ ?
-                       maxPacketSize_ : flitsLeft;
+        maxPacketSize_ : flitsLeft;
 
     Packet* packet = new Packet(p, packetLength, message);
     message->setPacket(p, packet);

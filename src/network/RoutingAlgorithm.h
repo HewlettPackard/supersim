@@ -64,7 +64,7 @@ class RoutingAlgorithm : public Component {
    *  must override the processRequest() function.
    */
   RoutingAlgorithm(const std::string& _name, const Component* _parent,
-                  Router* _router, u32 _latency);
+                   Router* _router, u32 _latency);
   virtual ~RoutingAlgorithm();
   u32 latency() const;
   void request(Client* _client, Flit* _flit, Response* _response);

@@ -117,8 +117,7 @@ void ProcessorTerminal::startNextMemoryAccess() {
   u32 address = gSim->rnd.nextU64(0, totalMemory - 1);
   address &= ~(blockSize - 1);  // align to blockSize
   MemoryOp::eOp op = gSim->rnd.nextBool() ?
-                     MemoryOp::eOp::kReadReq :
-                     MemoryOp::eOp::kWriteReq;
+      MemoryOp::eOp::kReadReq : MemoryOp::eOp::kWriteReq;
   MemoryOp* memOp = new MemoryOp(op, address, blockSize);
   if (op == MemoryOp::eOp::kWriteReq) {
     u8* block = memOp->block();

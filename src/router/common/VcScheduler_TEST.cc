@@ -63,25 +63,11 @@ class VcSchedulerTestClient : public VcScheduler::Client, public Component {
 
     if (requests_.size() == 0) {
       // new request
-      u32 cnt = 0;
-      for (u32 v = 0; v < numVcs_; v++) {
-        /*
-        if (gSim->rnd.nextF64() < 0.75) {
-          u64 m = gSim->rnd.nextU64(1000, 2000);
-          assert(requests_.count(v) == 0);
-          requests_.insert({v, m});
-          vcSch_->request(id_, v, m);
-          cnt++;
-        }
-        */
-      }
-      if (cnt == 0) {
-        u32 v = gSim->rnd.nextU64(0, numVcs_ - 1);
-        u64 m = gSim->rnd.nextU64(1000, 2000);
-        assert(requests_.count(v) == 0);
-        requests_.insert({v, m});
-        vcSch_->request(id_, v, m);
-      }
+      u32 v = gSim->rnd.nextU64(0, numVcs_ - 1);
+      u64 m = gSim->rnd.nextU64(1000, 2000);
+      assert(requests_.count(v) == 0);
+      requests_.insert({v, m});
+      vcSch_->request(id_, v, m);
     } else {
       // re-request of original requests
       for (auto it = requests_.cbegin(); it != requests_.cend(); ++it) {

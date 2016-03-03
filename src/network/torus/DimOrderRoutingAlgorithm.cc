@@ -105,12 +105,12 @@ void DimOrderRoutingAlgorithm::processRequest(
     } else {
       // in torus topology, we can get to a destination in two directions,
       //  this algorithm takes the shortest path, randomized tie breaker
-      u32 rightDelta = (dst > src) ?
-                       (dst - src) :
-                       (dst + dimensionWidths_.at(dim) - src);
-      u32 leftDelta = (src > dst) ?
-                      (src - dst) :
-                      (src + dimensionWidths_.at(dim) - dst);
+      u32 rightDelta = ((dst > src) ?
+                        (dst - src) :
+                        (dst + dimensionWidths_.at(dim) - src));
+      u32 leftDelta = ((src > dst) ?
+                       (src - dst) :
+                       (src + dimensionWidths_.at(dim) - dst));
       if (rightDelta == leftDelta) {
         outputPort = portBase + gSim->rnd.nextU64(0, 1);
       } else if (rightDelta < leftDelta) {

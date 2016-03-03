@@ -66,7 +66,7 @@ u32 RoutingAlgorithm::latency() const {
 }
 
 void RoutingAlgorithm::request(Client* _client, Flit* _flit,
-                              Response* _response) {
+                               Response* _response) {
   u64 respTime = gSim->futureCycle(latency_);
   EventPackage* evt = new EventPackage();
   evt->client = _client;
