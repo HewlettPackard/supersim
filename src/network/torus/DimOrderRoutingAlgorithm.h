@@ -41,6 +41,7 @@ class DimOrderRoutingAlgorithm : public RoutingAlgorithm {
 
  private:
   const std::vector<u32> dimensionWidths_;
+  const u32 numVcs_;
   const u32 concentration_;
   const u32 inputPort_;
   const bool isTerminalPort_;

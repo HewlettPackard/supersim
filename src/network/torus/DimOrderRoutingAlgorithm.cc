@@ -52,19 +52,19 @@ DimOrderRoutingAlgorithm::DimOrderRoutingAlgorithm(
     u64 _latency, std::vector<u32> _dimensionWidths,
     u32 _concentration, u32 _inputPort)
     : RoutingAlgorithm(_name, _parent, _router, _latency),
-      dimensionWidths_(_dimensionWidths),
+      dimensionWidths_(_dimensionWidths), numVcs_(router_->numVcs()),
       concentration_(_concentration), inputPort_(_inputPort),
       isTerminalPort_(inputPort_ < concentration_),
       inputPortDim_(computeInputPortDim(dimensionWidths_, concentration_,
-                                        inputPort_, isTerminalPort_)) {}
+                                        inputPort_, isTerminalPort_)) {
+  assert(numVcs_ >= 2);
+}
 
 DimOrderRoutingAlgorithm::~DimOrderRoutingAlgorithm() {}
 
 void DimOrderRoutingAlgorithm::processRequest(
     Flit* _flit, RoutingAlgorithm::Response* _response) {
   u32 outputPort;
-
-  u32 numVcs = router_->numVcs();
 
   // ex: [x,y,z]
   const std::vector<u32>& routerAddress = router_->getAddress();
@@ -91,7 +91,7 @@ void DimOrderRoutingAlgorithm::processRequest(
   if (dim == routerAddress.size()) {
     outputPort = destinationAddress->at(0);
     // use all VCs on egress
-    for (u32 i = 0; i < numVcs; i++) {
+    for (u32 i = 0; i < numVcs_; i++) {
       _response->add(outputPort, i);
     }
   } else {
@@ -141,7 +141,7 @@ void DimOrderRoutingAlgorithm::processRequest(
     }
 
     // use VCs in the corresponding set
-    for (u32 vc = vcSet; vc < numVcs; vc += 2) {
+    for (u32 vc = vcSet; vc < numVcs_; vc += 2) {
       _response->add(outputPort, vc);
     }
   }
