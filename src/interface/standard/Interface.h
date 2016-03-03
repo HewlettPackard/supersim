@@ -23,8 +23,8 @@
 
 #include "interface/Interface.h"
 #include "network/Channel.h"
-#include "network/InjectionFunction.h"
-#include "network/InjectionFunctionFactory.h"
+#include "network/InjectionAlgorithm.h"
+#include "network/InjectionAlgorithmFactory.h"
 #include "router/common/Crossbar.h"
 #include "router/common/CrossbarScheduler.h"
 #include "types/Credit.h"
@@ -41,17 +41,17 @@ class Ejector;
 class PacketReassembler;
 class MessageReassembler;
 
-class Interface : public ::Interface, public InjectionFunction::Client {
+class Interface : public ::Interface, public InjectionAlgorithm::Client {
  public:
   Interface(const std::string& _name, const Component* _parent, u32 _id,
-            InjectionFunctionFactory* _injectionFunctionFactory,
+            InjectionAlgorithmFactory* _injectionAlgorithmFactory,
             Json::Value _settings);
   ~Interface();
   void setInputChannel(Channel* _channel) override;
   void setOutputChannel(Channel* _channel) override;
   void receiveMessage(Message* _message) override;
-  void injectionFunctionResponse(
-      Message* _message, InjectionFunction::Response* _response) override;
+  void injectionAlgorithmResponse(
+      Message* _message, InjectionAlgorithm::Response* _response) override;
 
   void sendFlit(u32 _port, Flit* _flit) override;
   void receiveFlit(u32 _port, Flit* _flit) override;
@@ -62,7 +62,7 @@ class Interface : public ::Interface, public InjectionFunction::Client {
   Channel* inputChannel_;
   Channel* outputChannel_;
 
-  InjectionFunction* injectionFunction_;
+  InjectionAlgorithm* injectionAlgorithm_;
   bool fixedMsgVc_;  // all pkts of a msg have same VC
 
   std::vector<InputQueue*> inputQueues_;

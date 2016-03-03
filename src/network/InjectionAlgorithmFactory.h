@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef ROUTER_ROUTERFACTORY_H_
-#define ROUTER_ROUTERFACTORY_H_
+#ifndef NETWORK_INJECTIONALGORITHMFACTORY_H_
+#define NETWORK_INJECTIONALGORITHMFACTORY_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>
 
-#include "event/Component.h"
-#include "network/RoutingAlgorithmFactory.h"
-#include "router/Router.h"
+class Component;
+class Interface;
+class Router;
+class InjectionAlgorithm;
 
-class RouterFactory {
+class InjectionAlgorithmFactory {
  public:
-  static Router* createRouter(
-      const std::string& _name, const Component* _parent,
-      RoutingAlgorithmFactory* _routingAlgorithmFactory,
-      Json::Value _settings);
+  InjectionAlgorithmFactory();
+  virtual ~InjectionAlgorithmFactory();
+  virtual InjectionAlgorithm* createInjectionAlgorithm(
+      const std::string& _name, const Component* _parent, Interface* _interface,
+      Json::Value _settings) = 0;
 };
 
-#endif  // ROUTER_ROUTERFACTORY_H_
+#endif  // NETWORK_INJECTIONALGORITHMFACTORY_H_

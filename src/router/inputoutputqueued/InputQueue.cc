@@ -30,11 +30,11 @@ namespace InputOutputQueued {
 InputQueue::InputQueue(
     const std::string& _name, const Component* _parent, Router* _router,
     u32 _depth, u32 _port, u32 _numVcs, u32 _vc,
-    RoutingFunction* _routingFunction, VcScheduler* _vcScheduler,
+    RoutingAlgorithm* _routingAlgorithm, VcScheduler* _vcScheduler,
     u32 _vcSchedulerIndex, CrossbarScheduler* _crossbarScheduler,
     u32 _crossbarSchedulerIndex, Crossbar* _crossbar, u32 _crossbarIndex)
     : Component(_name, _parent), depth_(_depth), port_(_port), numVcs_(_numVcs),
-      vc_(_vc), router_(_router), routingFunction_(_routingFunction),
+      vc_(_vc), router_(_router), routingAlgorithm_(_routingAlgorithm),
       vcScheduler_(_vcScheduler),
       vcSchedulerIndex_(_vcSchedulerIndex),
       crossbarScheduler_(_crossbarScheduler),
@@ -98,7 +98,8 @@ void InputQueue::processEvent(void* _event, s32 _type) {
   }
 }
 
-void InputQueue::routingFunctionResponse(RoutingFunction::Response* _response) {
+void InputQueue::routingAlgorithmResponse(
+    RoutingAlgorithm::Response* _response) {
   assert(rfe_.fsm == ePipelineFsm::kWaitingForResponse);
   rfe_.fsm = ePipelineFsm::kReadyToAdvance;
 
@@ -289,7 +290,7 @@ void InputQueue::processPipeline() {
     // send a credit back
     router_->sendCredit(port_, vc_);
 
-    // set state as ready to request routing function
+    // set state as ready to request routing algorithm
     rfe_.fsm = ePipelineFsm::kWaitingToRequest;
   }
 
@@ -302,7 +303,7 @@ void InputQueue::processPipeline() {
       // dbgprintf("[RFE], head flit");
 
       // submit request
-      routingFunction_->request(this, rfe_.flit, &rfe_.route);
+      routingAlgorithm_->request(this, rfe_.flit, &rfe_.route);
 
       // set state machine
       rfe_.fsm = ePipelineFsm::kWaitingForResponse;

@@ -22,17 +22,18 @@
 #include "interface/standard/MessageReassembler.h"
 #include "interface/standard/Ejector.h"
 #include "interface/standard/PacketReassembler.h"
-#include "network/InjectionFunction.h"
+#include "network/InjectionAlgorithm.h"
 #include "types/MessageOwner.h"
 
 namespace Standard {
 
 Interface::Interface(
     const std::string& _name, const Component* _parent, u32 _id,
-    InjectionFunctionFactory* _injectionFunctionFactory, Json::Value _settings)
+    InjectionAlgorithmFactory* _injectionAlgorithmFactory,
+    Json::Value _settings)
     : ::Interface(_name, _parent, _id, _settings) {
-  injectionFunction_ = _injectionFunctionFactory->createInjectionFunction(
-      "InjectionFunction", this, this, _settings["injection"]);
+  injectionAlgorithm_ = _injectionAlgorithmFactory->createInjectionAlgorithm(
+      "InjectionAlgorithm", this, this, _settings["injection"]);
 
   u32 initCredits = _settings["init_credits"].asUInt();
   assert(initCredits > 0);
@@ -74,7 +75,7 @@ Interface::Interface(
 }
 
 Interface::~Interface() {
-  delete injectionFunction_;
+  delete injectionAlgorithm_;
   delete ejector_;
   delete crossbarScheduler_;
   delete crossbar_;
@@ -109,13 +110,13 @@ void Interface::receiveMessage(Message* _message) {
     }
   }
 
-  // issue an injection function request
-  InjectionFunction::Response* resp = new InjectionFunction::Response();
-  injectionFunction_->request(this, _message, resp);
+  // issue an injection algorithm request
+  InjectionAlgorithm::Response* resp = new InjectionAlgorithm::Response();
+  injectionAlgorithm_->request(this, _message, resp);
 }
 
-void Interface::injectionFunctionResponse(
-    Message* _message, InjectionFunction::Response* _response) {
+void Interface::injectionAlgorithmResponse(
+    Message* _message, InjectionAlgorithm::Response* _response) {
   // push all flits into the corresponding input queue
   u32 pktVc = U32_MAX;
   for (u32 p = 0; p < _message->numPackets(); p++) {

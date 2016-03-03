@@ -13,24 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef ROUTER_ROUTERFACTORY_H_
-#define ROUTER_ROUTERFACTORY_H_
+#ifndef NETWORK_TORUS_ROUTINGALGORITHMFACTORY_H_
+#define NETWORK_TORUS_ROUTINGALGORITHMFACTORY_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>
+#include <vector>
 
 #include "event/Component.h"
 #include "network/RoutingAlgorithmFactory.h"
 #include "router/Router.h"
 
-class RouterFactory {
+namespace Torus {
+
+class RoutingAlgorithmFactory : public ::RoutingAlgorithmFactory {
  public:
-  static Router* createRouter(
-      const std::string& _name, const Component* _parent,
-      RoutingAlgorithmFactory* _routingAlgorithmFactory,
-      Json::Value _settings);
+  RoutingAlgorithmFactory(std::vector<u32> _dimensionWidths,
+                         u32 _concentration);
+  ~RoutingAlgorithmFactory();
+  RoutingAlgorithm* createRoutingAlgorithm(
+      const std::string& _name, const Component* _parent, Router* _router,
+      u32 inputPort, Json::Value _settings);
+
+ private:
+  std::vector<u32> dimensionWidths_;
+  u32 concentration_;
 };
 
-#endif  // ROUTER_ROUTERFACTORY_H_
+}  // namespace Torus
+
+#endif  // NETWORK_TORUS_ROUTINGALGORITHMFACTORY_H_

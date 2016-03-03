@@ -13,24 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef ROUTER_ROUTERFACTORY_H_
-#define ROUTER_ROUTERFACTORY_H_
+#ifndef NETWORK_UNO_DIRECTROUTINGALGORITHM_H_
+#define NETWORK_UNO_DIRECTROUTINGALGORITHM_H_
 
-#include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>
+#include <vector>
 
 #include "event/Component.h"
-#include "network/RoutingAlgorithmFactory.h"
+#include "network/RoutingAlgorithm.h"
 #include "router/Router.h"
 
-class RouterFactory {
+namespace Uno {
+
+class DirectRoutingAlgorithm : public RoutingAlgorithm {
  public:
-  static Router* createRouter(
-      const std::string& _name, const Component* _parent,
-      RoutingAlgorithmFactory* _routingAlgorithmFactory,
-      Json::Value _settings);
+  DirectRoutingAlgorithm(const std::string& _name, const Component* _parent,
+                        Router* _router, u64 _latency, u32 _concentration);
+  ~DirectRoutingAlgorithm();
+
+ protected:
+  void processRequest(
+      Flit* _flit, RoutingAlgorithm::Response* _response) override;
+
+ private:
+  const u32 numVcs_;
+  const u32 concentration_;
 };
 
-#endif  // ROUTER_ROUTERFACTORY_H_
+}  // namespace Uno
+
+#endif  // NETWORK_UNO_DIRECTROUTINGALGORITHM_H_

@@ -21,8 +21,8 @@
 #include <cmath>
 
 #include "interface/InterfaceFactory.h"
-#include "network/torus/RoutingFunctionFactory.h"
-#include "network/torus/InjectionFunctionFactory.h"
+#include "network/torus/RoutingAlgorithmFactory.h"
+#include "network/torus/InjectionAlgorithmFactory.h"
 #include "router/RouterFactory.h"
 #include "util/DimensionIterator.h"
 
@@ -58,9 +58,9 @@ Network::Network(const std::string& _name, const Component* _parent,
   _settings["router"]["num_vcs"] = Json::Value(numVcs_);
   _settings["interface"]["num_vcs"] = Json::Value(numVcs_);
 
-  // create a routing function factory to give to the routers
-  RoutingFunctionFactory* routingFunctionFactory = new RoutingFunctionFactory(
-      dimensionWidths_, concentration_);
+  // create a routing algorithm factory to give to the routers
+  RoutingAlgorithmFactory* routingAlgorithmFactory =
+      new RoutingAlgorithmFactory(dimensionWidths_, concentration_);
 
   // setup a router iterator for looping over the router dimensions
   DimensionIterator routerIterator(dimensionWidths_);
@@ -74,12 +74,12 @@ Network::Network(const std::string& _name, const Component* _parent,
 
     // use the router factory to create a router
     routers_.at(routerAddress) = RouterFactory::createRouter(
-        routerName, this, routingFunctionFactory, _settings["router"]);
+        routerName, this, routingAlgorithmFactory, _settings["router"]);
 
     // set the router's address
     routers_.at(routerAddress)->setAddress(routerAddress);
   }
-  delete routingFunctionFactory;
+  delete routingAlgorithmFactory;
 
   // link routers via channels
   routerIterator.reset();
@@ -176,9 +176,9 @@ Network::Network(const std::string& _name, const Component* _parent,
   fullDimensionWidths.insert(fullDimensionWidths.begin() + 1,
                              dimensionWidths_.begin(), dimensionWidths_.end());
 
-  // create an injection function factory
-  InjectionFunctionFactory* injectionFunctionFactory =
-      new InjectionFunctionFactory();
+  // create an injection algorithm factory
+  InjectionAlgorithmFactory* injectionAlgorithmFactory =
+      new InjectionAlgorithmFactory();
 
   // create interfaces and link them with the routers
   interfaces_.setSize(fullDimensionWidths);
@@ -202,7 +202,7 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // create the interface
       Interface* interface = InterfaceFactory::createInterface(
-          interfaceName, this, interfaceId, injectionFunctionFactory,
+          interfaceName, this, interfaceId, injectionAlgorithmFactory,
           _settings["interface"]);
       interfaces_.at(interfaceAddress) = interface;
       interfaceId++;
@@ -229,7 +229,7 @@ Network::Network(const std::string& _name, const Component* _parent,
     }
   }
 
-  delete injectionFunctionFactory;
+  delete injectionAlgorithmFactory;
 }
 
 Network::~Network() {

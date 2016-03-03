@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef ROUTER_ROUTERFACTORY_H_
-#define ROUTER_ROUTERFACTORY_H_
+#ifndef NETWORK_FOLDEDCLOS_ROUTINGALGORITHMFACTORY_H_
+#define NETWORK_FOLDEDCLOS_ROUTINGALGORITHMFACTORY_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -23,14 +23,22 @@
 
 #include "event/Component.h"
 #include "network/RoutingAlgorithmFactory.h"
-#include "router/Router.h"
 
-class RouterFactory {
+namespace FoldedClos {
+
+class RoutingAlgorithmFactory : public ::RoutingAlgorithmFactory {
  public:
-  static Router* createRouter(
-      const std::string& _name, const Component* _parent,
-      RoutingAlgorithmFactory* _routingAlgorithmFactory,
-      Json::Value _settings);
+  RoutingAlgorithmFactory(u32 _numLevels, u32 level);
+  ~RoutingAlgorithmFactory();
+  RoutingAlgorithm* createRoutingAlgorithm(
+      const std::string& _name, const Component* _parent, Router* _router,
+      u32 inputPort, Json::Value _settings);
+
+ private:
+  u32 numLevels_;
+  u32 level_;
 };
 
-#endif  // ROUTER_ROUTERFACTORY_H_
+}  // namespace FoldedClos
+
+#endif  // NETWORK_FOLDEDCLOS_ROUTINGALGORITHMFACTORY_H_

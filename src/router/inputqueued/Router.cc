@@ -17,7 +17,7 @@
 
 #include <cassert>
 
-#include "network/RoutingFunctionFactory.h"
+#include "network/RoutingAlgorithmFactory.h"
 #include "router/inputqueued/Ejector.h"
 #include "router/inputqueued/InputQueue.h"
 
@@ -25,7 +25,7 @@ namespace InputQueued {
 
 Router::Router(
     const std::string& _name, const Component* _parent,
-    RoutingFunctionFactory* _routingFunctionFactory,
+    RoutingAlgorithmFactory* _routingAlgorithmFactory,
     Json::Value _settings)
     : ::Router(_name, _parent, _settings) {
   u32 inputQueueDepth = _settings["input_queue_depth"].asUInt();
@@ -46,9 +46,9 @@ Router::Router(
       "CrossbarScheduler", this, numPorts_ * numVcs_, numPorts_ * numVcs_,
       numPorts_, _settings["crossbar_scheduler"]);
 
-  // create routing functions, input queues, link to routing function,
+  // create routing algorithms, input queues, link to routing algorithm,
   //  crossbar, and schedulers
-  routingFunctions_.resize(numPorts_ * numVcs_);
+  routingAlgorithms_.resize(numPorts_ * numVcs_);
   inputQueues_.resize(numPorts_ * numVcs_, nullptr);
   for (u32 port = 0; port < numPorts_; port++) {
     for (u32 vc = 0; vc < numVcs_; vc++) {
@@ -59,11 +59,11 @@ Router::Router(
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
                                std::to_string(vc);
 
-      // routing function
-      std::string rfname = "RoutingFunction" + nameSuffix;
-      RoutingFunction* rf = _routingFunctionFactory->createRoutingFunction(
+      // routing algorithm
+      std::string rfname = "RoutingAlgorithm" + nameSuffix;
+      RoutingAlgorithm* rf = _routingAlgorithmFactory->createRoutingAlgorithm(
           rfname, this, this, port, _settings["routing"]);
-      routingFunctions_.at(vcIndex(port, vc)) = rf;
+      routingAlgorithms_.at(vcIndex(port, vc)) = rf;
 
       // compute the client index (same for VC alloc, SW alloc, and Xbar)
       u32 clientIndex = (port * numVcs_) + vc;
@@ -102,7 +102,7 @@ Router::~Router() {
   delete vcScheduler_;
   delete crossbarScheduler_;
   for (u32 vc = 0; vc < (numPorts_ * numVcs_); vc++) {
-    delete routingFunctions_.at(vc);
+    delete routingAlgorithms_.at(vc);
     delete inputQueues_.at(vc);
   }
   for (u32 port = 0; port < numPorts_; port++) {

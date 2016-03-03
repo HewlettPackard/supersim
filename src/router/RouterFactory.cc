@@ -22,16 +22,16 @@
 
 Router* RouterFactory::createRouter(
     const std::string& _name, const Component* _parent,
-    RoutingFunctionFactory* _routingFunctionFactory,
+    RoutingAlgorithmFactory* _routingAlgorithmFactory,
     Json::Value _settings) {
   std::string architecture = _settings["architecture"].asString();
 
   if (architecture == "input_queued") {
     return new InputQueued::Router(
-        _name, _parent, _routingFunctionFactory, _settings);
+        _name, _parent, _routingAlgorithmFactory, _settings);
   } else if (architecture == "input_output_queued") {
     return new InputOutputQueued::Router(
-        _name, _parent, _routingFunctionFactory, _settings);
+        _name, _parent, _routingAlgorithmFactory, _settings);
   } else {
     fprintf(stderr, "unknown router architecture: %s\n", architecture.c_str());
     assert(false);

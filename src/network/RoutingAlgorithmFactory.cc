@@ -13,24 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef ROUTER_ROUTERFACTORY_H_
-#define ROUTER_ROUTERFACTORY_H_
-
-#include <json/json.h>
-#include <prim/prim.h>
-
-#include <string>
-
-#include "event/Component.h"
 #include "network/RoutingAlgorithmFactory.h"
-#include "router/Router.h"
 
-class RouterFactory {
- public:
-  static Router* createRouter(
-      const std::string& _name, const Component* _parent,
-      RoutingAlgorithmFactory* _routingAlgorithmFactory,
-      Json::Value _settings);
-};
+RoutingAlgorithmFactory::RoutingAlgorithmFactory() {}
 
-#endif  // ROUTER_ROUTERFACTORY_H_
+RoutingAlgorithmFactory::~RoutingAlgorithmFactory() {}

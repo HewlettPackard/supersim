@@ -13,22 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "interface/InterfaceFactory.h"
+#include "network/hyperx/AnyInjectionAlgorithm.h"
 
 #include <cassert>
 
-#include "interface/standard/Interface.h"
+#include "types/Message.h"
+#include "types/Packet.h"
 
-Interface* InterfaceFactory::createInterface(
-    const std::string& _name, const Component* _parent, u32 _id,
-    InjectionAlgorithmFactory* _injectionAlgorithmFactory,
-    Json::Value _settings) {
-  std::string type = _settings["type"].asString();
-  if (type == "standard") {
-    return new Standard::Interface(
-        _name, _parent, _id, _injectionAlgorithmFactory, _settings);
-  } else {
-    fprintf(stderr, "unknown interface type: %s\n", type.c_str());
-    assert(false);
+namespace HyperX {
+
+AnyInjectionAlgorithm::AnyInjectionAlgorithm(
+    const std::string& _name, const Component* _parent, Interface* _interface,
+    u64 _latency)
+    : InjectionAlgorithm(_name, _parent, _interface, _latency) {}
+
+AnyInjectionAlgorithm::~AnyInjectionAlgorithm() {}
+
+void AnyInjectionAlgorithm::processRequest(
+    Message* _message, InjectionAlgorithm::Response* _response) {
+  u32 numVcs = interface_->numVcs();
+
+  // use all VCs
+  for (u32 vc = 0; vc < numVcs; vc++) {
+    _response->add(vc);
   }
 }
+
+}  // namespace HyperX

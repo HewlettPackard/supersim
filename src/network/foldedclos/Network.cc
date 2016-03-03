@@ -19,8 +19,8 @@
 #include <cmath>
 
 #include "interface/InterfaceFactory.h"
-#include "network/foldedclos/InjectionFunctionFactory.h"
-#include "network/foldedclos/RoutingFunctionFactory.h"
+#include "network/foldedclos/InjectionAlgorithmFactory.h"
+#include "network/foldedclos/RoutingAlgorithmFactory.h"
 #include "router/RouterFactory.h"
 
 namespace FoldedClos {
@@ -76,16 +76,16 @@ Network::Network(const std::string& _name, const Component* _parent,
       }
       rname += ']';
 
-      // create a routing function factory
-      RoutingFunctionFactory* routingFunctionFactory =
-          new RoutingFunctionFactory(numLevels_, row);
+      // create a routing algorithm factory
+      RoutingAlgorithmFactory* routingAlgorithmFactory =
+          new RoutingAlgorithmFactory(numLevels_, row);
 
       // make router
       routers_.at(row).at(col) = RouterFactory::createRouter(
-          rname, this, routingFunctionFactory, _settings["router"]);
+          rname, this, routingAlgorithmFactory, _settings["router"]);
 
-      // delete the routing function factory
-      delete routingFunctionFactory;
+      // delete the routing algorithm factory
+      delete routingAlgorithmFactory;
 
       // set router address
       routers_.at(row).at(col)->setAddress(routerAddress);
@@ -144,8 +144,8 @@ Network::Network(const std::string& _name, const Component* _parent,
     }
   }
 
-  InjectionFunctionFactory* injectionFunctionFactory =
-      new InjectionFunctionFactory();
+  InjectionAlgorithmFactory* injectionAlgorithmFactory =
+      new InjectionAlgorithmFactory();
 
   // create interfaces, external channels, link together
   u32 interfaceId = 0;
@@ -176,7 +176,7 @@ Network::Network(const std::string& _name, const Component* _parent,
       std::string interfaceName = "Interface_" + std::to_string(c) + ":" +
           std::to_string(p);
       Interface* interface = InterfaceFactory::createInterface(
-          interfaceName, this, interfaceId, injectionFunctionFactory,
+          interfaceName, this, interfaceId, injectionAlgorithmFactory,
           _settings["interface"]);
       interfaces_.at(c).at(p) = interface;
       interfaceId++;
@@ -187,7 +187,7 @@ Network::Network(const std::string& _name, const Component* _parent,
     }
   }
 
-  delete injectionFunctionFactory;
+  delete injectionAlgorithmFactory;
 
   for (u32 id = 0; id < numInterfaces(); id++) {
     assert(getInterface(id) != nullptr);

@@ -13,24 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef ROUTER_ROUTERFACTORY_H_
-#define ROUTER_ROUTERFACTORY_H_
+#ifndef NETWORK_UNO_INJECTIONALGORITHMFACTORY_H_
+#define NETWORK_UNO_INJECTIONALGORITHMFACTORY_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>
+#include <vector>
 
 #include "event/Component.h"
-#include "network/RoutingAlgorithmFactory.h"
-#include "router/Router.h"
+#include "interface/Interface.h"
+#include "network/InjectionAlgorithmFactory.h"
 
-class RouterFactory {
+namespace Uno {
+
+class InjectionAlgorithmFactory : public ::InjectionAlgorithmFactory {
  public:
-  static Router* createRouter(
-      const std::string& _name, const Component* _parent,
-      RoutingAlgorithmFactory* _routingAlgorithmFactory,
+  InjectionAlgorithmFactory();
+  ~InjectionAlgorithmFactory();
+  InjectionAlgorithm* createInjectionAlgorithm(
+      const std::string& _name, const Component* _parent, Interface* _interface,
       Json::Value _settings);
 };
 
-#endif  // ROUTER_ROUTERFACTORY_H_
+}  // namespace Uno
+
+#endif  // NETWORK_UNO_INJECTIONALGORITHMFACTORY_H_

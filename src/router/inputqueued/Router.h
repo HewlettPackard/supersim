@@ -24,8 +24,8 @@
 
 #include "event/Component.h"
 #include "network/Channel.h"
-#include "network/RoutingFunction.h"
-#include "network/RoutingFunctionFactory.h"
+#include "network/RoutingAlgorithm.h"
+#include "network/RoutingAlgorithmFactory.h"
 #include "router/common/CongestionStatus.h"
 #include "router/common/Crossbar.h"
 #include "router/common/CrossbarScheduler.h"
@@ -42,7 +42,7 @@ class Ejector;
 class Router : public ::Router {
  public:
   Router(const std::string& _name, const Component* _parent,
-         RoutingFunctionFactory* _routingFunctionFactory,
+         RoutingAlgorithmFactory* _routingAlgorithmFactory,
          Json::Value _settings);
   ~Router();
 
@@ -60,7 +60,7 @@ class Router : public ::Router {
 
  private:
   std::vector<InputQueue*> inputQueues_;
-  std::vector<RoutingFunction*> routingFunctions_;
+  std::vector<RoutingAlgorithm*> routingAlgorithms_;
   CongestionStatus* congestionStatus_;
   Crossbar* crossbar_;
   CrossbarScheduler* crossbarScheduler_;

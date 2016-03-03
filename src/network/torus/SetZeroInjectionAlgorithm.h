@@ -13,24 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef ROUTER_ROUTERFACTORY_H_
-#define ROUTER_ROUTERFACTORY_H_
+#ifndef NETWORK_TORUS_SETZEROINJECTIONALGORITHM_H_
+#define NETWORK_TORUS_SETZEROINJECTIONALGORITHM_H_
 
-#include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>
+#include <vector>
 
 #include "event/Component.h"
-#include "network/RoutingAlgorithmFactory.h"
-#include "router/Router.h"
+#include "network/InjectionAlgorithm.h"
+#include "interface/Interface.h"
 
-class RouterFactory {
+namespace Torus {
+
+class SetZeroInjectionAlgorithm : public InjectionAlgorithm {
  public:
-  static Router* createRouter(
-      const std::string& _name, const Component* _parent,
-      RoutingAlgorithmFactory* _routingAlgorithmFactory,
-      Json::Value _settings);
+  SetZeroInjectionAlgorithm(const std::string& _name, const Component* _parent,
+                           Interface* _interface, u64 _latency);
+  ~SetZeroInjectionAlgorithm();
+
+ protected:
+  void processRequest(
+      Message* _message, InjectionAlgorithm::Response* _response) override;
 };
 
-#endif  // ROUTER_ROUTERFACTORY_H_
+}  // namespace Torus
+
+#endif  // NETWORK_TORUS_SETZEROINJECTIONALGORITHM_H_
