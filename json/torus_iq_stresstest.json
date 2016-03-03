@@ -22,7 +22,7 @@
     "interface": {
       "type": "standard",
       "injection": {
-        "algorithm": "dimension_ordered",
+        "algorithm": "set_zero",
         "latency": 1  // cycles
       },
       "fixed_msg_vc": true,

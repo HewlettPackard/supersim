@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_TORUS_DIMORDERINJECTIONFUNCTION_H_
-#define NETWORK_TORUS_DIMORDERINJECTIONFUNCTION_H_
+#ifndef NETWORK_TORUS_SETZEROINJECTIONFUNCTION_H_
+#define NETWORK_TORUS_SETZEROINJECTIONFUNCTION_H_
 
 #include <prim/prim.h>
 
@@ -27,11 +27,11 @@
 
 namespace Torus {
 
-class DimOrderInjectionFunction : public InjectionFunction {
+class SetZeroInjectionFunction : public InjectionFunction {
  public:
-  DimOrderInjectionFunction(const std::string& _name, const Component* _parent,
-                            Interface* _interface, u64 _latency);
-  ~DimOrderInjectionFunction();
+  SetZeroInjectionFunction(const std::string& _name, const Component* _parent,
+                           Interface* _interface, u64 _latency);
+  ~SetZeroInjectionFunction();
 
  protected:
   void processRequest(
@@ -40,4 +40,4 @@ class DimOrderInjectionFunction : public InjectionFunction {
 
 }  // namespace Torus
 
-#endif  // NETWORK_TORUS_DIMORDERINJECTIONFUNCTION_H_
+#endif  // NETWORK_TORUS_SETZEROINJECTIONFUNCTION_H_

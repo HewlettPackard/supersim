@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "network/torus/DimOrderInjectionFunction.h"
+#include "network/torus/SetZeroInjectionFunction.h"
 
 #include <cassert>
 
@@ -22,14 +22,14 @@
 
 namespace Torus {
 
-DimOrderInjectionFunction::DimOrderInjectionFunction(
+SetZeroInjectionFunction::SetZeroInjectionFunction(
     const std::string& _name, const Component* _parent, Interface* _interface,
     u64 _latency)
     : InjectionFunction(_name, _parent, _interface, _latency) {}
 
-DimOrderInjectionFunction::~DimOrderInjectionFunction() {}
+SetZeroInjectionFunction::~SetZeroInjectionFunction() {}
 
-void DimOrderInjectionFunction::processRequest(
+void SetZeroInjectionFunction::processRequest(
     Message* _message, InjectionFunction::Response* _response) {
   u32 numVcs = interface_->numVcs();
 

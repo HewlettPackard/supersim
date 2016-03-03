@@ -17,7 +17,7 @@
 
 #include <cassert>
 
-#include "network/torus/DimOrderInjectionFunction.h"
+#include "network/torus/SetZeroInjectionFunction.h"
 #include "network/InjectionFunction.h"
 
 namespace Torus {
@@ -33,8 +33,8 @@ InjectionFunction* InjectionFunctionFactory::createInjectionFunction(
   std::string algorithm = _settings["algorithm"].asString();
   u32 latency = _settings["latency"].asUInt();
 
-  if (algorithm == "dimension_ordered") {
-    return new Torus::DimOrderInjectionFunction(
+  if (algorithm == "set_zero") {
+    return new Torus::SetZeroInjectionFunction(
         _name, _parent, _interface, latency);
   } else {
     fprintf(stderr, "Unknown injection algorithm: '%s'\n", algorithm.c_str());
