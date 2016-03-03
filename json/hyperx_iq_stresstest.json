@@ -20,12 +20,12 @@
     "channel_log": {
       "file": "/dev/null"  // "channels.csv"
     },
+    "routing": {
+      "algorithm": "dimension_order",
+      "latency": 1
+    },
     "interface": {
       "type": "standard",
-      "injection": {
-        "algorithm": "any",
-        "latency": 1
-      },
       "fixed_msg_vc": false,
       "crossbar_scheduler": {
         "allocator": {
@@ -44,11 +44,6 @@
     },
     "router": {
       "architecture": "input_queued",
-      "routing": {
-        "algorithm": "dimension_ordered",
-        "latency": 1,  // cycles
-        "all_vcs": true
-      },
       "congestion_status": {
         "latency": 1
       },

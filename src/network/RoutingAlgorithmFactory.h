@@ -32,7 +32,7 @@ class RoutingAlgorithmFactory {
   virtual ~RoutingAlgorithmFactory();
   virtual RoutingAlgorithm* createRoutingAlgorithm(
       const std::string& _name, const Component* _parent, Router* _router,
-      u32 _inputPort, Json::Value _settings) = 0;
+      u32 _inputPort) = 0;
 };
 
 #endif  // NETWORK_ROUTINGALGORITHMFACTORY_H_

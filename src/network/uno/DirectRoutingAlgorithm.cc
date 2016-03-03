@@ -24,9 +24,9 @@ namespace Uno {
 
 DirectRoutingAlgorithm::DirectRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u64 _latency, u32 _concentration)
+    u64 _latency, u32 _numVcs, u32 _concentration)
     : RoutingAlgorithm(_name, _parent, _router, _latency),
-      numVcs_(router_->numVcs()), concentration_(_concentration) {}
+      numVcs_(_numVcs), concentration_(_concentration) {}
 
 DirectRoutingAlgorithm::~DirectRoutingAlgorithm() {}
 

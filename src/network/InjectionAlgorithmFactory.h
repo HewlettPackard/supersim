@@ -31,8 +31,8 @@ class InjectionAlgorithmFactory {
   InjectionAlgorithmFactory();
   virtual ~InjectionAlgorithmFactory();
   virtual InjectionAlgorithm* createInjectionAlgorithm(
-      const std::string& _name, const Component* _parent, Interface* _interface,
-      Json::Value _settings) = 0;
+      const std::string& _name, const Component* _parent,
+      Interface* _interface) = 0;
 };
 
 #endif  // NETWORK_INJECTIONALGORITHMFACTORY_H_

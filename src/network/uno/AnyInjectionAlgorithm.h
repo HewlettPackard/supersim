@@ -30,12 +30,15 @@ namespace Uno {
 class AnyInjectionAlgorithm : public InjectionAlgorithm {
  public:
   AnyInjectionAlgorithm(const std::string& _name, const Component* _parent,
-                       Interface* _interface, u64 _latency);
+                        Interface* _interface, u64 _latency, u32 _numVcs);
   ~AnyInjectionAlgorithm();
 
  protected:
   void processRequest(
       Message* _message, InjectionAlgorithm::Response* _response) override;
+
+ private:
+  const u32 numVcs_;
 };
 
 }  // namespace Uno

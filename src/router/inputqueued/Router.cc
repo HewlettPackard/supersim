@@ -62,7 +62,7 @@ Router::Router(
       // routing algorithm
       std::string rfname = "RoutingAlgorithm" + nameSuffix;
       RoutingAlgorithm* rf = _routingAlgorithmFactory->createRoutingAlgorithm(
-          rfname, this, this, port, _settings["routing"]);
+          rfname, this, this, port);
       routingAlgorithms_.at(vcIndex(port, vc)) = rf;
 
       // compute the client index (same for VC alloc, SW alloc, and Xbar)

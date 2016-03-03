@@ -42,7 +42,8 @@ Network::Network(const std::string& _name, const Component* _parent,
 
   // create a routing algorithm factory to give to the routers
   RoutingAlgorithmFactory* routingAlgorithmFactory =
-      new RoutingAlgorithmFactory(concentration_);
+      new RoutingAlgorithmFactory(numVcs_, concentration_,
+                                  _settings["routing"]);
 
   // create the router
   router_ = RouterFactory::createRouter(
@@ -52,7 +53,7 @@ Network::Network(const std::string& _name, const Component* _parent,
 
   // create an injection algorithm factory to give to the interfaces
   InjectionAlgorithmFactory* injectionAlgorithmFactory =
-      new InjectionAlgorithmFactory();
+      new InjectionAlgorithmFactory(numVcs_, _settings["routing"]);
 
   // create the interfaces and external channels
   interfaces_.resize(concentration_, nullptr);

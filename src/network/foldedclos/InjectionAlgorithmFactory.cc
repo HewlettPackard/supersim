@@ -22,20 +22,23 @@
 
 namespace FoldedClos {
 
-InjectionAlgorithmFactory::InjectionAlgorithmFactory()
-    : ::InjectionAlgorithmFactory() {}
+InjectionAlgorithmFactory::InjectionAlgorithmFactory(
+    u32 _numVcs, Json::Value _settings)
+    : ::InjectionAlgorithmFactory(), numVcs_(_numVcs), settings_(_settings) {}
 
 InjectionAlgorithmFactory::~InjectionAlgorithmFactory() {}
 
 InjectionAlgorithm* InjectionAlgorithmFactory::createInjectionAlgorithm(
-    const std::string& _name, const Component* _parent, Interface* _interface,
-    Json::Value _settings) {
-  std::string algorithm = _settings["algorithm"].asString();
-  u32 latency = _settings["latency"].asUInt();
+    const std::string& _name, const Component* _parent, Interface* _interface) {
+  std::string algorithm = settings_["algorithm"].asString();
+  u32 latency = settings_["latency"].asUInt();
 
-  if (algorithm == "any") {
+  if (algorithm == "most_common_ancestor") {
     return new FoldedClos::AnyInjectionAlgorithm(
-        _name, _parent, _interface, latency);
+        _name, _parent, _interface, latency, numVcs_);
+  } else if (algorithm == "least_common_ancestor") {
+    return new FoldedClos::AnyInjectionAlgorithm(
+        _name, _parent, _interface, latency, numVcs_);
   } else {
     fprintf(stderr, "Unknown injection algorithm: '%s'\n", algorithm.c_str());
     assert(false);

@@ -30,10 +30,10 @@ namespace HyperX {
 class DimOrderRoutingAlgorithm : public RoutingAlgorithm {
  public:
   DimOrderRoutingAlgorithm(const std::string& _name, const Component* _parent,
-                          Router* _router, u64 _latency,
-                          const std::vector<u32>& _dimensionWidths,
-                          const std::vector<u32>& _dimensionWeights,
-                          u32 _concentration);
+                           Router* _router, u64 _latency, u32 _numVcs,
+                           const std::vector<u32>& _dimensionWidths,
+                           const std::vector<u32>& _dimensionWeights,
+                           u32 _concentration);
   ~DimOrderRoutingAlgorithm();
 
  protected:

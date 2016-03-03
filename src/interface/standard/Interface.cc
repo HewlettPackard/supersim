@@ -33,7 +33,7 @@ Interface::Interface(
     Json::Value _settings)
     : ::Interface(_name, _parent, _id, _settings) {
   injectionAlgorithm_ = _injectionAlgorithmFactory->createInjectionAlgorithm(
-      "InjectionAlgorithm", this, this, _settings["injection"]);
+      "InjectionAlgorithm", this, this);
 
   u32 initCredits = _settings["init_credits"].asUInt();
   assert(initCredits > 0);

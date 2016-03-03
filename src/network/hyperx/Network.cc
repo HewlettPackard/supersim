@@ -66,8 +66,8 @@ Network::Network(const std::string& _name, const Component* _parent,
 
   // create a routing algorithm factory to give to the routers
   RoutingAlgorithmFactory* routingAlgorithmFactory =
-      new RoutingAlgorithmFactory(dimensionWidths_, dimensionWeights_,
-                                  concentration_);
+      new RoutingAlgorithmFactory(numVcs_, dimensionWidths_, dimensionWeights_,
+                                  concentration_, _settings["routing"]);
 
   // setup a router iterator for looping over the router dimensions
   DimensionIterator routerIterator(dimensionWidths_);
@@ -144,7 +144,7 @@ Network::Network(const std::string& _name, const Component* _parent,
 
   // create a injection algorithm factory
   InjectionAlgorithmFactory* injectionAlgorithmFactory =
-      new InjectionAlgorithmFactory();
+      new InjectionAlgorithmFactory(numVcs_, _settings["routing"]);
 
   // create interfaces and link them with the routers
   interfaces_.setSize(fullDimensionWidths);

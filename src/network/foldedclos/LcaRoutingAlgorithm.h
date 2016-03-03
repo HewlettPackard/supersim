@@ -29,8 +29,8 @@ namespace FoldedClos {
 class LcaRoutingAlgorithm : public RoutingAlgorithm {
  public:
   LcaRoutingAlgorithm(const std::string& _name, const Component* _parent,
-                     Router* _router, u64 _latency, u32 _numLevels, u32 _level,
-                     u32 _inputPort);
+                      Router* _router, u64 _latency, u32 _numVcs, u32 _numPorts,
+                      u32 _numLevels, u32 _level, u32 _inputPort);
   ~LcaRoutingAlgorithm();
 
  protected:

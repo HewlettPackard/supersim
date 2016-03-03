@@ -30,11 +30,15 @@ namespace FoldedClos {
 
 class InjectionAlgorithmFactory : public ::InjectionAlgorithmFactory {
  public:
-  InjectionAlgorithmFactory();
+  InjectionAlgorithmFactory(u32 _numVcs, Json::Value _settings);
   ~InjectionAlgorithmFactory();
   InjectionAlgorithm* createInjectionAlgorithm(
-      const std::string& _name, const Component* _parent, Interface* _interface,
-      Json::Value _settings);
+      const std::string& _name, const Component* _parent,
+      Interface* _interface);
+
+ private:
+  const u32 numVcs_;
+  Json::Value settings_;
 };
 
 }  // namespace FoldedClos

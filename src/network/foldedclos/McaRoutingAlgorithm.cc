@@ -25,15 +25,16 @@ namespace FoldedClos {
 
 McaRoutingAlgorithm::McaRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u64 _latency, u32 _numLevels, u32 _level, u32 _inputPort)
+    u64 _latency, u32 _numVcs, u32 _numPorts, u32 _numLevels, u32 _level,
+    u32 _inputPort)
     : RoutingAlgorithm(_name, _parent, _router, _latency),
-      numVcs_(_router->numVcs()), numPorts_(_router->numPorts()),
-      numLevels_(_numLevels), level_(_level), inputPort_(_inputPort) {}
+      numVcs_(_numVcs), numPorts_(_numPorts), numLevels_(_numLevels),
+      level_(_level), inputPort_(_inputPort) {}
 
 McaRoutingAlgorithm::~McaRoutingAlgorithm() {}
 
-void McaRoutingAlgorithm::processRequest(Flit* _flit,
-                                        RoutingAlgorithm::Response* _response) {
+void McaRoutingAlgorithm::processRequest(
+    Flit* _flit, RoutingAlgorithm::Response* _response) {
   u32 outputPort;
 
   bool atTopLevel = (level_ == (numLevels_ - 1));

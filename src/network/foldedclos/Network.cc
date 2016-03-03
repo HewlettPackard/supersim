@@ -78,7 +78,8 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // create a routing algorithm factory
       RoutingAlgorithmFactory* routingAlgorithmFactory =
-          new RoutingAlgorithmFactory(numLevels_, row);
+          new RoutingAlgorithmFactory(numVcs_, routerRadix_, numLevels_, row,
+                                      _settings["routing"]);
 
       // make router
       routers_.at(row).at(col) = RouterFactory::createRouter(
@@ -145,7 +146,7 @@ Network::Network(const std::string& _name, const Component* _parent,
   }
 
   InjectionAlgorithmFactory* injectionAlgorithmFactory =
-      new InjectionAlgorithmFactory();
+      new InjectionAlgorithmFactory(numVcs_, _settings["routing"]);
 
   // create interfaces, external channels, link together
   u32 interfaceId = 0;

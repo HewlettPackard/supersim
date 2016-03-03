@@ -24,24 +24,28 @@
 namespace FoldedClos {
 
 RoutingAlgorithmFactory::RoutingAlgorithmFactory(
-    u32 _numLevels, u32 _level)
-    : ::RoutingAlgorithmFactory(), numLevels_(_numLevels), level_(_level) {}
+    u32 _numVcs, u32 _numPorts, u32 _numLevels, u32 _level,
+    Json::Value _settings)
+    : ::RoutingAlgorithmFactory(), numVcs_(_numVcs), numPorts_(_numPorts),
+      numLevels_(_numLevels), level_(_level), settings_(_settings) {}
 
 RoutingAlgorithmFactory::~RoutingAlgorithmFactory() {}
 
 RoutingAlgorithm* RoutingAlgorithmFactory::createRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u32 _inputPort, Json::Value _settings) {
+    u32 _inputPort) {
 
-  std::string algorithm = _settings["algorithm"].asString();
-  u32 latency = _settings["latency"].asUInt();
+  std::string algorithm = settings_["algorithm"].asString();
+  u32 latency = settings_["latency"].asUInt();
 
   if (algorithm == "most_common_ancestor") {
     return new McaRoutingAlgorithm(_name, _parent, _router, latency,
-                                  numLevels_, level_, _inputPort);
+                                   numVcs_, numPorts_, numLevels_, level_,
+                                   _inputPort);
   } else if (algorithm == "least_common_ancestor") {
     return new LcaRoutingAlgorithm(_name, _parent, _router, latency,
-                                  numLevels_, level_, _inputPort);
+                                   numVcs_, numPorts_, numLevels_, level_,
+                                   _inputPort);
   } else {
     fprintf(stderr, "Unknown routing algorithm: '%s'\n", algorithm.c_str());
     assert(false);

@@ -30,16 +30,18 @@ namespace Torus {
 
 class RoutingAlgorithmFactory : public ::RoutingAlgorithmFactory {
  public:
-  RoutingAlgorithmFactory(std::vector<u32> _dimensionWidths,
-                         u32 _concentration);
+  RoutingAlgorithmFactory(u32 _numVcs, const std::vector<u32>& _dimensionWidths,
+                          u32 _concentration, Json::Value _settings);
   ~RoutingAlgorithmFactory();
   RoutingAlgorithm* createRoutingAlgorithm(
       const std::string& _name, const Component* _parent, Router* _router,
-      u32 inputPort, Json::Value _settings);
+      u32 inputPort);
 
  private:
-  std::vector<u32> dimensionWidths_;
-  u32 concentration_;
+  const u32 numVcs_;
+  const std::vector<u32> dimensionWidths_;
+  const u32 concentration_;
+  Json::Value settings_;
 };
 
 }  // namespace Torus

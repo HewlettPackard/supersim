@@ -23,22 +23,24 @@
 namespace HyperX {
 
 RoutingAlgorithmFactory::RoutingAlgorithmFactory(
-    const std::vector<u32>& _dimensionWidths,
-    const std::vector<u32>& _dimensionWeights, u32 _concentration)
-    : ::RoutingAlgorithmFactory(), dimensionWidths_(_dimensionWidths),
-      dimensionWeights_(_dimensionWeights), concentration_(_concentration) {}
+    u32 _numVcs, const std::vector<u32>& _dimensionWidths,
+    const std::vector<u32>& _dimensionWeights, u32 _concentration,
+    Json::Value _settings)
+    : ::RoutingAlgorithmFactory(), numVcs_(_numVcs),
+      dimensionWidths_(_dimensionWidths), dimensionWeights_(_dimensionWeights),
+      concentration_(_concentration), settings_(_settings) {}
 
 RoutingAlgorithmFactory::~RoutingAlgorithmFactory() {}
 
 RoutingAlgorithm* RoutingAlgorithmFactory::createRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u32 _inputPort, Json::Value _settings) {
-  std::string algorithm = _settings["algorithm"].asString();
-  u32 latency = _settings["latency"].asUInt();
+    u32 _inputPort) {
+  std::string algorithm = settings_["algorithm"].asString();
+  u32 latency = settings_["latency"].asUInt();
 
-  if (algorithm == "dimension_ordered") {
+  if (algorithm == "dimension_order") {
     return new HyperX::DimOrderRoutingAlgorithm(
-        _name, _parent, _router, latency, dimensionWidths_,
+        _name, _parent, _router, latency, numVcs_, dimensionWidths_,
         dimensionWeights_, concentration_);
   } else {
     fprintf(stderr, "Unknown routing algorithm: '%s'\n", algorithm.c_str());

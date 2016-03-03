@@ -17,25 +17,25 @@
 
 #include <cassert>
 
-#include "network/torus/SetZeroInjectionAlgorithm.h"
+#include "network/torus/FixedSetInjectionAlgorithm.h"
 #include "network/InjectionAlgorithm.h"
 
 namespace Torus {
 
-InjectionAlgorithmFactory::InjectionAlgorithmFactory()
-    : ::InjectionAlgorithmFactory() {}
+InjectionAlgorithmFactory::InjectionAlgorithmFactory(
+    u32 _numVcs, Json::Value _settings)
+    : ::InjectionAlgorithmFactory(), numVcs_(_numVcs), settings_(_settings) {}
 
 InjectionAlgorithmFactory::~InjectionAlgorithmFactory() {}
 
 InjectionAlgorithm* InjectionAlgorithmFactory::createInjectionAlgorithm(
-    const std::string& _name, const Component* _parent, Interface* _interface,
-    Json::Value _settings) {
-  std::string algorithm = _settings["algorithm"].asString();
-  u32 latency = _settings["latency"].asUInt();
+    const std::string& _name, const Component* _parent, Interface* _interface) {
+  std::string algorithm = settings_["algorithm"].asString();
+  u32 latency = settings_["latency"].asUInt();
 
-  if (algorithm == "set_zero") {
-    return new Torus::SetZeroInjectionAlgorithm(
-        _name, _parent, _interface, latency);
+  if (algorithm == "dimension_order") {
+    return new Torus::FixedSetInjectionAlgorithm(
+        _name, _parent, _interface, latency, numVcs_, 2, 0);
   } else {
     fprintf(stderr, "Unknown injection algorithm: '%s'\n", algorithm.c_str());
     assert(false);

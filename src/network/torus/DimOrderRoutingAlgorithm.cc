@@ -49,10 +49,10 @@ u32 computeInputPortDim(const std::vector<u32>& _dimensionWidths,
 
 DimOrderRoutingAlgorithm::DimOrderRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u64 _latency, std::vector<u32> _dimensionWidths,
+    u64 _latency, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
     u32 _concentration, u32 _inputPort)
     : RoutingAlgorithm(_name, _parent, _router, _latency),
-      dimensionWidths_(_dimensionWidths), numVcs_(router_->numVcs()),
+      numVcs_(_numVcs), dimensionWidths_(_dimensionWidths),
       concentration_(_concentration), inputPort_(_inputPort),
       isTerminalPort_(inputPort_ < concentration_),
       inputPortDim_(computeInputPortDim(dimensionWidths_, concentration_,

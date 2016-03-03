@@ -24,17 +24,16 @@ namespace HyperX {
 
 AnyInjectionAlgorithm::AnyInjectionAlgorithm(
     const std::string& _name, const Component* _parent, Interface* _interface,
-    u64 _latency)
-    : InjectionAlgorithm(_name, _parent, _interface, _latency) {}
+    u64 _latency, u32 _numVcs)
+    : InjectionAlgorithm(_name, _parent, _interface, _latency),
+      numVcs_(_numVcs) {}
 
 AnyInjectionAlgorithm::~AnyInjectionAlgorithm() {}
 
 void AnyInjectionAlgorithm::processRequest(
     Message* _message, InjectionAlgorithm::Response* _response) {
-  u32 numVcs = interface_->numVcs();
-
   // use all VCs
-  for (u32 vc = 0; vc < numVcs; vc++) {
+  for (u32 vc = 0; vc < numVcs_; vc++) {
     _response->add(vc);
   }
 }
