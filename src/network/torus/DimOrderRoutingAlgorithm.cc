@@ -17,35 +17,11 @@
 
 #include <cassert>
 
+#include "network/torus/util.h"
 #include "types/Message.h"
 #include "types/Packet.h"
 
 namespace Torus {
-
-// I use this function so that I can make the inputPortDim_ field a const
-namespace {
-u32 computeInputPortDim(const std::vector<u32>& _dimensionWidths,
-                        u32 _concentration, u32 _inputPort,
-                        bool _isTerminalPort) {
-  // determine which network dimension this port is attached to
-  u32 inputPortDim = U32_MAX;  // invalid
-  if (!_isTerminalPort) {
-    u32 port = _inputPort - _concentration;
-    for (u32 dim = 0; dim < _dimensionWidths.size(); dim++) {
-      u32 dimWidth = _dimensionWidths.at(dim);
-      u32 dimPorts = dimWidth == 2 ? 1 : 2;
-      if (port <= dimPorts) {
-        inputPortDim = dim;
-        break;
-      } else {
-        port -= dimPorts;
-      }
-    }
-    assert(inputPortDim != U32_MAX);
-  }
-  return inputPortDim;
-}
-}  // namespace
 
 DimOrderRoutingAlgorithm::DimOrderRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
@@ -54,9 +30,8 @@ DimOrderRoutingAlgorithm::DimOrderRoutingAlgorithm(
     : RoutingAlgorithm(_name, _parent, _router, _latency),
       numVcs_(_numVcs), dimensionWidths_(_dimensionWidths),
       concentration_(_concentration), inputPort_(_inputPort),
-      isTerminalPort_(inputPort_ < concentration_),
       inputPortDim_(computeInputPortDim(dimensionWidths_, concentration_,
-                                        inputPort_, isTerminalPort_)) {
+                                        inputPort_)) {
   assert(numVcs_ >= 2);
 }
 
@@ -90,18 +65,23 @@ void DimOrderRoutingAlgorithm::processRequest(
   // test if already at destination router
   if (dim == routerAddress.size()) {
     outputPort = destinationAddress->at(0);
-    // use all VCs on egress
-    for (u32 i = 0; i < numVcs_; i++) {
-      _response->add(outputPort, i);
+
+    // on ejection, any dateline VcSet is ok
+    for (u32 vc = 0; vc < numVcs_; vc++) {
+      _response->add(outputPort, vc);
     }
   } else {
+    u32 vcSet = _flit->getVc() % 2;
+
     // more router-to-router hops needed
     u32 src = routerAddress.at(dim);
     u32 dst = destinationAddress->at(dim + 1);
     assert(src != dst);
+
     // in dimension with width of 2, there is only one port
+    bool right;
     if (dimensionWidths_.at(dim) == 2) {
-      outputPort = portBase;
+      right = true;
     } else {
       // in torus topology, we can get to a destination in two directions,
       //  this algorithm takes the shortest path, randomized tie breaker
@@ -111,33 +91,41 @@ void DimOrderRoutingAlgorithm::processRequest(
       u32 leftDelta = ((src > dst) ?
                        (src - dst) :
                        (src + dimensionWidths_.at(dim) - dst));
+
+      // determine direction
       if (rightDelta == leftDelta) {
-        outputPort = portBase + gSim->rnd.nextU64(0, 1);
+        right = gSim->rnd.nextBool();
       } else if (rightDelta < leftDelta) {
-        outputPort = portBase;
+        right = true;
       } else {
-        outputPort = portBase + 1;
+        right = false;
       }
+    }
+
+    // choose output port, figure out next router in this dimension
+    u32 next;
+    if (right) {
+      outputPort = portBase;
+      next = (src + 1) % dimensionWidths_.at(dim);
+    } else {
+      outputPort = portBase + 1;
+      next = src == 0 ? dimensionWidths_.at(dim) - 1 : src - 1;
     }
 
     // the output port is now determined, now figure out which VC(s) to use
     assert(outputPort != inputPort_);  // this case is already checked
 
-    u32 vcSet;
+    // reset to VC set 0 when switching dimensions
+    //  this also occurs on an injection port
     if (dim != inputPortDim_) {
-      // reset to VC set 0 when switching dimensions
       vcSet = 0;
-    } else {
-      u32 currentVcSet = _flit -> getVc() % 2;
+    }
 
-      // in same dimension, detect dateline crossing or stay in same set
-      if (((src == 0) && (dst == (dimensionWidths_.at(dim) - 1))) ||
-          ((dst == 0) && (src == (dimensionWidths_.at(dim) - 1)))) {
-        assert(currentVcSet == 0);  // can only cross once
-        vcSet = 1;
-      } else {
-        vcSet = currentVcSet;
-      }
+    // check dateline crossing
+    if (((src == 0) && (next == (dimensionWidths_.at(dim) - 1))) ||
+        ((next == 0) && (src == (dimensionWidths_.at(dim) - 1)))) {
+      assert(vcSet == 0);  // can only cross once
+      vcSet++;
     }
 
     // use VCs in the corresponding set

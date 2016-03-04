@@ -48,6 +48,9 @@ class Packet {
   u64 getMetadata() const;
   void setMetadata(u64 _metadata);
 
+  void* getRoutingExtension() const;
+  void setRoutingExtension(void* _ext);
+
  private:
   u32 id_;
   std::vector<Flit*> flits_;
@@ -55,6 +58,8 @@ class Packet {
 
   u32 hopCount_;
   u64 metadata_;
+
+  void* routingExtension_;
 };
 
 #endif  // TYPES_PACKET_H_

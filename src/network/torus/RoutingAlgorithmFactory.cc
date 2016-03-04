@@ -18,6 +18,7 @@
 #include <cassert>
 
 #include "network/torus/DimOrderRoutingAlgorithm.h"
+#include "network/torus/ValiantsRoutingAlgorithm.h"
 #include "network/RoutingAlgorithm.h"
 
 namespace Torus {
@@ -39,6 +40,10 @@ RoutingAlgorithm* RoutingAlgorithmFactory::createRoutingAlgorithm(
 
   if (algorithm == "dimension_order") {
     return new Torus::DimOrderRoutingAlgorithm(
+        _name, _parent, _router, latency, numVcs_, dimensionWidths_,
+        concentration_, _inputPort);
+  } else if (algorithm == "valiants") {
+    return new Torus::ValiantsRoutingAlgorithm(
         _name, _parent, _router, latency, numVcs_, dimensionWidths_,
         concentration_, _inputPort);
   } else {

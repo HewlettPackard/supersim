@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "network/torus/FixedSetInjectionAlgorithm.h"
+#include "network/torus/FixedSetsInjectionAlgorithm.h"
 
 #include <cassert>
 
@@ -22,21 +22,25 @@
 
 namespace Torus {
 
-FixedSetInjectionAlgorithm::FixedSetInjectionAlgorithm(
+FixedSetsInjectionAlgorithm::FixedSetsInjectionAlgorithm(
     const std::string& _name, const Component* _parent, Interface* _interface,
-    u64 _latency, u32 _numVcs, u32 _numSets, u32 _set)
+    u64 _latency, u32 _numVcs, u32 _numSets, const std::set<u32>& _sets)
     : InjectionAlgorithm(_name, _parent, _interface, _latency),
-      numVcs_(_numVcs), numSets_(_numSets), set_(_set) {
-  assert(set_ < numSets_);
+      numVcs_(_numVcs), numSets_(_numSets), sets_(_sets) {
+  for (auto set : sets_) {
+    assert(set < numSets_);
+  }
 }
 
-FixedSetInjectionAlgorithm::~FixedSetInjectionAlgorithm() {}
+FixedSetsInjectionAlgorithm::~FixedSetsInjectionAlgorithm() {}
 
-void FixedSetInjectionAlgorithm::processRequest(
+void FixedSetsInjectionAlgorithm::processRequest(
     Message* _message, InjectionAlgorithm::Response* _response) {
-  // use VCs in the corresponding set
-  for (u32 vc = set_; vc < numVcs_; vc += numSets_) {
-    _response->add(vc);
+  // use VCs in the corresponding sets
+  for (auto set : sets_) {
+    for (u32 vc = set; vc < numVcs_; vc += numSets_) {
+      _response->add(vc);
+    }
   }
 }
 

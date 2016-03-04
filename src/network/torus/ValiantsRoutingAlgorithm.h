@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_TORUS_DIMORDERROUTINGALGORITHM_H_
-#define NETWORK_TORUS_DIMORDERROUTINGALGORITHM_H_
+#ifndef NETWORK_TORUS_VALIANTSROUTINGALGORITHM_H_
+#define NETWORK_TORUS_VALIANTSROUTINGALGORITHM_H_
 
 #include <prim/prim.h>
 
@@ -27,13 +27,13 @@
 
 namespace Torus {
 
-class DimOrderRoutingAlgorithm : public RoutingAlgorithm {
+class ValiantsRoutingAlgorithm : public RoutingAlgorithm {
  public:
-  DimOrderRoutingAlgorithm(
+  ValiantsRoutingAlgorithm(
       const std::string& _name, const Component* _parent, Router* _router,
       u64 _latency, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
       u32 _concentration, u32 _inputPort);
-  ~DimOrderRoutingAlgorithm();
+  ~ValiantsRoutingAlgorithm();
 
  protected:
   void processRequest(
@@ -49,4 +49,4 @@ class DimOrderRoutingAlgorithm : public RoutingAlgorithm {
 
 }  // namespace Torus
 
-#endif  // NETWORK_TORUS_DIMORDERROUTINGALGORITHM_H_
+#endif  // NETWORK_TORUS_VALIANTSROUTINGALGORITHM_H_

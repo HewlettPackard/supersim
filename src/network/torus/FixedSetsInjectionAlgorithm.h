@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_TORUS_FIXEDSETINJECTIONALGORITHM_H_
-#define NETWORK_TORUS_FIXEDSETINJECTIONALGORITHM_H_
+#ifndef NETWORK_TORUS_FIXEDSETSINJECTIONALGORITHM_H_
+#define NETWORK_TORUS_FIXEDSETSINJECTIONALGORITHM_H_
 
 #include <prim/prim.h>
 
+#include <set>
 #include <string>
-#include <vector>
 
 #include "event/Component.h"
 #include "network/InjectionAlgorithm.h"
@@ -27,12 +27,12 @@
 
 namespace Torus {
 
-class FixedSetInjectionAlgorithm : public InjectionAlgorithm {
+class FixedSetsInjectionAlgorithm : public InjectionAlgorithm {
  public:
-  FixedSetInjectionAlgorithm(const std::string& _name, const Component* _parent,
-                             Interface* _interface, u64 _latency, u32 _numVcs,
-                             u32 _numSets, u32 _set);
-  ~FixedSetInjectionAlgorithm();
+  FixedSetsInjectionAlgorithm(
+      const std::string& _name, const Component* _parent, Interface* _interface,
+      u64 _latency, u32 _numVcs, u32 _numSets, const std::set<u32>& _sets);
+  ~FixedSetsInjectionAlgorithm();
 
  protected:
   void processRequest(
@@ -41,9 +41,9 @@ class FixedSetInjectionAlgorithm : public InjectionAlgorithm {
  private:
   const u32 numVcs_;
   const u32 numSets_;
-  const u32 set_;
+  const std::set<u32> sets_;
 };
 
 }  // namespace Torus
 
-#endif  // NETWORK_TORUS_FIXEDSETINJECTIONALGORITHM_H_
+#endif  // NETWORK_TORUS_FIXEDSETSINJECTIONALGORITHM_H_

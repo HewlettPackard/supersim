@@ -17,7 +17,7 @@
 
 #include <cassert>
 
-#include "network/torus/FixedSetInjectionAlgorithm.h"
+#include "network/torus/FixedSetsInjectionAlgorithm.h"
 #include "network/InjectionAlgorithm.h"
 
 namespace Torus {
@@ -34,8 +34,11 @@ InjectionAlgorithm* InjectionAlgorithmFactory::createInjectionAlgorithm(
   u32 latency = settings_["latency"].asUInt();
 
   if (algorithm == "dimension_order") {
-    return new Torus::FixedSetInjectionAlgorithm(
-        _name, _parent, _interface, latency, numVcs_, 2, 0);
+    return new Torus::FixedSetsInjectionAlgorithm(
+        _name, _parent, _interface, latency, numVcs_, 2, {0, 1});
+  } else  if (algorithm == "valiants") {
+    return new Torus::FixedSetsInjectionAlgorithm(
+        _name, _parent, _interface, latency, numVcs_, 4, {0, 1, 2, 3});
   } else {
     fprintf(stderr, "Unknown injection algorithm: '%s'\n", algorithm.c_str());
     assert(false);
