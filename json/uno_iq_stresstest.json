@@ -15,9 +15,13 @@
     "channel_log": {
       "file": "/dev/null"  // "channels.csv"
     },
+    "routing": {
+      "algorithm": "direct",
+      "latency": 1
+    },
     "interface": {
       "type": "standard",
-      "init_credits": 16,
+      "fixed_msg_vc": false,
       "crossbar_scheduler": {
         "allocator": {
           "type": "r_separable",
@@ -28,16 +32,15 @@
           }
         }
       },
+      "init_credits": 16,
       "crossbar": {
         "latency": 1  // cycles
       }
     },
     "router": {
       "architecture": "input_queued",
-      "routing": {
-        "algorithm": "direct",
-        "latency": 1,  // cycles
-        "all_vcs": true
+      "congestion_status": {
+        "latency": 1
       },
       "input_queue_depth": 16,
       "crossbar": {

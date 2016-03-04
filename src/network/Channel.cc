@@ -19,13 +19,13 @@
 
 #include "types/Flit.h"
 #include "types/FlitReceiver.h"
-#include "types/Control.h"
-#include "types/ControlReceiver.h"
+#include "types/Credit.h"
+#include "types/CreditReceiver.h"
 #include "types/Packet.h"
 #include "event/Simulator.h"
 
 #define FLIT 0xBE
-#define CTRL 0xEF
+#define CRDT 0xEF
 
 Channel::Channel(const std::string& _name, const Component* _parent,
                  Json::Value _settings)
@@ -35,8 +35,8 @@ Channel::Channel(const std::string& _name, const Component* _parent,
 
   nextFlitTime_ = U64_MAX;
   nextFlit_ = nullptr;
-  nextControlTime_ = U64_MAX;
-  nextControl_ = nullptr;
+  nextCreditTime_ = U64_MAX;
+  nextCredit_ = nullptr;
 
   monitoring_ = false;
   monitorTime_ = U64_MAX;
@@ -48,7 +48,7 @@ u32 Channel::latency() const {
   return latency_;
 }
 
-void Channel::setSource(ControlReceiver* _source, u32 _port) {
+void Channel::setSource(CreditReceiver* _source, u32 _port) {
   source_ = _source;
   sourcePort_ = _port;
 }
@@ -91,10 +91,10 @@ void Channel::processEvent(void* _event, s32 _type) {
         sink_->receiveFlit(sinkPort_, flit);
       }
       break;
-    case CTRL:
+    case CRDT:
       {
-        source_->receiveControl(sourcePort_,
-                                reinterpret_cast<Control*>(_event));
+        Credit* credit = reinterpret_cast<Credit*>(_event);
+        source_->receiveCredit(sourcePort_, credit);
       }
       break;
     default:
@@ -137,32 +137,32 @@ u64 Channel::setNextFlit(Flit* _flit) {
   return nextFlitTime_;
 }
 
-Control* Channel::getNextControl() const {
-  // determine the next time slot to send a control
+Credit* Channel::getNextCredit() const {
+  // determine the next time slot to send a credit
   u64 nextSlot = gSim->futureCycle(1);
 
-  // return nullptr if the next control hasn't been set
-  if (nextControlTime_ != nextSlot) {
+  // return nullptr if the next credit hasn't been set
+  if (nextCreditTime_ != nextSlot) {
     return nullptr;
   } else {
     // if it was set, return it
-    return nextControl_;
+    return nextCredit_;
   }
 }
 
-u64 Channel::setNextControl(Control* _control) {
-  // determine the next time slot to send a control
+u64 Channel::setNextCredit(Credit* _credit) {
+  // determine the next time slot to send a credit
   u64 nextSlot = gSim->futureCycle(1);
-  assert(nextSlot != nextControlTime_);
+  assert(nextSlot != nextCreditTime_);
 
   // set the time and value
-  nextControlTime_ = nextSlot;
-  nextControl_ = _control;
+  nextCreditTime_ = nextSlot;
+  nextCredit_ = _credit;
 
-  // add the event of when the control will arrive on the other end
+  // add the event of when the credit will arrive on the other end
   u64 nextTime = gSim->futureCycle(latency_);
-  addEvent(nextTime, 1, _control, CTRL);
+  addEvent(nextTime, 1, _credit, CRDT);
 
   // return the injection time
-  return nextControlTime_;
+  return nextCreditTime_;
 }

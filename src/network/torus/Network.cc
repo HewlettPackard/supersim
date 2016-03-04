@@ -21,7 +21,8 @@
 #include <cmath>
 
 #include "interface/InterfaceFactory.h"
-#include "network/torus/RoutingFunctionFactory.h"
+#include "network/torus/RoutingAlgorithmFactory.h"
+#include "network/torus/InjectionAlgorithmFactory.h"
 #include "router/RouterFactory.h"
 #include "util/DimensionIterator.h"
 
@@ -57,9 +58,10 @@ Network::Network(const std::string& _name, const Component* _parent,
   _settings["router"]["num_vcs"] = Json::Value(numVcs_);
   _settings["interface"]["num_vcs"] = Json::Value(numVcs_);
 
-  // create a routing function factory to give to the routers
-  RoutingFunctionFactory* routingFunctionFactory = new RoutingFunctionFactory(
-      numVcs_, dimensionWidths_, concentration_);
+  // create a routing algorithm factory to give to the routers
+  RoutingAlgorithmFactory* routingAlgorithmFactory =
+      new RoutingAlgorithmFactory(numVcs_, dimensionWidths_, concentration_,
+                                  _settings["routing"]);
 
   // setup a router iterator for looping over the router dimensions
   DimensionIterator routerIterator(dimensionWidths_);
@@ -73,12 +75,10 @@ Network::Network(const std::string& _name, const Component* _parent,
 
     // use the router factory to create a router
     routers_.at(routerAddress) = RouterFactory::createRouter(
-        routerName, this, routingFunctionFactory, _settings["router"]);
-
-    // set the router's address
-    routers_.at(routerAddress)->setAddress(routerAddress);
+        routerName, this, routerAddress, routingAlgorithmFactory,
+        _settings["router"]);
   }
-  delete routingFunctionFactory;
+  delete routingAlgorithmFactory;
 
   // link routers via channels
   routerIterator.reset();
@@ -98,9 +98,9 @@ Network::Network(const std::string& _name, const Component* _parent,
         sourcePort = portBase;
         destinationPort = portBase;
         std::string channelName = "Channel_" +
-                                  strop::vecString<u32>(routerAddress) +
-                                  "-to-" +
-                                  strop::vecString<u32>(destinationAddress);
+            strop::vecString<u32>(routerAddress) +
+            "-to-" +
+            strop::vecString<u32>(destinationAddress);
 
         // create the channel
         Channel* channel = new Channel(channelName, this,
@@ -127,9 +127,9 @@ Network::Network(const std::string& _name, const Component* _parent,
 
         // create the channel
         std::string channelName = "Channel_"  +
-                                  strop::vecString<u32>(routerAddress) +
-                                  "-to-" +
-                                  strop::vecString<u32>(destinationAddress);
+            strop::vecString<u32>(routerAddress) +
+            "-to-" +
+            strop::vecString<u32>(destinationAddress);
         Channel* channel = new Channel(channelName, this,
                                        _settings["internal_channel"]);
         internalChannels_.push_back(channel);
@@ -145,13 +145,13 @@ Network::Network(const std::string& _name, const Component* _parent,
                                                          channel);
         // determine the destination router (going down)
         destinationAddress.at(dim) = (sourceAddress.at(dim) + dimWidth - 1) %
-                                     dimWidth;
+            dimWidth;
         sourcePort = portBase + 1;
         destinationPort = portBase;
         channelName = "Channel_" +
-                      strop::vecString<u32>(routerAddress) +
-                      "-to-" +
-                      strop::vecString<u32>(destinationAddress);
+            strop::vecString<u32>(routerAddress) +
+            "-to-" +
+            strop::vecString<u32>(destinationAddress);
         channel = new Channel(channelName, this, _settings["internal_channel"]);
         internalChannels_.push_back(channel);
 
@@ -175,7 +175,11 @@ Network::Network(const std::string& _name, const Component* _parent,
   fullDimensionWidths.insert(fullDimensionWidths.begin() + 1,
                              dimensionWidths_.begin(), dimensionWidths_.end());
 
-    // create interfaces and link them with the routers
+  // create an injection algorithm factory
+  InjectionAlgorithmFactory* injectionAlgorithmFactory =
+      new InjectionAlgorithmFactory(numVcs_, _settings["routing"]);
+
+  // create interfaces and link them with the routers
   interfaces_.setSize(fullDimensionWidths);
   u32 interfaceId = 0;
   routerIterator.reset();
@@ -197,7 +201,8 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // create the interface
       Interface* interface = InterfaceFactory::createInterface(
-          interfaceName, this, interfaceId, _settings["interface"]);
+          interfaceName, this, interfaceId, injectionAlgorithmFactory,
+          _settings["interface"]);
       interfaces_.at(interfaceAddress) = interface;
       interfaceId++;
 
@@ -211,7 +216,7 @@ Network::Network(const std::string& _name, const Component* _parent,
       Channel* inChannel = new Channel(inChannelName, this,
                                        _settings["external_channel"]);
       Channel* outChannel = new Channel(outChannelName, this,
-                                       _settings["external_channel"]);
+                                        _settings["external_channel"]);
       externalChannels_.push_back(inChannel);
       externalChannels_.push_back(outChannel);
 
@@ -222,6 +227,8 @@ Network::Network(const std::string& _name, const Component* _parent,
       interface->setInputChannel(outChannel);
     }
   }
+
+  delete injectionAlgorithmFactory;
 }
 
 Network::~Network() {

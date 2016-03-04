@@ -25,8 +25,8 @@
 
 class Flit;
 class FlitReceiver;
-class Control;
-class ControlReceiver;
+class Credit;
+class CreditReceiver;
 
 class Channel : public Component {
  public:
@@ -34,7 +34,7 @@ class Channel : public Component {
           Json::Value _settings);
   ~Channel();
   u32 latency() const;
-  void setSource(ControlReceiver* _source, u32 _port);
+  void setSource(CreditReceiver* _source, u32 _port);
   void setSink(FlitReceiver* _sink, u32 _port);
   void startMonitoring();
   void endMonitoring();
@@ -57,33 +57,33 @@ class Channel : public Component {
   u64 setNextFlit(Flit* _flit);
 
   /*
-   * This retrieves the control that exists in the event queue for the next
-   * control time in the future. nullptr is returned if it has not been set.
+   * This retrieves the credit that exists in the event queue for the next
+   * credit time in the future. nullptr is returned if it has not been set.
    */
-  Control* getNextControl() const;
+  Credit* getNextCredit() const;
 
   /*
-   * Sets 'control' to be the next control to traverse the channel. This inserts
-   * an event into the event queue. If an existing control is already set for
+   * Sets 'credit' to be the next credit to traverse the channel. This inserts
+   * an event into the event queue. If an existing credit is already set for
    * this time, an assertion will fail!
-   * This returns the time the control will be injected into the channel,
+   * This returns the time the credit will be injected into the channel,
    * which is guaranteed to be in the future.
    */
-  u64 setNextControl(Control* _control);
+  u64 setNextCredit(Credit* _credit);
 
  private:
   u32 latency_;
   u64 nextFlitTime_;
   Flit* nextFlit_;
-  u64 nextControlTime_;
-  Control* nextControl_;
+  u64 nextCreditTime_;
+  Credit* nextCredit_;
   bool monitoring_;
   u64 monitorTime_;
   u64 monitorCount_;
 
-  ControlReceiver* source_;  // sends flits, receives controls
+  CreditReceiver* source_;  // sends flits, receives credits
   u32 sourcePort_;
-  FlitReceiver* sink_;   // receives flits, sends controls
+  FlitReceiver* sink_;   // receives flits, sends credits
   u32 sinkPort_;
 };
 

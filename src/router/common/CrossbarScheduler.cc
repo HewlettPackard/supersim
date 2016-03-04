@@ -26,12 +26,12 @@ CrossbarScheduler::Client::~Client() {}
 
 CrossbarScheduler::CrossbarScheduler(
     const std::string& _name, const Component* _parent, u32 _numClients,
-    u32 _numVcs, u32 _numPorts, Json::Value _settings)
-    : Component(_name, _parent), numClients_(_numClients), numVcs_(_numVcs),
-      numPorts_(_numPorts) {
+    u32 _totalVcs, u32 _crossbarPorts, Json::Value _settings)
+    : Component(_name, _parent), numClients_(_numClients),
+      totalVcs_(_totalVcs), crossbarPorts_(_crossbarPorts) {
   assert(numClients_ > 0 && numClients_ != U32_MAX);
-  assert(numVcs_ > 0 && numVcs_ != U32_MAX);
-  assert(numPorts_ > 0 && numPorts_ != U32_MAX);
+  assert(totalVcs_ > 0 && totalVcs_ != U32_MAX);
+  assert(crossbarPorts_ > 0 && crossbarPorts_ != U32_MAX);
 
   // create Client pointers and requested flags
   clients_.resize(numClients_, nullptr);
@@ -39,22 +39,22 @@ CrossbarScheduler::CrossbarScheduler(
   clientRequestVcs_.resize(numClients_, U32_MAX);
 
   // create the credit counters
-  credits_.resize(numVcs_, 0);
-  maxCredits_.resize(numVcs_, 0);
+  credits_.resize(totalVcs_, 0);
+  maxCredits_.resize(totalVcs_, 0);
 
   // create arrays for allocator inputs and outputs
-  requests_ = new bool[numPorts_ * numClients_];
-  memset(requests_, 0, sizeof(bool) * numPorts_ * numClients_);
-  metadatas_ = new u64[numPorts_ * numClients_];
-  grants_ = new bool[numPorts_ * numClients_];
+  requests_ = new bool[crossbarPorts_ * numClients_];
+  memset(requests_, 0, sizeof(bool) * crossbarPorts_ * numClients_);
+  metadatas_ = new u64[crossbarPorts_ * numClients_];
+  grants_ = new bool[crossbarPorts_ * numClients_];
 
   // create the allocator
   allocator_ = AllocatorFactory::createAllocator(
-      "Allocator", this, numClients_, numPorts_, _settings["allocator"]);
+      "Allocator", this, numClients_, crossbarPorts_, _settings["allocator"]);
 
   // map inputs and outputs to allocator
   for (u32 c = 0; c < numClients_; c++) {
-    for (u32 p = 0; p < numPorts_; p++) {
+    for (u32 p = 0; p < crossbarPorts_; p++) {
       allocator_->setRequest(c, p, &requests_[index(c, p)]);
       allocator_->setMetadata(c, p, &metadatas_[index(c, p)]);
       allocator_->setGrant(c, p, &grants_[index(c, p)]);
@@ -76,12 +76,12 @@ u32 CrossbarScheduler::numClients() const {
   return numClients_;
 }
 
-u32 CrossbarScheduler::numVcs() const {
-  return numVcs_;
+u32 CrossbarScheduler::totalVcs() const {
+  return totalVcs_;
 }
 
-u32 CrossbarScheduler::numPorts() const {
-  return numPorts_;
+u32 CrossbarScheduler::crossbarPorts() const {
+  return crossbarPorts_;
 }
 
 void CrossbarScheduler::setClient(u32 _id, Client* _client) {
@@ -89,18 +89,18 @@ void CrossbarScheduler::setClient(u32 _id, Client* _client) {
   clients_.at(_id) = _client;
 }
 
-void CrossbarScheduler::request(u32 _client, u32 _port, u32 _vc,
+void CrossbarScheduler::request(u32 _client, u32 _port, u32 _vcIdx,
                                 u32 _metadata) {
   assert(gSim->epsilon() >= 1);
   assert(_client < numClients_);
   assert(clientRequestPorts_[_client] == U32_MAX);
   assert(clientRequestVcs_[_client] == U32_MAX);
-  assert(_vc < numVcs_);
-  assert(_port < numPorts_);
+  assert(_vcIdx < totalVcs_);
+  assert(_port < crossbarPorts_);
 
   // set request
   clientRequestPorts_[_client] = _port;
-  clientRequestVcs_[_client] = _vc;
+  clientRequestVcs_[_client] = _vcIdx;
   u64 idx = index(_client, _port);
   requests_[idx] = true;
   metadatas_[idx] = _metadata;
@@ -114,18 +114,18 @@ void CrossbarScheduler::request(u32 _client, u32 _port, u32 _vc,
   }
 }
 
-void CrossbarScheduler::initCreditCount(u32 _vc, u32 _credits) {
-  assert(_vc < numVcs_);
-  credits_[_vc] = _credits;
-  maxCredits_[_vc] = _credits;
+void CrossbarScheduler::initCreditCount(u32 _vcIdx, u32 _credits) {
+  assert(_vcIdx < totalVcs_);
+  credits_[_vcIdx] = _credits;
+  maxCredits_[_vcIdx] = _credits;
 }
 
-void CrossbarScheduler::incrementCreditCount(u32 _vc) {
+void CrossbarScheduler::incrementCreditCount(u32 _vcIdx) {
   assert(gSim->epsilon() >= 1);
-  assert(_vc < numVcs_);
+  assert(_vcIdx < totalVcs_);
 
   // add increment value to VC
-  incrCredits_[_vc]++;
+  incrCredits_[_vcIdx]++;
 
   // upgrade event
   if (eventAction_ == EventAction::NONE) {
@@ -134,17 +134,17 @@ void CrossbarScheduler::incrementCreditCount(u32 _vc) {
   }
 }
 
-void CrossbarScheduler::decrementCreditCount(u32 _vc) {
-  assert(_vc < numVcs_);
+void CrossbarScheduler::decrementCreditCount(u32 _vcIdx) {
+  assert(_vcIdx < totalVcs_);
 
   // decrement the credit count
-  assert(credits_[_vc] > 0);
-  credits_[_vc]--;
+  assert(credits_[_vcIdx] > 0);
+  credits_[_vcIdx]--;
 }
 
-u32 CrossbarScheduler::getCreditCount(u32 _vc) const {
-  assert(_vc < numVcs_);
-  return credits_[_vc];
+u32 CrossbarScheduler::getCreditCount(u32 _vcIdx) const {
+  assert(_vcIdx < totalVcs_);
+  return credits_[_vcIdx];
 }
 
 void CrossbarScheduler::processEvent(void* _event, s32 _type) {
@@ -155,7 +155,7 @@ void CrossbarScheduler::processEvent(void* _event, s32 _type) {
   for (auto it = incrCredits_.cbegin(); it != incrCredits_.cend(); ++it) {
     u32 vc = it->first;
     u32 incr = it->second;
-    assert(vc < numVcs_);
+    assert(vc < totalVcs_);
     credits_[vc] += incr;
     assert(credits_[vc] <= maxCredits_[vc]);
   }
@@ -176,7 +176,7 @@ void CrossbarScheduler::processEvent(void* _event, s32 _type) {
     }
 
     // clear the grants (must do before allocate() call)
-    memset(grants_, false, sizeof(bool) * numClients_ * numPorts_);
+    memset(grants_, false, sizeof(bool) * numClients_ * crossbarPorts_);
 
     // run the allocator
     allocator_->allocate();
@@ -208,5 +208,5 @@ void CrossbarScheduler::processEvent(void* _event, s32 _type) {
 
 u64 CrossbarScheduler::index(u64 _client, u64 _port) const {
   // this indexing contiguously places resources
-  return (numPorts_ * _client) + _port;
+  return (crossbarPorts_ * _client) + _port;
 }

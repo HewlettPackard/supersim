@@ -19,7 +19,6 @@
 #include <gtest/gtest.h>
 #include <mut/mut.h>
 #include <prim/prim.h>
-#include <strop/strop.h>
 
 #include <vector>
 

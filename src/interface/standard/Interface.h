@@ -23,10 +23,12 @@
 
 #include "interface/Interface.h"
 #include "network/Channel.h"
+#include "network/InjectionAlgorithm.h"
+#include "network/InjectionAlgorithmFactory.h"
 #include "router/common/Crossbar.h"
 #include "router/common/CrossbarScheduler.h"
-#include "types/Control.h"
-#include "types/ControlReceiver.h"
+#include "types/Credit.h"
+#include "types/CreditReceiver.h"
 #include "types/Flit.h"
 #include "types/FlitReceiver.h"
 #include "types/Message.h"
@@ -39,21 +41,29 @@ class Ejector;
 class PacketReassembler;
 class MessageReassembler;
 
-class Interface : public ::Interface {
+class Interface : public ::Interface, public InjectionAlgorithm::Client {
  public:
   Interface(const std::string& _name, const Component* _parent, u32 _id,
+            InjectionAlgorithmFactory* _injectionAlgorithmFactory,
             Json::Value _settings);
   ~Interface();
   void setInputChannel(Channel* _channel) override;
   void setOutputChannel(Channel* _channel) override;
   void receiveMessage(Message* _message) override;
+  void injectionAlgorithmResponse(
+      Message* _message, InjectionAlgorithm::Response* _response) override;
+
+  void sendFlit(u32 _port, Flit* _flit) override;
   void receiveFlit(u32 _port, Flit* _flit) override;
-  void receiveControl(u32 _port, Control* _control) override;
-  void sendFlit(Flit* _flit);
+  void sendCredit(u32 _port, u32 _vc) override;
+  void receiveCredit(u32 _port, Credit* _credit) override;
 
  private:
   Channel* inputChannel_;
   Channel* outputChannel_;
+
+  InjectionAlgorithm* injectionAlgorithm_;
+  bool fixedMsgVc_;  // all pkts of a msg have same VC
 
   std::vector<InputQueue*> inputQueues_;
   Crossbar* crossbar_;

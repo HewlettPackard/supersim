@@ -21,10 +21,12 @@
 
 Interface* InterfaceFactory::createInterface(
     const std::string& _name, const Component* _parent, u32 _id,
+    InjectionAlgorithmFactory* _injectionAlgorithmFactory,
     Json::Value _settings) {
   std::string type = _settings["type"].asString();
   if (type == "standard") {
-    return new Standard::Interface(_name, _parent, _id, _settings);
+    return new Standard::Interface(
+        _name, _parent, _id, _injectionAlgorithmFactory, _settings);
   } else {
     fprintf(stderr, "unknown interface type: %s\n", type.c_str());
     assert(false);

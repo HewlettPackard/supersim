@@ -19,7 +19,8 @@
 #include <cmath>
 
 #include "interface/InterfaceFactory.h"
-#include "network/uno/RoutingFunctionFactory.h"
+#include "network/uno/InjectionAlgorithmFactory.h"
+#include "network/uno/RoutingAlgorithmFactory.h"
 #include "router/RouterFactory.h"
 
 namespace Uno {
@@ -39,15 +40,20 @@ Network::Network(const std::string& _name, const Component* _parent,
   _settings["router"]["num_vcs"] = Json::Value(numVcs_);
   _settings["interface"]["num_vcs"] = Json::Value(numVcs_);
 
-  // create a routing function factory to give to the routers
-  RoutingFunctionFactory* routingFunctionFactory = new RoutingFunctionFactory(
-      numVcs_, concentration_);
+  // create a routing algorithm factory to give to the routers
+  RoutingAlgorithmFactory* routingAlgorithmFactory =
+      new RoutingAlgorithmFactory(numVcs_, concentration_,
+                                  _settings["routing"]);
 
   // create the router
   router_ = RouterFactory::createRouter(
-      "Router", this, routingFunctionFactory, _settings["router"]);
-  router_->setAddress(std::vector<u32>());  // empty
-  delete routingFunctionFactory;
+      "Router", this, std::vector<u32>(), routingAlgorithmFactory,
+      _settings["router"]);
+  delete routingAlgorithmFactory;
+
+  // create an injection algorithm factory to give to the interfaces
+  InjectionAlgorithmFactory* injectionAlgorithmFactory =
+      new InjectionAlgorithmFactory(numVcs_, _settings["routing"]);
 
   // create the interfaces and external channels
   interfaces_.resize(concentration_, nullptr);
@@ -55,7 +61,8 @@ Network::Network(const std::string& _name, const Component* _parent,
     // create the interface
     std::string interfaceName = "Interface_" + std::to_string(id);
     Interface* interface = InterfaceFactory::createInterface(
-        interfaceName, this, id, _settings["interface"]);
+        interfaceName, this, id, injectionAlgorithmFactory,
+        _settings["interface"]);
     interfaces_.at(id) = interface;
 
     // create the channels
@@ -74,6 +81,8 @@ Network::Network(const std::string& _name, const Component* _parent,
     interface->setInputChannel(outChannel);
     interface->setOutputChannel(inChannel);
   }
+
+  delete injectionAlgorithmFactory;
 }
 
 Network::~Network() {

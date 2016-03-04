@@ -18,7 +18,7 @@
 #include <cassert>
 
 NullTerminal::NullTerminal(const std::string& _name, const Component* _parent,
-                           u32 _id, std::vector<u32> _address,
+                           u32 _id, const std::vector<u32>& _address,
                            Application* _app)
     : Terminal(_name, _parent, _id, _address, _app) {}
 

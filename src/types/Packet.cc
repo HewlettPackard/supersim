@@ -21,7 +21,8 @@
 #include "types/Message.h"
 
 Packet::Packet(u32 _id, u32 _numFlits, Message* _message)
-    : id_(_id), message_(_message), hopCount_(0), metadata_(U64_MAX) {
+    : id_(_id), message_(_message), hopCount_(0),
+      metadata_(U64_MAX), routingExtension_(nullptr) {
   flits_.resize(_numFlits);
 }
 
@@ -31,6 +32,7 @@ Packet::~Packet() {
       delete flits_.at(f);
     }
   }
+  assert(routingExtension_ == nullptr);
 }
 
 u32 Packet::getId() const {
@@ -86,4 +88,12 @@ u64 Packet::getMetadata() const {
 void Packet::setMetadata(u64 _metadata) {
   assert(_metadata != U64_MAX);
   metadata_ = _metadata;
+}
+
+void* Packet::getRoutingExtension() const {
+  return routingExtension_;
+}
+
+void Packet::setRoutingExtension(void* _ext) {
+  routingExtension_ = _ext;
 }

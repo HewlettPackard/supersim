@@ -19,7 +19,8 @@
 #include <cmath>
 
 #include "interface/InterfaceFactory.h"
-#include "network/foldedclos/RoutingFunctionFactory.h"
+#include "network/foldedclos/InjectionAlgorithmFactory.h"
+#include "network/foldedclos/RoutingAlgorithmFactory.h"
 #include "router/RouterFactory.h"
 
 namespace FoldedClos {
@@ -61,7 +62,7 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // router name
       std::string rname = "Router_" + std::to_string(row) + "-" +
-                          std::to_string(col) + "_[";
+          std::to_string(col) + "_[";
       for (u32 i = 0; i < routerAddress.size(); i++) {
         if (routerAddress.at(i) == U32_MAX) {
           rname +=  "*";
@@ -75,19 +76,18 @@ Network::Network(const std::string& _name, const Component* _parent,
       }
       rname += ']';
 
-      // create a routing function factory
-      RoutingFunctionFactory* routingFunctionFactory =
-          new RoutingFunctionFactory(numVcs_, routerRadix_, numLevels_, row);
+      // create a routing algorithm factory
+      RoutingAlgorithmFactory* routingAlgorithmFactory =
+          new RoutingAlgorithmFactory(numVcs_, routerRadix_, numLevels_, row,
+                                      _settings["routing"]);
 
       // make router
       routers_.at(row).at(col) = RouterFactory::createRouter(
-          rname, this, routingFunctionFactory, _settings["router"]);
+          rname, this, routerAddress, routingAlgorithmFactory,
+          _settings["router"]);
 
-      // delete the routing function factory
-      delete routingFunctionFactory;
-
-      // set router address
-      routers_.at(row).at(col)->setAddress(routerAddress);
+      // delete the routing algorithm factory
+      delete routingAlgorithmFactory;
     }
   }
 
@@ -120,17 +120,17 @@ Network::Network(const std::string& _name, const Component* _parent,
         u32 thatOffset = c - thatBase;
         assert(thatOffset == (c % thatGroupSize));
 
-        // u32 thisRow    = r;
-        // u32 thisColumn = c;
+        u32 thisRow    = r;
+        u32 thisColumn = c;
         u32 thisPort = halfRadix_ + p;
 
         u32 thatRow = r + 1;
         u32 thatColumn = thatBase + thisOffset + (p * thisGroupSize);
         u32 thatPort = thisGroup % halfRadix_;
 
-        /*printf("[R,C,P]: [%u,%u,%u] -> [%u,%u,%u]\n",
-               thisRow, thisColumn, thisPort,
-               thatRow, thatColumn, thatPort);*/
+        dbgprintf("[R,C,P]: [%u,%u,%u] -> [%u,%u,%u]\n",
+                  thisRow, thisColumn, thisPort,
+                  thatRow, thatColumn, thatPort);
 
         Router* thisRouter = routers_.at(r).at(c);
         Router* thatRouter = routers_.at(thatRow).at(thatColumn);
@@ -142,6 +142,9 @@ Network::Network(const std::string& _name, const Component* _parent,
       }
     }
   }
+
+  InjectionAlgorithmFactory* injectionAlgorithmFactory =
+      new InjectionAlgorithmFactory(numVcs_, _settings["routing"]);
 
   // create interfaces, external channels, link together
   u32 interfaceId = 0;
@@ -172,7 +175,8 @@ Network::Network(const std::string& _name, const Component* _parent,
       std::string interfaceName = "Interface_" + std::to_string(c) + ":" +
           std::to_string(p);
       Interface* interface = InterfaceFactory::createInterface(
-          interfaceName, this, interfaceId, _settings["interface"]);
+          interfaceName, this, interfaceId, injectionAlgorithmFactory,
+          _settings["interface"]);
       interfaces_.at(c).at(p) = interface;
       interfaceId++;
 
@@ -181,6 +185,8 @@ Network::Network(const std::string& _name, const Component* _parent,
       interface->setOutputChannel(inChannel);
     }
   }
+
+  delete injectionAlgorithmFactory;
 
   for (u32 id = 0; id < numInterfaces(); id++) {
     assert(getInterface(id) != nullptr);

@@ -17,20 +17,25 @@
 
 #include <cassert>
 
-#include "network/RoutingFunctionFactory.h"
-#include "router/inputqueued/InputQueue.h"
+#include "network/RoutingAlgorithmFactory.h"
 #include "router/inputqueued/Ejector.h"
-#include "types/Credit.h"
+#include "router/inputqueued/InputQueue.h"
 
 namespace InputQueued {
 
 Router::Router(
     const std::string& _name, const Component* _parent,
-    RoutingFunctionFactory* _routingFunctionFactory,
+    const std::vector<u32>& _address,
+    RoutingAlgorithmFactory* _routingAlgorithmFactory,
     Json::Value _settings)
-    : ::Router(_name, _parent, _settings) {
+    : ::Router(_name, _parent, _address, _settings) {
   u32 inputQueueDepth = _settings["input_queue_depth"].asUInt();
   assert(inputQueueDepth > 0);
+
+  // create a congestion status device
+  congestionStatus_ = new CongestionStatus(
+      "CongestionStatus", this, numPorts_ * numVcs_,
+      _settings["congestion_status"]);
 
   // create the crossbar and schedulers
   crossbar_ = new Crossbar("Crossbar", this, numPorts_ * numVcs_, numPorts_,
@@ -42,9 +47,9 @@ Router::Router(
       "CrossbarScheduler", this, numPorts_ * numVcs_, numPorts_ * numVcs_,
       numPorts_, _settings["crossbar_scheduler"]);
 
-  // create routing functions, input queues, link to routing function,
+  // create routing algorithms, input queues, link to routing algorithm,
   //  crossbar, and schedulers
-  routingFunctions_.resize(numPorts_ * numVcs_);
+  routingAlgorithms_.resize(numPorts_ * numVcs_);
   inputQueues_.resize(numPorts_ * numVcs_, nullptr);
   for (u32 port = 0; port < numPorts_; port++) {
     for (u32 vc = 0; vc < numVcs_; vc++) {
@@ -53,13 +58,13 @@ Router::Router(
 
       // create the name suffix
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
-                               std::to_string(vc);
+          std::to_string(vc);
 
-      // routing function
-      std::string rfname = "RoutingFunction" + nameSuffix;
-      RoutingFunction* rf = _routingFunctionFactory->createRoutingFunction(
-          rfname, this, this, port, _settings["routing"]);
-      routingFunctions_.at(vcIndex(port, vc)) = rf;
+      // routing algorithm
+      std::string rfname = "RoutingAlgorithm" + nameSuffix;
+      RoutingAlgorithm* rf = _routingAlgorithmFactory->createRoutingAlgorithm(
+          rfname, this, this, port);
+      routingAlgorithms_.at(vcIndex(port, vc)) = rf;
 
       // compute the client index (same for VC alloc, SW alloc, and Xbar)
       u32 clientIndex = (port * numVcs_) + vc;
@@ -93,11 +98,12 @@ Router::Router(
 }
 
 Router::~Router() {
+  delete congestionStatus_;
   delete crossbar_;
   delete vcScheduler_;
   delete crossbarScheduler_;
   for (u32 vc = 0; vc < (numPorts_ * numVcs_); vc++) {
-    delete routingFunctions_.at(vc);
+    delete routingAlgorithms_.at(vc);
     delete inputQueues_.at(vc);
   }
   for (u32 port = 0; port < numPorts_; port++) {
@@ -121,29 +127,25 @@ void Router::receiveFlit(u32 _port, Flit* _flit) {
   iq->receiveFlit(0, _flit);
 }
 
-void Router::receiveControl(u32 _port, Control* _control) {
-  Credit* credit = dynamic_cast<Credit*>(_control);
-  while (credit->more()) {
-    u32 vc = credit->getNum();
+void Router::receiveCredit(u32 _port, Credit* _credit) {
+  while (_credit->more()) {
+    u32 vc = _credit->getNum();
     crossbarScheduler_->incrementCreditCount(vcIndex(_port, vc));
   }
-  delete credit;
+  delete _credit;
 }
 
 void Router::sendCredit(u32 _port, u32 _vc) {
   // ensure there is an outgoing credit for the next time slot
-  Control* ctrl = inputChannels_.at(_port)->getNextControl();
-  Credit* cred;
-  if (ctrl == nullptr) {
-    cred = new Credit(numVcs_);
-    inputChannels_.at(_port)->setNextControl(cred);
-  } else {
-    cred = dynamic_cast<Credit*>(ctrl);
-    assert(cred);
+  assert(_vc < numVcs_);
+  Credit* credit = inputChannels_.at(_port)->getNextCredit();
+  if (credit == nullptr) {
+    credit = new Credit(numVcs_);
+    inputChannels_.at(_port)->setNextCredit(credit);
   }
 
   // mark the credit with the specified VC
-  cred->putNum(_vc);
+  credit->putNum(_vc);
 }
 
 void Router::sendFlit(u32 _port, Flit* _flit) {
@@ -151,14 +153,8 @@ void Router::sendFlit(u32 _port, Flit* _flit) {
   outputChannels_.at(_port)->setNextFlit(_flit);
 }
 
-u32 Router::vcIndex(u32 _port, u32 _vc) const {
-  return (_port * numVcs_) + _vc;
-}
-
-void Router::vcIndexRev(u32 _index, u32* _port, u32* _vc) const {
-  assert(_index < (numPorts_ * numVcs_));
-  *_port = _index / numVcs_;
-  *_vc = _index % numVcs_;
+f64 Router::congestionStatus(u32 _vcIdx) const {
+  return congestionStatus_->status(_vcIdx);
 }
 
 }  // namespace InputQueued

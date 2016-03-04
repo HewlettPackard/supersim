@@ -16,7 +16,6 @@
 #include <json/json.h>
 #include <gtest/gtest.h>
 #include <prim/prim.h>
-#include <strop/strop.h>
 
 #include <algorithm>
 #include <string>
@@ -34,11 +33,12 @@ class CrossbarSchedulerTestClient : public CrossbarScheduler::Client,
   static const s32 GiveBackCreditEvent = 456;
   enum class Fsm : u8 { REQUESTING = 1, WAITING = 2, DONE = 3 };
 
-  CrossbarSchedulerTestClient(u32 _id, CrossbarScheduler* _xbarSch, u32 _numVcs,
-                              u32 _numPorts, u32 _allocs)
+  CrossbarSchedulerTestClient(
+      u32 _id, CrossbarScheduler* _xbarSch, u32 _totalVcs, u32 _crossbarPorts,
+      u32 _allocs)
       : Component("TestClient_" + std::to_string(_id), nullptr),
-        id_(_id), xbarSch_(_xbarSch), numVcs_(_numVcs), numPorts_(_numPorts),
-        fsm_(Fsm::REQUESTING),
+        id_(_id), xbarSch_(_xbarSch), totalVcs_(_totalVcs),
+        crossbarPorts_(_crossbarPorts), fsm_(Fsm::REQUESTING),
         request_(std::make_tuple(U32_MAX, U32_MAX, U64_MAX)),
         remaining_(_allocs) {
     debug_ = !true;
@@ -59,7 +59,7 @@ class CrossbarSchedulerTestClient : public CrossbarScheduler::Client,
         break;
       case GiveBackCreditEvent:
         vcPtr = reinterpret_cast<u32*>(_event);
-        assert(*vcPtr < numVcs_);
+        assert(*vcPtr < totalVcs_);
         xbarSch_->incrementCreditCount(*vcPtr);
         delete vcPtr;
         break;
@@ -73,8 +73,8 @@ class CrossbarSchedulerTestClient : public CrossbarScheduler::Client,
 
     if (std::get<0>(request_) == U32_MAX) {
       // new request
-      u32 vc = gSim->rnd.nextU64(0, numVcs_ - 1);
-      u32 port = vc / (numVcs_ / numPorts_);
+      u32 vc = gSim->rnd.nextU64(0, totalVcs_ - 1);
+      u32 port = vc / (totalVcs_ / crossbarPorts_);
       u64 metadata = gSim->rnd.nextU64(1000, 2000 - 1);
       dbgprintf("requesting %u %u %lu", port, vc, metadata);
       request_ = std::make_tuple(port, vc, metadata);
@@ -125,8 +125,8 @@ class CrossbarSchedulerTestClient : public CrossbarScheduler::Client,
  private:
   u32 id_;
   CrossbarScheduler* xbarSch_;
-  u32 numVcs_;
-  u32 numPorts_;
+  u32 totalVcs_;
+  u32 crossbarPorts_;
   Fsm fsm_;
   std::tuple<u32, u32, u64> request_;
   u32 remaining_;
@@ -153,8 +153,8 @@ TEST(CrossbarScheduler, basic) {
         CrossbarScheduler* xbarSch =
             new CrossbarScheduler("XbarSch", nullptr, C, V, P, schSettings);
         assert(xbarSch->numClients() == C);
-        assert(xbarSch->numVcs() == V);
-        assert(xbarSch->numPorts() == P);
+        assert(xbarSch->totalVcs() == V);
+        assert(xbarSch->crossbarPorts() == P);
         for (u32 v = 0; v < V; v++) {
           xbarSch->initCreditCount(v, 3);
         }

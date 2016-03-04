@@ -24,13 +24,13 @@
 
 #include "event/Component.h"
 #include "network/Channel.h"
-#include "network/RoutingFunction.h"
-#include "network/RoutingFunctionFactory.h"
+#include "network/RoutingAlgorithm.h"
+#include "network/RoutingAlgorithmFactory.h"
+#include "router/common/CongestionStatus.h"
 #include "router/common/Crossbar.h"
 #include "router/common/CrossbarScheduler.h"
 #include "router/common/VcScheduler.h"
 #include "router/Router.h"
-#include "types/Control.h"
 #include "types/Credit.h"
 #include "types/Flit.h"
 
@@ -43,7 +43,8 @@ class Ejector;
 class Router : public ::Router {
  public:
   Router(const std::string& _name, const Component* _parent,
-         RoutingFunctionFactory* _routingFunctionFactory,
+         const std::vector<u32>& _address,
+         RoutingAlgorithmFactory* _routingAlgorithmFactory,
          Json::Value _settings);
   ~Router();
 
@@ -52,17 +53,17 @@ class Router : public ::Router {
   void setOutputChannel(u32 _index, Channel* _channel) override;
 
   void receiveFlit(u32 _port, Flit* _flit) override;
-  void receiveControl(u32 _port, Control* _control) override;
+  void receiveCredit(u32 _port, Credit* _credit) override;
 
-  void sendCredit(u32 _port, u32 _vc);  // called by InputQueue
-  void sendFlit(u32 _port, Flit* _flit);  // called by Ejector
+  void sendCredit(u32 _port, u32 _vc) override;
+  void sendFlit(u32 _port, Flit* _flit) override;
 
-  u32 vcIndex(u32 _port, u32 _vc) const;
-  void vcIndexRev(u32 _index, u32* _port, u32* _vc) const;
+  f64 congestionStatus(u32 _vcIdx) const override;
 
  private:
   std::vector<InputQueue*> inputQueues_;
-  std::vector<RoutingFunction*> routingFunctions_;
+  std::vector<RoutingAlgorithm*> routingAlgorithms_;
+  CongestionStatus* congestionStatus_;
   Crossbar* crossbar_;
   CrossbarScheduler* crossbarScheduler_;
   VcScheduler* vcScheduler_;

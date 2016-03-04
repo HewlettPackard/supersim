@@ -24,9 +24,8 @@
 
 #include "event/Component.h"
 #include "network/Channel.h"
-#include "types/Control.h"
-#include "types/ControlReceiver.h"
 #include "types/Credit.h"
+#include "types/CreditReceiver.h"
 #include "types/Flit.h"
 #include "types/FlitReceiver.h"
 
@@ -38,7 +37,7 @@ const bool DEBUG = false;
 class Source;
 class Sink;
 
-class Source : public Component, public ControlReceiver {
+class Source : public Component, public CreditReceiver {
  public:
   explicit Source(Channel* _channel);
   ~Source();
@@ -46,7 +45,7 @@ class Source : public Component, public ControlReceiver {
   void load(u32 _count, u64 _totalCycles);
   void expect(u64 _time);
   void processEvent(void* _event, s32 _type);
-  void receiveControl(u32 _port, Control* _control);
+  void receiveCredit(u32 _port, Credit* _credit);
 
  private:
   Channel* channel_;
@@ -124,12 +123,12 @@ void Source::processEvent(void* _event, s32 _type) {
   dbgprintf("source injecting at %lu", gSim->time());
 }
 
-void Source::receiveControl(u32 _port, Control* _control) {
-  dbgprintf("source receiving control at %lu", gSim->time());
+void Source::receiveCredit(u32 _port, Credit* _credit) {
+  dbgprintf("source receiving credit at %lu", gSim->time());
   assert(_port == port_);
   assert(expected_.count(gSim->time()) == 1);
   expected_.erase(gSim->time());
-  delete _control;
+  delete _credit;
 }
 
 /* Sink impl */
@@ -178,9 +177,9 @@ void Sink::expect(u64 _time) {
 }
 
 void Sink::processEvent(void* _event, s32 _type) {
-  Control* control = new Control();
-  assert(channel_->getNextControl() == nullptr);
-  channel_->setNextControl(control);
+  Credit* credit = new Credit(0);
+  assert(channel_->getNextCredit() == nullptr);
+  channel_->setNextCredit(credit);
   dbgprintf("sink injecting at %lu", gSim->time());
 }
 
@@ -233,9 +232,9 @@ TEST(Channel, full) {
 
     const u32 clocks = 10000;
     const u32 flits = gSim->rnd.nextU64(1, clocks);
-    const u32 controls = gSim->rnd.nextU64(1, clocks);
+    const u32 credits = gSim->rnd.nextU64(1, clocks);
     source.load(flits, clocks);
-    sink.load(controls, clocks);
+    sink.load(credits, clocks);
 
     EndMonitoring ender(&c, clocks);
 

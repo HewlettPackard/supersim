@@ -30,7 +30,7 @@
 namespace StressTest {
 
 BlastTerminal::BlastTerminal(const std::string& _name, const Component* _parent,
-                             u32 _id, std::vector<u32> _address,
+                             u32 _id, const std::vector<u32>& _address,
                              ::Application* _app, Json::Value _settings)
     : ::Terminal(_name, _parent, _id, _address, _app),
       lastSendTime_(0) {
@@ -248,21 +248,16 @@ void BlastTerminal::sendNextMessage() {
   u32 flitsLeft = messageLength;
   for (u32 p = 0; p < numPackets; p++) {
     u32 packetLength = flitsLeft > maxPacketSize_ ?
-                       maxPacketSize_ : flitsLeft;
+        maxPacketSize_ : flitsLeft;
 
     Packet* packet = new Packet(p, packetLength, message);
     message->setPacket(p, packet);
-
-    // pick a random starting VC
-    u32 numVcs = gSim->getNetwork()->numVcs();
-    u32 vc = gSim->rnd.nextU64(0, numVcs - 1);
 
     // create flits
     for (u32 f = 0; f < packetLength; f++) {
       bool headFlit = f == 0;
       bool tailFlit = f == (packetLength - 1);
       Flit* flit = new Flit(f, headFlit, tailFlit, packet);
-      flit->setVc(vc);
       packet->setFlit(f, flit);
     }
     flitsLeft -= packetLength;

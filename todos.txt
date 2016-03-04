@@ -8,7 +8,7 @@ Variable crossbar input speedup
 -pre(or) and port(arb&and) processing of core allocator
 
 Variable crossbar output speedup
--HOW TO WIRE THIS UP?
+-This is doable because only a single VC can be allocated at one time.
 
 Multi-frequency designs
 -speedup via frequency
@@ -23,3 +23,13 @@ Adaptive Routing
 -move "routing" in JSON to "network"
 -interface routing function, or option in regular one
 -router provides link congestion state
+
+CustomPermutationTrafficPattern
+-take a mapping from the config file (external tool for generation)
+
+Multiple simultaneous applications
+-basic desire is to have background traffic (stresstest)
+  then introduce another traffic pattern (hotspot)
+
+Torus Topology Weights
+-Just like HyperX is a flexible version of Fbfly, make Torus have weights

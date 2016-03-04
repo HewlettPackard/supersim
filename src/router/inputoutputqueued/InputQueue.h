@@ -23,7 +23,7 @@
 #include <vector>
 
 #include "event/Component.h"
-#include "network/RoutingFunction.h"
+#include "network/RoutingAlgorithm.h"
 #include "router/common/Crossbar.h"
 #include "router/common/CrossbarScheduler.h"
 #include "router/common/VcScheduler.h"
@@ -35,13 +35,13 @@ namespace InputOutputQueued {
 class Router;
 
 class InputQueue : public Component, public FlitReceiver,
-                   public RoutingFunction::Client,
+                   public RoutingAlgorithm::Client,
                    public VcScheduler::Client,
                    public CrossbarScheduler::Client {
  public:
   InputQueue(const std::string& _name, const Component* _parent,
              Router* _router, u32 _depth, u32 _port, u32 _numVcs, u32 _vc,
-             RoutingFunction* _routingFunction, VcScheduler* _vcScheduler,
+             RoutingAlgorithm* _routingAlgorithm, VcScheduler* _vcScheduler,
              u32 _vcSchedulerIndex, CrossbarScheduler* _crossbarScheduler,
              u32 _crossbarSchedulerIndex, Crossbar* _crossbar,
              u32 _crossbarIndex);
@@ -53,8 +53,8 @@ class InputQueue : public Component, public FlitReceiver,
   // event system (Component)
   void processEvent(void* _event, s32 _type) override;
 
-  // response from routing function
-  void routingFunctionResponse(RoutingFunction::Response* _response) override;
+  // response from routing algorithm
+  void routingAlgorithmResponse(RoutingAlgorithm::Response* _response) override;
 
   // response from VcScheduler
   void vcSchedulerResponse(u32 _vc) override;
@@ -74,7 +74,7 @@ class InputQueue : public Component, public FlitReceiver,
 
   // external devices
   Router* router_;
-  RoutingFunction* routingFunction_;
+  RoutingAlgorithm* routingAlgorithm_;
   VcScheduler* vcScheduler_;
   u32 vcSchedulerIndex_;
   CrossbarScheduler* crossbarScheduler_;
@@ -86,12 +86,8 @@ class InputQueue : public Component, public FlitReceiver,
   u64 lastReceivedTime_;
 
   // state machine to represent a generic pipeline stage
-  enum class ePipelineFsm {
-    kEmpty,
-    kWaitingToRequest,
-    kWaitingForResponse,
-    kReadyToAdvance
-  };
+  enum class ePipelineFsm { kEmpty, kWaitingToRequest, kWaitingForResponse,
+      kReadyToAdvance };
 
   // remembers if an event is set to process the pipeline
   u64 eventTime_;
@@ -101,19 +97,19 @@ class InputQueue : public Component, public FlitReceiver,
   // buffer
   std::queue<Flit*> buffer_;
 
-  // routing function execution [rfe_] pipeline stage
+  // routing algorithm execution [rfe_] pipeline stage
   struct {
     ePipelineFsm fsm;
     Flit* flit;
     // results
-    RoutingFunction::Response route;
+    RoutingAlgorithm::Response route;
   } rfe_;
 
   // VC allocation [vca] pipeline stage
   struct {
     ePipelineFsm fsm;
     Flit* flit;
-    RoutingFunction::Response route;
+    RoutingAlgorithm::Response route;
     // results
     u32 allocatedPort;
     u32 allocatedVc;

@@ -23,10 +23,10 @@
 #include <vector>
 
 #include "event/Component.h"
-#include "types/Flit.h"
 #include "types/FlitReceiver.h"
-#include "types/Control.h"
-#include "types/ControlReceiver.h"
+#include "types/FlitSender.h"
+#include "types/CreditReceiver.h"
+#include "types/CreditSender.h"
 #include "types/Message.h"
 #include "types/MessageReceiver.h"
 #include "network/Channel.h"
@@ -34,8 +34,9 @@
 class PacketReassembler;
 class MessageReassembler;
 
-class Interface : public Component, public FlitReceiver,
-                  public ControlReceiver, public MessageReceiver {
+class Interface : public Component, public FlitSender, public FlitReceiver,
+                  public CreditSender, public CreditReceiver,
+                  public MessageReceiver {
  public:
   Interface(const std::string& _name, const Component* _parent, u32 _id,
             Json::Value _settings);

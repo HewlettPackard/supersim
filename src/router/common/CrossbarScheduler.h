@@ -46,34 +46,34 @@ class CrossbarScheduler : public Component {
 
   // constructor and destructor
   CrossbarScheduler(const std::string& _name, const Component* _parent,
-                    u32 _numClients, u32 _numVcs, u32 _numPorts,
+                    u32 _numClients, u32 _totalVcs, u32 _crossbarPorts,
                     Json::Value _settings);
   ~CrossbarScheduler();
 
   // constant attributes
   u32 numClients() const;
-  u32 numVcs() const;
-  u32 numPorts() const;
+  u32 totalVcs() const;
+  u32 crossbarPorts() const;
 
   // links a client to the scheduler
   void setClient(u32 _id, Client* _client);
 
   // requests to send a flit to a VC
-  void request(u32 _client, u32 _port, u32 _vc, u32 _metadata);
+  void request(u32 _client, u32 _port, u32 _vcIdx, u32 _metadata);
 
   // credit counts
-  void initCreditCount(u32 _vc, u32 _credits);
-  void incrementCreditCount(u32 _vc);
-  void decrementCreditCount(u32 _vc);
-  u32 getCreditCount(u32 _vc) const;
+  void initCreditCount(u32 _vcIdx, u32 _credits);
+  void incrementCreditCount(u32 _vcIdx);
+  void decrementCreditCount(u32 _vcIdx);
+  u32 getCreditCount(u32 _vcIdx) const;
 
   // event processing
   void processEvent(void* _event, s32 _type);
 
  private:
   const u32 numClients_;
-  const u32 numVcs_;
-  const u32 numPorts_;
+  const u32 totalVcs_;
+  const u32 crossbarPorts_;
 
   std::vector<Client*> clients_;
   std::vector<u32> clientRequestPorts_;

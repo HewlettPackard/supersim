@@ -28,7 +28,8 @@ namespace SimpleMem {
 
 ProcessorTerminal::ProcessorTerminal(
     const std::string& _name, const Component* _parent, u32 _id,
-    std::vector<u32> _address, ::Application* _app, Json::Value _settings)
+    const std::vector<u32>& _address, ::Application* _app,
+    Json::Value _settings)
     : ::Terminal(_name, _parent, _id, _address, _app) {
   latency_ = _settings["latency"].asUInt();
   assert(latency_ > 0);
@@ -106,7 +107,6 @@ void ProcessorTerminal::startNextMemoryAccess() {
   assert(remainingAccesses_ > 0);
 
   Application* app = reinterpret_cast<Application*>(gSim->getApplication());
-  u32 numVcs = app->numVcs();
   u32 totalMemory = app->totalMemory();
   u32 memorySlice = app->memorySlice();
   u32 blockSize = app->blockSize();
@@ -118,8 +118,7 @@ void ProcessorTerminal::startNextMemoryAccess() {
   u32 address = gSim->rnd.nextU64(0, totalMemory - 1);
   address &= ~(blockSize - 1);  // align to blockSize
   MemoryOp::eOp op = gSim->rnd.nextBool() ?
-                     MemoryOp::eOp::kReadReq :
-                     MemoryOp::eOp::kWriteReq;
+      MemoryOp::eOp::kReadReq : MemoryOp::eOp::kWriteReq;
   MemoryOp* memOp = new MemoryOp(op, address, blockSize);
   if (op == MemoryOp::eOp::kWriteReq) {
     u8* block = memOp->block();
@@ -153,12 +152,10 @@ void ProcessorTerminal::startNextMemoryAccess() {
     Packet* packet = new Packet(p, packetLength, message);
     message->setPacket(p, packet);
 
-    u32 vc = gSim->rnd.nextU64(0, numVcs - 1);
     for (u32 f = 0; f < packetLength; f++) {
       bool headFlit = f == 0;
       bool tailFlit = f == (packetLength - 1);
       Flit* flit = new Flit(f, headFlit, tailFlit, packet);
-      flit->setVc(vc);
       packet->setFlit(f, flit);
     }
     flitsLeft -= packetLength;

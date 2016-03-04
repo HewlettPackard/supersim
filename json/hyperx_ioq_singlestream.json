@@ -20,8 +20,13 @@
     "channel_log": {
       "file": "/dev/null"  // "channels.csv"
     },
+    "routing": {
+      "algorithm": "dimension_order",
+      "latency": 1
+    },
     "interface": {
       "type": "standard",
+      "fixed_msg_vc": false,
       "crossbar_scheduler": {
         "allocator": {
           "type": "r_separable",
@@ -39,10 +44,8 @@
     },
     "router": {
       "architecture": "input_output_queued",
-      "routing": {
-        "algorithm": "dimension_ordered",
-        "latency": 1,  // cycles
-        "all_vcs": true
+      "congestion_status": {
+        "latency": 1
       },
       "input_queue_depth": 12,
       "output_queue_depth": 2,
@@ -93,9 +96,9 @@
     "max_injection_rate": 1.0,
     "terminal": {
       "num_messages": 100,
-      "min_message_size": 10000,
-      "max_message_size": 10000,
-      "max_packet_size": 10000
+      "min_message_size": 3000,
+      "max_message_size": 3000,
+      "max_packet_size": 3000
     },
     "message_log": {
       "file": "/dev/null"  // "data.mpf.gz"

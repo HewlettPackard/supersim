@@ -21,8 +21,8 @@
 #include "types/Packet.h"
 
 Message::Message(u32 _numPackets, void* _data)
-    : data_(_data), transaction_(U32_MAX), sourceId_(U32_MAX),
-      destinationId_(U32_MAX) {
+    : data_(_data), transaction_(U32_MAX),
+      sourceId_(U32_MAX), destinationId_(U32_MAX) {
   packets_.resize(_numPackets);
 }
 

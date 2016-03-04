@@ -20,16 +20,18 @@
 #include <prim/prim.h>
 
 #include <string>
+#include <vector>
 
 #include "event/Component.h"
-#include "network/RoutingFunctionFactory.h"
+#include "network/RoutingAlgorithmFactory.h"
 #include "router/Router.h"
 
 class RouterFactory {
  public:
   static Router* createRouter(
       const std::string& _name, const Component* _parent,
-      RoutingFunctionFactory* _routingFunctionFactory,
+      const std::vector<u32>& _address,
+      RoutingAlgorithmFactory* _routingAlgorithmFactory,
       Json::Value _settings);
 };
 

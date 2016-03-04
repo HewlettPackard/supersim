@@ -8,15 +8,20 @@
   "network": {
     "topology": "uno",
     "num_vcs": 2,
-    "concentration": 64,
+    "concentration": 16,
     "external_channel": {
       "latency": 1
     },
     "channel_log": {
       "file": "/dev/null"  // "channels.csv"
     },
+    "routing": {
+      "algorithm": "direct",
+      "latency": 1
+    },
     "interface": {
       "type": "standard",
+      "fixed_msg_vc": false,
       "crossbar_scheduler": {
         "allocator": {
           "type": "r_separable",
@@ -34,10 +39,8 @@
     },
     "router": {
       "architecture": "input_output_queued",
-      "routing": {
-        "algorithm": "direct",
-        "latency": 1,  // cycles
-        "all_vcs": true
+      "congestion_status": {
+        "latency": 1
       },
       "input_queue_depth": 16,
       "output_queue_depth": 16,
@@ -88,7 +91,7 @@
     "max_injection_rate": 0.5,
     "warmup_threshold": 0.99,
     "blast_terminal": {
-      "num_messages": 300,
+      "num_messages": 3000,
       "min_message_size": 1,
       "max_message_size": 64,
       "max_packet_size": 16,
