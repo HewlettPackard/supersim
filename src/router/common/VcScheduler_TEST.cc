@@ -32,9 +32,10 @@ class VcSchedulerTestClient : public VcScheduler::Client, public Component {
   static const s32 ReleaseVcEvent = 456;
   enum class Fsm : u8 { REQUESTING = 1, WAITING = 2, USING = 3, DONE = 4 };
 
-  VcSchedulerTestClient(u32 _id, VcScheduler* _vcSch, u32 _numVcs, u32 _allocs)
+  VcSchedulerTestClient(u32 _id, VcScheduler* _vcSch, u32 _totalVcs,
+                        u32 _allocs)
       : Component("TestClient_" + std::to_string(_id), nullptr),
-        id_(_id), vcSch_(_vcSch), numVcs_(_numVcs), fsm_(Fsm::REQUESTING),
+        id_(_id), vcSch_(_vcSch), totalVcs_(_totalVcs), fsm_(Fsm::REQUESTING),
         grantedVc_(U32_MAX), remaining_(_allocs) {
     vcSch_->setClient(id_, this);
     addEvent(gSim->time(), 1, nullptr, RequestVcsEvent);
@@ -63,7 +64,7 @@ class VcSchedulerTestClient : public VcScheduler::Client, public Component {
 
     if (requests_.size() == 0) {
       // new request
-      u32 v = gSim->rnd.nextU64(0, numVcs_ - 1);
+      u32 v = gSim->rnd.nextU64(0, totalVcs_ - 1);
       u64 m = gSim->rnd.nextU64(1000, 2000);
       assert(requests_.count(v) == 0);
       requests_.insert({v, m});
@@ -115,7 +116,7 @@ class VcSchedulerTestClient : public VcScheduler::Client, public Component {
  private:
   u32 id_;
   VcScheduler* vcSch_;
-  u32 numVcs_;
+  u32 totalVcs_;
   Fsm fsm_;
   std::unordered_map<u32, u64> requests_;
   u32 grantedVc_;
@@ -141,7 +142,7 @@ TEST(VcScheduler, basic) {
       schSettings["allocator"] = allocSettings;
       VcScheduler* vcSch = new VcScheduler("VcSch", nullptr, C, V, schSettings);
       assert(vcSch->numClients() == C);
-      assert(vcSch->numVcs() == V);
+      assert(vcSch->totalVcs() == V);
 
       std::vector<VcSchedulerTestClient*> clients(C);
       for (u32 c = 0; c < C; c++) {

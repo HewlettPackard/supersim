@@ -38,31 +38,31 @@ class VcScheduler : public Component {
    public:
     Client();
     virtual ~Client();
-    virtual void vcSchedulerResponse(u32 _vc) = 0;
+    virtual void vcSchedulerResponse(u32 _vcIdx) = 0;
   };
 
   // constructor and destructor
   VcScheduler(const std::string& _name, const Component* _parent,
-              u32 _numClients, u32 _numVcs, Json::Value _settings);
+              u32 _numClients, u32 _totalVcs, Json::Value _settings);
   ~VcScheduler();
 
   // constant attributes
   u32 numClients() const;
-  u32 numVcs() const;
+  u32 totalVcs() const;
 
   // links a client to the scheduler
   void setClient(u32 _id, Client* _client);
 
   // requesting and releasing VCs
-  void request(u32 _client, u32 _vc, u64 _metadata);
-  void releaseVc(u32 _vc);
+  void request(u32 _client, u32 _vcIdx, u64 _metadata);
+  void releaseVc(u32 _vcIdx);
 
   // event processing
   void processEvent(void* _event, s32 _type);
 
  private:
   const u32 numClients_;
-  const u32 numVcs_;
+  const u32 totalVcs_;
 
   std::vector<Client*> clients_;
   std::vector<bool> clientRequested_;
@@ -76,7 +76,7 @@ class VcScheduler : public Component {
   bool allocEventSet_;
 
   // this creates an index for requests_, metadatas_, and grants_
-  u64 index(u64 _client, u64 _vc) const;
+  u64 index(u64 _client, u64 _vcIdx) const;
 };
 
 #endif  // ROUTER_COMMON_VCSCHEDULER_H_
