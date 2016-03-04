@@ -84,6 +84,10 @@ void Component::processEvent(void* _event, s32 _type) {
   assert(false);  // this function should be overridden if it is to be used
 }
 
+bool Component::getDebug() {
+  return debug_;
+}
+
 void Component::setDebug(bool _debug) {
   debug_ = _debug;
 }

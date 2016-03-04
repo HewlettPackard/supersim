@@ -36,6 +36,7 @@ class Component {
   void setParent(const Component* _parent);
   const Component* getParent() const;
   virtual void processEvent(void* _event, s32 _type);
+  bool getDebug();
   void setDebug(bool _debug);
 
   static Component* findComponentByName(std::string _fullName);
