@@ -26,9 +26,10 @@ namespace InputOutputQueued {
 
 Router::Router(
     const std::string& _name, const Component* _parent,
+    const std::vector<u32>& _address,
     RoutingAlgorithmFactory* _routingAlgorithmFactory,
     Json::Value _settings)
-    : ::Router(_name, _parent, _settings) {
+    : ::Router(_name, _parent, _address, _settings) {
   u32 inputQueueDepth = _settings["input_queue_depth"].asUInt();
   assert(inputQueueDepth > 0);
   u32 outputQueueDepth = _settings["output_queue_depth"].asUInt();

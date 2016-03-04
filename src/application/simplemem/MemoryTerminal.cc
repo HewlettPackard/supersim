@@ -29,7 +29,7 @@ namespace SimpleMem {
 
 MemoryTerminal::MemoryTerminal(
     const std::string& _name, const Component* _parent, u32 _id,
-    std::vector<u32> _address, u32 _memorySlice, ::Application* _app,
+    const std::vector<u32>& _address, u32 _memorySlice, ::Application* _app,
     Json::Value _settings)
     : ::Terminal(_name, _parent, _id, _address, _app),
       fsm_(eState::kWaiting) {

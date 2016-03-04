@@ -28,7 +28,8 @@ namespace SimpleMem {
 
 ProcessorTerminal::ProcessorTerminal(
     const std::string& _name, const Component* _parent, u32 _id,
-    std::vector<u32> _address, ::Application* _app, Json::Value _settings)
+    const std::vector<u32>& _address, ::Application* _app,
+    Json::Value _settings)
     : ::Terminal(_name, _parent, _id, _address, _app) {
   latency_ = _settings["latency"].asUInt();
   assert(latency_ > 0);

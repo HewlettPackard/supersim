@@ -35,7 +35,7 @@ class Application;
 class StreamTerminal : public Terminal {
  public:
   StreamTerminal(const std::string& _name, const Component* _parent,
-                 u32 _id, std::vector<u32> _address, ::Application* _app,
+                 u32 _id, const std::vector<u32>& _address, ::Application* _app,
                  Json::Value _settings);
   ~StreamTerminal();
   void processEvent(void* _event, s32 _type) override;

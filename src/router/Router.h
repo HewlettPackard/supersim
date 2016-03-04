@@ -33,12 +33,11 @@ class Router : public Component, public FlitSender, public FlitReceiver,
                public CreditSender, public CreditReceiver {
  public:
   Router(const std::string& _name, const Component* _parent,
-         Json::Value _settings);
+         const std::vector<u32>& _address, Json::Value _settings);
   virtual ~Router();
 
   u32 numPorts() const;
   u32 numVcs() const;
-  void setAddress(const std::vector<u32>& _address);
   const std::vector<u32>& getAddress() const;
 
   u32 vcIndex(u32 _port, u32 _vc) const;
@@ -50,9 +49,9 @@ class Router : public Component, public FlitSender, public FlitReceiver,
   virtual f64 congestionStatus(u32 _vcIdx) const;
 
  protected:
+  const std::vector<u32> address_;
   const u32 numPorts_;
   const u32 numVcs_;
-  std::vector<u32> address_;
 };
 
 #endif  // ROUTER_ROUTER_H_

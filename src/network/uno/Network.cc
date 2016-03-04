@@ -47,8 +47,8 @@ Network::Network(const std::string& _name, const Component* _parent,
 
   // create the router
   router_ = RouterFactory::createRouter(
-      "Router", this, routingAlgorithmFactory, _settings["router"]);
-  router_->setAddress(std::vector<u32>());  // empty
+      "Router", this, std::vector<u32>(), routingAlgorithmFactory,
+      _settings["router"]);
   delete routingAlgorithmFactory;
 
   // create an injection algorithm factory to give to the interfaces

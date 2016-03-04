@@ -32,8 +32,8 @@ namespace SimpleMem {
 class ProcessorTerminal : public Terminal {
  public:
   ProcessorTerminal(const std::string& _name, const Component* _parent,
-                    u32 _id, std::vector<u32> _address, ::Application* _app,
-                    Json::Value _settings);
+                    u32 _id, const std::vector<u32>& _address,
+                    ::Application* _app, Json::Value _settings);
   ~ProcessorTerminal();
   void processEvent(void* _event, s32 _type) override;
   void handleMessage(Message* _message) override;

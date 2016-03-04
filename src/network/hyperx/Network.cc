@@ -81,10 +81,8 @@ Network::Network(const std::string& _name, const Component* _parent,
 
     // use the router factory to create a router
     routers_.at(routerAddress) = RouterFactory::createRouter(
-        routerName, this, routingAlgorithmFactory, _settings["router"]);
-
-    // set the router's address
-    routers_.at(routerAddress)->setAddress(routerAddress);
+        routerName, this, routerAddress, routingAlgorithmFactory,
+        _settings["router"]);
   }
   delete routingAlgorithmFactory;
 

@@ -31,10 +31,10 @@ class Application;
 class Terminal : public Component, public MessageReceiver {
  public:
   Terminal(const std::string& _name, const Component* _parent, u32 _id,
-           std::vector<u32> _address, Application* _app);
+           const std::vector<u32>& _address, Application* _app);
   virtual ~Terminal();
   u32 getId() const;
-  const std::vector<u32>* address() const;
+  const std::vector<u32>& getAddress() const;
   u32 messagesSent() const;
   u32 messagesReceived() const;
   u32 transactionsCreated() const;
@@ -103,7 +103,7 @@ class Terminal : public Component, public MessageReceiver {
 
  private:
   u32 id_;
-  std::vector<u32> address_;
+  const std::vector<u32> address_;
   Application* app_;
   MessageReceiver* messageReceiver_;
   u32 messagesSent_;

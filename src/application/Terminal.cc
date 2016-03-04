@@ -22,7 +22,7 @@
 #include "metadata/MetadataHandler.h"
 
 Terminal::Terminal(const std::string& _name, const Component* _parent, u32 _id,
-                   std::vector<u32> _address, Application* _app)
+                   const std::vector<u32>& _address, Application* _app)
     : Component(_name, _parent), id_(_id), address_(_address), app_(_app),
       messagesSent_(0), messagesReceived_(0), transactionsCreated_(0) {}
 
@@ -37,8 +37,8 @@ u32 Terminal::getId() const {
   return id_;
 }
 
-const std::vector<u32>* Terminal::address() const {
-  return &address_;
+const std::vector<u32>& Terminal::getAddress() const {
+  return address_;
 }
 
 u32 Terminal::messagesSent() const {

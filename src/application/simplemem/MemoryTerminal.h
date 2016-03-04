@@ -33,7 +33,7 @@ namespace SimpleMem {
 class MemoryTerminal : public Terminal {
  public:
   MemoryTerminal(const std::string& _name, const Component* _parent,
-                 u32 _id, std::vector<u32> _address, u32 _memorySlice,
+                 u32 _id, const std::vector<u32>& _address, u32 _memorySlice,
                  ::Application* _app, Json::Value _settings);
   ~MemoryTerminal();
   void processEvent(void* _event, s32 _type) override;

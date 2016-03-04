@@ -43,6 +43,7 @@ class Ejector;
 class Router : public ::Router {
  public:
   Router(const std::string& _name, const Component* _parent,
+         const std::vector<u32>& _address,
          RoutingAlgorithmFactory* _routingAlgorithmFactory,
          Json::Value _settings);
   ~Router();

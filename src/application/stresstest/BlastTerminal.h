@@ -35,7 +35,7 @@ class Application;
 class BlastTerminal : public Terminal {
  public:
   BlastTerminal(const std::string& _name, const Component* _parent,
-                u32 _id, std::vector<u32> _address,
+                u32 _id, const std::vector<u32>& _address,
                 ::Application* _app, Json::Value _settings);
   ~BlastTerminal();
   void processEvent(void* _event, s32 _type) override;
