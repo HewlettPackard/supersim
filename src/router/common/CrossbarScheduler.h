@@ -41,7 +41,7 @@ class CrossbarScheduler : public Component {
    public:
     Client();
     virtual ~Client();
-    virtual void crossbarSchedulerResponse(u32 _port, u32 _vc) = 0;
+    virtual void crossbarSchedulerResponse(u32 _port, u32 _vcIdx) = 0;
   };
 
   // constructor and destructor

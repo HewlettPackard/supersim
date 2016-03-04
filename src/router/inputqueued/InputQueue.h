@@ -57,10 +57,10 @@ class InputQueue : public Component, public FlitReceiver,
   void routingAlgorithmResponse(RoutingAlgorithm::Response* _response) override;
 
   // response from VcScheduler
-  void vcSchedulerResponse(u32 _vc) override;
+  void vcSchedulerResponse(u32 _vcIdx) override;
 
   // response from CrossbarScheduler
-  void crossbarSchedulerResponse(u32 _port, u32 _vc) override;
+  void crossbarSchedulerResponse(u32 _port, u32 _vcIdx) override;
 
  private:
   void setPipelineEvent();
@@ -111,6 +111,7 @@ class InputQueue : public Component, public FlitReceiver,
     Flit* flit;
     RoutingAlgorithm::Response route;
     // results
+    u32 allocatedVcIdx;
     u32 allocatedPort;
     u32 allocatedVc;
   } vca_;
@@ -120,7 +121,7 @@ class InputQueue : public Component, public FlitReceiver,
     ePipelineFsm fsm;
     Flit* flit;
     u32 allocatedPort;
-    u32 allocatedVc;
+    u32 allocatedVcIdx;
   } swa_;
 
   // Crossbar traversal [xtr_] stage (no state needed)

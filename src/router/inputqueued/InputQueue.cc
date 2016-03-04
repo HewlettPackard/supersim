@@ -52,13 +52,14 @@ InputQueue::InputQueue(
   vca_.fsm = ePipelineFsm::kEmpty;
   vca_.flit = nullptr;
   vca_.route.clear();
+  vca_.allocatedVcIdx = U32_MAX;
   vca_.allocatedPort = U32_MAX;
   vca_.allocatedVc = U32_MAX;
 
   swa_.fsm = ePipelineFsm::kEmpty;
   swa_.flit = nullptr;
   swa_.allocatedPort = U32_MAX;
-  swa_.allocatedVc = U32_MAX;
+  swa_.allocatedVcIdx = U32_MAX;
 
   // no event is set to trigger
   eventTime_ = U64_MAX;
@@ -107,15 +108,15 @@ void InputQueue::routingAlgorithmResponse(
   setPipelineEvent();
 }
 
-void InputQueue::vcSchedulerResponse(u32 _vc) {
+void InputQueue::vcSchedulerResponse(u32 _vcIdx) {
   assert(vca_.flit->isHead());
   assert(vca_.fsm == ePipelineFsm::kWaitingForResponse);
 
-  if (_vc != U32_MAX) {
+  if (_vcIdx != U32_MAX) {
     // granted
     vca_.fsm = ePipelineFsm::kReadyToAdvance;
-    router_->vcIndexInv(_vc, &vca_.allocatedPort, &vca_.allocatedVc);
-    // dbgprintf("VcSch p=%u v=%u", vca_.allocatedPort, vca_.allocatedVc);
+    vca_.allocatedVcIdx = _vcIdx;
+    router_->vcIndexInv(_vcIdx, &vca_.allocatedPort, &vca_.allocatedVc);
   } else {
     // denied
     vca_.fsm = ePipelineFsm::kWaitingToRequest;
@@ -125,7 +126,7 @@ void InputQueue::vcSchedulerResponse(u32 _vc) {
   setPipelineEvent();
 }
 
-void InputQueue::crossbarSchedulerResponse(u32 _port, u32 _vc) {
+void InputQueue::crossbarSchedulerResponse(u32 _port, u32 _vcIdx) {
   assert(swa_.fsm == ePipelineFsm::kWaitingForResponse);
 
   if (_port != U32_MAX) {
@@ -156,20 +157,20 @@ void InputQueue::processPipeline() {
 
     // send the flit on the crossbar, consume a credit
     crossbar_->inject(swa_.flit, crossbarIndex_, swa_.allocatedPort);
-    crossbarScheduler_->decrementCreditCount(swa_.allocatedVc);
+    crossbarScheduler_->decrementCreditCount(swa_.allocatedVcIdx);
 
     // if this is a tail flit, release the VC
     /** NOTE: this causes a stall when there are back-to-back
         packets in the same VC going to the same VC **/
     if (swa_.flit->isTail()) {
-      vcScheduler_->releaseVc(swa_.allocatedVc);
+      vcScheduler_->releaseVc(swa_.allocatedVcIdx);
     }
 
     // clear SWA info
     swa_.fsm = ePipelineFsm::kEmpty;
     swa_.flit = nullptr;
     swa_.allocatedPort = U32_MAX;
-    swa_.allocatedVc = U32_MAX;
+    swa_.allocatedVcIdx = U32_MAX;
   }
 
   /*
@@ -183,13 +184,13 @@ void InputQueue::processPipeline() {
     // ensure SWA is empty
     assert(swa_.flit == nullptr);
     assert(swa_.allocatedPort == U32_MAX);
-    assert(swa_.allocatedVc == U32_MAX);
+    assert(swa_.allocatedVcIdx == U32_MAX);
 
     // set SWA info
     swa_.flit = vca_.flit;
     swa_.flit->setVc(vca_.allocatedVc);
     swa_.allocatedPort = vca_.allocatedPort;
-    swa_.allocatedVc = router_->vcIndex(vca_.allocatedPort, vca_.allocatedVc);
+    swa_.allocatedVcIdx = vca_.allocatedVcIdx;
     swa_.fsm = ePipelineFsm::kWaitingToRequest;
 
     // clear VCA info
@@ -198,6 +199,7 @@ void InputQueue::processPipeline() {
     vca_.route.clear();
     if (swa_.flit->isTail()) {
       // clear the allocated info only on tail flit
+      vca_.allocatedVcIdx = U32_MAX;
       vca_.allocatedPort = U32_MAX;
       vca_.allocatedVc = U32_MAX;
     }
@@ -208,7 +210,7 @@ void InputQueue::processPipeline() {
    */
   if (swa_.fsm == ePipelineFsm::kWaitingToRequest) {
     crossbarScheduler_->request(
-        crossbarSchedulerIndex_, swa_.allocatedPort, swa_.allocatedVc,
+        crossbarSchedulerIndex_, swa_.allocatedPort, swa_.allocatedVcIdx,
         swa_.flit->getPacket()->getMetadata());
     swa_.fsm = ePipelineFsm::kWaitingForResponse;
   }
@@ -224,10 +226,12 @@ void InputQueue::processPipeline() {
     assert(vca_.flit == nullptr);
     if (rfe_.flit->isHead()) {
       // U32_MAX means cleared
+      assert(vca_.allocatedVcIdx == U32_MAX);
       assert(vca_.allocatedPort == U32_MAX);
       assert(vca_.allocatedVc == U32_MAX);
     } else {
       // these should still be valid from the head flit
+      assert(vca_.allocatedVcIdx != U32_MAX);
       assert(vca_.allocatedPort != U32_MAX);
       assert(vca_.allocatedVc != U32_MAX);
     }
@@ -264,9 +268,9 @@ void InputQueue::processPipeline() {
     for (u32 r = 0; r < responseSize; r++) {
       u32 requestPort, requestVc;
       vca_.route.get(r, &requestPort, &requestVc);
-      u32 vcIndex = router_->vcIndex(requestPort, requestVc);
+      u32 vcIdx = router_->vcIndex(requestPort, requestVc);
       u32 metadata = vca_.flit->getPacket()->getMetadata();
-      vcScheduler_->request(vcSchedulerIndex_, vcIndex, metadata);
+      vcScheduler_->request(vcSchedulerIndex_, vcIdx, metadata);
     }
   }
 
