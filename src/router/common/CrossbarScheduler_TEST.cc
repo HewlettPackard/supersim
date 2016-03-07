@@ -148,43 +148,50 @@ class CrossbarSchedulerTestClient : public CrossbarScheduler::Client,
 TEST(CrossbarScheduler, basic) {
   const u32 ALLOCS_PER_CLIENT = 100;
 
-  for (u32 C = 1; C < 16; C++) {
-    for (u32 P = 1; P < 16; P++) {
-      for (u32 Vd = 1; Vd < 4; Vd++) {
-        u32 V = P * Vd;
+  std::vector<std::pair<bool, bool>> styles = {
+    {true, true}, {true, false}, {false, false}};
 
-        // setup
-        TestSetup testSetup(12, 0x1234567890abcdf);
-        Json::Value arbSettings;
-        arbSettings["type"] = "random";
-        Json::Value allocSettings;
-        allocSettings["type"] = "r_separable";
-        allocSettings["resource_arbiter"] = arbSettings;
-        allocSettings["slip_latch"] = true;
-        Json::Value schSettings;
-        schSettings["allocator"] = allocSettings;
-        CrossbarScheduler* xbarSch =
-            new CrossbarScheduler("XbarSch", nullptr, C, V, P, schSettings);
-        assert(xbarSch->numClients() == C);
-        assert(xbarSch->totalVcs() == V);
-        assert(xbarSch->crossbarPorts() == P);
-        for (u32 v = 0; v < V; v++) {
-          xbarSch->initCreditCount(v, 3);
-        }
+  for (auto style : styles) {
+    for (u32 C = 1; C < 16; C++) {
+      for (u32 P = 1; P < 16; P++) {
+        for (u32 Vd = 1; Vd < 4; Vd++) {
+          u32 V = P * Vd;
 
-        std::vector<CrossbarSchedulerTestClient*> clients(C);
-        for (u32 c = 0; c < C; c++) {
-          clients[c] = new CrossbarSchedulerTestClient(c, xbarSch, V, P,
-                                                       ALLOCS_PER_CLIENT);
-        }
+          // setup
+          TestSetup testSetup(12, 0x1234567890abcdf);
+          Json::Value arbSettings;
+          arbSettings["type"] = "random";
+          Json::Value allocSettings;
+          allocSettings["type"] = "r_separable";
+          allocSettings["resource_arbiter"] = arbSettings;
+          allocSettings["slip_latch"] = true;
+          Json::Value schSettings;
+          schSettings["allocator"] = allocSettings;
+          schSettings["packet_lock"] = style.first;
+          schSettings["idle_unlock"] = style.second;
+          CrossbarScheduler* xbarSch =
+              new CrossbarScheduler("XbarSch", nullptr, C, V, P, schSettings);
+          assert(xbarSch->numClients() == C);
+          assert(xbarSch->totalVcs() == V);
+          assert(xbarSch->crossbarPorts() == P);
+          for (u32 v = 0; v < V; v++) {
+            xbarSch->initCreditCount(v, 3);
+          }
 
-        // run the simulator
-        gSim->simulate();
+          std::vector<CrossbarSchedulerTestClient*> clients(C);
+          for (u32 c = 0; c < C; c++) {
+            clients[c] = new CrossbarSchedulerTestClient(c, xbarSch, V, P,
+                                                         ALLOCS_PER_CLIENT);
+          }
 
-        // tear down
-        delete xbarSch;
-        for (u32 c = 0; c < C; c++) {
-          delete clients[c];
+          // run the simulator
+          gSim->simulate();
+
+          // tear down
+          delete xbarSch;
+          for (u32 c = 0; c < C; c++) {
+            delete clients[c];
+          }
         }
       }
     }
