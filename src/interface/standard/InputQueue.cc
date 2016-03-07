@@ -84,8 +84,8 @@ void InputQueue::crossbarSchedulerResponse(u32 _port, u32 _vc) {
 }
 
 void InputQueue::processEvent(void* _event, s32 _type) {
-  u64 metadata = sendQueue_.front()->getPacket()->getMetadata();
-  crossbarScheduler_->request(crossbarSchedulerIndex_, 0, vc_, metadata);
+  crossbarScheduler_->request(crossbarSchedulerIndex_, 0, vc_,
+                              sendQueue_.front());
 }
 
 }  // namespace Standard

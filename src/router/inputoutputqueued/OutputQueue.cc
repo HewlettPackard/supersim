@@ -154,9 +154,8 @@ void OutputQueue::processPipeline() {
    */
   if (swa_.fsm == ePipelineFsm::kWaitingToRequest) {
     swa_.fsm = ePipelineFsm::kWaitingForResponse;
-    u64 metadata = swa_.flit->getPacket()->getMetadata();
     outputCrossbarScheduler_->request(crossbarSchedulerIndex_, 0, vc_,
-                                      metadata);
+                                      swa_.flit);
   }
 
   // clear the eventTime_ variable to indicate no more events are set

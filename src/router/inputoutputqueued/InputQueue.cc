@@ -212,7 +212,7 @@ void InputQueue::processPipeline() {
   if (swa_.fsm == ePipelineFsm::kWaitingToRequest) {
     crossbarScheduler_->request(
         crossbarSchedulerIndex_, swa_.allocatedPort, swa_.allocatedVcIdx,
-        swa_.flit->getPacket()->getMetadata());
+        swa_.flit);
     swa_.fsm = ePipelineFsm::kWaitingForResponse;
   }
 

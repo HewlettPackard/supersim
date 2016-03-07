@@ -25,6 +25,7 @@
 
 #include "allocator/Allocator.h"
 #include "event/Component.h"
+#include "types/Flit.h"
 
 class CrossbarScheduler : public Component {
  public:
@@ -59,7 +60,7 @@ class CrossbarScheduler : public Component {
   void setClient(u32 _id, Client* _client);
 
   // requests to send a flit to a VC
-  void request(u32 _client, u32 _port, u32 _vcIdx, u32 _metadata);
+  void request(u32 _client, u32 _port, u32 _vcIdx, Flit* _flit);
 
   // credit counts
   void initCreditCount(u32 _vcIdx, u32 _credits);
@@ -78,6 +79,7 @@ class CrossbarScheduler : public Component {
   std::vector<Client*> clients_;
   std::vector<u32> clientRequestPorts_;
   std::vector<u32> clientRequestVcs_;
+  std::vector<bool> clientRequestTails_;  // request is a tail
 
   std::vector<u32> credits_;
   std::vector<u32> maxCredits_;
@@ -85,9 +87,15 @@ class CrossbarScheduler : public Component {
 
   bool* requests_;
   u64* metadatas_;
-  u32* vcs_;
   bool* grants_;
+
+  std::vector<bool> anyRequests_;  // someone has requested port
+  std::vector<u32> portLocks_;  // output port locks
+
   Allocator* allocator_;
+
+  const bool packetLock_;  // packets lock the channel
+  const bool idleUnlock_;  // locks are deactivated when idle (others want)
 
   enum class EventAction : u8 { NONE = 0, CREDITS = 1, RUNALLOC = 2 };
   EventAction eventAction_;

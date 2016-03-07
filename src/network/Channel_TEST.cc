@@ -177,7 +177,7 @@ void Sink::expect(u64 _time) {
 }
 
 void Sink::processEvent(void* _event, s32 _type) {
-  Credit* credit = new Credit(0);
+  Credit* credit = new Credit(1);
   assert(channel_->getNextCredit() == nullptr);
   channel_->setNextCredit(credit);
   dbgprintf("sink injecting at %lu", gSim->time());

@@ -30,7 +30,9 @@
             "type": "comparing",
             "greater": false
           }
-        }
+        },
+        "packet_lock": true,
+        "idle_unlock": true
       },
       "init_credits": 16,
       "crossbar": {
@@ -69,7 +71,9 @@
             "type": "comparing",
             "greater": false
           }
-        }
+        },
+        "packet_lock": true,
+        "idle_unlock": true
       },
       "output_crossbar": {
         "latency": 1  // cycles
@@ -82,7 +86,9 @@
             "type": "comparing",
             "greater": false
           }
-        }
+        },
+        "packet_lock": true,
+        "idle_unlock": true
       }
     }
   },

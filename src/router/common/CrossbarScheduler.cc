@@ -19,6 +19,7 @@
 #include <cstring>
 
 #include "allocator/AllocatorFactory.h"
+#include "types/Packet.h"
 
 CrossbarScheduler::Client::Client() {}
 
@@ -28,7 +29,15 @@ CrossbarScheduler::CrossbarScheduler(
     const std::string& _name, const Component* _parent, u32 _numClients,
     u32 _totalVcs, u32 _crossbarPorts, Json::Value _settings)
     : Component(_name, _parent), numClients_(_numClients),
-      totalVcs_(_totalVcs), crossbarPorts_(_crossbarPorts) {
+      totalVcs_(_totalVcs), crossbarPorts_(_crossbarPorts),
+      packetLock_(_settings["packet_lock"].asBool()),
+      idleUnlock_(_settings["idle_unlock"].asBool()) {
+  assert(!_settings["packet_lock"].isNull());
+  assert(!_settings["idle_unlock"].isNull());
+  if (idleUnlock_) {
+    assert(packetLock_);
+  }
+
   assert(numClients_ > 0 && numClients_ != U32_MAX);
   assert(totalVcs_ > 0 && totalVcs_ != U32_MAX);
   assert(crossbarPorts_ > 0 && crossbarPorts_ != U32_MAX);
@@ -37,6 +46,7 @@ CrossbarScheduler::CrossbarScheduler(
   clients_.resize(numClients_, nullptr);
   clientRequestPorts_.resize(numClients_, U32_MAX);
   clientRequestVcs_.resize(numClients_, U32_MAX);
+  clientRequestTails_.resize(numClients_, false);
 
   // create the credit counters
   credits_.resize(totalVcs_, 0);
@@ -44,9 +54,13 @@ CrossbarScheduler::CrossbarScheduler(
 
   // create arrays for allocator inputs and outputs
   requests_ = new bool[crossbarPorts_ * numClients_];
-  memset(requests_, 0, sizeof(bool) * crossbarPorts_ * numClients_);
+  memset(requests_, false, crossbarPorts_ * numClients_);
   metadatas_ = new u64[crossbarPorts_ * numClients_];
   grants_ = new bool[crossbarPorts_ * numClients_];
+
+  // create arrays for handling port locks
+  anyRequests_.resize(crossbarPorts_, false);
+  portLocks_.resize(crossbarPorts_, false);
 
   // create the allocator
   allocator_ = AllocatorFactory::createAllocator(
@@ -90,7 +104,7 @@ void CrossbarScheduler::setClient(u32 _id, Client* _client) {
 }
 
 void CrossbarScheduler::request(u32 _client, u32 _port, u32 _vcIdx,
-                                u32 _metadata) {
+                                Flit* _flit) {
   assert(gSim->epsilon() >= 1);
   assert(_client < numClients_);
   assert(clientRequestPorts_[_client] == U32_MAX);
@@ -101,9 +115,11 @@ void CrossbarScheduler::request(u32 _client, u32 _port, u32 _vcIdx,
   // set request
   clientRequestPorts_[_client] = _port;
   clientRequestVcs_[_client] = _vcIdx;
+  clientRequestTails_[_client] = _flit->isTail();
+  anyRequests_[_port] = true;
   u64 idx = index(_client, _port);
   requests_[idx] = true;
-  metadatas_[idx] = _metadata;
+  metadatas_[idx] = _flit->getPacket()->getMetadata();
 
   // upgrade event
   if (eventAction_ == EventAction::NONE) {
@@ -164,6 +180,7 @@ void CrossbarScheduler::processEvent(void* _event, s32 _type) {
   // if required, run the allocator
   if (eventAction_ == EventAction::RUNALLOC) {
     // check credit counts for each request
+    //  when credits don't exist, disable the request
     for (u32 c = 0; c < numClients_; c++) {
       if (clientRequestPorts_[c] != U32_MAX) {
         u32 port = clientRequestPorts_[c];
@@ -172,6 +189,42 @@ void CrossbarScheduler::processEvent(void* _event, s32 _type) {
         if (requests_[idx] && credits_[vc] == 0) {
           requests_[idx] = false;
         }
+      }
+    }
+
+    // handle the locking algorithm
+    if (packetLock_) {
+      // perform the port locking mechanism
+      for (u32 p = 0; p < crossbarPorts_; p++) {
+        // the lock has to be active and there must be at least one request
+        if (portLocks_[p] != U32_MAX && anyRequests_[p]) {
+          // determine if the owner is requesting
+          u32 owner = portLocks_[p];
+          u32 ownerIndex = index(owner, p);
+          if (requests_[ownerIndex]) {
+            // deactivate other requests
+            for (u32 c = 0; c < numClients_; c++) {
+              if (c != owner) {
+                u32 otherIndex = index(c, p);
+                requests_[otherIndex] = false;
+              }
+            }
+
+            // deactivate the port lock if the request is for a tail flit
+            if (clientRequestTails_[owner]) {
+              portLocks_[p] = U32_MAX;
+            }
+          } else if (idleUnlock_) {
+            // the owner isn't requesting and idle unlock is enabled, disable
+            //  the port lock
+            portLocks_[p] = U32_MAX;
+          }
+        }
+      }
+
+      // clear the any request vector
+      for (u32 p = 0; p < crossbarPorts_; p++) {
+        anyRequests_[p] = false;
       }
     }
 

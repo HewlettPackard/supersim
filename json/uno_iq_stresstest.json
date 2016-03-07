@@ -30,7 +30,9 @@
             "type": "comparing",
             "greater": false
           }
-        }
+        },
+        "packet_lock": false,
+        "idle_unlock": false
       },
       "init_credits": 16,
       "crossbar": {
@@ -68,7 +70,9 @@
             "type": "comparing",
             "greater": false
           }
-        }
+        },
+        "packet_lock": false,
+        "idle_unlock": false
       }
     }
   },

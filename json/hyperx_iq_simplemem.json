@@ -34,7 +34,9 @@
           "resource_arbiter": {
             "type": "lslp"
           }
-        }
+        },
+        "packet_lock": true,
+        "idle_unlock": true
       },
       "init_credits": 16,
       "crossbar": {
@@ -70,7 +72,9 @@
           "resource_arbiter": {
             "type": "lslp"
           }
-        }
+        },
+        "packet_lock": true,
+        "idle_unlock": true
       }
     }
   },

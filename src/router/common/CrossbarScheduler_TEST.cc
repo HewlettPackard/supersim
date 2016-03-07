@@ -23,6 +23,8 @@
 
 #include "event/Component.h"
 #include "router/common/CrossbarScheduler.h"
+#include "types/Flit.h"
+#include "types/Packet.h"
 
 #include "test/TestSetup_TEST.h"
 
@@ -39,7 +41,7 @@ class CrossbarSchedulerTestClient : public CrossbarScheduler::Client,
       : Component("TestClient_" + std::to_string(_id), nullptr),
         id_(_id), xbarSch_(_xbarSch), totalVcs_(_totalVcs),
         crossbarPorts_(_crossbarPorts), fsm_(Fsm::REQUESTING),
-        request_(std::make_tuple(U32_MAX, U32_MAX, U64_MAX)),
+        request_(std::make_tuple(U32_MAX, U32_MAX, nullptr)),
         remaining_(_allocs) {
     debug_ = !true;
     xbarSch_->setClient(id_, this);
@@ -73,44 +75,55 @@ class CrossbarSchedulerTestClient : public CrossbarScheduler::Client,
 
     if (std::get<0>(request_) == U32_MAX) {
       // new request
-      u32 vc = gSim->rnd.nextU64(0, totalVcs_ - 1);
-      u32 port = vc / (totalVcs_ / crossbarPorts_);
+      u32 vcIdx = gSim->rnd.nextU64(0, totalVcs_ - 1);
+      u32 port = vcIdx / (totalVcs_ / crossbarPorts_);
       u64 metadata = gSim->rnd.nextU64(1000, 2000 - 1);
-      dbgprintf("requesting %u %u %lu", port, vc, metadata);
-      request_ = std::make_tuple(port, vc, metadata);
-      xbarSch_->request(id_, port, vc, metadata);
+
+      // we have to make a packet and flit to have some metadata
+      Packet* packet = new Packet(0, 1, nullptr);
+      Flit* flit = new Flit(0, true, true, packet);
+      packet->setFlit(0, flit);
+      packet->setMetadata(metadata);
+
+      // make the request
+      dbgprintf("requesting %u %u %lu", port, vcIdx, metadata);
+      request_ = std::make_tuple(port, vcIdx, flit);
+      xbarSch_->request(id_, port, vcIdx, flit);
     } else {
       // re-request
       u32 port = std::get<0>(request_);
-      u32 vc = std::get<1>(request_);
-      u64 metadata = std::get<2>(request_);
-      xbarSch_->request(id_, port, vc, metadata);
+      u32 vcIdx = std::get<1>(request_);
+      Flit* flit = std::get<2>(request_);
+      xbarSch_->request(id_, port, vcIdx, flit);
     }
 
     fsm_ = Fsm::WAITING;
   }
 
-  void crossbarSchedulerResponse(u32 _port, u32 _vc) override {
+  void crossbarSchedulerResponse(u32 _port, u32 _vcIdx) override {
     assert(remaining_ > 0);
     assert(std::get<0>(request_) != U32_MAX);
 
     if (_port != U32_MAX) {
       u32 port = std::get<0>(request_);
-      u32 vc = std::get<1>(request_);
+      u32 vcIdx = std::get<1>(request_);
+      Flit* flit = std::get<2>(request_);
+      Packet* packet = flit->getPacket();
+      delete packet;
       std::get<0>(request_) = U32_MAX;
 
       assert(port == _port);
-      assert(vc == _vc);
+      assert(vcIdx == _vcIdx);
 
       // use credit
-      dbgprintf("using %u (via port %u)", vc, port);
-      xbarSch_->decrementCreditCount(vc);
+      dbgprintf("using %u (via port %u)", vcIdx, port);
+      xbarSch_->decrementCreditCount(vcIdx);
       remaining_--;
 
       // release later
       u64 releaseTime = gSim->futureCycle(gSim->rnd.nextU64(2, 6));
       u32* vcPtr = new u32;
-      *vcPtr = vc;
+      *vcPtr = vcIdx;
       addEvent(releaseTime, 1, vcPtr, GiveBackCreditEvent);
     }
 
@@ -128,7 +141,7 @@ class CrossbarSchedulerTestClient : public CrossbarScheduler::Client,
   u32 totalVcs_;
   u32 crossbarPorts_;
   Fsm fsm_;
-  std::tuple<u32, u32, u64> request_;
+  std::tuple<u32, u32, Flit*> request_;
   u32 remaining_;
 };
 
