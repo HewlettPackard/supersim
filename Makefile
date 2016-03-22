@@ -6,7 +6,7 @@ SOURCE_BASE   := src
 MAIN_FILE     := src/main.cc
 
 #--------------------- External Libraries -------------------------------------#
-LIBS_LOC      := ../../
+LIBS_LOC      := ../
 HEADER_DIRS   := \
 	$(LIBS_LOC)libprim/inc \
 	$(LIBS_LOC)librnd/inc \
