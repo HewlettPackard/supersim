@@ -33,3 +33,7 @@ Multiple simultaneous applications
 
 Torus Topology Weights
 -Just like HyperX is a flexible version of Fbfly, make Torus have weights
+
+VC Scheduler Queue Eligibility Masking
+-Create an optional setting to mask off requests where buffer space is insufficient
+-Consider using a threshold for deciding 'insufficient'
