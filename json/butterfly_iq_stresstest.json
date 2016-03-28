@@ -88,7 +88,7 @@
       "max_packet_size": 16,
       "warmup_interval": 200,  // delivered flits
       "warmup_window": 15,
-      "warmup_attempts": 20,
+      "warmup_attempts": 50,
       "traffic_pattern": {
         "type": "uniform_random",
         "send_to_self": false
