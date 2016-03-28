@@ -112,11 +112,13 @@ Router::~Router() {
 }
 
 void Router::setInputChannel(u32 _index, Channel* _channel) {
+  assert(inputChannels_.at(_index) == nullptr);
   inputChannels_.at(_index) = _channel;
   _channel->setSink(this, _index);
 }
 
 void Router::setOutputChannel(u32 _index, Channel* _channel) {
+  assert(outputChannels_.at(_index) == nullptr);
   outputChannels_.at(_index) = _channel;
   _channel->setSource(this, _index);
 }

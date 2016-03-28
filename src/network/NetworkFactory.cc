@@ -17,6 +17,7 @@
 
 #include <cassert>
 
+#include "network/butterfly/Network.h"
 #include "network/foldedclos/Network.h"
 #include "network/hyperx/Network.h"
 #include "network/torus/Network.h"
@@ -27,7 +28,9 @@ Network* NetworkFactory::createNetwork(
     Json::Value _settings) {
   std::string topology = _settings["topology"].asString();
 
-  if (topology == "folded_clos") {
+  if (topology == "butterfly") {
+    return new Butterfly::Network(_name, _parent, _settings);
+  } else if (topology == "folded_clos") {
     return new FoldedClos::Network(_name, _parent, _settings);
   } else if (topology == "hyperx") {
     return new HyperX::Network(_name, _parent, _settings);

@@ -1,0 +1,108 @@
+{
+  "simulator": {
+    "cycle_time": 500,  // picoseconds
+    "print_progress": true,
+    "print_interval": 1.0,  // seconds
+    "random_seed": 12345678
+  },
+  "network": {
+    "topology": "butterfly",
+    "num_vcs": 1,
+    "stages": 3,
+    "internal_channel": {
+      "latency": 1  // cycles
+    },
+    "external_channel": {
+      "latency": 1  // cycles
+    },
+    "channel_log": {
+      "file": "/dev/null"  // "channels.csv"
+    },
+    "routing": {
+      "algorithm": "destination_tag",
+      "latency": 1  // cycles
+    },
+    "interface": {
+      "type": "standard",
+      "fixed_msg_vc": false,
+      "crossbar_scheduler": {
+        "allocator": {
+          "type": "r_separable",
+          "slip_latch": true,
+          "resource_arbiter": {
+            "type": "lslp"
+          }
+        },
+        "packet_lock": false,
+        "idle_unlock": false
+      },
+      "init_credits": 16,
+      "crossbar": {
+        "latency": 1  // cycles
+      }
+    },
+    "router": {
+      "architecture": "input_queued",
+      "num_ports": 4,
+      "congestion_status": {
+        "latency": 1
+      },
+      "input_queue_depth": 16,
+      "crossbar": {
+        "latency": 1  // cycles
+      },
+      "vc_scheduler": {
+        "allocator": {
+          "type": "rc_separable",
+          "slip_latch": true,
+          "iterations": 1,
+          "resource_arbiter": {
+            "type": "lslp"
+          },
+          "client_arbiter": {
+            "type": "lslp"
+          }
+        }
+      },
+      "crossbar_scheduler": {
+        "allocator": {
+          "type": "r_separable",
+          "slip_latch": true,
+          "resource_arbiter": {
+            "type": "lslp"
+          }
+        },
+        "packet_lock": false,
+        "idle_unlock": false
+      }
+    }
+  },
+  "application": {
+    "type": "stress_test",
+    "max_injection_rate": 0.1,
+    "warmup_threshold": 0.99,
+    "blast_terminal": {
+      "num_messages": 500,
+      "min_message_size": 1,
+      "max_message_size": 64,
+      "max_packet_size": 16,
+      "warmup_interval": 200,  // delivered flits
+      "warmup_window": 15,
+      "warmup_attempts": 20,
+      "traffic_pattern": {
+        "type": "uniform_random",
+        "send_to_self": false
+      }
+    },
+    "message_log": {
+      "file": "/dev/null"  // "data.mpf.gz"
+    },
+    "rate_log": {
+      "file": "/dev/null"  // "rates.csv"
+    }
+  },
+  "metadata_handler": {
+    "type": "zero"
+  },
+  "debug": []
+}
