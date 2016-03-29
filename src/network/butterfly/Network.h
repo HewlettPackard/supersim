@@ -54,6 +54,7 @@ class Network : public ::Network {
   std::vector<std::vector<Router*> > routers_;  // [stage][column]
 
   std::vector<Channel*> externalChannels_;
+  std::vector<Channel*> internalChannels_;
   std::vector<Interface*> interfaces_;
 };
 

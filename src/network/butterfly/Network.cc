@@ -85,6 +85,7 @@ Network::Network(const std::string& _name, const Component* _parent,
             strop::vecString<u32>(destinationRouter->getAddress());
         Channel* channel = new Channel(chname, this,
                                        _settings["internal_channel"]);
+        internalChannels_.push_back(channel);
 
         // need to connect
         sourceRouter->setOutputChannel(cOutputPort, channel);
@@ -149,6 +150,11 @@ Network::~Network() {
     Channel* channel = *it;
     delete channel;
   }
+  for (auto it = internalChannels_.begin(); it != internalChannels_.end();
+       ++it) {
+    Channel* channel = *it;
+    delete channel;
+  }
 }
 
 u32 Network::numRouters() const {
@@ -181,6 +187,11 @@ void Network::translateIdToAddress(u32 _id, std::vector<u32>* _address) const {
 
 void Network::collectChannels(std::vector<Channel*>* _channels) {
   for (auto it = externalChannels_.begin(); it != externalChannels_.end();
+       ++it) {
+    Channel* channel = *it;
+    _channels->push_back(channel);
+  }
+  for (auto it = internalChannels_.begin(); it != internalChannels_.end();
        ++it) {
     Channel* channel = *it;
     _channels->push_back(channel);
