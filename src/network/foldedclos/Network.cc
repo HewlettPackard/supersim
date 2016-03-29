@@ -71,7 +71,7 @@ Network::Network(const std::string& _name, const Component* _parent,
         }
 
         if (i < routerAddress.size() - 1) {
-          rname += ',';
+          rname += '-';
         }
       }
       rname += ']';

@@ -42,7 +42,7 @@ Network::Network(const std::string& _name, const Component* _parent,
   }
   dbgprintf("dimensions_ = %u", dimensions_);
   dbgprintf("dimensionWidths_ = %s",
-            strop::vecString<u32>(dimensionWidths_).c_str());
+            strop::vecString<u32>(dimensionWidths_, '-').c_str());
   dbgprintf("concentration_ = %u", concentration_);
 
   // router radix
@@ -71,7 +71,8 @@ Network::Network(const std::string& _name, const Component* _parent,
   routerIterator.reset();
   routers_.setSize(dimensionWidths_);
   while (routerIterator.next(&routerAddress)) {
-    std::string routerName = "Router_" + strop::vecString<u32>(routerAddress);
+    std::string routerName = "Router_" +
+      strop::vecString<u32>(routerAddress, '-');
 
     // use the router factory to create a router
     routers_.at(routerAddress) = RouterFactory::createRouter(
@@ -98,9 +99,9 @@ Network::Network(const std::string& _name, const Component* _parent,
         sourcePort = portBase;
         destinationPort = portBase;
         std::string channelName = "Channel_" +
-            strop::vecString<u32>(routerAddress) +
+            strop::vecString<u32>(routerAddress, '-') +
             "-to-" +
-            strop::vecString<u32>(destinationAddress);
+            strop::vecString<u32>(destinationAddress, '-');
 
         // create the channel
         Channel* channel = new Channel(channelName, this,
@@ -109,8 +110,8 @@ Network::Network(const std::string& _name, const Component* _parent,
 
         // link the routers from source to destination
         dbgprintf("linking %s:%u to %s:%u with %s",
-                  strop::vecString<u32>(sourceAddress).c_str(), sourcePort,
-                  strop::vecString<u32>(destinationAddress).c_str(),
+                  strop::vecString<u32>(sourceAddress, '-').c_str(), sourcePort,
+                  strop::vecString<u32>(destinationAddress, '-').c_str(),
                   destinationPort,
                   channelName.c_str());
         routers_.at(sourceAddress)->setOutputChannel(sourcePort, channel);
@@ -127,17 +128,17 @@ Network::Network(const std::string& _name, const Component* _parent,
 
         // create the channel
         std::string channelName = "Channel_"  +
-            strop::vecString<u32>(routerAddress) +
+            strop::vecString<u32>(routerAddress, '-') +
             "-to-" +
-            strop::vecString<u32>(destinationAddress);
+            strop::vecString<u32>(destinationAddress, '-');
         Channel* channel = new Channel(channelName, this,
                                        _settings["internal_channel"]);
         internalChannels_.push_back(channel);
 
         // link the routers from source to destination
         dbgprintf("linking %s:%u to %s:%u with %s",
-                  strop::vecString<u32>(sourceAddress).c_str(), sourcePort,
-                  strop::vecString<u32>(destinationAddress).c_str(),
+                  strop::vecString<u32>(sourceAddress, '-').c_str(), sourcePort,
+                  strop::vecString<u32>(destinationAddress, '-').c_str(),
                   destinationPort,
                   channelName.c_str());
         routers_.at(sourceAddress)->setOutputChannel(sourcePort, channel);
@@ -149,16 +150,16 @@ Network::Network(const std::string& _name, const Component* _parent,
         sourcePort = portBase + 1;
         destinationPort = portBase;
         channelName = "Channel_" +
-            strop::vecString<u32>(routerAddress) +
+            strop::vecString<u32>(routerAddress, '-') +
             "-to-" +
-            strop::vecString<u32>(destinationAddress);
+            strop::vecString<u32>(destinationAddress, '-');
         channel = new Channel(channelName, this, _settings["internal_channel"]);
         internalChannels_.push_back(channel);
 
         // link the routers from source to destination
         dbgprintf("linking %s:%u to %s:%u with %s",
-                  strop::vecString<u32>(sourceAddress).c_str(), sourcePort,
-                  strop::vecString<u32>(destinationAddress).c_str(),
+                  strop::vecString<u32>(sourceAddress, '-').c_str(), sourcePort,
+                  strop::vecString<u32>(destinationAddress, '-').c_str(),
                   destinationPort,
                   channelName.c_str());
         routers_.at(sourceAddress)->setOutputChannel(sourcePort, channel);
@@ -197,7 +198,7 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // create an interface name
       std::string interfaceName = "Interface_" +
-          strop::vecString<u32>(interfaceAddress);
+          strop::vecString<u32>(interfaceAddress, '-');
 
       // create the interface
       Interface* interface = InterfaceFactory::createInterface(
@@ -208,11 +209,11 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // create I/O channels
       std::string inChannelName = "Channel_" +
-          strop::vecString<u32>(interfaceAddress) + "-to-" +
-          strop::vecString<u32>(routerAddress);
+          strop::vecString<u32>(interfaceAddress, '-') + "-to-" +
+          strop::vecString<u32>(routerAddress, '-');
       std::string outChannelName = "Channel_" +
-          strop::vecString<u32>(routerAddress) + "-to-" +
-          strop::vecString<u32>(interfaceAddress);
+          strop::vecString<u32>(routerAddress, '-') + "-to-" +
+          strop::vecString<u32>(interfaceAddress, '-');
       Channel* inChannel = new Channel(inChannelName, this,
                                        _settings["external_channel"]);
       Channel* outChannel = new Channel(outChannelName, this,

@@ -81,8 +81,8 @@ Network::Network(const std::string& _name, const Component* _parent,
 
         // create channel
         std::string chname = "Channel_" +
-            strop::vecString<u32>(sourceRouter->getAddress()) + "-to-" +
-            strop::vecString<u32>(destinationRouter->getAddress());
+            strop::vecString<u32>(sourceRouter->getAddress(), '-') + "-to-" +
+            strop::vecString<u32>(destinationRouter->getAddress(), '-');
         Channel* channel = new Channel(chname, this,
                                        _settings["internal_channel"]);
         internalChannels_.push_back(channel);
