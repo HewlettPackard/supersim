@@ -286,6 +286,10 @@ void Network::translateIdToAddress(u32 _id, std::vector<u32>* _address) const {
 }
 
 void Network::collectChannels(std::vector<Channel*>* _channels) {
+  for (auto it = externalChannels_.begin(); it != externalChannels_.end();
+       ++it) {
+    _channels->push_back(*it);
+  }
   for (auto it = internalChannels_.begin(); it != internalChannels_.end();
        ++it) {
     _channels->push_back(*it);
