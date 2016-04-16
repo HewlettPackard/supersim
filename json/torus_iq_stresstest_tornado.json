@@ -9,7 +9,7 @@
     "topology": "torus",
     "num_vcs": 4,
     "dimensions": [4, 3, 2],
-    "concentration": 1,
+    "concentration": 2,
     "internal_channel": {
       "latency": 1  // cycles
     },
@@ -94,8 +94,9 @@
       "warmup_window": 15,
       "warmup_attempts": 20,
       "traffic_pattern": {
-        "type": "uniform_random",
-        "send_to_self": false
+        "type": "tornado",
+        "dimensions": [4, 3, 2],
+        "concentration": 2
       }
     },
     "message_log": {

@@ -13,26 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_TORUS_UTIL_H_
-#define NETWORK_TORUS_UTIL_H_
+#ifndef TRAFFIC_TORNADOTRAFFICPATTERN_H_
+#define TRAFFIC_TORNADOTRAFFICPATTERN_H_
 
+#include <json/json.h>
 #include <prim/prim.h>
 
-#include <vector>
+#include <string>
 
-namespace Torus {
+#include "traffic/PermutationTrafficPattern.h"
 
-// This function determines the dimension correspondance of an input port.
-//  This returns U32_MAX for terminal ports.
-u32 computeInputPortDim(const std::vector<u32>& _dimensionWidths,
-                        u32 _concentration, u32 _inputPort);
+class TornadoTrafficPattern : public PermutationTrafficPattern {
+ public:
+  TornadoTrafficPattern(
+      const std::string& _name, const Component* _parent, u32 _numTerminals,
+      u32 _self, Json::Value _settings);
+  ~TornadoTrafficPattern();
 
-void computeAddress(u32 _id, const std::vector<u32>& _widths,
-                    u32 _concentration, std::vector<u32>* _address);
+  u32 nextDestination() override;
 
-u32 computeId(const std::vector<u32>& _address, const std::vector<u32>& _widths,
-              u32 _concentration);
+ private:
+  u32 dest_;
+};
 
-}  // namespace Torus
-
-#endif  // NETWORK_TORUS_UTIL_H_
+#endif  // TRAFFIC_TORNADOTRAFFICPATTERN_H_

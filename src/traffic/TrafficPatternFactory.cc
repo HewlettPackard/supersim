@@ -22,6 +22,7 @@
 #include "traffic/BitRotateTrafficPattern.h"
 #include "traffic/LoopbackTrafficPattern.h"
 #include "traffic/ScanTrafficPattern.h"
+#include "traffic/TornadoTrafficPattern.h"
 #include "traffic/UniformRandomTrafficPattern.h"
 
 TrafficPattern* TrafficPatternFactory::createTrafficPattern(
@@ -46,6 +47,9 @@ TrafficPattern* TrafficPatternFactory::createTrafficPattern(
         _name, _parent, _numTerminals, _self, _settings);
   } else if (type == "bit_rotate") {
     return new BitRotateTrafficPattern(
+        _name, _parent, _numTerminals, _self, _settings);
+  } else if (type == "tornado") {
+    return new TornadoTrafficPattern(
         _name, _parent, _numTerminals, _self, _settings);
   } else {
     fprintf(stderr, "unknown traffic pattern: %s\n", type.c_str());

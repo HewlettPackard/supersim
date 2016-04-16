@@ -21,8 +21,9 @@
 #include <cmath>
 
 #include "interface/InterfaceFactory.h"
-#include "network/torus/RoutingAlgorithmFactory.h"
 #include "network/torus/InjectionAlgorithmFactory.h"
+#include "network/torus/RoutingAlgorithmFactory.h"
+#include "network/torus/util.h"
 #include "router/RouterFactory.h"
 #include "util/DimensionIterator.h"
 
@@ -238,18 +239,7 @@ Interface* Network::getInterface(u32 _id) const {
 }
 
 void Network::translateIdToAddress(u32 _id, std::vector<u32>* _address) const {
-  _address->resize(dimensions_ + 1);
-  // addresses are in little endian format
-  u32 mod, div;
-  mod = _id % concentration_;
-  div = _id / concentration_;
-  _address->at(0) = mod;
-  for (u32 dim = 0; dim < dimensions_; dim++) {
-    u32 dimWidth = dimensionWidths_.at(dim);
-    mod = div % dimWidth;
-    div = div / dimWidth;
-    _address->at(dim + 1) = mod;
-  }
+  computeAddress(_id, dimensionWidths_, concentration_, _address);
 }
 
 void Network::collectChannels(std::vector<Channel*>* _channels) {
