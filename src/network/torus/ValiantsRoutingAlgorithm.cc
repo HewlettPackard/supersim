@@ -51,7 +51,7 @@ void ValiantsRoutingAlgorithm::processRequest(
   Packet* packet = _flit->getPacket();
   Message* message = packet->getMessage();
 
-  // this is the current routers address
+  // this is the current router's address
   // ex: [x,y,z]
   const std::vector<u32>& routerAddress = router_->getAddress();
 
@@ -69,8 +69,7 @@ void ValiantsRoutingAlgorithm::processRequest(
 
     // random intermediate address
     for (u32 idx = 1; idx < re->size(); idx++) {
-      u32 rnd = gSim->rnd.nextU64(0, dimensionWidths_.at(idx - 1) - 1);
-      re->at(idx) = rnd;
+      re->at(idx) = gSim->rnd.nextU64(0, dimensionWidths_.at(idx - 1) - 1);
     }
   }
 
@@ -78,7 +77,6 @@ void ValiantsRoutingAlgorithm::processRequest(
   const std::vector<u32>* intermediateAddress =
       reinterpret_cast<const std::vector<u32>*>(packet->getRoutingExtension());
 
-  // this is the address we are currently routing towards
   // ex: [c,x,y,z]
   const std::vector<u32>* destinationAddress = message->getDestinationAddress();
   assert(routerAddress.size() == (destinationAddress->size() - 1));
@@ -86,14 +84,13 @@ void ValiantsRoutingAlgorithm::processRequest(
 
   // determine which stage we are in based on VC set
   //  if this is a terminal port, force to stage 0
-  u32 stage = (inputPortDim_ == U32_MAX) ?
-      0 : ((_flit->getVc() % 4) < 2 ? 0 : 1);
-
-  // these will be needed later
-  u32 dim;
-  u32 portBase = concentration_;
-  bool stageTransition = false;
-  const std::vector<u32>* routingTo;
+  u32 stage;
+  if (inputPortDim_ == U32_MAX) {
+    assert(packet->getHopCount() == 1);
+    stage = 0;
+  } else {
+    stage = ((_flit->getVc() % 4) < 2) ? 0 : 1;
+  }
 
   // intermediate dimension to work on
   u32 iDim;
@@ -123,7 +120,11 @@ void ValiantsRoutingAlgorithm::processRequest(
     }
   }
 
-  // figure out with dimension of which stage we need to work on
+  // figure out which dimension of which stage we need to work on
+  u32 dim;
+  u32 portBase;
+  bool stageTransition = false;
+  const std::vector<u32>* routingTo;
   if (stage == 0) {
     if (iDim == routerAddress.size()) {
       // done with stage 0, go to stage 1
@@ -159,8 +160,6 @@ void ValiantsRoutingAlgorithm::processRequest(
     delete intermediateAddress;
     packet->setRoutingExtension(nullptr);
   } else {
-    u32 vcSet = _flit->getVc() % 4;
-
     // more router-to-router hops needed
     u32 src = routerAddress.at(dim);
     u32 dst = routingTo->at(dim + 1);
@@ -192,15 +191,20 @@ void ValiantsRoutingAlgorithm::processRequest(
 
     // choose output port, figure out next router in this dimension
     u32 next;
+    bool crossDateline;
     if (right) {
       outputPort = portBase;
       next = (src + 1) % dimensionWidths_.at(dim);
+      crossDateline = next < src;
     } else {
       outputPort = portBase + 1;
       next = src == 0 ? dimensionWidths_.at(dim) - 1 : src - 1;
+      crossDateline = next > src;
     }
+    assert(next != src);
 
-    // the output port is now determined, now figure out which VC(s) to use
+    // the output port is now determined, now figure out which VC set to use
+    u32 vcSet = _flit->getVc() % 4;
 
     // reset to VC set 0 (stage 0) or 2 (stage 1) when switching dimensions or
     //  when after a stage transition. this also occurs on an injection port
@@ -209,9 +213,8 @@ void ValiantsRoutingAlgorithm::processRequest(
     }
 
     // check dateline crossing
-    if (((src == 0) && (next == (dimensionWidths_.at(dim) - 1))) ||
-        ((next == 0) && (src == (dimensionWidths_.at(dim) - 1)))) {
-      assert(vcSet == 0 || vcSet == 2);  // can only cross once
+    if (crossDateline) {
+      assert(vcSet == 0 || vcSet == 2);  // only cross once per stage per dim
       vcSet++;
     }
 
