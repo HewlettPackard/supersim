@@ -31,6 +31,9 @@ Router::Router(
     : ::Router(_name, _parent, _address, _settings) {
   u32 inputQueueDepth = _settings["input_queue_depth"].asUInt();
   assert(inputQueueDepth > 0);
+  assert(_settings.isMember("vca_swa_wait") &&
+         _settings["vca_swa_wait"].isBool());
+  bool vcaSwaWait = _settings["vca_swa_wait"].asBool();
 
   // create a congestion status device
   congestionStatus_ = new CongestionStatus(
@@ -72,9 +75,9 @@ Router::Router(
       // input queue
       std::string iqName = "InputQueue" + nameSuffix;
       InputQueue* iq = new InputQueue(
-          iqName, this, this, inputQueueDepth, port, numVcs_, vc, rf,
-          vcScheduler_, clientIndex, crossbarScheduler_, clientIndex, crossbar_,
-          clientIndex);
+          iqName, this, this, inputQueueDepth, port, numVcs_, vc, vcaSwaWait,
+          rf, vcScheduler_, clientIndex, crossbarScheduler_, clientIndex,
+          crossbar_, clientIndex);
       inputQueues_.at(vcIndex(port, vc)) = iq;
 
       // register the input queue with VC and crossbar schedulers

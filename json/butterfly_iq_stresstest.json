@@ -48,6 +48,7 @@
         "latency": 1
       },
       "input_queue_depth": 16,
+      "vca_swa_wait": false,
       "crossbar": {
         "latency": 1  // cycles
       },

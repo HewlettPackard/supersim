@@ -29,13 +29,13 @@ namespace InputOutputQueued {
 
 InputQueue::InputQueue(
     const std::string& _name, const Component* _parent, Router* _router,
-    u32 _depth, u32 _port, u32 _numVcs, u32 _vc,
+    u32 _depth, u32 _port, u32 _numVcs, u32 _vc, bool _vcaSwaWait,
     RoutingAlgorithm* _routingAlgorithm, VcScheduler* _vcScheduler,
     u32 _vcSchedulerIndex, CrossbarScheduler* _crossbarScheduler,
     u32 _crossbarSchedulerIndex, Crossbar* _crossbar, u32 _crossbarIndex)
     : Component(_name, _parent), depth_(_depth), port_(_port), numVcs_(_numVcs),
-      vc_(_vc), router_(_router), routingAlgorithm_(_routingAlgorithm),
-      vcScheduler_(_vcScheduler),
+      vc_(_vc), vcaSwaWait_(_vcaSwaWait), router_(_router),
+      routingAlgorithm_(_routingAlgorithm), vcScheduler_(_vcScheduler),
       vcSchedulerIndex_(_vcSchedulerIndex),
       crossbarScheduler_(_crossbarScheduler),
       crossbarSchedulerIndex_(_crossbarSchedulerIndex),
@@ -257,7 +257,8 @@ void InputQueue::processPipeline() {
   /*
    * attempt to submit VCA requests
    */
-  if (vca_.fsm == ePipelineFsm::kWaitingToRequest) {
+  if ((vca_.fsm == ePipelineFsm::kWaitingToRequest) &&
+      (swa_.fsm == ePipelineFsm::kEmpty || !vcaSwaWait_)) {
     assert(vca_.flit->isHead());
 
     // set state machine as waiting for response from VC alloc

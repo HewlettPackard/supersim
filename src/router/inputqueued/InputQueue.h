@@ -41,10 +41,10 @@ class InputQueue : public Component, public FlitReceiver,
  public:
   InputQueue(const std::string& _name, const Component* _parent,
              Router* _router, u32 _depth, u32 _port, u32 _numVcs, u32 _vc,
-             RoutingAlgorithm* _routingAlgorithm, VcScheduler* _vcScheduler,
-             u32 _vcSchedulerIndex, CrossbarScheduler* _crossbarScheduler,
-             u32 _crossbarSchedulerIndex, Crossbar* _crossbar,
-             u32 _crossbarIndex);
+             bool _vcaSwaWait, RoutingAlgorithm* _routingAlgorithm,
+             VcScheduler* _vcScheduler, u32 _vcSchedulerIndex,
+             CrossbarScheduler* _crossbarScheduler, u32 _crossbarSchedulerIndex,
+             Crossbar* _crossbar, u32 _crossbarIndex);
   ~InputQueue();
 
   // called by next higher router (FlitReceiver)
@@ -67,10 +67,13 @@ class InputQueue : public Component, public FlitReceiver,
   void processPipeline();
 
   // attributes
-  u32 depth_;
-  u32 port_;
-  u32 numVcs_;  // in system, not this module
-  u32 vc_;
+  const u32 depth_;
+  const u32 port_;
+  const u32 numVcs_;  // in system, not this module
+  const u32 vc_;
+
+  // settings
+  const bool vcaSwaWait_;  // stall VCA until SWA is empty
 
   // external devices
   Router* router_;
