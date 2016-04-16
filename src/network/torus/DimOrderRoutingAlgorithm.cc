@@ -55,11 +55,7 @@ void DimOrderRoutingAlgorithm::processRequest(
     if (routerAddress.at(dim) != destinationAddress->at(dim+1)) {
       break;
     }
-    if (dimensionWidths_.at(dim) == 2) {
-      portBase += 1;
-    } else {
-      portBase += 2;
-    }
+    portBase += 2;
   }
 
   // test if already at destination router
@@ -76,28 +72,24 @@ void DimOrderRoutingAlgorithm::processRequest(
     u32 dst = destinationAddress->at(dim + 1);
     assert(src != dst);
 
-    // in dimension with width of 2, there is only one port
+
+    // in torus topology, we can get to a destination in two directions,
+    //  this algorithm takes the shortest path, randomized tie breaker
+    u32 rightDelta = ((dst > src) ?
+                      (dst - src) :
+                      (dst + dimensionWidths_.at(dim) - src));
+    u32 leftDelta = ((src > dst) ?
+                     (src - dst) :
+                     (src + dimensionWidths_.at(dim) - dst));
+
+    // determine direction
     bool right;
-    if (dimensionWidths_.at(dim) == 2) {
+    if (rightDelta == leftDelta) {
+      right = gSim->rnd.nextBool();
+    } else if (rightDelta < leftDelta) {
       right = true;
     } else {
-      // in torus topology, we can get to a destination in two directions,
-      //  this algorithm takes the shortest path, randomized tie breaker
-      u32 rightDelta = ((dst > src) ?
-                        (dst - src) :
-                        (dst + dimensionWidths_.at(dim) - src));
-      u32 leftDelta = ((src > dst) ?
-                       (src - dst) :
-                       (src + dimensionWidths_.at(dim) - dst));
-
-      // determine direction
-      if (rightDelta == leftDelta) {
-        right = gSim->rnd.nextBool();
-      } else if (rightDelta < leftDelta) {
-        right = true;
-      } else {
-        right = false;
-      }
+      right = false;
     }
 
     // choose output port, figure out next router in this dimension

@@ -28,12 +28,10 @@ u32 computeInputPortDim(const std::vector<u32>& _dimensionWidths,
 
   u32 portBase = _concentration;
   for (u32 dim = 0; dim < _dimensionWidths.size(); dim++) {
-    u32 dimWidth = _dimensionWidths.at(dim);
-    u32 dimPorts = dimWidth == 2 ? 1 : 2;
-    if ((_inputPort >= portBase) && (_inputPort < (portBase + dimPorts))) {
+    if ((_inputPort >= portBase) && (_inputPort < (portBase + 2))) {
       return dim;
     }
-    portBase += dimPorts;
+    portBase += 2;
   }
   assert(false);
 }

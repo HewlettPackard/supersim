@@ -46,14 +46,7 @@ Network::Network(const std::string& _name, const Component* _parent,
   dbgprintf("concentration_ = %u", concentration_);
 
   // router radix
-  u32 routerRadix = concentration_;
-  for (u32 i = 0; i < dimensions_; i++) {
-    if (dimensionWidths_.at(i) == 2) {
-      routerRadix += 1;
-    } else {
-      routerRadix += 2;
-    }
-  }
+  u32 routerRadix = concentration_ + (dimensions_ * 2);
   _settings["router"]["num_ports"] = Json::Value(routerRadix);
   _settings["router"]["num_vcs"] = Json::Value(numVcs_);
   _settings["interface"]["num_vcs"] = Json::Value(numVcs_);
@@ -92,81 +85,55 @@ Network::Network(const std::string& _name, const Component* _parent,
       u32 dimWidth = dimensionWidths_.at(dim);
       std::vector<u32> destinationAddress(sourceAddress);
 
-      // For dimension with width of 2, there is only one port
-      if (dimWidth == 2) {
-        // determine the destination router to work
-        destinationAddress.at(dim) = (sourceAddress.at(dim) + 1) % dimWidth;
-        sourcePort = portBase;
-        destinationPort = portBase;
-        std::string channelName = "Channel_" +
-            strop::vecString<u32>(routerAddress, '-') +
-            "-to-" +
-            strop::vecString<u32>(destinationAddress, '-');
+      // there is one port going right (to router with larger index in this
+      // dimension), and one port going left.
 
-        // create the channel
-        Channel* channel = new Channel(channelName, this,
-                                       _settings["internal_channel"]);
-        internalChannels_.push_back(channel);
+      // connect to the destination router going right
+      destinationAddress.at(dim) = (sourceAddress.at(dim) + 1) % dimWidth;
+      sourcePort = portBase;
+      destinationPort = portBase + 1;
 
-        // link the routers from source to destination
-        dbgprintf("linking %s:%u to %s:%u with %s",
-                  strop::vecString<u32>(sourceAddress, '-').c_str(), sourcePort,
-                  strop::vecString<u32>(destinationAddress, '-').c_str(),
-                  destinationPort,
-                  channelName.c_str());
-        routers_.at(sourceAddress)->setOutputChannel(sourcePort, channel);
-        routers_.at(destinationAddress)->setInputChannel(destinationPort,
-                                                         channel);
-        portBase+=1;
-      } else {
-        // For dimensions with width bigger than 2, there is one port going up
-        // (router with bigger index in this dimension), and one port going
-        // down. determine the destination router (going up)
-        destinationAddress.at(dim) = (sourceAddress.at(dim) + 1) % dimWidth;
-        sourcePort = portBase;
-        destinationPort = portBase + 1;
+      // create the channel
+      std::string channelName = "RChannel_"  +
+          strop::vecString<u32>(routerAddress, '-') +
+          "-to-" +
+          strop::vecString<u32>(destinationAddress, '-');
+      Channel* channel = new Channel(channelName, this,
+                                     _settings["internal_channel"]);
+      internalChannels_.push_back(channel);
 
-        // create the channel
-        std::string channelName = "Channel_"  +
-            strop::vecString<u32>(routerAddress, '-') +
-            "-to-" +
-            strop::vecString<u32>(destinationAddress, '-');
-        Channel* channel = new Channel(channelName, this,
-                                       _settings["internal_channel"]);
-        internalChannels_.push_back(channel);
+      // link the routers from source to destination
+      dbgprintf("linking %s:%u to %s:%u with %s",
+                strop::vecString<u32>(sourceAddress, '-').c_str(), sourcePort,
+                strop::vecString<u32>(destinationAddress, '-').c_str(),
+                destinationPort,
+                channelName.c_str());
+      routers_.at(sourceAddress)->setOutputChannel(sourcePort, channel);
+      routers_.at(destinationAddress)->setInputChannel(destinationPort,
+                                                       channel);
 
-        // link the routers from source to destination
-        dbgprintf("linking %s:%u to %s:%u with %s",
-                  strop::vecString<u32>(sourceAddress, '-').c_str(), sourcePort,
-                  strop::vecString<u32>(destinationAddress, '-').c_str(),
-                  destinationPort,
-                  channelName.c_str());
-        routers_.at(sourceAddress)->setOutputChannel(sourcePort, channel);
-        routers_.at(destinationAddress)->setInputChannel(destinationPort,
-                                                         channel);
-        // determine the destination router (going down)
-        destinationAddress.at(dim) = (sourceAddress.at(dim) + dimWidth - 1) %
-            dimWidth;
-        sourcePort = portBase + 1;
-        destinationPort = portBase;
-        channelName = "Channel_" +
-            strop::vecString<u32>(routerAddress, '-') +
-            "-to-" +
-            strop::vecString<u32>(destinationAddress, '-');
-        channel = new Channel(channelName, this, _settings["internal_channel"]);
-        internalChannels_.push_back(channel);
+      // connect to the destination router going right
+      destinationAddress.at(dim) = (sourceAddress.at(dim) + dimWidth - 1) %
+          dimWidth;
+      sourcePort = portBase + 1;
+      destinationPort = portBase;
+      channelName = "LChannel_" +
+          strop::vecString<u32>(routerAddress, '-') +
+          "-to-" +
+          strop::vecString<u32>(destinationAddress, '-');
+      channel = new Channel(channelName, this, _settings["internal_channel"]);
+      internalChannels_.push_back(channel);
 
-        // link the routers from source to destination
-        dbgprintf("linking %s:%u to %s:%u with %s",
-                  strop::vecString<u32>(sourceAddress, '-').c_str(), sourcePort,
-                  strop::vecString<u32>(destinationAddress, '-').c_str(),
-                  destinationPort,
-                  channelName.c_str());
-        routers_.at(sourceAddress)->setOutputChannel(sourcePort, channel);
-        routers_.at(destinationAddress)->setInputChannel(destinationPort,
-                                                         channel);
-        portBase += 2;
-      }
+      // link the routers from source to destination
+      dbgprintf("linking %s:%u to %s:%u with %s",
+                strop::vecString<u32>(sourceAddress, '-').c_str(), sourcePort,
+                strop::vecString<u32>(destinationAddress, '-').c_str(),
+                destinationPort,
+                channelName.c_str());
+      routers_.at(sourceAddress)->setOutputChannel(sourcePort, channel);
+      routers_.at(destinationAddress)->setInputChannel(destinationPort,
+                                                       channel);
+      portBase += 2;
     }
   }
 

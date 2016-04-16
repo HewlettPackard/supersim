@@ -99,11 +99,7 @@ void ValiantsRoutingAlgorithm::processRequest(
     if (routerAddress.at(iDim) != intermediateAddress->at(iDim+1)) {
       break;
     }
-    if (dimensionWidths_.at(iDim) == 2) {
-      iPortBase += 1;
-    } else {
-      iPortBase += 2;
-    }
+    iPortBase += 2;
   }
 
   // destination dimension to work on
@@ -113,11 +109,7 @@ void ValiantsRoutingAlgorithm::processRequest(
     if (routerAddress.at(dDim) != destinationAddress->at(dDim+1)) {
       break;
     }
-    if (dimensionWidths_.at(dDim) == 2) {
-      dPortBase += 1;
-    } else {
-      dPortBase += 2;
-    }
+    dPortBase += 2;
   }
 
   // figure out which dimension of which stage we need to work on
@@ -165,28 +157,23 @@ void ValiantsRoutingAlgorithm::processRequest(
     u32 dst = routingTo->at(dim + 1);
     assert(src != dst);
 
-    // in dimension with width of 2, there is only one port
+    // in torus topology, we can get to a destination in two directions,
+    //  this algorithm takes the shortest path, randomized tie breaker
+    u32 rightDelta = ((dst > src) ?
+                      (dst - src) :
+                      (dst + dimensionWidths_.at(dim) - src));
+    u32 leftDelta = ((src > dst) ?
+                     (src - dst) :
+                     (src + dimensionWidths_.at(dim) - dst));
+
+    // determine direction
     bool right;
-    if (dimensionWidths_.at(dim) == 2) {
+    if (rightDelta == leftDelta) {
+      right = gSim->rnd.nextBool();
+    } else if (rightDelta < leftDelta) {
       right = true;
     } else {
-      // in torus topology, we can get to a destination in two directions,
-      //  this algorithm takes the shortest path, randomized tie breaker
-      u32 rightDelta = ((dst > src) ?
-                        (dst - src) :
-                        (dst + dimensionWidths_.at(dim) - src));
-      u32 leftDelta = ((src > dst) ?
-                       (src - dst) :
-                       (src + dimensionWidths_.at(dim) - dst));
-
-      // determine direction
-      if (rightDelta == leftDelta) {
-        right = gSim->rnd.nextBool();
-      } else if (rightDelta < leftDelta) {
-        right = true;
-      } else {
-        right = false;
-      }
+      right = false;
     }
 
     // choose output port, figure out next router in this dimension
