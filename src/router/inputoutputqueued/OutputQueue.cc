@@ -55,7 +55,7 @@ OutputQueue::OutputQueue(
 OutputQueue::~OutputQueue() {}
 
 void OutputQueue::receiveFlit(u32 _port, Flit* _flit) {
-  assert(gSim->epsilon() == 0);
+  assert(gSim->epsilon() == 1);
 
   // 'port' is unused
   assert(_port == 0);

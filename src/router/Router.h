@@ -46,6 +46,7 @@ class Router : public Component, public FlitSender, public FlitReceiver,
   virtual void setInputChannel(u32 _port, Channel* _channel) = 0;
   virtual void setOutputChannel(u32 port, Channel* _channel) = 0;
 
+  // this returns creditCount/maxCredits (buffer availability)
   virtual f64 congestionStatus(u32 _vcIdx) const;
 
  protected:

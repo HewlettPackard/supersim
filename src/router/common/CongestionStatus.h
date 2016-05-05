@@ -32,14 +32,14 @@ class CongestionStatus : public Component {
   ~CongestionStatus();
 
   // configuration
-  void setMax(u32 _vcIdx, u32 _maxCredits);
+  void initCredits(u32 _vcIdx, u32 _credits);
 
   // operation
   void increment(u32 _vcIdx);
   void decrement(u32 _vcIdx);
 
-  // status (must be epsilon >= 1)
-  f64 status(u32 _vcIdx) const;
+  // this returns creditCount/maxCredits (buffer availability)
+  f64 status(u32 _vcIdx) const;  // (must be epsilon >= 1)
 
   void processEvent(void* _event, s32 _type);
 

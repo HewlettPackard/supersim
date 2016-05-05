@@ -56,8 +56,13 @@ Router::Router(
   inputQueues_.resize(numPorts_ * numVcs_, nullptr);
   for (u32 port = 0; port < numPorts_; port++) {
     for (u32 vc = 0; vc < numVcs_; vc++) {
+      u32 vcIdx = vcIndex(port, vc);
+
       // initialize the credit count in the CrossbarScheduler
-      crossbarScheduler_->initCreditCount(vcIndex(port, vc), inputQueueDepth);
+      crossbarScheduler_->initCreditCount(vcIdx, inputQueueDepth);
+
+      // initialize the credit count in the CongestionStatus
+      congestionStatus_->initCredits(vcIdx, inputQueueDepth);
 
       // create the name suffix
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
@@ -67,7 +72,7 @@ Router::Router(
       std::string rfname = "RoutingAlgorithm" + nameSuffix;
       RoutingAlgorithm* rf = _routingAlgorithmFactory->createRoutingAlgorithm(
           rfname, this, this, port);
-      routingAlgorithms_.at(vcIndex(port, vc)) = rf;
+      routingAlgorithms_.at(vcIdx) = rf;
 
       // compute the client index (same for VC alloc, SW alloc, and Xbar)
       u32 clientIndex = (port * numVcs_) + vc;
@@ -78,7 +83,7 @@ Router::Router(
           iqName, this, this, inputQueueDepth, port, numVcs_, vc, vcaSwaWait,
           rf, vcScheduler_, clientIndex, crossbarScheduler_, clientIndex,
           crossbar_, clientIndex);
-      inputQueues_.at(vcIndex(port, vc)) = iq;
+      inputQueues_.at(vcIdx) = iq;
 
       // register the input queue with VC and crossbar schedulers
       vcScheduler_->setClient(clientIndex, iq);
@@ -135,7 +140,9 @@ void Router::receiveFlit(u32 _port, Flit* _flit) {
 void Router::receiveCredit(u32 _port, Credit* _credit) {
   while (_credit->more()) {
     u32 vc = _credit->getNum();
-    crossbarScheduler_->incrementCreditCount(vcIndex(_port, vc));
+    u32 vcIdx = vcIndex(_port, vc);
+    crossbarScheduler_->incrementCreditCount(vcIdx);
+    congestionStatus_->increment(vcIdx);
   }
   delete _credit;
 }
@@ -156,6 +163,7 @@ void Router::sendCredit(u32 _port, u32 _vc) {
 void Router::sendFlit(u32 _port, Flit* _flit) {
   assert(outputChannels_.at(_port)->getNextFlit() == nullptr);
   outputChannels_.at(_port)->setNextFlit(_flit);
+  congestionStatus_->decrement(vcIndex(_port, _flit->getVc()));
 }
 
 f64 Router::congestionStatus(u32 _vcIdx) const {

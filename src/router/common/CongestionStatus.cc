@@ -26,15 +26,16 @@ CongestionStatus::CongestionStatus(
     : Component(_name, _parent), totalVcs_(_totalVcs),
       latency_(_settings["latency"].asUInt()) {
   assert(latency_ > 0);
-  maximums_.resize(totalVcs_, U32_MAX);
-  maximums_.resize(totalVcs_, 0);
+  maximums_.resize(totalVcs_);
+  counts_.resize(totalVcs_);
 }
 
 CongestionStatus::~CongestionStatus() {}
 
-void CongestionStatus::setMax(u32 _vcIdx, u32 _maxCredits) {
-  assert(_maxCredits > 0);
-  maximums_.at(_vcIdx) = _maxCredits;
+void CongestionStatus::initCredits(u32 _vcIdx, u32 _credits) {
+  assert(_credits > 0);
+  maximums_.at(_vcIdx) = _credits;
+  counts_.at(_vcIdx) = _credits;
 }
 
 void CongestionStatus::increment(u32 _vcIdx) {
@@ -55,12 +56,14 @@ void CongestionStatus::processEvent(void* _event, s32 _type) {
   u32 vcIdx = static_cast<u32>(reinterpret_cast<u64>(_event));
   switch (_type) {
     case INCR:
+      dbgprintf("incr %u from %u", vcIdx, counts_.at(vcIdx));
       assert(counts_.at(vcIdx) < maximums_.at(vcIdx));
       counts_.at(vcIdx)++;
       break;
     case DECR:
+      dbgprintf("decr %u from %u", vcIdx, counts_.at(vcIdx));
       assert(counts_.at(vcIdx) > 0);
-      counts_.at(vcIdx)++;
+      counts_.at(vcIdx)--;
       break;
     default:
       assert(false);
@@ -68,8 +71,7 @@ void CongestionStatus::processEvent(void* _event, s32 _type) {
 }
 
 void CongestionStatus::createEvent(u32 _vcIdx, s32 _type) {
-  u8 epsilon = gSim->epsilon();
-  assert(epsilon > 0 && epsilon != U8_MAX);
-  addEvent(gSim->futureCycle(latency_ - 1), epsilon + 1,
-           reinterpret_cast<void*>(_vcIdx), _type);
+  assert(gSim->epsilon() > 0);
+  u64 time = latency_ == 1 ? gSim->time() : gSim->futureCycle(latency_ - 1);
+  addEvent(time, gSim->epsilon() + 1, reinterpret_cast<void*>(_vcIdx), _type);
 }

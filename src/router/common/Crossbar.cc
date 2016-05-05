@@ -61,7 +61,7 @@ void Crossbar::inject(Flit* _flit, u32 _srcId, u32 _destId) {
     destMaps_.push_front(std::vector<Flit*>(numOutputs_, nullptr));
 
     // schedule an event for the new map
-    addEvent(gSim->futureCycle(latency_), 0, nullptr, 0);
+    addEvent(gSim->futureCycle(latency_), 1, nullptr, 0);
   }
 
   std::vector<Flit*>& map = destMaps_.front();
@@ -72,7 +72,7 @@ void Crossbar::inject(Flit* _flit, u32 _srcId, u32 _destId) {
 }
 
 void Crossbar::processEvent(void* _event, s32 _type) {
-  assert(gSim->epsilon() == 0);
+  assert(gSim->epsilon() == 1);
   assert(destMaps_.size() >= 1);
 
   // pull out the next map
