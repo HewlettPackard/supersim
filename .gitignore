@@ -30,6 +30,7 @@
 # Build and binary directories
 bld/
 bin/
+.installed
 
 # Simulator outputs
 *.log
