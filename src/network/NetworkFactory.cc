@@ -20,6 +20,7 @@
 #include "network/butterfly/Network.h"
 #include "network/foldedclos/Network.h"
 #include "network/hyperx/Network.h"
+#include "network/slimfly/Network.h"
 #include "network/torus/Network.h"
 #include "network/uno/Network.h"
 
@@ -34,6 +35,8 @@ Network* NetworkFactory::createNetwork(
     return new FoldedClos::Network(_name, _parent, _settings);
   } else if (topology == "hyperx") {
     return new HyperX::Network(_name, _parent, _settings);
+  } else if (topology == "slimfly") {
+    return new SlimFly::Network(_name, _parent, _settings);
   } else if (topology == "torus") {
     return new Torus::Network(_name, _parent, _settings);
   } else if (topology == "uno") {
