@@ -8,8 +8,7 @@
   "network": {
     "topology": "slimfly",
     "num_vcs": 4,
-    "dimension_widths": [2, 3, 4],
-    "dimension_weights": [2, 1, 2],
+    "width": 5,
     "concentration": 1,
     "internal_channel": {
       "latency": 1  // cycles

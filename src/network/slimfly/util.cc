@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 #include "network/slimfly/util.h"
-
+#include <math.h>
 #include <cassert>
 
 namespace SlimFly {
@@ -24,16 +24,35 @@ bool isPrimePower(u32 _width) {
 	return true;
 }
 
-//TODO: implement
-static u32 computePrimitiveElement(u32 _width) {
-	return 2;
-}
+static bool isPrimitiveElement(u32 _width, u32 prim) {
+	u32 power = 0;
+	u32 k = 1;
+	u32 i = 1;
+	std::vector<bool> satisfy(_width, 0);
+	while(power < _width) {
+		for (i = 1; i < _width; i++) {
+			if(((k % _width) == i)) {
+				if(satisfy[i]) return false; // match repeat
+				satisfy[i] = true;	
+				break;
+			}
+		} 
+		if (i == _width) return false; // no match 
+		k *= prim;
+		power++; 	
+	}	
+	return true;
+}	
 
 void createGeneratorSet(u32 coeff, int delta, std::vector<u32>& X, std::vector<u32>& X_i) {
-
-	// compute primitive element
 	u32 _width = 4 * coeff + delta;
-	u32 prim = computePrimitiveElement(_width);
+	
+	// compute primitive element
+	u32 prim = 1;
+	for (prim = 1; prim < _width; prim++) {
+		if(isPrimitiveElement(_width, prim)) break;
+	}
+	assert(prim < _width);
 	u32 curr = 1;
 	for (u32 i = 0; i < 2*coeff; i++) {
 		X.push_back(curr);
