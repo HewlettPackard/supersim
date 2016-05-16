@@ -49,9 +49,7 @@ class Network : public ::Network {
   void collectChannels(std::vector<Channel*>* _channels) override;
 
  private:
-  u32 dimensions_;
-  std::vector<u32> dimensionWidths_;
-  std::vector<u32> dimensionWeights_;
+  u32 width_;
   u32 concentration_;
   DimensionalArray<Router*> routers_;
   DimensionalArray<Interface*> interfaces_;

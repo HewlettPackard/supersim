@@ -25,11 +25,10 @@ namespace SlimFly {
 
 RoutingAlgorithmFactory::RoutingAlgorithmFactory(
     u32 _numVcs, const std::vector<u32>& _dimensionWidths,
-    const std::vector<u32>& _dimensionWeights, u32 _concentration,
-    Json::Value _settings)
+    u32 _concentration, Json::Value _settings)
     : ::RoutingAlgorithmFactory(), numVcs_(_numVcs),
-      dimensionWidths_(_dimensionWidths), dimensionWeights_(_dimensionWeights),
-      concentration_(_concentration), settings_(_settings) {}
+      dimensionWidths_(_dimensionWidths), concentration_(_concentration), 
+			settings_(_settings) {}
 
 RoutingAlgorithmFactory::~RoutingAlgorithmFactory() {}
 
@@ -42,10 +41,10 @@ RoutingAlgorithm* RoutingAlgorithmFactory::createRoutingAlgorithm(
   if (algorithm == "dimension_order") {
     return new SlimFly::DimOrderRoutingAlgorithm(
         _name, _parent, _router, latency, numVcs_, dimensionWidths_,
-        dimensionWeights_, concentration_);
+        concentration_);
   } else {
-    fprintf(stderr, "Unknown routing algorithm: '%s'\n", algorithm.c_str());
-    assert(false);
+   fprintf(stderr, "Unknown routing algorithm: '%s'\n", algorithm.c_str());
+   assert(false);
   }
 }
 

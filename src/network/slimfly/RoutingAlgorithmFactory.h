@@ -31,7 +31,6 @@ namespace SlimFly {
 class RoutingAlgorithmFactory : public ::RoutingAlgorithmFactory {
  public:
   RoutingAlgorithmFactory(u32 _numVcs, const std::vector<u32>& _dimensionWidths,
-                          const std::vector<u32>& _dimensionWeights,
                           u32 _concentration, Json::Value _settings);
   ~RoutingAlgorithmFactory();
   RoutingAlgorithm* createRoutingAlgorithm(
