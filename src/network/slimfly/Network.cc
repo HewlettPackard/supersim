@@ -80,8 +80,9 @@ Network::Network(const std::string& _name, const Component* _parent,
   }
   delete routingAlgorithmFactory;
 
-
-	std::vector<std::vector<u32> > inputPorts(2*width_, std::vector<u32>(width_, concentration_)); //(2*row, col)
+  // input port for all the router nodes (both subgraphs) initialized to concentration_
+  // output port for all the router nodes (both subgraphs) initialized to routerRadix - 1
+	std::vector<std::vector<u32> > inputPorts(2*width_, std::vector<u32>(width_, concentration_)); 
 	std::vector<std::vector<u32> > outputPorts(2*width_, std::vector<u32>(width_, routerRadix - 1)); 
 
   // link routers via channels: Intra subgraph connections
@@ -113,16 +114,14 @@ Network::Network(const std::string& _name, const Component* _parent,
           	internalChannels_.push_back(revChannel);
 
           	// determine the port numbers
-          	u32 fwdOutPort = outputPorts.at(row).at(col)++;
-          	u32 fwdInPort = inputPorts.at(width_ + dstRow).at(col)--;
-          	u32 revOutPort = outputPorts.at(width_ + dstRow).at(col)++;
-          	u32 revInPort = inputPorts.at(row).at(col)--;
+          	u32 outPort = outputPorts.at(row).at(col)++;
+          	u32 inPort = inputPorts.at(width_ + dstRow).at(col)--;
 
            	// link the routers from source to destination
-           	routers_.at(addr1)->setOutputChannel(fwdOutPort, fwdChannel);
-           	routers_.at(addr2)->setInputChannel(fwdInPort, fwdChannel);
-           	routers_.at(addr2)->setOutputChannel(revOutPort, revChannel);
-           	routers_.at(addr1)->setInputChannel(revInPort, revChannel);
+           	routers_.at(addr1)->setOutputChannel(outPort, fwdChannel);
+           	routers_.at(addr2)->setInputChannel(inPort, fwdChannel);
+           	routers_.at(addr2)->setOutputChannel(inPort, revChannel);
+           	routers_.at(addr1)->setInputChannel(outPort, revChannel);
 
 				}	else {
 						break;
@@ -159,16 +158,14 @@ Network::Network(const std::string& _name, const Component* _parent,
           	internalChannels_.push_back(revChannel);
 
           	// determine the port numbers
-          	u32 fwdOutPort = outputPorts.at(y).at(x)++;
-          	u32 fwdInPort = inputPorts.at(width_ + c).at(m)--;
-          	u32 revOutPort = outputPorts.at(width_ + c).at(m)++;
-          	u32 revInPort = inputPorts.at(y).at(x)--;
+          	u32 outPort = outputPorts.at(y).at(x)++;
+          	u32 inPort = inputPorts.at(width_ + c).at(m)--;
 
            	// link the routers from source to destination
-           	routers_.at(addr1)->setOutputChannel(fwdOutPort, fwdChannel);
-           	routers_.at(addr2)->setInputChannel(fwdInPort, fwdChannel);
-           	routers_.at(addr2)->setOutputChannel(revOutPort, revChannel);
-           	routers_.at(addr1)->setInputChannel(revInPort, revChannel);
+           	routers_.at(addr1)->setOutputChannel(outPort, fwdChannel);
+           	routers_.at(addr2)->setInputChannel(inPort, fwdChannel);
+           	routers_.at(addr2)->setOutputChannel(inPort, revChannel);
+           	routers_.at(addr1)->setInputChannel(outPort, revChannel);
 				  }	
 			  }
 		  }
