@@ -16,50 +16,38 @@
 #include "network/slimfly/util.h"
 #include <math.h>
 #include <cassert>
-
 namespace SlimFly {
 
 //TODO: implement
 bool isPrimePower(u32 _width) {
-	return true;
+  return true;
 }
 
 static bool isPrimitiveElement(u32 _width, u32 prim) {
-	u32 power = 0;
-	u32 k = 1;
-	u32 i = 1;
-	std::vector<bool> satisfy(_width, 0);
-	while(power < _width) {
-		for (i = 1; i < _width; i++) {
-			if(((k % _width) == i)) {
-				if(satisfy[i]) return false; // match repeat
-				satisfy[i] = true;	
-				break;
-			}
-		} 
-		if (i == _width) return false; // no match 
-		k *= prim;
-		power++; 	
-	}	
-	return true;
-}	
+  std::vector<bool> satisfy(_width, false);
+  satisfy[0] = true; //exception for primitive elem
+  for (u32 p = 0; p < _width; p++) {
+    satisfy[static_cast<u32>(pow(prim, p)) % _width] = true;
+  }
+  bool isprim = true;
+  for (bool s : satisfy) {
+    isprim &= s;
+  }
+  return isprim;
+}
 
-void createGeneratorSet(u32 coeff, int delta, std::vector<u32>& X, std::vector<u32>& X_i) {
-	u32 _width = 4 * coeff + delta;
-	
-	// compute primitive element
-	u32 prim = 1;
-	for (prim = 1; prim < _width; prim++) {
-		if(isPrimitiveElement(_width, prim)) break;
-	}
-	assert(prim < _width);
-	u32 curr = 1;
-	for (u32 i = 0; i < 2*coeff; i++) {
-		X.push_back(curr);
-		X_i.push_back(curr * prim);
-		curr *= prim*prim; 	
-		if ((i == coeff) && (delta == -1)) curr /= prim;
-	}
+void createGeneratorSet(u32 _width, int delta, std::vector<u32>& X, std::vector<u32>& X_i) {
+  u32 prim = 1;
+  for (prim = 1; prim < _width; prim++) {
+    if(isPrimitiveElement(_width, prim)) break;
+  }
+  assert(prim < _width);
+  u32 last_pow = (delta == 1) ? _width - 3 : _width - 2;
+  for (u32 p = 0; p <= last_pow; p += 2) {
+    u32 val = pow(prim, p);
+    X.push_back(val%_width);
+    X_i.push_back((val*prim)%_width);
+  }
 }
 
 void computeAddress(u32 _id, u32 _width,

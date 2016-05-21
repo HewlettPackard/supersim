@@ -22,7 +22,7 @@
 namespace SlimFly {
 
 bool isPrimePower(u32 _width);
-void createGeneratorSet(u32 coeff, int delta, std::vector<u32>& X, std::vector<u32>& X_i);
+void createGeneratorSet(u32 _width, int delta, std::vector<u32>& X, std::vector<u32>& X_i);
 void computeAddress(u32 _id, u32 _width,
                     u32 _concentration, std::vector<u32>* _address); 
 
