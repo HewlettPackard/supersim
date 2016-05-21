@@ -25,13 +25,16 @@
 
 #include "event/Component.h"
 #include "network/RoutingAlgorithmFactory.h"
+#include "util/DimensionalArray.h"
+#include "RoutingTable.h"
 
 namespace SlimFly {
 
 class RoutingAlgorithmFactory : public ::RoutingAlgorithmFactory {
  public:
   RoutingAlgorithmFactory(u32 _numVcs, const std::vector<u32>& _dimensionWidths,
-                          u32 _concentration, Json::Value _settings);
+    u32 _concentration, Json::Value _settings,
+    const DimensionalArray<RoutingTable*>& _routingTables);
   ~RoutingAlgorithmFactory();
   RoutingAlgorithm* createRoutingAlgorithm(
       const std::string& _name, const Component* _parent, Router* _router,
@@ -43,6 +46,7 @@ class RoutingAlgorithmFactory : public ::RoutingAlgorithmFactory {
   const std::vector<u32> dimensionWeights_;
   const u32 concentration_;
   Json::Value settings_;
+  const DimensionalArray<RoutingTable*>& routingTables_;
 };
 
 }  // namespace SlimFly

@@ -58,10 +58,13 @@ Network::Network(const std::string& _name, const Component* _parent,
   _settings["router"]["num_vcs"] = Json::Value(numVcs_);
   _settings["interface"]["num_vcs"] = Json::Value(numVcs_);
 
+  routingTables_.setSize(dimensionWidths_);
+
   // create a routing algorithm factory to give to the routers
   RoutingAlgorithmFactory* routingAlgorithmFactory =
       new SlimFly::RoutingAlgorithmFactory(
-          numVcs_, dimensionWidths_, concentration_, _settings["routing"]);
+          numVcs_, dimensionWidths_, concentration_, _settings["routing"],
+          routingTables_);
 
   // setup a router iterator for looping over the router dimensions
   DimensionIterator routerIterator(dimensionWidths_);
@@ -78,6 +81,7 @@ Network::Network(const std::string& _name, const Component* _parent,
     routers_.at(routerAddress) = RouterFactory::createRouter(
         routerName, this, routerAddress, routingAlgorithmFactory,
         _settings["router"]);
+    routingTables_.at(routerAddress) = new RoutingTable(routerAddress);
   }
   delete routingAlgorithmFactory;
 
@@ -110,6 +114,7 @@ Network::Network(const std::string& _name, const Component* _parent,
             // link the routers from source to destination
             routers_.at(srcAddr)->setOutputChannel(outPort, channel);
             routers_.at(dstAddr)->setInputChannel(inPort, channel);
+            routingTables_.at(srcAddr)->addHop(outPort, dstAddr);
           }
         }
       }
@@ -146,20 +151,44 @@ Network::Network(const std::string& _name, const Component* _parent,
             internalChannels_.push_back(revChannel);
 
              // link the routers from source to destination
-             routers_.at(addr1)->setOutputChannel(
-                 outputPorts.at(x).at(y)++, fwdChannel);
-             routers_.at(addr2)->setInputChannel(
-                 inputPorts.at(width_ + m).at(c)++, fwdChannel);
-             routers_.at(addr2)->setOutputChannel(
-                 outputPorts.at(width_ + m).at(c)++, revChannel);
-             routers_.at(addr1)->setInputChannel(
-                 inputPorts.at(x).at(y)++, revChannel);
+            u32 outPort0 = outputPorts.at(x).at(y)++;
+            u32 inPort0 = inputPorts.at(x).at(y)++;
+            u32 outPort1 = outputPorts.at(width_ + m).at(c)++;
+            u32 inPort1 = inputPorts.at(width_ + m).at(c)++;
+
+            routers_.at(addr1)->setOutputChannel(outPort0, fwdChannel);
+            routers_.at(addr2)->setInputChannel(inPort1, fwdChannel);
+            routingTables_.at(addr1)->addHop(outPort0, addr2);
+
+            routers_.at(addr2)->setOutputChannel(outPort1, revChannel);
+            routers_.at(addr1)->setInputChannel(inPort0, revChannel);
+            routingTables_.at(addr2)->addHop(outPort1, addr1);
           }
         }
       }
     }
   }
 
+  for (u32 src = 0; src < routingTables_.size(); src++) {
+    for (u32 dst = 0; dst < routingTables_.size(); dst++) {
+      const std::vector<u32>& dstAddr = routingTables_.at(dst)->getAddr();
+      // Check if there is a pat from src -> dst
+      // If so, move on
+      if (routingTables_.at(src)->getNumHops(dstAddr)) continue;
+      // If there isnt a path look for an intermediate
+      // node that does. Because Slim Fly has a max
+      // diameter of 2, this does not have to be recursive
+      for (u32 hop = 0; hop < routingTables_.size(); hop++) {
+        const std::vector<u32>& hopAddr = routingTables_.at(dst)->getAddr();
+        if (routingTables_.at(hop)->getNumHops(dstAddr)) {
+          if (routingTables_.at(src)->getNumHops(hopAddr) &&
+              routingTables_.at(hop)->getNumHops(dstAddr)) {
+            routingTables_.at(src)->addPath(dstAddr, hopAddr);
+          }
+        }
+      }
+    }
+  }
 
   // create a vector of dimension widths that contains the concentration
   std::vector<u32> fullDimensionWidths(1);
@@ -227,6 +256,7 @@ Network::~Network() {
   // delete routers
   for (u32 id = 0; id < routers_.size(); id++) {
     delete routers_.at(id);
+    delete routingTables_.at(id);
   }
 
   // delete interfaces

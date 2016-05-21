@@ -25,10 +25,11 @@ namespace SlimFly {
 
 RoutingAlgorithmFactory::RoutingAlgorithmFactory(
     u32 _numVcs, const std::vector<u32>& _dimensionWidths,
-    u32 _concentration, Json::Value _settings
+    u32 _concentration, Json::Value _settings,
+    const DimensionalArray<RoutingTable*>& _routingTables
 ) : ::RoutingAlgorithmFactory(), numVcs_(_numVcs),
       dimensionWidths_(_dimensionWidths), concentration_(_concentration),
-      settings_(_settings) {}
+      settings_(_settings), routingTables_(_routingTables) {}
 
 RoutingAlgorithmFactory::~RoutingAlgorithmFactory() {}
 

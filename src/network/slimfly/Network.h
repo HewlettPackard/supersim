@@ -28,6 +28,7 @@
 #include "network/Network.h"
 #include "network/Channel.h"
 #include "router/Router.h"
+#include "RoutingTable.h"
 #include "util/DimensionalArray.h"
 
 namespace SlimFly {
@@ -52,6 +53,7 @@ class Network : public ::Network {
   u32 width_;
   u32 concentration_;
   DimensionalArray<Router*> routers_;
+  DimensionalArray<RoutingTable*> routingTables_;
   DimensionalArray<Interface*> interfaces_;
   std::vector<Channel*> internalChannels_;
   std::vector<Channel*> externalChannels_;
