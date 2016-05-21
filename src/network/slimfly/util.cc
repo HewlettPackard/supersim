@@ -18,14 +18,14 @@
 #include <cassert>
 namespace SlimFly {
 
-//TODO: implement
+// TODO(Nehal): implement
 bool isPrimePower(u32 _width) {
   return true;
 }
 
 static bool isPrimitiveElement(u32 _width, u32 prim) {
   std::vector<bool> satisfy(_width, false);
-  satisfy[0] = true; //exception for primitive elem
+  satisfy[0] = true;  // exception for primitive elem
   for (u32 p = 0; p < _width; p++) {
     satisfy[static_cast<u32>(pow(prim, p)) % _width] = true;
   }
@@ -36,23 +36,28 @@ static bool isPrimitiveElement(u32 _width, u32 prim) {
   return isprim;
 }
 
-void createGeneratorSet(u32 _width, int delta, std::vector<u32>& X, std::vector<u32>& X_i) {
+u32 createGeneratorSet(
+    u32 _width, int delta, std::vector<u32>& X, std::vector<u32>& X_i) {
   u32 prim = 1;
   for (prim = 1; prim < _width; prim++) {
-    if(isPrimitiveElement(_width, prim)) break;
+    if (isPrimitiveElement(_width, prim))
+      break;
   }
   assert(prim < _width);
   u32 last_pow = (delta == 1) ? _width - 3 : _width - 2;
+  X.clear();
+  X_i.clear();
   for (u32 p = 0; p <= last_pow; p += 2) {
     u32 val = pow(prim, p);
     X.push_back(val%_width);
     X_i.push_back((val*prim)%_width);
   }
+  return X.size();
 }
 
 void computeAddress(u32 _id, u32 _width,
                     u32 _concentration, std::vector<u32>* _address) {
-  u32 dimensions = 3; 
+  u32 dimensions = 3;
   _address->resize(dimensions + 1);
 
   // addresses are in little endian format

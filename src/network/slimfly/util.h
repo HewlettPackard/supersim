@@ -16,15 +16,16 @@
 #ifndef NETWORK_SLIMFLY_UTIL_H_
 #define NETWORK_SLIMFLY_UTIL_H_
 
-#include <vector>
 #include <prim/prim.h>
+#include <vector>
 
 namespace SlimFly {
 
 bool isPrimePower(u32 _width);
-void createGeneratorSet(u32 _width, int delta, std::vector<u32>& X, std::vector<u32>& X_i);
-void computeAddress(u32 _id, u32 _width,
-                    u32 _concentration, std::vector<u32>* _address); 
+u32 createGeneratorSet(
+  u32 _width, int delta, std::vector<u32>& X, std::vector<u32>& X_i);
+void computeAddress(
+  u32 _id, u32 _width, u32 _concentration, std::vector<u32>* _address);
 
-} // namespace SlimFly
+}  // namespace SlimFly
 #endif  // NETWORK_SLIMFLY_UTIL_H_

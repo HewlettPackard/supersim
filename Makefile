@@ -25,8 +25,8 @@ STATIC_LIBS   := \
 	$(LIBS_LOC)libstrop/bld/libstrop.a
 
 #--------------------- Cpp Lint -----------------------------------------------#
-#LINT          := ../makeccpp/cpplint/cpplint.py
-#LINT_FLAGS    :=
+LINT          := ../makeccpp/cpplint/cpplint.py --filter=-runtime/references
+LINT_FLAGS    :=
 
 #--------------------- Unit Tests ---------------------------------------------#
 TEST_SUFFIX   := _TEST
@@ -38,7 +38,7 @@ SRC_EXTS      := .cc
 HDR_EXTS      := .h .tcc
 CXX_FLAGS     := -Wall -Wextra -pedantic -Wfatal-errors -std=c++11
 CXX_FLAGS     += -Wno-unused-parameter -Wno-variadic-macros
-CXX_FLAGS     +=  -g -O3 -flto
+CXX_FLAGS     += -march=native -g -O3 -flto
 LINK_FLAGS    := -lz
 
 #--------------------- Auto Makefile ------------------------------------------#

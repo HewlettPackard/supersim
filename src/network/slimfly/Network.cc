@@ -52,7 +52,6 @@ Network::Network(const std::string& _name, const Component* _parent,
   // create generator sets
   std::vector<u32> X;
   std::vector<u32> X_i;
-  //createGeneratorSet(coeff, delta, X, X_i);
   createGeneratorSet(width_, delta, X, X_i);
 
   _settings["router"]["num_ports"] = Json::Value(routerRadix);
@@ -82,9 +81,10 @@ Network::Network(const std::string& _name, const Component* _parent,
   }
   delete routingAlgorithmFactory;
 
+  static const u32 NUM_GRAPHS = dimensionWidths_.at(0);
   // link routers via channels: Intra subgraph connections
-  for (u32 graph = 0; graph < dimensionWidths_.at(0); graph++) {
-    std::vector<u32>& dVtr = (graph == 0) ? X : X_i; //Deep copy
+  for (u32 graph = 0; graph < NUM_GRAPHS; graph++) {
+    std::vector<u32>& dVtr = (graph == 0) ? X : X_i;  // Deep copy
     std::set<u32> distSet(dVtr.begin(), dVtr.end());
     for (u32 col = 0; col < width_; col++) {
       std::vector<u32> inPorts(width_, 0), outPorts(width_, 0);
@@ -110,16 +110,16 @@ Network::Network(const std::string& _name, const Component* _parent,
             // link the routers from source to destination
             routers_.at(srcAddr)->setOutputChannel(outPort, channel);
             routers_.at(dstAddr)->setInputChannel(inPort, channel);
-//            printf("      \"%s\" <-> \"%s\"\n", strop::vecString<u32>(srcAddr).c_str(), strop::vecString<u32>(dstAddr).c_str());
-//            printf("      outPort = %d, inPort = %d\n", outPort, inPort);
           }
         }
       }
     }
   }
 
-  std::vector< std::vector<u32> > inputPorts(2*width_, std::vector<u32>(width_, concentration_ + X.size()));
-  std::vector< std::vector<u32> > outputPorts(2*width_, std::vector<u32>(width_, concentration_ + X.size()));
+  std::vector< std::vector<u32> > inputPorts(
+      NUM_GRAPHS*width_, std::vector<u32>(width_, concentration_ + X.size()));
+  std::vector< std::vector<u32> > outputPorts(
+      NUM_GRAPHS*width_, std::vector<u32>(width_, concentration_ + X.size()));
 
   // link routers via channels: Inter subgraph connections
   for (u32 x = 0; x < width_; x++) {
@@ -129,10 +129,8 @@ Network::Network(const std::string& _name, const Component* _parent,
           if (y == (m * x + c)) {
              // determine the source router
             std::vector<u32> addr1 = {0, x, y};
-
-            // determine the destination router
             std::vector<u32> addr2 = {1, m, c};
-          
+
             // create the channel
             std::string fwdChannelName = "Channel_" +
               strop::vecString<u32>(addr1, '-') + "-to-" +
@@ -148,10 +146,14 @@ Network::Network(const std::string& _name, const Component* _parent,
             internalChannels_.push_back(revChannel);
 
              // link the routers from source to destination
-             routers_.at(addr1)->setOutputChannel(outputPorts.at(x).at(y)++, fwdChannel);
-             routers_.at(addr2)->setInputChannel(inputPorts.at(width_ + m).at(c)++, fwdChannel);
-             routers_.at(addr2)->setOutputChannel(outputPorts.at(width_ + m).at(c)++, revChannel);
-             routers_.at(addr1)->setInputChannel(inputPorts.at(x).at(y)++, revChannel);
+             routers_.at(addr1)->setOutputChannel(
+                 outputPorts.at(x).at(y)++, fwdChannel);
+             routers_.at(addr2)->setInputChannel(
+                 inputPorts.at(width_ + m).at(c)++, fwdChannel);
+             routers_.at(addr2)->setOutputChannel(
+                 outputPorts.at(width_ + m).at(c)++, revChannel);
+             routers_.at(addr1)->setInputChannel(
+                 inputPorts.at(x).at(y)++, revChannel);
           }
         }
       }
