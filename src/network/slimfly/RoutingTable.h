@@ -43,6 +43,7 @@ class RoutingTable {
     return srcAddr_;
   }
   u32 getNumHops(const std::vector<u32>& dstAddr) const;
+  u32 getPortNum(const std::vector<u32>& hopAddr) const;
   const std::vector<PathInfo> getPaths(const std::vector<u32>& dstAddr) const;
 
  private:
