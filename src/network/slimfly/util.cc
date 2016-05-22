@@ -48,9 +48,12 @@ u32 createGeneratorSet(
   X.clear();
   X_i.clear();
   for (u32 p = 0; p <= last_pow; p += 2) {
+		if ((delta == -1) && p = (_width + 1) / 2) {
+			p--;
+		}
     u32 val = pow(prim, p);
-    X.push_back(val%_width);
-    X_i.push_back((val*prim)%_width);
+    X.push_back(val % _width);
+    X_i.push_back((val * prim) % _width);
   }
   return X.size();
 }
