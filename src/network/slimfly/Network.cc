@@ -50,9 +50,7 @@ Network::Network(const std::string& _name, const Component* _parent,
   std::vector<u32> dimensionWidths_ = {2, width_, width_};
 
   // create generator sets
-  std::vector<u32> X;
-  std::vector<u32> X_i;
-  createGeneratorSet(width_, delta, X, X_i);
+  createGeneratorSet(width_, delta, X_, X_i_);
 
   _settings["router"]["num_ports"] = Json::Value(routerRadix);
   _settings["router"]["num_vcs"] = Json::Value(numVcs_);
@@ -64,7 +62,7 @@ Network::Network(const std::string& _name, const Component* _parent,
   RoutingAlgorithmFactory* routingAlgorithmFactory =
       new SlimFly::RoutingAlgorithmFactory(
           numVcs_, dimensionWidths_, concentration_, _settings["routing"],
-          routingTables_);
+          routingTables_, X_, X_i_);
 
   // setup a router iterator for looping over the router dimensions
   DimensionIterator routerIterator(dimensionWidths_);
@@ -88,7 +86,7 @@ Network::Network(const std::string& _name, const Component* _parent,
   static const u32 NUM_GRAPHS = dimensionWidths_.at(0);
   // link routers via channels: Intra subgraph connections
   for (u32 graph = 0; graph < NUM_GRAPHS; graph++) {
-    std::vector<u32>& dVtr = (graph == 0) ? X : X_i;  // Deep copy
+    std::vector<u32>& dVtr = (graph == 0) ? X_ : X_i_;  // Deep copy
     std::set<u32> distSet(dVtr.begin(), dVtr.end());
     for (u32 col = 0; col < width_; col++) {
       std::vector<u32> inPorts(width_, 0), outPorts(width_, 0);
@@ -122,9 +120,9 @@ Network::Network(const std::string& _name, const Component* _parent,
   }
 
   std::vector< std::vector<u32> > inputPorts(
-      NUM_GRAPHS*width_, std::vector<u32>(width_, concentration_ + X.size()));
+      NUM_GRAPHS*width_, std::vector<u32>(width_, concentration_ + X_.size()));
   std::vector< std::vector<u32> > outputPorts(
-      NUM_GRAPHS*width_, std::vector<u32>(width_, concentration_ + X.size()));
+      NUM_GRAPHS*width_, std::vector<u32>(width_, concentration_ + X_.size()));
 
   // link routers via channels: Inter subgraph connections
   for (u32 x = 0; x < width_; x++) {

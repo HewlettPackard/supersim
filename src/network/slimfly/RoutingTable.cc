@@ -31,37 +31,26 @@ void RoutingTable::addHop(
 
 void RoutingTable::addPath(
   const std::vector<u32>& dstAddr, const std::vector<u32>& thruAddr) {
-  pathTable_[strop::vecString<u32>(dstAddr)] =
-      hopTable_[strop::vecString<u32>(thruAddr)];
+  PathInfo info(thruAddr, hopTable_[strop::vecString<u32>(thruAddr)]);
+
+  if (pathTable_.count(strop::vecString<u32>(dstAddr))) {
+    pathTable_.at(strop::vecString<u32>(dstAddr)).push_back(info);
+  } else {
+    pathTable_[strop::vecString<u32>(dstAddr)] = std::vector<PathInfo>(1, info);
+  }
 }
 
 u32 RoutingTable::getNumHops(const std::vector<u32>& dstAddr) const {
   auto hopIter = hopTable_.find(strop::vecString<u32>(dstAddr));
   if (hopIter != hopTable_.end()) {
-    return 1;
+    return 1;   // hop table by definition contains nodes 1 hop away
   } else {
     auto pathIter = pathTable_.find(strop::vecString<u32>(dstAddr));
     if (pathIter != pathTable_.end()) {
-      return 2;
+      return 2;   // max diameter == 2 so if not in hop table then here
     } else {
       return 0;
     }
   }
 }
-
-u32 RoutingTable::getOutPort(const std::vector<u32>& dstAddr) const {
-  auto hopIter = hopTable_.find(strop::vecString<u32>(dstAddr));
-  if (hopIter != hopTable_.end()) {
-    return hopIter->second;
-  } else {
-    auto pathIter = pathTable_.find(strop::vecString<u32>(dstAddr));
-    if (pathIter != pathTable_.end()) {
-      return pathIter->second;
-    } else {
-      assert(false);
-      return UINT_MAX;
-    }
-  }
-}
-
 }  // namespace SlimFly

@@ -25,6 +25,14 @@ namespace SlimFly {
 
 class RoutingTable {
  public:
+  struct PathInfo {
+    PathInfo(const std::vector<u32>& _thruAddr, u32 _portNum)
+    : thruAddr(_thruAddr), outPortNum(_portNum) {
+    }
+    const std::vector<u32> thruAddr;
+    const u32 outPortNum;
+  };
+
   explicit RoutingTable(const std::vector<u32>& _srcAddr);
 
   void addHop(u32 srcPort, const std::vector<u32>& dstAddr);
@@ -35,13 +43,14 @@ class RoutingTable {
     return srcAddr_;
   }
   u32 getNumHops(const std::vector<u32>& dstAddr) const;
-  u32 getOutPort(const std::vector<u32>& dstAddr) const;
+  const std::vector<PathInfo> getPaths(const std::vector<u32>& dstAddr) const;
 
  private:
-  typedef std::unordered_map<std::string, u32> PathMap;
+  typedef std::unordered_map<std::string, u32> HopMap;
+  typedef std::unordered_map<std::string, std::vector<PathInfo> > PathMap;
 
   const std::vector<u32> srcAddr_;
-  PathMap hopTable_;
+  HopMap hopTable_;
   PathMap pathTable_;
 };
 

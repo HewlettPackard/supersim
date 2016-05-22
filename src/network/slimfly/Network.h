@@ -57,6 +57,8 @@ class Network : public ::Network {
   DimensionalArray<Interface*> interfaces_;
   std::vector<Channel*> internalChannels_;
   std::vector<Channel*> externalChannels_;
+  std::vector<u32> X_;
+  std::vector<u32> X_i_;
 };
 
 }  // namespace SlimFly

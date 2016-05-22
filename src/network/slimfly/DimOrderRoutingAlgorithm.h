@@ -24,6 +24,7 @@
 #include "event/Component.h"
 #include "network/RoutingAlgorithm.h"
 #include "router/Router.h"
+#include "RoutingTable.h"
 
 namespace SlimFly {
 
@@ -32,7 +33,10 @@ class DimOrderRoutingAlgorithm : public RoutingAlgorithm {
   DimOrderRoutingAlgorithm(const std::string& _name, const Component* _parent,
                            Router* _router, u64 _latency, u32 _numVcs,
                            const std::vector<u32>& _dimensionWidths,
-                           u32 _concentration);
+                           u32 _concentration,
+                           const RoutingTable& _routingTable,
+                           const std::vector<u32>& _X,
+                           const std::vector<u32>& _X_i);
   ~DimOrderRoutingAlgorithm();
 
  protected:
@@ -43,6 +47,8 @@ class DimOrderRoutingAlgorithm : public RoutingAlgorithm {
   const u32 numVcs_;
   const std::vector<u32> dimensionWidths_;
   const u32 concentration_;
+  const RoutingTable& routingTable_;
+  const std::vector<u32>& X_, X_i_;
 };
 
 }  // namespace SlimFly

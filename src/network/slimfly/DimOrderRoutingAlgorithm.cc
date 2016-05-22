@@ -27,10 +27,14 @@ namespace SlimFly {
 DimOrderRoutingAlgorithm::DimOrderRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
     u64 _latency, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
-    u32 _concentration)
+    u32 _concentration,
+    const RoutingTable& _routingTable,
+    const std::vector<u32>& _X,
+    const std::vector<u32>& _X_i)
     : RoutingAlgorithm(_name, _parent, _router, _latency),
       numVcs_(router_->numVcs()), dimensionWidths_(_dimensionWidths),
-      concentration_(_concentration) {}
+      concentration_(_concentration), routingTable_(_routingTable),
+      X_(_X), X_i_(_X_i) {}
 
 DimOrderRoutingAlgorithm::~DimOrderRoutingAlgorithm() {}
 
