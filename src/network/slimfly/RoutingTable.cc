@@ -53,4 +53,24 @@ u32 RoutingTable::getNumHops(const std::vector<u32>& dstAddr) const {
     }
   }
 }
+
+u32 RoutingTable::getPortNum(const std::vector<u32>& hopAddr) const {
+  auto hopIter = hopTable_.find(strop::vecString<u32>(hopAddr));
+  assert(hopIter != hopTable_.end());
+  return hopIter->second;
+}
+
+const std::vector<RoutingTable::PathInfo> RoutingTable::getPaths(
+    const std::vector<u32>& dstAddr) const {
+  if (hopTable_.count(strop::vecString<u32>(dstAddr))) {
+    PathInfo info(dstAddr, hopTable_.at(strop::vecString<u32>(dstAddr)));
+    return std::vector<PathInfo>(1, info);
+  } else if (pathTable_.count(strop::vecString<u32>(dstAddr))) {
+    return pathTable_.at(strop::vecString<u32>(dstAddr));
+  } else {
+    return std::vector<PathInfo>();
+  }
+}
+
+
 }  // namespace SlimFly
