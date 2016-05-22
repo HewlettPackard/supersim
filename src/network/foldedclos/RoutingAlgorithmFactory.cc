@@ -36,16 +36,19 @@ RoutingAlgorithm* RoutingAlgorithmFactory::createRoutingAlgorithm(
     u32 _inputPort) {
 
   std::string algorithm = settings_["algorithm"].asString();
+  assert(settings_.isMember("latency"));
   u32 latency = settings_["latency"].asUInt();
+  assert(settings_.isMember("adaptive"));
+  bool adaptive = settings_["adaptive"].asBool();
 
   if (algorithm == "most_common_ancestor") {
     return new McaRoutingAlgorithm(_name, _parent, _router, latency,
                                    numVcs_, numPorts_, numLevels_, level_,
-                                   _inputPort);
+                                   _inputPort, adaptive);
   } else if (algorithm == "least_common_ancestor") {
     return new LcaRoutingAlgorithm(_name, _parent, _router, latency,
                                    numVcs_, numPorts_, numLevels_, level_,
-                                   _inputPort);
+                                   _inputPort, adaptive);
   } else {
     fprintf(stderr, "Unknown routing algorithm: '%s'\n", algorithm.c_str());
     assert(false);
