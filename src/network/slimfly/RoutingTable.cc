@@ -31,22 +31,21 @@ void RoutingTable::addHop(
 
 void RoutingTable::addPath(
   const std::vector<u32>& dstAddr, const std::vector<u32>& thruAddr) {
-  PathInfo info(thruAddr, hopTable_[strop::vecString<u32>(thruAddr)]);
+  assert(hopTable_.count(strop::vecString<u32>(thruAddr)));
 
-  if (pathTable_.count(strop::vecString<u32>(dstAddr))) {
-    pathTable_.at(strop::vecString<u32>(dstAddr)).push_back(info);
-  } else {
-    pathTable_[strop::vecString<u32>(dstAddr)] = std::vector<PathInfo>(1, info);
+  std::string dstAddrStr = strop::vecString<u32>(dstAddr);
+  if (pathTable_.count(dstAddrStr) == 0) {
+    pathTable_[dstAddrStr] = std::set<std::string>();
   }
+  addrMap_[strop::vecString<u32>(thruAddr)] = thruAddr;
+  pathTable_.at(dstAddrStr).insert(strop::vecString<u32>(thruAddr));
 }
 
 u32 RoutingTable::getNumHops(const std::vector<u32>& dstAddr) const {
-  auto hopIter = hopTable_.find(strop::vecString<u32>(dstAddr));
-  if (hopIter != hopTable_.end()) {
+  if (hopTable_.count(strop::vecString<u32>(dstAddr))) {
     return 1;   // hop table by definition contains nodes 1 hop away
   } else {
-    auto pathIter = pathTable_.find(strop::vecString<u32>(dstAddr));
-    if (pathIter != pathTable_.end()) {
+    if (pathTable_.count(strop::vecString<u32>(dstAddr))) {
       return 2;   // max diameter == 2 so if not in hop table then here
     } else {
       return 0;
@@ -63,10 +62,15 @@ u32 RoutingTable::getPortNum(const std::vector<u32>& hopAddr) const {
 const std::vector<RoutingTable::PathInfo> RoutingTable::getPaths(
     const std::vector<u32>& dstAddr) const {
   if (hopTable_.count(strop::vecString<u32>(dstAddr))) {
-    PathInfo info(dstAddr, hopTable_.at(strop::vecString<u32>(dstAddr)));
-    return std::vector<PathInfo>(1, info);
+    return std::vector<PathInfo>(1,
+      PathInfo(dstAddr, hopTable_.at(strop::vecString<u32>(dstAddr))));
   } else if (pathTable_.count(strop::vecString<u32>(dstAddr))) {
-    return pathTable_.at(strop::vecString<u32>(dstAddr));
+    std::vector<PathInfo> retVal;
+    for (auto thruAddr : pathTable_.at(strop::vecString<u32>(dstAddr))) {
+      retVal.push_back(PathInfo(
+        addrMap_.find(thruAddr)->second, hopTable_.find(thruAddr)->second));
+    }
+    return retVal;
   } else {
     return std::vector<PathInfo>();
   }

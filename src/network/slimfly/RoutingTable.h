@@ -20,6 +20,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <set>
 
 namespace SlimFly {
 
@@ -48,11 +49,13 @@ class RoutingTable {
 
  private:
   typedef std::unordered_map<std::string, u32> HopMap;
-  typedef std::unordered_map<std::string, std::vector<PathInfo> > PathMap;
+  typedef std::unordered_map<std::string, std::set<std::string> > PathMap;
+  typedef std::unordered_map<std::string, std::vector<u32> > AddrMap;
 
   const std::vector<u32> srcAddr_;
   HopMap hopTable_;
   PathMap pathTable_;
+  AddrMap addrMap_;
 };
 
 }  // namespace SlimFly

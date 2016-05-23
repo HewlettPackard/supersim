@@ -15,8 +15,8 @@
  */
 #include "network/slimfly/DimOrderRoutingAlgorithm.h"
 
+#include <strop/strop.h>
 #include <cassert>
-
 #include <unordered_set>
 
 #include "types/Message.h"
@@ -40,54 +40,28 @@ DimOrderRoutingAlgorithm::~DimOrderRoutingAlgorithm() {}
 
 void DimOrderRoutingAlgorithm::processRequest(
     Flit* _flit, RoutingAlgorithm::Response* _response) {
-//  std::unordered_set<u32> outputPorts;
-//
-//  // ex: [x,y,z]
-//  const std::vector<u32>& routerAddress = router_->getAddress();
-//  // ex: [c,x,y,z]
-//  const std::vector<u32>* destinationAddress =
-//      _flit->getPacket()->getMessage()->getDestinationAddress();
-//  assert(routerAddress.size() == (destinationAddress->size() - 1));
-//
-//  // determine the next dimension to work on
-//  u32 dim;
-//  u32 portBase = concentration_;
-//  for (dim = 0; dim < routerAddress.size(); dim++) {
-//    if (routerAddress.at(dim) != destinationAddress->at(dim+1)) {
-//      break;
-//    }
-//    portBase += ((dimensionWidths_.at(dim) - 1) * dimensionWeights_.at(dim));
-//  }
-//
-//  // test if already at destination router
-//  if (dim == routerAddress.size()) {
-//    bool res = outputPorts.insert(destinationAddress->at(0)).second;
-//    (void)res;
-//    assert(res);
-//  } else {
-//    // more router-to-router hops needed
-//    u32 src = routerAddress.at(dim);
-//    u32 dst = destinationAddress->at(dim+1);
-//    if (dst < src) {
-//      dst += dimensionWidths_.at(dim);
-//    }
-//    u32 offset = (dst - src - 1) * dimensionWeights_.at(dim);
-//    // add all ports where the two routers are connecting
-//    for (u32 weight = 0; weight < dimensionWeights_.at(dim); weight++) {
-//      bool res = outputPorts.insert(portBase + offset + weight).second;
-//      (void)res;
-//      assert(res);
-//    }
-//  }
-//
-//  assert(outputPorts.size() > 0);
-//  for (auto it = outputPorts.cbegin(); it != outputPorts.cend(); ++it) {
-//    u32 outputPort = *it;
-//    // select all VCs in the output port
-//    for (u32 vc = 0; vc < numVcs_; vc++) {
-//      _response->add(outputPort, vc);
-//    }
-//  }
+
+  // ex: [x,y,z]
+  const std::vector<u32>& routerAddress = router_->getAddress();
+  // ex: [c,x,y,z]
+  const std::vector<u32>* destinationAddress =
+      _flit->getPacket()->getMessage()->getDestinationAddress();
+  assert(routerAddress.size() == (destinationAddress->size() - 1));
+
+  std::vector<u32> dstAddr;
+  for (u32 i = 1; i < destinationAddress->size(); i++) {
+    dstAddr.push_back((*destinationAddress)[i]);
+  }
+
+  std::vector<RoutingTable::PathInfo> paths =
+    routingTable_.getPaths(dstAddr);
+  const RoutingTable::PathInfo& path =
+    paths[gSim->rnd.nextU64(0, paths.size()-1)];
+
+  // select all VCs in the output port
+  for (u32 vc = 0; vc < numVcs_; vc++) {
+    _response->add(path.outPortNum, vc);
+  }
 }
 
 }  // namespace SlimFly
