@@ -20,7 +20,8 @@
     },
     "routing": {
       "algorithm": "least_common_ancestor",
-      "latency": 1  // cycles
+      "latency": 1,  // cycles
+      "adaptive": true
     },
     "interface": {
       "type": "standard",
