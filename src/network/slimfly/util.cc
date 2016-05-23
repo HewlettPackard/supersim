@@ -48,7 +48,7 @@ u32 createGeneratorSet(
   X.clear();
   X_i.clear();
   for (u32 p = 0; p <= last_pow; p += 2) {
-		if ((delta == -1) && p = (_width + 1) / 2) {
+		if ((delta == -1) && p == (_width + 1) / 2) {
 			p--;
 		}
     u32 val = pow(prim, p);

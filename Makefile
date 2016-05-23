@@ -25,8 +25,8 @@ STATIC_LIBS   := \
 	$(LIBS_LOC)libstrop/bld/libstrop.a
 
 #--------------------- Cpp Lint -----------------------------------------------#
-LINT          := ../makeccpp/cpplint/cpplint.py --filter=-runtime/references
-LINT_FLAGS    :=
+#LINT          := ../makeccpp/cpplint/cpplint.py --filter=-runtime/references
+#LINT_FLAGS    :=
 
 #--------------------- Unit Tests ---------------------------------------------#
 TEST_SUFFIX   := _TEST
