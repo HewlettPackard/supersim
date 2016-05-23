@@ -52,6 +52,7 @@ void DimOrderRoutingAlgorithm::processRequest(
   for (u32 i = 1; i < destinationAddress->size(); i++) {
     dstAddr.push_back((*destinationAddress)[i]);
   }
+  assert(dstAddr[0]==0 || dstAddr[0]==1);
 
   std::vector<RoutingTable::PathInfo> paths =
     routingTable_.getPaths(dstAddr);

@@ -60,19 +60,17 @@ u32 createGeneratorSet(
 
 void computeAddress(u32 _id, u32 _width,
                     u32 _concentration, std::vector<u32>* _address) {
-  u32 dimensions = 3;
-  _address->resize(dimensions + 1);
+  _address->clear();
+  _address->resize(4);  //Dimwidth is always 3 so 4 = 3 + 1
 
-  // addresses are in little endian format
-  u32 mod, div;
-  mod = _id % _concentration;
-  div = _id / _concentration;
-  _address->at(0) = mod;
-  for (u32 dim = 0; dim < dimensions; dim++) {
-    mod = div % _width;
-    div = div / _width;
-    _address->at(dim + 1) = mod;
-  }
+  u32 curr = _id;
+  (*_address)[0] = curr % _concentration;
+  curr = curr / _concentration;
+  (*_address)[2] = curr % _width;
+  curr = curr / _width;
+  (*_address)[3] = curr % _width;
+  curr = curr / _width;
+  (*_address)[1] = curr;
 }
 
 }  // namespace SlimFly
