@@ -95,8 +95,10 @@ Network::Network(const std::string& _name, const Component* _parent,
           // determine the source and destination router
           std::vector<u32> srcAddr = {graph, col, srcRow};
           std::vector<u32> dstAddr = {graph, col, dstRow};
+          u32 dist = static_cast<u32>(
+            std::abs<int>(static_cast<int>(dstRow) - srcRow));
 
-          if (distSet.count(std::abs(static_cast<int>(dstRow) - srcRow))) {
+          if (distSet.count(dist)) {
             // create the channel
             std::string chanName = "Channel_" +
               strop::vecString<u32>(srcAddr, '-') + "-to-" +
@@ -129,7 +131,7 @@ Network::Network(const std::string& _name, const Component* _parent,
     for (u32 y = 0; y < width_; y++) {
       for (u32 m = 0; m < width_; m++) {
         for (u32 c = 0; c < width_; c++) {
-          if (y == (m * x + c)) {
+          if (y == ((m*x + c) % width_)) {
              // determine the source router
             std::vector<u32> addr1 = {0, x, y};
             std::vector<u32> addr2 = {1, m, c};
@@ -177,17 +179,26 @@ Network::Network(const std::string& _name, const Component* _parent,
       // node that does. Because Slim Fly has a max
       // diameter of 2, this does not have to be recursive
       for (u32 hop = 0; hop < routingTables_.size(); hop++) {
-        const std::vector<u32>& hopAddr = routingTables_.at(dst)->getAddr();
-        if (routingTables_.at(hop)->getNumHops(dstAddr)) {
-          if (routingTables_.at(src)->getNumHops(hopAddr) &&
-              routingTables_.at(hop)->getNumHops(dstAddr)) {
-            routingTables_.at(src)->addPath(dstAddr, hopAddr);
-          }
+        const std::vector<u32>& hopAddr = routingTables_.at(hop)->getAddr();
+        if (routingTables_.at(src)->getNumHops(hopAddr) == 1 &&
+            routingTables_.at(hop)->getNumHops(dstAddr) == 1) {
+          routingTables_.at(src)->addPath(dstAddr, hopAddr);
         }
       }
     }
   }
 
+  for (u32 src = 0; src < routingTables_.size(); src++) {
+    for (u32 dst = 0; dst < routingTables_.size(); dst++) {
+      const std::vector<u32>& dstAddr = routingTables_.at(dst)->getAddr();
+      if (routingTables_.at(src)->getPaths(dstAddr).size() == 0) {
+        printf("No path from %s -> %s\n",
+          strop::vecString<u32>(routingTables_.at(src)->getAddr()).c_str(),
+          strop::vecString<u32>(dstAddr).c_str());
+        assert(false);
+      }
+    }
+  }
   // create a vector of dimension widths that contains the concentration
   std::vector<u32> fullDimensionWidths(1);
   fullDimensionWidths.at(0) = concentration_;
