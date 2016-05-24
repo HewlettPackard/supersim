@@ -107,9 +107,5 @@
   },
   "metadata_handler": {
     "type": "zero"
-  },
-  "debug": [
-    "Application",
-    "Application.BlastTerminal_17"
-  ]
+  }
 }

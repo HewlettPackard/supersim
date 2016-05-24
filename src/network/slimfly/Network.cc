@@ -211,7 +211,6 @@ Network::Network(const std::string& _name, const Component* _parent,
 
   // create interfaces and link them with the routers
   interfaces_.setSize(fullDimensionWidths);
-  u32 interfaceId = 0;
   routerIterator.reset();
   while (routerIterator.next(&routerAddress)) {
     // get the router now, for later linking with terminals
@@ -231,10 +230,9 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // create the interface
       Interface* interface = InterfaceFactory::createInterface(
-          interfaceName, this, interfaceId, injectionAlgorithmFactory,
-          _settings["interface"]);
+          interfaceName, this, ifaceIdFromAddress(interfaceAddress, width_, concentration_),
+          injectionAlgorithmFactory, _settings["interface"]);
       interfaces_.at(interfaceAddress) = interface;
-      interfaceId++;
 
       // create I/O channels
       std::string inChannelName = "Channel_" +
@@ -301,7 +299,7 @@ Interface* Network::getInterface(u32 _id) const {
 }
 
 void Network::translateIdToAddress(u32 _id, std::vector<u32>* _address) const {
-  computeAddress(_id, width_, concentration_, _address);
+  addressFromInterfaceId(_id, width_, concentration_, _address);
 }
 
 void Network::collectChannels(std::vector<Channel*>* _channels) {

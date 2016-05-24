@@ -16,6 +16,7 @@
 #include "network/slimfly/util.h"
 #include <math.h>
 #include <cassert>
+
 namespace SlimFly {
 
 // TODO(Nehal): implement
@@ -58,19 +59,31 @@ u32 createGeneratorSet(
   return X.size();
 }
 
-void computeAddress(u32 _id, u32 _width,
-                    u32 _concentration, std::vector<u32>* _address) {
+void addressFromInterfaceId(u32 _id, u32 _width,
+    u32 _concentration, std::vector<u32>* _address) {
   _address->clear();
   _address->resize(4);  //Dimwidth is always 3 so 4 = 3 + 1
 
   u32 curr = _id;
   (*_address)[0] = curr % _concentration;
   curr = curr / _concentration;
-  (*_address)[2] = curr % _width;
-  curr = curr / _width;
   (*_address)[3] = curr % _width;
   curr = curr / _width;
+  (*_address)[2] = curr % _width;
+  curr = curr / _width;
   (*_address)[1] = curr;
+
+  assert(_id == ifaceIdFromAddress(*_address, _width, _concentration));
+}
+
+u32 ifaceIdFromAddress(const std::vector<u32>& _address,
+    u32 _width, u32 _concentration) {
+  return (
+      _address[0] +
+      (_concentration * _address[3]) +
+      (_concentration * _width * _address[2]) +
+      (_concentration * _width * _width * _address[1])
+  );
 }
 
 }  // namespace SlimFly

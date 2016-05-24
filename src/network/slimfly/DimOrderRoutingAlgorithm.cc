@@ -54,14 +54,20 @@ void DimOrderRoutingAlgorithm::processRequest(
   }
   assert(dstAddr[0]==0 || dstAddr[0]==1);
 
-  std::vector<RoutingTable::PathInfo> paths =
-    getRoutingTable()->getPaths(dstAddr);
-  const RoutingTable::PathInfo& path =
-    paths[gSim->rnd.nextU64(0, paths.size()-1)];
-
+  //Check if already at destination router
+  u32 outputPort = 0;
+  if (dstAddr == routerAddress) {
+    outputPort = (*destinationAddress)[0];
+  } else {
+    std::vector<RoutingTable::PathInfo> paths =
+      getRoutingTable()->getPaths(dstAddr);
+    const RoutingTable::PathInfo& path =
+      paths[gSim->rnd.nextU64(0, paths.size()-1)];
+    outputPort = path.outPortNum;
+  }
   // select all VCs in the output port
   for (u32 vc = 0; vc < numVcs_; vc++) {
-    _response->add(path.outPortNum, vc);
+    _response->add(outputPort, vc);
   }
 }
 

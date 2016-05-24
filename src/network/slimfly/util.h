@@ -24,8 +24,10 @@ namespace SlimFly {
 bool isPrimePower(u32 _width);
 u32 createGeneratorSet(
   u32 _width, int delta, std::vector<u32>& X, std::vector<u32>& X_i);
-void computeAddress(
+void addressFromInterfaceId(
   u32 _id, u32 _width, u32 _concentration, std::vector<u32>* _address);
+u32 ifaceIdFromAddress(
+    const std::vector<u32>& _address, u32 _width, u32 _concentration);
 
 }  // namespace SlimFly
 #endif  // NETWORK_SLIMFLY_UTIL_H_
