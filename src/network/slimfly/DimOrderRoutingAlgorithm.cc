@@ -28,12 +28,12 @@ DimOrderRoutingAlgorithm::DimOrderRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
     u64 _latency, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
     u32 _concentration,
-    const RoutingTable& _routingTable,
+    DimensionalArray<RoutingTable*>* _routingTables,
     const std::vector<u32>& _X,
     const std::vector<u32>& _X_i)
     : RoutingAlgorithm(_name, _parent, _router, _latency),
       numVcs_(router_->numVcs()), dimensionWidths_(_dimensionWidths),
-      concentration_(_concentration), routingTable_(_routingTable),
+      concentration_(_concentration), routingTables_(_routingTables),
       X_(_X), X_i_(_X_i) {}
 
 DimOrderRoutingAlgorithm::~DimOrderRoutingAlgorithm() {}
@@ -55,7 +55,7 @@ void DimOrderRoutingAlgorithm::processRequest(
   assert(dstAddr[0]==0 || dstAddr[0]==1);
 
   std::vector<RoutingTable::PathInfo> paths =
-    routingTable_.getPaths(dstAddr);
+    getRoutingTable()->getPaths(dstAddr);
   const RoutingTable::PathInfo& path =
     paths[gSim->rnd.nextU64(0, paths.size()-1)];
 

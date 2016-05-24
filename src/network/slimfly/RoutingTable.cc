@@ -61,12 +61,13 @@ u32 RoutingTable::getPortNum(const std::vector<u32>& hopAddr) const {
 
 const std::vector<RoutingTable::PathInfo> RoutingTable::getPaths(
     const std::vector<u32>& dstAddr) const {
-  if (hopTable_.count(strop::vecString<u32>(dstAddr))) {
+  std::string dstAddrStr = strop::vecString<u32>(dstAddr);
+  if (hopTable_.count(dstAddrStr)) {
     return std::vector<PathInfo>(1,
-      PathInfo(dstAddr, hopTable_.at(strop::vecString<u32>(dstAddr))));
-  } else if (pathTable_.count(strop::vecString<u32>(dstAddr))) {
+      PathInfo(dstAddr, hopTable_.at(dstAddrStr)));
+  } else if (pathTable_.count(dstAddrStr)) {
     std::vector<PathInfo> retVal;
-    for (auto thruAddr : pathTable_.at(strop::vecString<u32>(dstAddr))) {
+    for (auto thruAddr : pathTable_.at(dstAddrStr)) {
       retVal.push_back(PathInfo(
         addrMap_.find(thruAddr)->second, hopTable_.find(thruAddr)->second));
     }

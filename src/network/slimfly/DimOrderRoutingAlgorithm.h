@@ -25,6 +25,7 @@
 #include "network/RoutingAlgorithm.h"
 #include "router/Router.h"
 #include "RoutingTable.h"
+#include "util/DimensionalArray.h"
 
 namespace SlimFly {
 
@@ -34,7 +35,7 @@ class DimOrderRoutingAlgorithm : public RoutingAlgorithm {
                            Router* _router, u64 _latency, u32 _numVcs,
                            const std::vector<u32>& _dimensionWidths,
                            u32 _concentration,
-                           const RoutingTable& _routingTable,
+                           DimensionalArray<RoutingTable*>* _routingTables,
                            const std::vector<u32>& _X,
                            const std::vector<u32>& _X_i);
   ~DimOrderRoutingAlgorithm();
@@ -44,11 +45,15 @@ class DimOrderRoutingAlgorithm : public RoutingAlgorithm {
       Flit* _flit, RoutingAlgorithm::Response* _response) override;
 
  private:
+  inline const RoutingTable* getRoutingTable() const {
+    return routingTables_->at(router_->getAddress());
+  }
+
   const u32 numVcs_;
   const std::vector<u32> dimensionWidths_;
   const u32 concentration_;
-  const RoutingTable& routingTable_;
-  const std::vector<u32>& X_, X_i_;
+  DimensionalArray<RoutingTable*>* routingTables_;
+  const std::vector<u32> X_, X_i_;
 };
 
 }  // namespace SlimFly

@@ -62,7 +62,7 @@ Network::Network(const std::string& _name, const Component* _parent,
   RoutingAlgorithmFactory* routingAlgorithmFactory =
       new SlimFly::RoutingAlgorithmFactory(
           numVcs_, dimensionWidths_, concentration_, _settings["routing"],
-          routingTables_, X_, X_i_);
+          &routingTables_, X_, X_i_);
 
   // setup a router iterator for looping over the router dimensions
   DimensionIterator routerIterator(dimensionWidths_);

@@ -34,7 +34,7 @@ class RoutingAlgorithmFactory : public ::RoutingAlgorithmFactory {
  public:
   RoutingAlgorithmFactory(u32 _numVcs, const std::vector<u32>& _dimensionWidths,
     u32 _concentration, Json::Value _settings,
-    DimensionalArray<RoutingTable*>& _routingTables,
+    DimensionalArray<RoutingTable*>* _routingTables,
     const std::vector<u32>& _X, const std::vector<u32>& _X_i);
   ~RoutingAlgorithmFactory();
   RoutingAlgorithm* createRoutingAlgorithm(
@@ -47,7 +47,7 @@ class RoutingAlgorithmFactory : public ::RoutingAlgorithmFactory {
   const std::vector<u32> dimensionWeights_;
   const u32 concentration_;
   Json::Value settings_;
-  DimensionalArray<RoutingTable*>& routingTables_;
+  DimensionalArray<RoutingTable*>* routingTables_;
   const std::vector<u32>& X_, X_i_;
 };
 
