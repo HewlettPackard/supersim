@@ -230,7 +230,8 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // create the interface
       Interface* interface = InterfaceFactory::createInterface(
-          interfaceName, this, ifaceIdFromAddress(interfaceAddress, width_, concentration_),
+          interfaceName, this,
+          ifaceIdFromAddress(interfaceAddress, width_, concentration_),
           injectionAlgorithmFactory, _settings["interface"]);
       interfaces_.at(interfaceAddress) = interface;
 

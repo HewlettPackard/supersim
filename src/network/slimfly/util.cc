@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Hewlett Packard Enterprise Development LP
+ * Copyright 2016 Ashish Chaudhari, Franky Romero, Nehal Bhandari, Wasam Altoyan
  *
  * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
@@ -49,9 +49,9 @@ u32 createGeneratorSet(
   X.clear();
   X_i.clear();
   for (u32 p = 0; p <= last_pow; p += 2) {
-		if ((delta == -1) && p == (_width + 1) / 2) {
-			p--;
-		}
+    if ((delta == -1) && p == (_width + 1) / 2) {
+      p--;
+    }
     u32 val = pow(prim, p);
     X.push_back(val % _width);
     X_i.push_back((val * prim) % _width);
@@ -62,7 +62,7 @@ u32 createGeneratorSet(
 void addressFromInterfaceId(u32 _id, u32 _width,
     u32 _concentration, std::vector<u32>* _address) {
   _address->clear();
-  _address->resize(4);  //Dimwidth is always 3 so 4 = 3 + 1
+  _address->resize(4);  // Dimwidth is always 3 so 4 = 3 + 1
 
   u32 curr = _id;
   (*_address)[0] = curr % _concentration;
@@ -82,8 +82,7 @@ u32 ifaceIdFromAddress(const std::vector<u32>& _address,
       _address[0] +
       (_concentration * _address[3]) +
       (_concentration * _width * _address[2]) +
-      (_concentration * _width * _width * _address[1])
-  );
+      (_concentration * _width * _width * _address[1]));
 }
 
 }  // namespace SlimFly

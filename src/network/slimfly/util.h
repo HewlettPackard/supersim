@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Hewlett Packard Enterprise Development LP
+ * Copyright 2016 Ashish Chaudhari, Franky Romero, Nehal Bhandari, Wasam Altoyan
  *
  * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Hewlett Packard Enterprise Development LP
+ * Copyright 2016 Ashish Chaudhari, Franky Romero, Nehal Bhandari, Wasam Altoyan
  *
  * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,10 @@ namespace SlimFly {
 
 class MinRoutingAlgorithm : public RoutingAlgorithm {
  public:
-  MinRoutingAlgorithm(const std::string& _name, const Component* _parent, 
-                Router* _router, u64 _latency, u32 _numVcs, 
-                const std::vector<u32>& _dimensionWidths, 
-                u32 _concentration, 
+  MinRoutingAlgorithm(const std::string& _name, const Component* _parent,
+                Router* _router, u64 _latency, u32 _numVcs,
+                const std::vector<u32>& _dimensionWidths,
+                u32 _concentration,
                 const std::vector<u32>& _X, const std::vector<u32>& _X_i);
   ~MinRoutingAlgorithm();
 
@@ -50,7 +50,8 @@ class MinRoutingAlgorithm : public RoutingAlgorithm {
   bool checkConnected(
     u32 graph, u32 srcRow, u32 dstRow);
   bool checkConnectedAcross(
-    const std::vector<u32>& routerAddress, const std::vector<u32>* destinationAddress);
+    const std::vector<u32>& routerAddress,
+    const std::vector<u32>* destinationAddress);
 };
 
 }  // namespace SlimFly
