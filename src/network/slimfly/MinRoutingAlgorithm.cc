@@ -19,7 +19,7 @@
 
 #include <unordered_set>
 #include <set>
-
+#include <iostream>
 #include "types/Message.h"
 #include "types/Packet.h"
 
@@ -86,6 +86,18 @@ void MinRoutingAlgorithm::processRequest(
     }
   }
 
+//  std::cout << "Dim " << dim << std::endl;
+//  std::cout << "Source Address "  << std::endl;
+//  for (u32 i = 1; i < destinationAddress->size(); i++) {
+//    std::cout << routerAddress.at(i-1) << " " << std::endl;
+//  }
+//  std::cout << std::endl;
+//  std::cout << "Destination Address "  << std::endl;
+//  for (u32 i = 1; i < destinationAddress->size(); i++) {
+//    std::cout << destinationAddress->at(i) << " " << std::endl;
+//  }
+//  std::cout << std::endl;
+
   // test if already at destination router
   if (dim == routerAddress.size()) {
     bool res = outputPorts.insert(destinationAddress->at(0)).second;
@@ -96,6 +108,11 @@ void MinRoutingAlgorithm::processRequest(
     u32 srcRow = routerAddress.at(dim);
     u32 dstRow = destinationAddress->at(dim + 1);
     if (checkConnected(graph, srcRow, dstRow)) {
+//      std::cout << "Next Hop Address "  << std::endl;
+//      for (u32 i = 1; i < destinationAddress->size(); i++) {
+//        std::cout << nextHop.at(i-1) << " " << std::endl;
+//      }
+//      std::cout << std::endl;
       bool res = outputPorts.insert(rt->getPortNum(nextHop)).second;
       (void)res;
       assert(res);
@@ -105,6 +122,11 @@ void MinRoutingAlgorithm::processRequest(
         bool srcToInt = checkConnected(graph, srcRow, intRow);
         bool intToDst = checkConnected(graph, intRow, dstRow);
         if (srcToInt && intToDst) {
+//          std::cout << "Next Hop Address "  << std::endl;
+//          for (u32 i = 1; i < destinationAddress->size(); i++) {
+//            std::cout << nextHop.at(i-1) << " " << std::endl;
+//          }
+//          std::cout << std::endl;
           bool res = outputPorts.insert(rt->getPortNum(nextHop)).second;
           (void)res;
           assert(res);
@@ -122,6 +144,11 @@ void MinRoutingAlgorithm::processRequest(
         bool srcToInt = checkConnectedAcross(routerAddress, &next);
         bool intToDst = checkConnectedAcross(nextHop, destinationAddress);
         if (srcToInt && intToDst) {
+//          std::cout << "Next Hop Address "  << std::endl;
+//          for (u32 i = 1; i < destinationAddress->size(); i++) {
+//            std::cout << nextHop.at(i-1) << " " << std::endl;
+//          }
+//          std::cout << std::endl;
           bool res = outputPorts.insert(rt->getPortNum(nextHop)).second;
           (void)res;
           assert(res);
@@ -130,10 +157,37 @@ void MinRoutingAlgorithm::processRequest(
     }
   } else {   // different subgraph
     if (checkConnectedAcross(routerAddress, destinationAddress)) {
+//      std::cout << "Next Hop Address "  << std::endl;
+//      for (u32 i = 1; i < destinationAddress->size(); i++) {
+//        std::cout << nextHop.at(i-1) << " " << std::endl;
+//      }
+//      std::cout << std::endl;
       bool res = outputPorts.insert(rt->getPortNum(nextHop)).second;
       (void)res;
       assert(res);
     } else {
+      // Search in destination's column
+      std::vector<u32> next(nextHop);
+      next.insert(next.begin(), 0);   // [dummy, nextHop]
+      for (u32 intRow = 0; intRow < width; intRow++) {
+        next.at(3) = intRow;
+        bool srcToInt = checkConnectedAcross(
+            routerAddress, &next);
+        bool intToDst = checkConnected(
+            destinationAddress->at(1), destinationAddress->at(3), intRow);
+        if (srcToInt && intToDst) {
+          nextHop.at(2) = intRow;
+//          std::cout << "Next Hop Address "  << std::endl;
+//          for (u32 i = 1; i < destinationAddress->size(); i++) {
+//            std::cout << nextHop.at(i-1) << " " << std::endl;
+//          }
+//          std::cout << std::endl;
+          bool res = outputPorts.insert(rt->getPortNum(nextHop)).second;
+          (void)res;
+          assert(res);
+        }
+      }
+      // Search in source's column
       nextHop.at(0) = routerAddress.at(0);
       nextHop.at(1) = routerAddress.at(1);
       for (u32 intRow = 0; intRow < width; intRow++) {
@@ -143,6 +197,11 @@ void MinRoutingAlgorithm::processRequest(
         bool intToDst = checkConnectedAcross(
             nextHop, destinationAddress);
         if (srcToInt && intToDst) {
+//          std::cout << "Next Hop Address "  << std::endl;
+//          for (u32 i = 1; i < destinationAddress->size(); i++) {
+//            std::cout << nextHop.at(i-1) << " " << std::endl;
+//          }
+//          std::cout << std::endl;
           bool res = outputPorts.insert(rt->getPortNum(nextHop)).second;
           (void)res;
           assert(res);

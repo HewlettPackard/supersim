@@ -37,6 +37,9 @@ InjectionAlgorithm* InjectionAlgorithmFactory::createInjectionAlgorithm(
   if (algorithm == "dimension_order") {
     return new SlimFly::AnyInjectionAlgorithm(
         _name, _parent, _interface, latency, numVcs_);
+  } else if (algorithm == "minimal") {
+    return new SlimFly::AnyInjectionAlgorithm(
+        _name, _parent, _interface, latency, numVcs_);
   } else {
     fprintf(stderr, "Unknown injection algorithm: '%s'\n", algorithm.c_str());
     assert(false);
