@@ -27,7 +27,6 @@
 #include "router/RouterFactory.h"
 #include "util/DimensionIterator.h"
 #include "network/slimfly/util.h"
-
 namespace SlimFly {
 
 Network::Network(const std::string& _name, const Component* _parent,
@@ -43,7 +42,7 @@ Network::Network(const std::string& _name, const Component* _parent,
 
   // router radix
   assert(_settings["router"].isMember("num_ports") == false);
-  u32 coeff = round(width_ / 4);
+  u32 coeff = ceil(width_ / 4.0);
   int delta = width_ - 4*coeff;
   u32 networkRadix = (3 * width_ - delta) / 2;
   u32 routerRadix = concentration_ + networkRadix;
