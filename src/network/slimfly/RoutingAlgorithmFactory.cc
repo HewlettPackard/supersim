@@ -19,6 +19,7 @@
 #include <cassert>
 
 #include "network/slimfly/DimOrderRoutingAlgorithm.h"
+#include "network/slimfly/MinRoutingAlgorithm.h"
 #include "network/RoutingAlgorithm.h"
 
 namespace SlimFly {
@@ -43,6 +44,10 @@ RoutingAlgorithm* RoutingAlgorithmFactory::createRoutingAlgorithm(
 
   if (algorithm == "dimension_order") {
     return new SlimFly::DimOrderRoutingAlgorithm(
+        _name, _parent, _router, latency, numVcs_, dimensionWidths_,
+        concentration_, routingTables_, X_, X_i_);
+  } else if (algorithm == "minimal") {
+    return new SlimFly::MinRoutingAlgorithm(
         _name, _parent, _router, latency, numVcs_, dimensionWidths_,
         concentration_, routingTables_, X_, X_i_);
   } else {

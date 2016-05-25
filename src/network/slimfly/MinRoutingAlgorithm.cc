@@ -28,11 +28,12 @@ namespace SlimFly {
 MinRoutingAlgorithm::MinRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
     u64 _latency, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
-    u32 _concentration,
+    u32 _concentration, DimensionalArray<RoutingTable*>* _routingTables,
     const std::vector<u32>& _X, const std::vector<u32>& _X_i)
     : RoutingAlgorithm(_name, _parent, _router, _latency),
       numVcs_(router_->numVcs()), dimensionWidths_(_dimensionWidths),
-      concentration_(_concentration), X_(_X), X_i_(_X_i) {}
+      concentration_(_concentration), routingTables_(_routingTables),
+      X_(_X), X_i_(_X_i) {}
 
 MinRoutingAlgorithm::~MinRoutingAlgorithm() {}
 
@@ -77,8 +78,7 @@ void MinRoutingAlgorithm::processRequest(
     nextHop.push_back(destinationAddress->at(i));
   }
   u32 width = dimensionWidths_.at(1);
-  RoutingTable rt(routerAddress);
-
+  const RoutingTable* rt = getRoutingTable();
   u32 dim;
   for (dim = 0; dim < routerAddress.size(); dim++) {
     if (routerAddress.at(dim) != destinationAddress->at(dim+1)) {
@@ -96,7 +96,7 @@ void MinRoutingAlgorithm::processRequest(
     u32 srcRow = routerAddress.at(dim);
     u32 dstRow = destinationAddress->at(dim + 1);
     if (checkConnected(graph, srcRow, dstRow)) {
-      bool res = outputPorts.insert(rt.getPortNum(nextHop)).second;
+      bool res = outputPorts.insert(rt->getPortNum(nextHop)).second;
       (void)res;
       assert(res);
     } else {
@@ -105,7 +105,7 @@ void MinRoutingAlgorithm::processRequest(
         bool srcToInt = checkConnected(graph, srcRow, intRow);
         bool intToDst = checkConnected(graph, intRow, dstRow);
         if (srcToInt && intToDst) {
-          bool res = outputPorts.insert(rt.getPortNum(nextHop)).second;
+          bool res = outputPorts.insert(rt->getPortNum(nextHop)).second;
           (void)res;
           assert(res);
         }
@@ -122,7 +122,7 @@ void MinRoutingAlgorithm::processRequest(
         bool srcToInt = checkConnectedAcross(routerAddress, &next);
         bool intToDst = checkConnectedAcross(nextHop, destinationAddress);
         if (srcToInt && intToDst) {
-          bool res = outputPorts.insert(rt.getPortNum(nextHop)).second;
+          bool res = outputPorts.insert(rt->getPortNum(nextHop)).second;
           (void)res;
           assert(res);
         }
@@ -130,7 +130,7 @@ void MinRoutingAlgorithm::processRequest(
     }
   } else {   // different subgraph
     if (checkConnectedAcross(routerAddress, destinationAddress)) {
-      bool res = outputPorts.insert(rt.getPortNum(nextHop)).second;
+      bool res = outputPorts.insert(rt->getPortNum(nextHop)).second;
       (void)res;
       assert(res);
     } else {
@@ -143,7 +143,7 @@ void MinRoutingAlgorithm::processRequest(
         bool intToDst = checkConnectedAcross(
             nextHop, destinationAddress);
         if (srcToInt && intToDst) {
-          bool res = outputPorts.insert(rt.getPortNum(nextHop)).second;
+          bool res = outputPorts.insert(rt->getPortNum(nextHop)).second;
           (void)res;
           assert(res);
         }
