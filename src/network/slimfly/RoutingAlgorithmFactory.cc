@@ -18,7 +18,7 @@
 
 #include <cassert>
 
-#include "network/slimfly/DimOrderRoutingAlgorithm.h"
+#include "MinTableRoutingAlgorithm.h"
 #include "network/slimfly/MinRoutingAlgorithm.h"
 #include "network/RoutingAlgorithm.h"
 
@@ -42,8 +42,8 @@ RoutingAlgorithm* RoutingAlgorithmFactory::createRoutingAlgorithm(
   std::string algorithm = settings_["algorithm"].asString();
   u32 latency = settings_["latency"].asUInt();
 
-  if (algorithm == "dimension_order") {
-    return new SlimFly::DimOrderRoutingAlgorithm(
+  if (algorithm == "minimal_table") {
+    return new SlimFly::MinTableRoutingAlgorithm(
         _name, _parent, _router, latency, numVcs_, dimensionWidths_,
         concentration_, routingTables_, X_, X_i_);
   } else if (algorithm == "minimal") {

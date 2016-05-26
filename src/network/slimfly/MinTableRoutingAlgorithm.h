@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_SLIMFLY_DIMORDERROUTINGALGORITHM_H_
-#define NETWORK_SLIMFLY_DIMORDERROUTINGALGORITHM_H_
+#ifndef NETWORK_SLIMFLY_MINTABLEROUTINGALGORITHM_H_
+#define NETWORK_SLIMFLY_MINTABLEROUTINGALGORITHM_H_
 
 #include <prim/prim.h>
 
@@ -29,16 +29,16 @@
 
 namespace SlimFly {
 
-class DimOrderRoutingAlgorithm : public RoutingAlgorithm {
+class MinTableRoutingAlgorithm : public RoutingAlgorithm {
  public:
-  DimOrderRoutingAlgorithm(const std::string& _name, const Component* _parent,
+  MinTableRoutingAlgorithm(const std::string& _name, const Component* _parent,
                            Router* _router, u64 _latency, u32 _numVcs,
                            const std::vector<u32>& _dimensionWidths,
                            u32 _concentration,
                            DimensionalArray<RoutingTable*>* _routingTables,
                            const std::vector<u32>& _X,
                            const std::vector<u32>& _X_i);
-  ~DimOrderRoutingAlgorithm();
+  ~MinTableRoutingAlgorithm();
 
  protected:
   void processRequest(
@@ -58,4 +58,4 @@ class DimOrderRoutingAlgorithm : public RoutingAlgorithm {
 
 }  // namespace SlimFly
 
-#endif  // NETWORK_SLIMFLY_DIMORDERROUTINGALGORITHM_H_
+#endif  // NETWORK_SLIMFLY_MINTABLEROUTINGALGORITHM_H_

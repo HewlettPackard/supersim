@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "network/slimfly/DimOrderRoutingAlgorithm.h"
+#include "network/slimfly/MinTableRoutingAlgorithm.h"
 
 #include <strop/strop.h>
 #include <cassert>
@@ -24,7 +24,7 @@
 
 namespace SlimFly {
 
-DimOrderRoutingAlgorithm::DimOrderRoutingAlgorithm(
+MinTableRoutingAlgorithm::MinTableRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
     u64 _latency, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
     u32 _concentration,
@@ -36,9 +36,9 @@ DimOrderRoutingAlgorithm::DimOrderRoutingAlgorithm(
       concentration_(_concentration), routingTables_(_routingTables),
       X_(_X), X_i_(_X_i) {}
 
-DimOrderRoutingAlgorithm::~DimOrderRoutingAlgorithm() {}
+MinTableRoutingAlgorithm::~MinTableRoutingAlgorithm() {}
 
-void DimOrderRoutingAlgorithm::processRequest(
+void MinTableRoutingAlgorithm::processRequest(
     Flit* _flit, RoutingAlgorithm::Response* _response) {
 
   // ex: [x,y,z]
