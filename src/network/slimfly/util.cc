@@ -16,12 +16,19 @@
 #include "network/slimfly/util.h"
 #include <math.h>
 #include <cassert>
-
+#include <set>
 namespace SlimFly {
 
-// TODO(Nehal): implement
-bool isPrimePower(u32 _width) {
-  return true;
+static const u32 numPrimes = 52;
+static const u32 kPrimes[] = {5, 7, 11, 13, 17, 19, 23, 29, 31, 37,
+  41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113,
+  127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197,
+  199, 211, 223, 227, 229, 233, 239, 241, 251};
+static const std::set<u32> kPrimeSet(kPrimes, kPrimes + numPrimes);
+
+bool isPrime(u32 _width) {
+  assert(_width < kPrimes[numPrimes - 1]);
+  return (kPrimeSet.count(_width) != 0);
 }
 
 static bool isPrimitiveElement(u32 _width, u32 prim) {

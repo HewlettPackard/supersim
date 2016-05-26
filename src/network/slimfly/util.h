@@ -21,7 +21,7 @@
 
 namespace SlimFly {
 
-bool isPrimePower(u32 _width);
+bool isPrime(u32 _width);
 u32 createGeneratorSet(
   u32 _width, int delta, std::vector<u32>& X, std::vector<u32>& X_i);
 void addressFromInterfaceId(

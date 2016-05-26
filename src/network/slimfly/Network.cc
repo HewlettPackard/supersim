@@ -34,7 +34,7 @@ Network::Network(const std::string& _name, const Component* _parent,
     : ::Network(_name, _parent, _settings) {
   // dimensions and concentration
   width_ = _settings["width"].asUInt();
-  assert(isPrimePower(width_));
+  assert(isPrime(width_));
   concentration_ = _settings["concentration"].asUInt();
   assert(concentration_ > 0);
   dbgprintf("width_ = %u", width_);
