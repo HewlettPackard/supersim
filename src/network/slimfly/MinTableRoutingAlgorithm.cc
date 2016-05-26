@@ -41,6 +41,7 @@ MinTableRoutingAlgorithm::~MinTableRoutingAlgorithm() {}
 void MinTableRoutingAlgorithm::processRequest(
     Flit* _flit, RoutingAlgorithm::Response* _response) {
 
+  std::unordered_set<u32> outputPorts;
   // ex: [x,y,z]
   const std::vector<u32>& routerAddress = router_->getAddress();
   // ex: [c,x,y,z]
@@ -55,19 +56,21 @@ void MinTableRoutingAlgorithm::processRequest(
   assert(dstAddr[0] == 0 || dstAddr[0] == 1);
 
   // Check if already at destination router
-  u32 outputPort = 0;
   if (dstAddr == routerAddress) {
-    outputPort = (*destinationAddress)[0];
+    outputPorts.insert((*destinationAddress)[0]);
   } else {
-    std::vector<RoutingTable::PathInfo> paths =
-      getRoutingTable()->getPaths(dstAddr);
-    const RoutingTable::PathInfo& path =
-      paths[gSim->rnd.nextU64(0, paths.size()-1)];
-    outputPort = path.outPortNum;
+    for (auto path : getRoutingTable()->getPaths(dstAddr)) {
+      outputPorts.insert(path.outPortNum);
+    }
   }
-  // select all VCs in the output port
-  for (u32 vc = 0; vc < numVcs_; vc++) {
-    _response->add(outputPort, vc);
+
+  assert(outputPorts.size() > 0);
+  for (auto it = outputPorts.cbegin(); it != outputPorts.cend(); ++it) {
+    u32 outputPort = *it;
+    // select all VCs in the output port
+    for (u32 vc = 0; vc < numVcs_; vc++) {
+      _response->add(outputPort, vc);
+    }
   }
 }
 
