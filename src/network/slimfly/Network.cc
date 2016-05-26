@@ -42,12 +42,11 @@ Network::Network(const std::string& _name, const Component* _parent,
 
   // router radix
   assert(_settings["router"].isMember("num_ports") == false);
-  u32 coeff = ceil(width_ / 4.0);
+  u32 coeff = round(width_ / 4.0);
   int delta = width_ - 4*coeff;
   u32 networkRadix = (3 * width_ - delta) / 2;
   u32 routerRadix = concentration_ + networkRadix;
   std::vector<u32> dimensionWidths_ = {2, width_, width_};
-
   // create generator sets
   createGeneratorSet(width_, delta, X_, X_i_);
 
