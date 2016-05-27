@@ -26,7 +26,7 @@ STATIC_LIBS   := \
 
 #--------------------- Cpp Lint -----------------------------------------------#
 LINT          := ../makeccpp/cpplint/cpplint.py
-LINT_FLAGS    := --filter=-runtime/references
+LINT_FLAGS    := 
 
 #--------------------- Unit Tests ---------------------------------------------#
 TEST_SUFFIX   := _TEST

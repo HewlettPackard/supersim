@@ -45,7 +45,7 @@ static bool isPrimitiveElement(u32 _width, u32 prim) {
 }
 
 u32 createGeneratorSet(
-    u32 _width, int delta, std::vector<u32>& X, std::vector<u32>& X_i) {
+    u32 _width, int delta, std::vector<u32>* X, std::vector<u32>* X_i) {
   u32 prim = 1;
   for (prim = 1; prim < _width; prim++) {
     if (isPrimitiveElement(_width, prim))
@@ -53,17 +53,17 @@ u32 createGeneratorSet(
   }
   assert(prim < _width);
   u32 last_pow = (delta == 1) ? _width - 3 : _width - 2;
-  X.clear();
-  X_i.clear();
+  X->clear();
+  X_i->clear();
   for (u32 p = 0; p <= last_pow; p += 2) {
     if ((delta == -1) && p == (_width + 1) / 2) {
       p--;
     }
     u32 val = pow(prim, p);
-    X.push_back(val % _width);
-    X_i.push_back((val * prim) % _width);
+    X->push_back(val % _width);
+    X_i->push_back((val * prim) % _width);
   }
-  return X.size();
+  return X->size();
 }
 
 void addressFromInterfaceId(u32 _id, u32 _width,

@@ -48,7 +48,7 @@ Network::Network(const std::string& _name, const Component* _parent,
   u32 routerRadix = concentration_ + networkRadix;
   std::vector<u32> dimensionWidths_ = {2, width_, width_};
   // create generator sets
-  createGeneratorSet(width_, delta, X_, X_i_);
+  createGeneratorSet(width_, delta, &X_, &X_i_);
 
   _settings["router"]["num_ports"] = Json::Value(routerRadix);
   _settings["router"]["num_vcs"] = Json::Value(numVcs_);

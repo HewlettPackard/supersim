@@ -23,7 +23,7 @@ namespace SlimFly {
 
 bool isPrime(u32 _width);
 u32 createGeneratorSet(
-  u32 _width, int delta, std::vector<u32>& X, std::vector<u32>& X_i);
+  u32 _width, int delta, std::vector<u32>* X, std::vector<u32>* X_i);
 void addressFromInterfaceId(
   u32 _id, u32 _width, u32 _concentration, std::vector<u32>* _address);
 u32 ifaceIdFromAddress(
