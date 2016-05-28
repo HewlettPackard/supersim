@@ -18,7 +18,6 @@
 
 #include <cassert>
 
-#include "MinTableRoutingAlgorithm.h"
 #include "network/slimfly/MinRoutingAlgorithm.h"
 #include "network/RoutingAlgorithm.h"
 
@@ -40,16 +39,14 @@ RoutingAlgorithm* RoutingAlgorithmFactory::createRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
     u32 _inputPort) {
   std::string algorithm = settings_["algorithm"].asString();
+  std::string impl = settings_["implementation"].asString();
+  bool adaptive = settings_["adaptive"].asBool();
   u32 latency = settings_["latency"].asUInt();
 
-  if (algorithm == "minimal_table") {
-    return new SlimFly::MinTableRoutingAlgorithm(
-        _name, _parent, _router, latency, numVcs_, dimensionWidths_,
-        concentration_, routingTables_, X_, X_i_);
-  } else if (algorithm == "minimal") {
+  if (algorithm == "minimal") {
     return new SlimFly::MinRoutingAlgorithm(
         _name, _parent, _router, latency, numVcs_, dimensionWidths_,
-        concentration_, routingTables_, X_, X_i_);
+        concentration_, routingTables_, X_, X_i_, impl, adaptive);
   } else {
     fprintf(stderr, "Unknown routing algorithm: '%s'\n", algorithm.c_str());
     assert(false);

@@ -36,7 +36,8 @@ class MinRoutingAlgorithm : public RoutingAlgorithm {
                 const std::vector<u32>& _dimensionWidths,
                 u32 _concentration,
                 DimensionalArray<RoutingTable*>* routingTables_,
-                const std::vector<u32>& _X, const std::vector<u32>& _X_i);
+                const std::vector<u32>& _X, const std::vector<u32>& _X_i,
+                const std::string& _impl, bool _adaptive);
   ~MinRoutingAlgorithm();
 
  protected:
@@ -48,17 +49,28 @@ class MinRoutingAlgorithm : public RoutingAlgorithm {
     return routingTables_->at(router_->getAddress());
   }
 
+  std::unordered_set<u32> computeOutputPortsAlgorithm(
+      const std::vector<u32>& routerAddress,
+      const std::vector<u32>* destinationAddress);
+
+  std::unordered_set<u32> computeOutputPortsTable(
+      const std::vector<u32>& routerAddress,
+      const std::vector<u32>* destinationAddress);
+
+  bool checkConnected(
+    u32 graph, u32 srcRow, u32 dstRow);
+
+  bool checkConnectedAcross(
+    const std::vector<u32>& routerAddress,
+    const std::vector<u32>* destinationAddress);
+
   const u32 numVcs_;
   const std::vector<u32> dimensionWidths_;
   const u32 concentration_;
   DimensionalArray<RoutingTable*>* routingTables_;
   const std::vector<u32>& X_, X_i_;
-
-  bool checkConnected(
-    u32 graph, u32 srcRow, u32 dstRow);
-  bool checkConnectedAcross(
-    const std::vector<u32>& routerAddress,
-    const std::vector<u32>* destinationAddress);
+  const std::string impl_;
+  bool adaptive_;
 };
 
 }  // namespace SlimFly

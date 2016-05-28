@@ -21,6 +21,8 @@
     },
     "routing": {
       "algorithm": "minimal",
+      "implementation": "algorithm",
+      "adaptive": false,
       "latency": 1
     },
     "interface": {
