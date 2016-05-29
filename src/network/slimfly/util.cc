@@ -34,8 +34,10 @@ bool isPrime(u32 _width) {
 static bool isPrimitiveElement(u32 _width, u32 prim) {
   std::vector<bool> satisfy(_width, false);
   satisfy[0] = true;  // exception for primitive elem
+  u32 value = 1;
   for (u32 p = 0; p < _width; p++) {
-    satisfy[static_cast<u32>(pow(prim, p)) % _width] = true;
+    satisfy[value] = true;
+    value = (value * prim) % _width;
   }
   bool isprim = true;
   for (bool s : satisfy) {
