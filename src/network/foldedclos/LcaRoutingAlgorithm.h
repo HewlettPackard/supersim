@@ -30,7 +30,8 @@ class LcaRoutingAlgorithm : public RoutingAlgorithm {
  public:
   LcaRoutingAlgorithm(const std::string& _name, const Component* _parent,
                       Router* _router, u64 _latency, u32 _numVcs, u32 _numPorts,
-                      u32 _numLevels, u32 _level, u32 _inputPort);
+                      u32 _numLevels, u32 _level, u32 _inputPort,
+                      bool _adaptive);
   ~LcaRoutingAlgorithm();
 
  protected:
@@ -43,6 +44,7 @@ class LcaRoutingAlgorithm : public RoutingAlgorithm {
   const u32 numLevels_;
   const u32 level_;
   const u32 inputPort_;
+  const bool adaptive_;
 };
 
 }  // namespace FoldedClos

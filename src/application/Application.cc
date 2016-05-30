@@ -101,7 +101,7 @@ void Application::endTransaction(u64 _trans) {
 
 
 u64 Application::cyclesToSend(u32 _numFlits) const {
-  if (isinf(maxInjectionRate_)) {
+  if (std::isinf(maxInjectionRate_)) {
     return 0;  // infinite injection rate
   }
   f64 cycles = _numFlits / maxInjectionRate_;

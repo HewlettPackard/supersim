@@ -17,6 +17,7 @@
 
 #include <cassert>
 
+#include "traffic/RandomExchangeTrafficPattern.h"
 #include "traffic/BitComplementTrafficPattern.h"
 #include "traffic/BitReverseTrafficPattern.h"
 #include "traffic/BitRotateTrafficPattern.h"
@@ -51,6 +52,9 @@ TrafficPattern* TrafficPatternFactory::createTrafficPattern(
         _name, _parent, _numTerminals, _self, _settings);
   } else if (type == "tornado") {
     return new TornadoTrafficPattern(
+        _name, _parent, _numTerminals, _self, _settings);
+  } else if (type == "random_exchange") {
+    return new RandomExchangeTrafficPattern(
         _name, _parent, _numTerminals, _self, _settings);
   } else if (type == "nearest_neighbor") {
     return new NearestNeighborTrafficPattern(

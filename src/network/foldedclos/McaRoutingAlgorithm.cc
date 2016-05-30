@@ -26,16 +26,16 @@ namespace FoldedClos {
 McaRoutingAlgorithm::McaRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
     u64 _latency, u32 _numVcs, u32 _numPorts, u32 _numLevels, u32 _level,
-    u32 _inputPort)
+    u32 _inputPort, bool _adaptive)
     : RoutingAlgorithm(_name, _parent, _router, _latency),
       numVcs_(_numVcs), numPorts_(_numPorts), numLevels_(_numLevels),
-      level_(_level), inputPort_(_inputPort) {}
+      level_(_level), inputPort_(_inputPort), adaptive_(_adaptive) {}
 
 McaRoutingAlgorithm::~McaRoutingAlgorithm() {}
 
 void McaRoutingAlgorithm::processRequest(
     Flit* _flit, RoutingAlgorithm::Response* _response) {
-  u32 outputPort;
+  u32 outputPort = U32_MAX;
 
   bool atTopLevel = (level_ == (numLevels_ - 1));
   bool movingUpward = (inputPort_ < (numPorts_ / 2));
@@ -51,8 +51,26 @@ void McaRoutingAlgorithm::processRequest(
   assert(destinationAddress->size() == numLevels_);
 
   if (movingUpward && !atTopLevel) {
-    // the packet needs continue upward, just choose a random upward output port
-    outputPort = gSim->rnd.nextU64(numPorts_/2, numPorts_-1);
+    // the packet needs continue upward
+    if (!adaptive_) {
+      // choose a random upward output port
+      outputPort = gSim->rnd.nextU64(numPorts_ / 2, numPorts_ - 1);
+    } else {
+      // choose the port with the most availability
+      f64 maxAvailability = F64_NEG_INF;
+      for (u32 port = numPorts_ / 2; port < numPorts_; port++) {
+        f64 availability = 0.0;
+        for (u32 vc = 0; vc < numVcs_; vc++) {
+          u32 vcIdx = router_->vcIndex(port, vc);
+          availability += router_->congestionStatus(vcIdx);
+        }
+        availability /= numVcs_;  // average
+        if (availability > maxAvailability) {
+          maxAvailability = availability;
+          outputPort = port;
+        }
+      }
+    }
   } else {
     // when moving down the tree, output port is a simple lookup into the
     //  destination address vector
@@ -60,6 +78,7 @@ void McaRoutingAlgorithm::processRequest(
   }
 
   // select all VCs in the output port
+  assert(outputPort != U32_MAX);
   for (u32 vc = 0; vc < numVcs_; vc++) {
     _response->add(outputPort, vc);
   }
