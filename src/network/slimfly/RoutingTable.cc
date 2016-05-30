@@ -48,7 +48,7 @@ u32 RoutingTable::getNumHops(const std::vector<u32>& dstAddr) const {
     if (pathTable_.count(strop::vecString<u32>(dstAddr))) {
       return 2;   // max diameter == 2 so if not in hop table then here
     } else {
-      return 0;
+      return 0;   // Num hops must be in {0,1,2} ... slimfly assumption
     }
   }
 }

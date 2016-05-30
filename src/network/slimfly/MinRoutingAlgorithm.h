@@ -51,18 +51,18 @@ class MinRoutingAlgorithm : public RoutingAlgorithm {
 
   std::unordered_set<u32> computeOutputPortsAlgorithm(
       const std::vector<u32>& routerAddress,
-      const std::vector<u32>* destinationAddress);
+      const std::vector<u32>& destinationAddress);
 
   std::unordered_set<u32> computeOutputPortsTable(
       const std::vector<u32>& routerAddress,
-      const std::vector<u32>* destinationAddress);
+      const std::vector<u32>& destinationAddress);
 
   bool checkConnected(
     u32 graph, u32 srcRow, u32 dstRow);
 
   bool checkConnectedAcross(
     const std::vector<u32>& routerAddress,
-    const std::vector<u32>* destinationAddress);
+    const std::vector<u32>& destinationAddress);
 
   const u32 numVcs_;
   const std::vector<u32> dimensionWidths_;

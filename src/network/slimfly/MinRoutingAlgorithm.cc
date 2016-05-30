@@ -51,10 +51,10 @@ bool MinRoutingAlgorithm::checkConnected(
 
 bool MinRoutingAlgorithm::checkConnectedAcross(
     const std::vector<u32>& routerAddress,
-    const std::vector<u32>* destinationAddress) {
+    const std::vector<u32>& destinationAddress) {
   u32 x1, y1, x2, y2;
-  x1 = destinationAddress->at(2);
-  y1 = destinationAddress->at(3);
+  x1 = destinationAddress.at(2);
+  y1 = destinationAddress.at(3);
   x2 = routerAddress.at(1);
   y2 = routerAddress.at(2);
   if (routerAddress.at(0)) {     // 1->0
@@ -72,12 +72,13 @@ void MinRoutingAlgorithm::processRequest(
   // ex: [c,x,y,z]
   const std::vector<u32>* destinationAddress =
       _flit->getPacket()->getMessage()->getDestinationAddress();
+  assert(destinationAddress);
   assert(routerAddress.size() == (destinationAddress->size() - 1));
 
   std::unordered_set<u32> outputPorts =
     (impl_ != "table") ?
-        computeOutputPortsAlgorithm(routerAddress, destinationAddress) :
-        computeOutputPortsTable(routerAddress, destinationAddress);
+        computeOutputPortsAlgorithm(routerAddress, *destinationAddress) :
+        computeOutputPortsTable(routerAddress, *destinationAddress);
   assert(outputPorts.size() > 0);
 
   if (adaptive_) {
@@ -117,50 +118,33 @@ void MinRoutingAlgorithm::processRequest(
 
 std::unordered_set<u32> MinRoutingAlgorithm::computeOutputPortsAlgorithm(
     const std::vector<u32>& routerAddress,
-    const std::vector<u32>* destinationAddress
+    const std::vector<u32>& destinationAddress
 ) {
   std::unordered_set<u32> outputPorts;
 
   std::vector<u32> nextHop;
-  for (u32 i = 1; i < destinationAddress->size(); i++) {
-    nextHop.push_back(destinationAddress->at(i));
+  for (u32 i = 1; i < destinationAddress.size(); i++) {
+    nextHop.push_back(destinationAddress.at(i));
   }
   u32 width = dimensionWidths_.at(1);
   const RoutingTable* rt = getRoutingTable();
   u32 dim;
   for (dim = 0; dim < routerAddress.size(); dim++) {
-    if (routerAddress.at(dim) != destinationAddress->at(dim+1)) {
+    if (routerAddress.at(dim) != destinationAddress.at(dim+1)) {
       break;
     }
   }
 
-//  std::cout << "Dim " << dim << std::endl;
-//  std::cout << "Source Address "  << std::endl;
-//  for (u32 i = 1; i < destinationAddress->size(); i++) {
-//    std::cout << routerAddress.at(i-1) << " " << std::endl;
-//  }
-//  std::cout << std::endl;
-//  std::cout << "Destination Address "  << std::endl;
-//  for (u32 i = 1; i < destinationAddress->size(); i++) {
-//    std::cout << destinationAddress->at(i) << " " << std::endl;
-//  }
-//  std::cout << std::endl;
-
   // test if already at destination router
   if (dim == routerAddress.size()) {
-    bool res = outputPorts.insert(destinationAddress->at(0)).second;
+    bool res = outputPorts.insert(destinationAddress.at(0)).second;
     (void)res;
     assert(res);
   } else if (dim == 2) {   // same column
     u32 graph = routerAddress.at(0);
     u32 srcRow = routerAddress.at(dim);
-    u32 dstRow = destinationAddress->at(dim + 1);
+    u32 dstRow = destinationAddress.at(dim + 1);
     if (checkConnected(graph, srcRow, dstRow)) {
-//      std::cout << "Next Hop Address "  << std::endl;
-//      for (u32 i = 1; i < destinationAddress->size(); i++) {
-//        std::cout << nextHop.at(i-1) << " " << std::endl;
-//      }
-//      std::cout << std::endl;
       bool res = outputPorts.insert(rt->getPortNum(nextHop)).second;
       (void)res;
       assert(res);
@@ -170,11 +154,6 @@ std::unordered_set<u32> MinRoutingAlgorithm::computeOutputPortsAlgorithm(
         bool srcToInt = checkConnected(graph, srcRow, intRow);
         bool intToDst = checkConnected(graph, intRow, dstRow);
         if (srcToInt && intToDst) {
-//          std::cout << "Next Hop Address "  << std::endl;
-//          for (u32 i = 1; i < destinationAddress->size(); i++) {
-//            std::cout << nextHop.at(i-1) << " " << std::endl;
-//          }
-//          std::cout << std::endl;
           bool res = outputPorts.insert(rt->getPortNum(nextHop)).second;
           (void)res;
           assert(res);
@@ -189,14 +168,9 @@ std::unordered_set<u32> MinRoutingAlgorithm::computeOutputPortsAlgorithm(
         nextHop.at(2) = intRow;
         std::vector<u32> next(nextHop);
         next.insert(next.begin(), 0);   // [dummy, nextHop]
-        bool srcToInt = checkConnectedAcross(routerAddress, &next);
+        bool srcToInt = checkConnectedAcross(routerAddress, next);
         bool intToDst = checkConnectedAcross(nextHop, destinationAddress);
         if (srcToInt && intToDst) {
-//          std::cout << "Next Hop Address "  << std::endl;
-//          for (u32 i = 1; i < destinationAddress->size(); i++) {
-//            std::cout << nextHop.at(i-1) << " " << std::endl;
-//          }
-//          std::cout << std::endl;
           bool res = outputPorts.insert(rt->getPortNum(nextHop)).second;
           (void)res;
           assert(res);
@@ -205,11 +179,6 @@ std::unordered_set<u32> MinRoutingAlgorithm::computeOutputPortsAlgorithm(
     }
   } else {   // different subgraph
     if (checkConnectedAcross(routerAddress, destinationAddress)) {
-//      std::cout << "Next Hop Address "  << std::endl;
-//      for (u32 i = 1; i < destinationAddress->size(); i++) {
-//        std::cout << nextHop.at(i-1) << " " << std::endl;
-//      }
-//      std::cout << std::endl;
       bool res = outputPorts.insert(rt->getPortNum(nextHop)).second;
       (void)res;
       assert(res);
@@ -220,16 +189,11 @@ std::unordered_set<u32> MinRoutingAlgorithm::computeOutputPortsAlgorithm(
       for (u32 intRow = 0; intRow < width; intRow++) {
         next.at(3) = intRow;
         bool srcToInt = checkConnectedAcross(
-            routerAddress, &next);
+            routerAddress, next);
         bool intToDst = checkConnected(
-            destinationAddress->at(1), destinationAddress->at(3), intRow);
+            destinationAddress.at(1), destinationAddress.at(3), intRow);
         if (srcToInt && intToDst) {
           nextHop.at(2) = intRow;
-//          std::cout << "Next Hop Address "  << std::endl;
-//          for (u32 i = 1; i < destinationAddress->size(); i++) {
-//            std::cout << nextHop.at(i-1) << " " << std::endl;
-//          }
-//          std::cout << std::endl;
           bool res = outputPorts.insert(rt->getPortNum(nextHop)).second;
           (void)res;
           assert(res);
@@ -245,11 +209,6 @@ std::unordered_set<u32> MinRoutingAlgorithm::computeOutputPortsAlgorithm(
         bool intToDst = checkConnectedAcross(
             nextHop, destinationAddress);
         if (srcToInt && intToDst) {
-//          std::cout << "Next Hop Address "  << std::endl;
-//          for (u32 i = 1; i < destinationAddress->size(); i++) {
-//            std::cout << nextHop.at(i-1) << " " << std::endl;
-//          }
-//          std::cout << std::endl;
           bool res = outputPorts.insert(rt->getPortNum(nextHop)).second;
           (void)res;
           assert(res);
@@ -262,19 +221,21 @@ std::unordered_set<u32> MinRoutingAlgorithm::computeOutputPortsAlgorithm(
 
 std::unordered_set<u32> MinRoutingAlgorithm::computeOutputPortsTable(
     const std::vector<u32>& routerAddress,
-    const std::vector<u32>* destinationAddress
+    const std::vector<u32>& destinationAddress
 ) {
   std::unordered_set<u32> outputPorts;
   std::vector<u32> dstAddr;
-  for (u32 i = 1; i < destinationAddress->size(); i++) {
-    dstAddr.push_back((*destinationAddress)[i]);
+  for (u32 i = 1; i < destinationAddress.size(); i++) {
+    dstAddr.push_back(destinationAddress[i]);
   }
   assert(dstAddr[0] == 0 || dstAddr[0] == 1);
 
   // Check if already at destination router
   if (dstAddr == routerAddress) {
-    outputPorts.insert((*destinationAddress)[0]);
+    outputPorts.insert(destinationAddress[0]);
   } else {
+    // If not at destination, just lookup all the paths
+    // in the routing table to decide where to go next...simple!
     for (auto path : getRoutingTable()->getPaths(dstAddr)) {
       outputPorts.insert(path.outPortNum);
     }

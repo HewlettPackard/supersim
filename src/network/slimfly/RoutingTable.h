@@ -24,6 +24,12 @@
 
 namespace SlimFly {
 
+/*
+ * This class defines a routing table for a slimfly router.
+ * In general the API can work for any netowrk, but the slimfly-specific
+ * assumption here is that paths through router will always have a length
+ * of 0, 1 or 2.
+ */
 class RoutingTable {
  public:
   struct PathInfo {
@@ -36,15 +42,30 @@ class RoutingTable {
 
   explicit RoutingTable(const std::vector<u32>& _srcAddr);
 
+  // Register a hop in the table. Called when adding an edge
+  // to a network.
   void addHop(u32 srcPort, const std::vector<u32>& dstAddr);
+
+  // Register a path in the table. A path is necessarily 2 hops
+  // with the source as this router, destination dstAddr and the
+  // intermediate hop thruAddr
   void addPath(
     const std::vector<u32>& dstAddr, const std::vector<u32>& thruAddr);
 
+  // Return the router that this table represents
   inline const std::vector<u32>& getAddr() const {
     return srcAddr_;
   }
+
+  // Return number of hops between this router and dstAddr
   u32 getNumHops(const std::vector<u32>& dstAddr) const;
+
+  // For a valid hop, return the port number given the hop addr
   u32 getPortNum(const std::vector<u32>& hopAddr) const;
+
+  // Return all possible "optimal" paths between the current router
+  // and dstAddr. If the destination is a single hop away, only that
+  // address will be returned even if there are more paths with >1 hop.
   const std::vector<PathInfo> getPaths(const std::vector<u32>& dstAddr) const;
 
  private:

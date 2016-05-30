@@ -34,10 +34,7 @@ InjectionAlgorithm* InjectionAlgorithmFactory::createInjectionAlgorithm(
   std::string algorithm = settings_["algorithm"].asString();
   u32 latency = settings_["latency"].asUInt();
 
-  if (algorithm == "minimal_table") {
-    return new SlimFly::AnyInjectionAlgorithm(
-        _name, _parent, _interface, latency, numVcs_);
-  } else if (algorithm == "minimal") {
+  if (algorithm == "minimal") {
     return new SlimFly::AnyInjectionAlgorithm(
         _name, _parent, _interface, latency, numVcs_);
   } else {

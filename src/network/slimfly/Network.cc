@@ -34,6 +34,11 @@ Network::Network(const std::string& _name, const Component* _parent,
     : ::Network(_name, _parent, _settings) {
   // dimensions and concentration
   width_ = _settings["width"].asUInt();
+  // TODO(someone): In theory the width of a Slim Fly network
+  // can be a prime power that satisfies 4*coeff + delta where
+  // coeff is a +ve int and delta in {-1,0,1}
+  // In this case we only support primes as the width which
+  // makes the Galois field computation very easy.
   assert(isPrime(width_));
   concentration_ = _settings["concentration"].asUInt();
   assert(concentration_ > 0);
@@ -46,14 +51,23 @@ Network::Network(const std::string& _name, const Component* _parent,
   int delta = width_ - 4*coeff;
   u32 networkRadix = (3 * width_ - delta) / 2;
   u32 routerRadix = concentration_ + networkRadix;
+
+  // Slimfly is a 2-D network but the address is represented
+  // as a 3-D address for convenience. The third dimension is
+  // a constant and represents the subgraph.
   std::vector<u32> dimensionWidths_ = {2, width_, width_};
-  // create generator sets
+  // create generator sets for column connections
   createGeneratorSet(width_, delta, &X_, &X_i_);
 
   _settings["router"]["num_ports"] = Json::Value(routerRadix);
   _settings["router"]["num_vcs"] = Json::Value(numVcs_);
   _settings["interface"]["num_vcs"] = Json::Value(numVcs_);
 
+  // Create a routing table for each router in network. At the
+  // minumum the table will store a hopAddress -> outputPort
+  // mapping. Alternatively, it will also store a path database
+  // that contains all destinations reachable from the routers
+  // with egress ports.
   routingTables_.setSize(dimensionWidths_);
 
   // create a routing algorithm factory to give to the routers
@@ -77,6 +91,8 @@ Network::Network(const std::string& _name, const Component* _parent,
     routers_.at(routerAddress) = RouterFactory::createRouter(
         routerName, this, routerAddress, routingAlgorithmFactory,
         _settings["router"]);
+
+    // create a routing table for later population
     routingTables_.at(routerAddress) = new RoutingTable(routerAddress);
   }
   delete routingAlgorithmFactory;
@@ -88,6 +104,9 @@ Network::Network(const std::string& _name, const Component* _parent,
     std::set<u32> distSet(dVtr.begin(), dVtr.end());
     for (u32 col = 0; col < width_; col++) {
       std::vector<u32> inPorts(width_, 0), outPorts(width_, 0);
+      // For each subgraph and column. Check each source and
+      // destination row, and connect them if the hammming
+      // distance between the nodes is in the generator set.
       for (u32 srcRow = 0; srcRow < width_; srcRow++) {
         for (u32 dstRow = 0; dstRow < width_; dstRow++) {
           // determine the source and destination router
@@ -112,6 +131,8 @@ Network::Network(const std::string& _name, const Component* _parent,
             // link the routers from source to destination
             routers_.at(srcAddr)->setOutputChannel(outPort, channel);
             routers_.at(dstAddr)->setInputChannel(inPort, channel);
+
+            // the routing table has to be update every time an edge is created
             routingTables_.at(srcAddr)->addHop(outPort, dstAddr);
           }
         }
@@ -129,6 +150,8 @@ Network::Network(const std::string& _name, const Component* _parent,
     for (u32 y = 0; y < width_; y++) {
       for (u32 m = 0; m < width_; m++) {
         for (u32 c = 0; c < width_; c++) {
+          // Using the definitions of slim fly, only connect
+          // two nodes in the subgraphs if y = mx + c
           if (y == ((m*x + c) % width_)) {
              // determine the source router
             std::vector<u32> addr1 = {0, x, y};
@@ -167,6 +190,12 @@ Network::Network(const std::string& _name, const Component* _parent,
     }
   }
 
+  // At this point we are done defining all the edges in the graph.
+  // This is an optional extra step (for table based routing) to use
+  // the edge information to build a database of all paths between
+  // all sources and destination. This is computationally more efficient
+  // than the previous step of connecting y=mx+c because we have a max
+  // path length of 2.
   for (u32 src = 0; src < routingTables_.size(); src++) {
     for (u32 dst = 0; dst < routingTables_.size(); dst++) {
       const std::vector<u32>& dstAddr = routingTables_.at(dst)->getAddr();
@@ -186,6 +215,9 @@ Network::Network(const std::string& _name, const Component* _parent,
     }
   }
 
+  // This is a sanity check to ensure that the topology was constructed
+  // properly. Check all src and dst nodes and assert that there is a path
+  // between them.
   for (u32 src = 0; src < routingTables_.size(); src++) {
     for (u32 dst = 0; dst < routingTables_.size(); dst++) {
       const std::vector<u32>& dstAddr = routingTables_.at(dst)->getAddr();
