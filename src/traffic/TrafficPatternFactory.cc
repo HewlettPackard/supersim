@@ -21,6 +21,7 @@
 #include "traffic/BitReverseTrafficPattern.h"
 #include "traffic/BitRotateTrafficPattern.h"
 #include "traffic/LoopbackTrafficPattern.h"
+#include "traffic/NearestNeighborTrafficPattern.h"
 #include "traffic/ScanTrafficPattern.h"
 #include "traffic/TornadoTrafficPattern.h"
 #include "traffic/UniformRandomTrafficPattern.h"
@@ -50,6 +51,9 @@ TrafficPattern* TrafficPatternFactory::createTrafficPattern(
         _name, _parent, _numTerminals, _self, _settings);
   } else if (type == "tornado") {
     return new TornadoTrafficPattern(
+        _name, _parent, _numTerminals, _self, _settings);
+  } else if (type == "nearest_neighbor") {
+    return new NearestNeighborTrafficPattern(
         _name, _parent, _numTerminals, _self, _settings);
   } else {
     fprintf(stderr, "unknown traffic pattern: %s\n", type.c_str());
