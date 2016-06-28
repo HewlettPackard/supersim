@@ -32,7 +32,7 @@ class RouterFactory {
       const std::string& _name, const Component* _parent,
       const std::vector<u32>& _address,
       RoutingAlgorithmFactory* _routingAlgorithmFactory,
-      Json::Value _settings);
+      MetadataHandler* _metadataHandler, Json::Value _settings);
 };
 
 #endif  // ROUTER_ROUTERFACTORY_H_

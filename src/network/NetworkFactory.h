@@ -28,7 +28,7 @@ class NetworkFactory {
  public:
   static Network* createNetwork(
       const std::string& _name, const Component* _parent,
-      Json::Value _settings);
+      MetadataHandler* _metadataHandler, Json::Value _settings);
 };
 
 #endif  // NETWORK_NETWORKFACTORY_H_

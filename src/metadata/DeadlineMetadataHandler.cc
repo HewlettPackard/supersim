@@ -57,3 +57,7 @@ void DeadlineMetadataHandler::packetInjection(Application* _app,
   }
   _packet->setMetadata(metadata);
 }
+
+void DeadlineMetadataHandler::packetArrival(Packet* _packet) {
+  // this isn't used in this handler
+}

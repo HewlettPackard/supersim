@@ -34,7 +34,7 @@ namespace HyperX {
 class Network : public ::Network {
  public:
   Network(const std::string& _name, const Component* _parent,
-          Json::Value _settings);
+          MetadataHandler* _metadataHandler, Json::Value _settings);
   ~Network();
 
   // Network

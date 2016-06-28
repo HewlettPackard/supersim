@@ -28,6 +28,7 @@ class ZeroMetadataHandler : public MetadataHandler {
   ~ZeroMetadataHandler();
 
   void packetInjection(Application* _app, Packet* _packet) override;
+  void packetArrival(Packet* _packet) override;
 };
 
 #endif  // METADATA_ZEROMETADATAHANDLER_H_

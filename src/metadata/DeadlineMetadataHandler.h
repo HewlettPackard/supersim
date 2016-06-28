@@ -31,6 +31,7 @@ class DeadlineMetadataHandler : public MetadataHandler {
   ~DeadlineMetadataHandler();
 
   void packetInjection(Application* _app, Packet* _packet) override;
+  void packetArrival(Packet* _packet) override;
 
  private:
   enum class Algorithm {kMessage, kTransaction};

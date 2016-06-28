@@ -20,6 +20,7 @@
 #include <string>
 
 #include "metadata/DeadlineMetadataHandler.h"
+#include "metadata/LocalTimestampMetadataHandler.h"
 #include "metadata/ZeroMetadataHandler.h"
 
 MetadataHandler* MetadataHandlerFactory::createHandler(Json::Value _settings) {
@@ -28,6 +29,8 @@ MetadataHandler* MetadataHandlerFactory::createHandler(Json::Value _settings) {
     return new ZeroMetadataHandler(_settings);
   } else if (type == "deadline") {
     return new DeadlineMetadataHandler(_settings);
+  } else if (type == "local_timestamp") {
+    return new LocalTimestampMetadataHandler(_settings);
   } else {
     fprintf(stderr, "unknown metadata handler type: %s\n", type.c_str());
     assert(false);

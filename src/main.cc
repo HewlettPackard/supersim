@@ -58,7 +58,7 @@ s32 main(s32 _argc, char** _argv) {
 
   // create a network
   Network* network = NetworkFactory::createNetwork(
-      "Network", nullptr, settings["network"]);
+      "Network", nullptr, metadataHandler, settings["network"]);
   gSim->setNetwork(network);
   u32 numInterfaces = network->numInterfaces();
   u32 numRouters = network->numRouters();

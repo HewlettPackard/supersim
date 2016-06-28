@@ -24,6 +24,7 @@
 
 #include "event/Component.h"
 #include "interface/Interface.h"
+#include "metadata/MetadataHandler.h"
 #include "network/Channel.h"
 #include "router/Router.h"
 #include "stats/ChannelLog.h"
@@ -31,7 +32,7 @@
 class Network : public Component {
  public:
   Network(const std::string& _name, const Component* _parent,
-          Json::Value _settings);
+          MetadataHandler* _metadataHandler, Json::Value _settings);
   virtual ~Network();
   virtual u32 numRouters() const = 0;
   virtual u32 numInterfaces() const = 0;
@@ -40,6 +41,8 @@ class Network : public Component {
   virtual void translateIdToAddress(u32 _id,
                                     std::vector<u32>* _address) const = 0;
   u32 numVcs() const;
+  MetadataHandler* getMetadataHandler() const;
+
   void startMonitoring();
   void endMonitoring();
 
@@ -50,6 +53,7 @@ class Network : public Component {
 
  private:
   ChannelLog* channelLog_;
+  MetadataHandler* metadataHandler_;
 };
 
 #endif  // NETWORK_NETWORK_H_

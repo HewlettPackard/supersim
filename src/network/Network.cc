@@ -18,9 +18,9 @@
 #include <cassert>
 
 Network::Network(const std::string& _name, const Component* _parent,
-                 Json::Value _settings)
-    : Component(_name, _parent),
-      numVcs_(_settings["num_vcs"].asUInt()) {
+                 MetadataHandler* _metadataHandler, Json::Value _settings)
+    : Component(_name, _parent), numVcs_(_settings["num_vcs"].asUInt()),
+      metadataHandler_(_metadataHandler) {
   // check settings
   assert(numVcs_ > 0);
 
@@ -34,6 +34,10 @@ Network::~Network() {
 
 u32 Network::numVcs() const {
   return numVcs_;
+}
+
+MetadataHandler* Network::getMetadataHandler() const {
+  return metadataHandler_;
 }
 
 void Network::startMonitoring() {

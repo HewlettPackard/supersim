@@ -28,8 +28,8 @@ Router::Router(
     const std::string& _name, const Component* _parent,
     const std::vector<u32>& _address,
     RoutingAlgorithmFactory* _routingAlgorithmFactory,
-    Json::Value _settings)
-    : ::Router(_name, _parent, _address, _settings) {
+    MetadataHandler* _metadataHandler, Json::Value _settings)
+    : ::Router(_name, _parent, _address, _metadataHandler, _settings) {
   u32 inputQueueDepth = _settings["input_queue_depth"].asUInt();
   assert(inputQueueDepth > 0);
   assert(_settings.isMember("vca_swa_wait") &&
@@ -187,6 +187,11 @@ void Router::receiveFlit(u32 _port, Flit* _flit) {
   u32 vc = _flit->getVc();
   InputQueue* iq = inputQueues_.at(vcIndex(_port, vc));
   iq->receiveFlit(0, _flit);
+
+  // give to metadata handler for router packet arrival
+  if (_flit->isHead()) {
+    packetArrival(_flit->getPacket());
+  }
 }
 
 void Router::receiveCredit(u32 _port, Credit* _credit) {

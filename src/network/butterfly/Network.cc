@@ -28,8 +28,8 @@
 namespace Butterfly {
 
 Network::Network(const std::string& _name, const Component* _parent,
-                 Json::Value _settings)
-    : ::Network(_name, _parent, _settings) {
+                 MetadataHandler* _metadataHandler, Json::Value _settings)
+    : ::Network(_name, _parent, _metadataHandler, _settings) {
   // radix and stages
   routerRadix_ = _settings["router"]["num_ports"].asUInt();
   assert(routerRadix_ >= 2);
@@ -59,7 +59,7 @@ Network::Network(const std::string& _name, const Component* _parent,
       // create the router
       routers_.at(stage).at(column) = RouterFactory::createRouter(
           rname, this, std::vector<u32>({stage, column}),
-          routingAlgorithmFactory, _settings["router"]);
+          routingAlgorithmFactory, _metadataHandler, _settings["router"]);
       delete routingAlgorithmFactory;
     }
   }

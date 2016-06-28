@@ -13,19 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "metadata/ZeroMetadataHandler.h"
+#include "metadata/LocalTimestampMetadataHandler.h"
 
+#include <cassert>
+
+#include <string>
+
+#include "application/Application.h"
 #include "event/Simulator.h"
+#include "types/Message.h"
 #include "types/Packet.h"
 
-ZeroMetadataHandler::ZeroMetadataHandler(Json::Value _settings) {}
+LocalTimestampMetadataHandler::LocalTimestampMetadataHandler(
+    Json::Value _settings) {}
 
-ZeroMetadataHandler::~ZeroMetadataHandler() {}
+LocalTimestampMetadataHandler::~LocalTimestampMetadataHandler() {}
 
-void ZeroMetadataHandler::packetInjection(Application* _app, Packet* _packet) {
-  _packet->setMetadata(0);
+void LocalTimestampMetadataHandler::packetInjection(Application* _app,
+                                                    Packet* _packet) {
+  _packet->setMetadata(gSim->time());
 }
 
-void ZeroMetadataHandler::packetArrival(Packet* _packet) {
-  // this isn't used in this handler
+void LocalTimestampMetadataHandler::packetArrival(Packet* _packet) {
+  _packet->setMetadata(gSim->time());
 }

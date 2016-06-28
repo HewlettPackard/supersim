@@ -26,8 +26,8 @@
 namespace Uno {
 
 Network::Network(const std::string& _name, const Component* _parent,
-                 Json::Value _settings)
-    : ::Network(_name, _parent, _settings) {
+                 MetadataHandler* _metadataHandler, Json::Value _settings)
+    : ::Network(_name, _parent, _metadataHandler, _settings) {
   // dimensions and concentration
   concentration_ = _settings["concentration"].asUInt();
   assert(concentration_ > 0);
@@ -48,7 +48,7 @@ Network::Network(const std::string& _name, const Component* _parent,
   // create the router
   router_ = RouterFactory::createRouter(
       "Router", this, std::vector<u32>(), routingAlgorithmFactory,
-      _settings["router"]);
+      _metadataHandler, _settings["router"]);
   delete routingAlgorithmFactory;
 
   // create an injection algorithm factory to give to the interfaces

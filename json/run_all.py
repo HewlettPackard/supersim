@@ -5,6 +5,7 @@ import glob
 import math
 import os
 import psutil
+import subprocess
 import sys
 import taskrun
 
@@ -42,6 +43,10 @@ def main(args):
 
   print('using up to {0} CPUs'.format(total_cpus))
   print('using up to {0} GiB of memory'.format(total_mem))
+
+  if args.check:
+    subprocess.check_call('valgrind -h', shell=True,
+                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
   rm = taskrun.ResourceManager(
     taskrun.CounterResource('cpu', 9999, total_cpus),

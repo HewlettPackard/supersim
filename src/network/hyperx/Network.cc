@@ -29,8 +29,8 @@
 namespace HyperX {
 
 Network::Network(const std::string& _name, const Component* _parent,
-                 Json::Value _settings)
-    : ::Network(_name, _parent, _settings) {
+                 MetadataHandler* _metadataHandler, Json::Value _settings)
+    : ::Network(_name, _parent, _metadataHandler, _settings) {
   // dimensions and concentration
   assert(_settings["dimension_widths"].isArray());
   dimensions_ = _settings["dimension_widths"].size();
@@ -83,7 +83,7 @@ Network::Network(const std::string& _name, const Component* _parent,
     // use the router factory to create a router
     routers_.at(routerAddress) = RouterFactory::createRouter(
         routerName, this, routerAddress, routingAlgorithmFactory,
-        _settings["router"]);
+        _metadataHandler, _settings["router"]);
   }
   delete routingAlgorithmFactory;
 

@@ -25,6 +25,7 @@ class MetadataHandler {
   virtual ~MetadataHandler();
 
   virtual void packetInjection(Application* _app, Packet* _packet) = 0;
+  virtual void packetArrival(Packet* _packet) = 0;
 };
 
 #endif  // METADATA_METADATAHANDLER_H_

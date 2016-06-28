@@ -26,8 +26,8 @@
 namespace FoldedClos {
 
 Network::Network(const std::string& _name, const Component* _parent,
-                 Json::Value _settings)
-    : ::Network(_name, _parent, _settings) {
+                 MetadataHandler* _metadataHandler, Json::Value _settings)
+    : ::Network(_name, _parent, _metadataHandler, _settings) {
   assert(_settings["router"].isMember("num_ports") == true);
   routerRadix_ = _settings["router"]["num_ports"].asUInt();
   _settings["router"]["num_vcs"] = Json::Value(numVcs_);
@@ -84,7 +84,7 @@ Network::Network(const std::string& _name, const Component* _parent,
       // make router
       routers_.at(row).at(col) = RouterFactory::createRouter(
           rname, this, routerAddress, routingAlgorithmFactory,
-          _settings["router"]);
+          _metadataHandler, _settings["router"]);
 
       // delete the routing algorithm factory
       delete routingAlgorithmFactory;

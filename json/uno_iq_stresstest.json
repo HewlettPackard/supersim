@@ -102,7 +102,7 @@
     }
   },
   "metadata_handler": {
-    "type": "zero"
+    "type": "local_timestamp"
   },
   "debug": []
 }
