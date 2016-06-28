@@ -69,6 +69,7 @@ void ProcessorTerminal::handleMessage(Message* _message) {
 
   // end the transaction
   endTransaction(_message->getTransaction());
+  app->getMessageLog()->endTransaction(_message->getTransaction());
 
   delete memOp;
   delete _message;
@@ -144,7 +145,9 @@ void ProcessorTerminal::startNextMemoryAccess() {
 
   // create network message, packets, and flits
   Message* message = new Message(numPackets, memOp);
-  message->setTransaction(createTransaction());
+  u64 trans = createTransaction();
+  message->setTransaction(trans);
+  app->getMessageLog()->startTransaction(trans);
 
   u32 flitsLeft = messageLength;
   for (u32 p = 0; p < numPackets; p++) {

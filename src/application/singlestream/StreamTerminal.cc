@@ -69,13 +69,14 @@ void StreamTerminal::handleMessage(Message* _message) {
 
   // end the transaction
   endTransaction(_message->getTransaction());
+  Application* app = reinterpret_cast<Application*>(getApplication());
+  app->getMessageLog()->endTransaction(_message->getTransaction());
 
   // determine when complete
   recvdMessages_++;
 
   // on first received message, start monitoring
   if (recvdMessages_ == 1) {
-    Application* app = reinterpret_cast<Application*>(getApplication());
     app->receivedFirst(getId());
   }
 
@@ -128,7 +129,9 @@ void StreamTerminal::sendNextMessage() {
 
   // create the message object
   Message* message = new Message(numPackets, nullptr);
-  message->setTransaction(createTransaction());
+  u64 trans = createTransaction();
+  message->setTransaction(trans);
+  app->getMessageLog()->startTransaction(trans);
 
   // create the packets
   u32 flitsLeft = messageLength;

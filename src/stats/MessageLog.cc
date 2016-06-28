@@ -51,3 +51,15 @@ void MessageLog::logMessage(const Message* _message) {
 
   write(ss.str());
 }
+
+void MessageLog::startTransaction(u64 _trans) {
+  std::stringstream ss;
+  ss << "+T" << ',' << _trans << '\n';
+  write(ss.str());
+}
+
+void MessageLog::endTransaction(u64 _trans) {
+  std::stringstream ss;
+  ss << "-T" << ',' << _trans << '\n';
+  write(ss.str());
+}

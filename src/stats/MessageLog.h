@@ -26,6 +26,8 @@ class MessageLog : public FileLog {
   explicit MessageLog(Json::Value _settings);
   ~MessageLog();
   void logMessage(const Message* _message);
+  void startTransaction(u64 _trans);
+  void endTransaction(u64 _trans);
 };
 
 #endif  // STATS_MESSAGELOG_H_
