@@ -30,7 +30,7 @@ u32 computeInputPortDim(const std::vector<u32>& _dimensionWidths,
 void computeAddress(u32 _id, const std::vector<u32>& _widths,
                     u32 _concentration, std::vector<u32>* _address);
 
-u32 computeId(const std::vector<u32>& _address, const std::vector<u32>& _widths,
+u32 computeId(const std::vector<u32>* _address, const std::vector<u32>& _widths,
               u32 _concentration);
 
 }  // namespace Torus

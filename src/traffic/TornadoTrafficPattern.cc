@@ -50,7 +50,7 @@ TornadoTrafficPattern::TornadoTrafficPattern(
   }
 
   // compute the tornado destination id
-  dest_ = Torus::computeId(addr, widths, concentration);
+  dest_ = Torus::computeId(&addr, widths, concentration);
 }
 
 TornadoTrafficPattern::~TornadoTrafficPattern() {}

@@ -115,9 +115,26 @@ Interface* Network::getInterface(u32 _id) const {
   return interfaces_.at(_id);
 }
 
-void Network::translateIdToAddress(u32 _id, std::vector<u32>* _address) const {
+void Network::translateTerminalIdToAddress(
+    u32 _id, std::vector<u32>* _address) const {
   _address->resize(1);
   _address->at(0) = _id;
+}
+
+u32 Network::translateTerminalAddressToId(
+    const std::vector<u32>* _address) const {
+  return _address->at(0);
+}
+
+void Network::translateRouterIdToAddress(
+    u32 _id, std::vector<u32>* _address) const {
+  _address->resize(1);
+  _address->at(0) = 0;
+}
+
+u32 Network::translateRouterAddressToId(
+    const std::vector<u32>* _address) const {
+  return 0;
 }
 
 void Network::collectChannels(std::vector<Channel*>* _channels) {

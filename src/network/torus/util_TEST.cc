@@ -61,26 +61,26 @@ TEST(TorusUtil, computeId) {
   std::vector<u32> address;
 
   address = {0, 0, 0, 0};
-  ASSERT_EQ(0u, Torus::computeId(address, widths, concentration));
+  ASSERT_EQ(0u, Torus::computeId(&address, widths, concentration));
 
   address = {1, 0, 0, 0};
-  ASSERT_EQ(1u, Torus::computeId(address, widths, concentration));
+  ASSERT_EQ(1u, Torus::computeId(&address, widths, concentration));
 
   address = {0, 1, 1, 0};
-  ASSERT_EQ(8u, Torus::computeId(address, widths, concentration));
+  ASSERT_EQ(8u, Torus::computeId(&address, widths, concentration));
 
   address = {1, 1, 1, 0};
-  ASSERT_EQ(9u, Torus::computeId(address, widths, concentration));
+  ASSERT_EQ(9u, Torus::computeId(&address, widths, concentration));
 
   address = {0, 2, 0, 1};
-  ASSERT_EQ(16u, Torus::computeId(address, widths, concentration));
+  ASSERT_EQ(16u, Torus::computeId(&address, widths, concentration));
 
   address = {1, 2, 0, 1};
-  ASSERT_EQ(17u, Torus::computeId(address, widths, concentration));
+  ASSERT_EQ(17u, Torus::computeId(&address, widths, concentration));
 
   address = {0, 1, 1, 1};
-  ASSERT_EQ(20u, Torus::computeId(address, widths, concentration));
+  ASSERT_EQ(20u, Torus::computeId(&address, widths, concentration));
 
   address = {1, 1, 1, 1};
-  ASSERT_EQ(21u, Torus::computeId(address, widths, concentration));
+  ASSERT_EQ(21u, Torus::computeId(&address, widths, concentration));
 }

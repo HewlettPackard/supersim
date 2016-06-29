@@ -52,7 +52,7 @@ Application::Application(const std::string& _name, const Component* _parent,
   remainingProcessors_ = 0;
   for (u32 t = 0; t < numTerminals(); t++) {
     std::vector<u32> address;
-    gSim->getNetwork()->translateIdToAddress(t, &address);
+    gSim->getNetwork()->translateTerminalIdToAddress(t, &address);
     std::string idStr = std::to_string(t / 2);
     if ((t & 0x1) == 0) {
       // even terminals are memory terminals

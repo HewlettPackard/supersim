@@ -42,7 +42,14 @@ class Network : public ::Network {
   u32 numInterfaces() const override;
   Router* getRouter(u32 _id) const override;
   Interface* getInterface(u32 _id) const override;
-  void translateIdToAddress(u32 _id, std::vector<u32>* _address) const override;
+  void translateTerminalIdToAddress(
+      u32 _id, std::vector<u32>* _address) const override;
+  u32 translateTerminalAddressToId(
+      const std::vector<u32>* _address) const override;
+  void translateRouterIdToAddress(
+      u32 _id, std::vector<u32>* _address) const override;
+  u32 translateRouterAddressToId(
+      const std::vector<u32>* _address) const override;
 
  protected:
   void collectChannels(std::vector<Channel*>* _channels) override;

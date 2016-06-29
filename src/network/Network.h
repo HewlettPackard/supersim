@@ -38,8 +38,14 @@ class Network : public Component {
   virtual u32 numInterfaces() const = 0;
   virtual Router* getRouter(u32 _id) const = 0;
   virtual Interface* getInterface(u32 _id) const = 0;
-  virtual void translateIdToAddress(u32 _id,
-                                    std::vector<u32>* _address) const = 0;
+  virtual void translateTerminalIdToAddress(
+      u32 _id, std::vector<u32>* _address) const = 0;
+  virtual u32 translateTerminalAddressToId(
+      const std::vector<u32>* _address) const = 0;
+  virtual void translateRouterIdToAddress(
+      u32 _id, std::vector<u32>* _address) const = 0;
+  virtual u32 translateRouterAddressToId(
+      const std::vector<u32>* _address) const = 0;
   u32 numVcs() const;
   MetadataHandler* getMetadataHandler() const;
 

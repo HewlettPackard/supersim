@@ -148,8 +148,16 @@ class CrossbarSchedulerTestClient : public CrossbarScheduler::Client,
 TEST(CrossbarScheduler, basic) {
   const u32 ALLOCS_PER_CLIENT = 100;
 
-  std::vector<std::pair<bool, bool>> styles = {
-    {true, true}, {true, false}, {false, false}};
+  std::vector<std::tuple<bool, bool, bool>> styles = {
+    // packet-buffer flow control
+    std::make_tuple(true, true, false),
+    // flit-buffer flow control
+    std::make_tuple(false, false, false),
+    // flit-buffer flow control with winner take all
+    std::make_tuple(false, true, true),
+    // packet-buffer flow control with packet interleaving
+    std::make_tuple(true, false, false)
+  };
 
   for (auto style : styles) {
     for (u32 C = 1; C < 16; C++) {
@@ -167,8 +175,9 @@ TEST(CrossbarScheduler, basic) {
           allocSettings["slip_latch"] = true;
           Json::Value schSettings;
           schSettings["allocator"] = allocSettings;
-          schSettings["packet_lock"] = style.first;
-          schSettings["idle_unlock"] = style.second;
+          schSettings["full_packet"] = std::get<0>(style);
+          schSettings["packet_lock"] = std::get<1>(style);
+          schSettings["idle_unlock"] = std::get<2>(style);
           CrossbarScheduler* xbarSch =
               new CrossbarScheduler("XbarSch", nullptr, C, V, P, schSettings);
           assert(xbarSch->numClients() == C);

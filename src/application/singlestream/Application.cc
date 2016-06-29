@@ -56,7 +56,7 @@ Application::Application(const std::string& _name, const Component* _parent,
   for (u32 t = 0; t < numTerminals(); t++) {
     std::string tname = "Terminal_" + std::to_string(t);
     std::vector<u32> address;
-    gSim->getNetwork()->translateIdToAddress(t, &address);
+    gSim->getNetwork()->translateTerminalIdToAddress(t, &address);
     StreamTerminal* terminal = new StreamTerminal(
         tname, this, t, address, this, _settings["terminal"]);
     setTerminal(t, terminal);

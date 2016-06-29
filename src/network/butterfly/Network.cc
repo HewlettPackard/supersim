@@ -175,7 +175,8 @@ Interface* Network::getInterface(u32 _id) const {
   return interfaces_.at(_id);
 }
 
-void Network::translateIdToAddress(u32 _id, std::vector<u32>* _address) const {
+void Network::translateTerminalIdToAddress(
+    u32 _id, std::vector<u32>* _address) const {
   _address->resize(numStages_);
   // work in reverse for little endian format
   for (u32 exp = 0, row = numStages_ - 1; exp < numStages_; exp++, row--) {
@@ -183,6 +184,23 @@ void Network::translateIdToAddress(u32 _id, std::vector<u32>* _address) const {
     _address->at(exp) = _id / divisor;
     _id %= divisor;
   }
+}
+
+u32 Network::translateTerminalAddressToId(
+    const std::vector<u32>* _address) const {
+  assert(false);  // TODO(nic): NOT YET IMPLEMENTED
+  return 0;
+}
+
+void Network::translateRouterIdToAddress(
+    u32 _id, std::vector<u32>* _address) const {
+  assert(false);  // TODO(nic): NOT YET IMPLEMENTED
+}
+
+u32 Network::translateRouterAddressToId(
+    const std::vector<u32>* _address) const {
+  assert(false);  // TODO(nic): NOT YET IMPLEMENTED
+  return 0;
 }
 
 void Network::collectChannels(std::vector<Channel*>* _channels) {

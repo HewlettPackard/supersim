@@ -54,7 +54,7 @@ void computeAddress(u32 _id, const std::vector<u32>& _widths,
   }
 }
 
-u32 computeId(const std::vector<u32>& _address, const std::vector<u32>& _widths,
+u32 computeId(const std::vector<u32>* _address, const std::vector<u32>& _widths,
               u32 _concentration) {
   u32 dimensions = _widths.size();
   std::vector<u32> coeff(dimensions + 1);
@@ -64,10 +64,10 @@ u32 computeId(const std::vector<u32>& _address, const std::vector<u32>& _widths,
   for (u32 idx = 0; idx < dimensions + 1; idx++) {
     coeff.at(idx) = prod;
     if (idx == 0) {
-      assert(_address.at(idx) < _concentration);
+      assert(_address->at(idx) < _concentration);
       prod *= _concentration;
     } else {
-      assert(_address.at(idx) < _widths.at(idx - 1));
+      assert(_address->at(idx) < _widths.at(idx - 1));
       prod *= _widths.at(idx - 1);
     }
   }
@@ -75,7 +75,7 @@ u32 computeId(const std::vector<u32>& _address, const std::vector<u32>& _widths,
   // compute dot product
   u32 sum = 0;
   for (u32 idx = 0; idx < dimensions + 1; idx++) {
-    sum += coeff.at(idx) * _address.at(idx);
+    sum += coeff.at(idx) * _address->at(idx);
   }
 
   return sum;

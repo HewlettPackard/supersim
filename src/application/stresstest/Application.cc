@@ -33,7 +33,7 @@ Application::Application(const std::string& _name, const Component* _parent,
   for (u32 t = 0; t < numTerminals(); t++) {
     std::string tname = "BlastTerminal_" + std::to_string(t);
     std::vector<u32> address;
-    gSim->getNetwork()->translateIdToAddress(t, &address);
+    gSim->getNetwork()->translateTerminalIdToAddress(t, &address);
     BlastTerminal* terminal = new BlastTerminal(tname, this, t, address, this,
                                                 _settings["blast_terminal"]);
     setTerminal(t, terminal);
