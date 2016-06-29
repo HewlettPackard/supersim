@@ -36,6 +36,7 @@
             "greater": false
           }
         },
+        "full_packet": false,
         "packet_lock": true,
         "idle_unlock": true
       },
@@ -78,6 +79,7 @@
             "greater": false
           }
         },
+        "full_packet": false,
         "packet_lock": true,
         "idle_unlock": true
       },
@@ -93,6 +95,7 @@
             "greater": false
           }
         },
+        "full_packet": false,
         "packet_lock": true,
         "idle_unlock": true
       }

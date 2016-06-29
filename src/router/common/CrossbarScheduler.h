@@ -79,7 +79,7 @@ class CrossbarScheduler : public Component {
   std::vector<Client*> clients_;
   std::vector<u32> clientRequestPorts_;
   std::vector<u32> clientRequestVcs_;
-  std::vector<bool> clientRequestTails_;  // request is a tail
+  std::vector<const Flit*> clientRequestFlits_;
 
   std::vector<u32> credits_;
   std::vector<u32> maxCredits_;
@@ -94,6 +94,7 @@ class CrossbarScheduler : public Component {
 
   Allocator* allocator_;
 
+  const bool fullPacket_;  // head packets need full packet downstream space
   const bool packetLock_;  // packets lock the channel
   const bool idleUnlock_;  // locks are deactivated when idle (others want)
 

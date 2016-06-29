@@ -21,6 +21,8 @@
 #include "allocator/AllocatorFactory.h"
 #include "types/Packet.h"
 
+static bool warningIssued = false;
+
 CrossbarScheduler::Client::Client() {}
 
 CrossbarScheduler::Client::~Client() {}
@@ -30,10 +32,19 @@ CrossbarScheduler::CrossbarScheduler(
     u32 _totalVcs, u32 _crossbarPorts, Json::Value _settings)
     : Component(_name, _parent), numClients_(_numClients),
       totalVcs_(_totalVcs), crossbarPorts_(_crossbarPorts),
+      fullPacket_(_settings["full_packet"].asBool()),
       packetLock_(_settings["packet_lock"].asBool()),
       idleUnlock_(_settings["idle_unlock"].asBool()) {
+  assert(!_settings["full_packet"].isNull());
   assert(!_settings["packet_lock"].isNull());
   assert(!_settings["idle_unlock"].isNull());
+  if (!warningIssued && !fullPacket_ && packetLock_ && !idleUnlock_) {
+    printf("**************************************************************\n"
+           "** WARNING!!!!!!! Packet-Channel Flit-Buffer Flow Control   **\n"
+           "** causes deadlock if VCs are being used to avoid deadlock. **\n"
+           "**************************************************************\n");
+    warningIssued = true;
+  }
   if (idleUnlock_) {
     assert(packetLock_);
   }
@@ -46,7 +57,7 @@ CrossbarScheduler::CrossbarScheduler(
   clients_.resize(numClients_, nullptr);
   clientRequestPorts_.resize(numClients_, U32_MAX);
   clientRequestVcs_.resize(numClients_, U32_MAX);
-  clientRequestTails_.resize(numClients_, false);
+  clientRequestFlits_.resize(numClients_, nullptr);
 
   // create the credit counters
   credits_.resize(totalVcs_, 0);
@@ -109,13 +120,14 @@ void CrossbarScheduler::request(u32 _client, u32 _port, u32 _vcIdx,
   assert(_client < numClients_);
   assert(clientRequestPorts_[_client] == U32_MAX);
   assert(clientRequestVcs_[_client] == U32_MAX);
+  assert(clientRequestFlits_[_client] == nullptr);
   assert(_vcIdx < totalVcs_);
   assert(_port < crossbarPorts_);
 
   // set request
   clientRequestPorts_[_client] = _port;
   clientRequestVcs_[_client] = _vcIdx;
-  clientRequestTails_[_client] = _flit->isTail();
+  clientRequestFlits_[_client] = _flit;
   anyRequests_[_port] = true;
   u64 idx = index(_client, _port);
   requests_[idx] = true;
@@ -180,14 +192,28 @@ void CrossbarScheduler::processEvent(void* _event, s32 _type) {
   // if required, run the allocator
   if (eventAction_ == EventAction::RUNALLOC) {
     // check credit counts for each request
-    //  when credits don't exist, disable the request
+    //  when credits aren't sufficient, disable the request
     for (u32 c = 0; c < numClients_; c++) {
       if (clientRequestPorts_[c] != U32_MAX) {
         u32 port = clientRequestPorts_[c];
         u32 vc = clientRequestVcs_[c];
         u64 idx = index(c, port);
-        if (requests_[idx] && credits_[vc] == 0) {
-          requests_[idx] = false;
+
+        if (fullPacket_) {
+          // packet-buffer flow control
+          const Flit* flit = clientRequestFlits_[c];
+          if (flit->isHead()) {
+            u32 packetSize = flit->getPacket()->numFlits();
+            assert(maxCredits_[vc] >= packetSize);  // buffer is large enough
+            if (requests_[idx] && credits_[vc] < packetSize) {
+              requests_[idx] = false;
+            }
+          }
+        } else {
+          // flit-buffer flow control
+          if (requests_[idx] && credits_[vc] == 0) {
+            requests_[idx] = false;
+          }
         }
       }
     }
@@ -211,7 +237,7 @@ void CrossbarScheduler::processEvent(void* _event, s32 _type) {
             }
 
             // deactivate the port lock if the request is for a tail flit
-            if (clientRequestTails_[owner]) {
+            if (clientRequestFlits_[owner]->isTail()) {
               portLocks_[p] = U32_MAX;
             }
           } else if (idleUnlock_) {
@@ -241,6 +267,7 @@ void CrossbarScheduler::processEvent(void* _event, s32 _type) {
         clientRequestPorts_[c] = U32_MAX;
         u32 vc = clientRequestVcs_[c];
         clientRequestVcs_[c] = U32_MAX;
+        clientRequestFlits_[c] = nullptr;
         u64 idx = index(c, port);
 
         u32 granted = U32_MAX;

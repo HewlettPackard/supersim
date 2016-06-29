@@ -33,6 +33,7 @@
             "type": "lslp"
           }
         },
+        "full_packet": false,
         "packet_lock": false,
         "idle_unlock": false
       },
@@ -73,6 +74,7 @@
             "type": "lslp"
           }
         },
+        "full_packet": false,
         "packet_lock": false,
         "idle_unlock": false
       }
