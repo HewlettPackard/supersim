@@ -19,7 +19,6 @@
 #include <json/json.h>
 #include <prim/prim.h>
 
-#include <stack>
 #include <string>
 #include <vector>
 
@@ -48,6 +47,7 @@ class CongestionStatus : public Component {
 
   const u32 totalVcs_;
   const u32 latency_;
+  const u32 granularity_;
   std::vector<u32> maximums_;
   std::vector<u32> counts_;
 };

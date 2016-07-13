@@ -16,6 +16,7 @@
 #include "router/common/CongestionStatus.h"
 
 #include <cassert>
+#include <cmath>
 
 const s32 INCR = 0x50;
 const s32 DECR = 0xAF;
@@ -24,8 +25,11 @@ CongestionStatus::CongestionStatus(
     const std::string& _name, const Component* _parent, u32 _totalVcs,
     Json::Value _settings)
     : Component(_name, _parent), totalVcs_(_totalVcs),
-      latency_(_settings["latency"].asUInt()) {
+      latency_(_settings["latency"].asUInt()),
+      granularity_(_settings["granularity"].asUInt()) {
   assert(latency_ > 0);
+  assert(!_settings["granularity"].isNull());
+
   maximums_.resize(totalVcs_);
   counts_.resize(totalVcs_);
 }
@@ -48,7 +52,11 @@ void CongestionStatus::decrement(u32 _vcIdx) {
 
 f64 CongestionStatus::status(u32 _vcIdx) const {
   assert(gSim->epsilon() == 0);
-  return (f64)counts_.at(_vcIdx) / (f64)maximums_.at(_vcIdx);
+  f64 value = (f64)counts_.at(_vcIdx) / (f64)maximums_.at(_vcIdx);
+  if (granularity_ > 0) {
+    value = round(value * granularity_) / granularity_;
+  }
+  return value;
 }
 
 void CongestionStatus::processEvent(void* _event, s32 _type) {

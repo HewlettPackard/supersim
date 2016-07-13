@@ -46,7 +46,8 @@
       "architecture": "input_queued",
       "num_ports": 4,
       "congestion_status": {
-        "latency": 1
+        "latency": 1,
+        "granularity": 0
       },
       "input_queue_depth": 16,
       "vca_swa_wait": false,
