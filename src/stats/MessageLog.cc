@@ -15,6 +15,8 @@
  */
 #include "stats/MessageLog.h"
 
+#include <cassert>
+
 #include <string>
 #include <sstream>
 
@@ -22,7 +24,9 @@
 #include "types/Flit.h"
 
 MessageLog::MessageLog(Json::Value _settings)
-    : FileLog(_settings) {}
+  : outFile_(_settings["file"].asString()) {
+  assert(!_settings["file"].isNull());
+}
 
 MessageLog::~MessageLog() {}
 
@@ -49,17 +53,17 @@ void MessageLog::logMessage(const Message* _message) {
   }
   ss << "-M\n";
 
-  write(ss.str());
+  outFile_.write(ss.str());
 }
 
 void MessageLog::startTransaction(u64 _trans) {
   std::stringstream ss;
   ss << "+T" << ',' << _trans << '\n';
-  write(ss.str());
+  outFile_.write(ss.str());
 }
 
 void MessageLog::endTransaction(u64 _trans) {
   std::stringstream ss;
   ss << "-T" << ',' << _trans << '\n';
-  write(ss.str());
+  outFile_.write(ss.str());
 }

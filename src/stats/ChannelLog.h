@@ -16,22 +16,22 @@
 #ifndef STATS_CHANNELLOG_H_
 #define STATS_CHANNELLOG_H_
 
+#include <fio/OutFile.h>
 #include <json/json.h>
 #include <prim/prim.h>
 
 #include <sstream>
-#include <string>
 
 #include "network/Channel.h"
-#include "stats/FileLog.h"
 
-class ChannelLog : public FileLog {
+class ChannelLog {
  public:
   explicit ChannelLog(Json::Value _settings);
   ~ChannelLog();
   void logChannel(const Channel* _channel);
 
  private:
+  fio::OutFile outFile_;
   std::stringstream ss_;
 };
 

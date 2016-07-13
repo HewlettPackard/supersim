@@ -51,9 +51,10 @@ def main(args):
   rm = taskrun.ResourceManager(
     taskrun.CounterResource('cpu', 9999, total_cpus),
     taskrun.MemoryResource('mem', 9999, total_mem))
-  ob = taskrun.VerboseObserver()
+  vob = taskrun.VerboseObserver()
+  cob = taskrun.FileCleanupObserver()
   tm = taskrun.TaskManager(resource_manager=rm,
-                           observer=ob,
+                           observers=[vob,cob],
                            failure_mode='passive_fail')
 
   # find all files

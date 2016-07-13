@@ -16,15 +16,14 @@
 #ifndef STATS_RATELOG_H_
 #define STATS_RATELOG_H_
 
+#include <fio/OutFile.h>
 #include <json/json.h>
 #include <prim/prim.h>
 
 #include <sstream>
 #include <string>
 
-#include "stats/FileLog.h"
-
-class RateLog : public FileLog {
+class RateLog {
  public:
   explicit RateLog(Json::Value _settings);
   ~RateLog();
@@ -32,6 +31,7 @@ class RateLog : public FileLog {
                 f64 _supplyRate, f64 _injectionRate, f64 _ejectionRate);
 
  private:
+  fio::OutFile outFile_;
   std::stringstream ss_;
 };
 

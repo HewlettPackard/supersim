@@ -16,18 +16,22 @@
 #ifndef STATS_MESSAGELOG_H_
 #define STATS_MESSAGELOG_H_
 
+#include <fio/OutFile.h>
 #include <json/json.h>
+#include <prim/prim.h>
 
-#include "stats/FileLog.h"
 #include "types/Message.h"
 
-class MessageLog : public FileLog {
+class MessageLog {
  public:
   explicit MessageLog(Json::Value _settings);
   ~MessageLog();
   void logMessage(const Message* _message);
   void startTransaction(u64 _trans);
   void endTransaction(u64 _trans);
+
+ private:
+  fio::OutFile outFile_;
 };
 
 #endif  // STATS_MESSAGELOG_H_
