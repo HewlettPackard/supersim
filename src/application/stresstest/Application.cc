@@ -28,7 +28,10 @@ namespace StressTest {
 Application::Application(const std::string& _name, const Component* _parent,
                          MetadataHandler* _metadataHandler,
                          Json::Value _settings)
-    : ::Application(_name, _parent, _metadataHandler, _settings) {
+    : ::Application(_name, _parent, _metadataHandler, _settings),
+      killFast_(_settings["kill_fast"].asBool()) {
+  assert(!_settings["kill_fast"].isNull());
+
   // all terminals are the same
   for (u32 t = 0; t < numTerminals(); t++) {
     std::string tname = "BlastTerminal_" + std::to_string(t);
@@ -76,6 +79,11 @@ void Application::terminalSaturated(u32 _id) {
   f64 percentSaturated = saturatedTerminals_ / static_cast<f64>(numTerminals());
   if (percentSaturated > (1.0 - warmupThreshold_)) {
     warmupComplete_ = true;
+    if (killFast_) {
+      printf("Saturation threshold %f reached, initiating kill fast\n",
+             1.0 - warmupThreshold_);
+      exit(0);
+    }
     printf("Saturation threshold %f reached, now draining the network\n",
            1.0 - warmupThreshold_);
     for (u32 idx = 0; idx < numTerminals(); idx++) {

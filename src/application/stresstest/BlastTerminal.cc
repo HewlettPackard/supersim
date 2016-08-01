@@ -20,6 +20,8 @@
 #include <cassert>
 #include <cmath>
 
+#include <algorithm>
+
 #include "application/stresstest/Application.h"
 #include "network/Network.h"
 #include "stats/MessageLog.h"
@@ -145,9 +147,11 @@ void BlastTerminal::messageExitedNetwork(Message* _message) {
       // run the fast fail logic for early saturation detection
       if (enrouteSampleTimes_.size() == warmupWindow_) {
         if (fastFailSample_ == U32_MAX) {
-          fastFailSample_ = mut::arithmeticMean<u64>(enrouteSampleTimes_);
+          fastFailSample_ = *std::max_element(enrouteSampleValues_.begin(),
+                                              enrouteSampleValues_.end());
+          dbgprintf("fast fail sample = %u", fastFailSample_);
         } else if (flits > (fastFailSample_ * 3)) {
-          printf("fast fail detected\n");
+          dbgprintf("fast fail detected");
           saturated = true;
         }
       }

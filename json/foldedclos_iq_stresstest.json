@@ -89,6 +89,7 @@
     "type": "stress_test",
     "max_injection_rate": 0.5,
     "warmup_threshold": 0.99,
+    "kill_fast": false,
     "blast_terminal": {
       "num_messages": 500,
       "min_message_size": 1,

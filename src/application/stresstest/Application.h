@@ -39,6 +39,7 @@ class Application : public ::Application {
   f64 percentComplete() const override;
 
  private:
+  const bool killFast_;
   u32 warmedTerminals_;
   u32 saturatedTerminals_;
   bool warmupComplete_;
