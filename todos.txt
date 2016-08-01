@@ -1,6 +1,3 @@
-Winner take all switch allocation
--packet based, implement in crossbar scheduler
-
 Traditional multi-VC 1x input speedup allocation
 -allocator different (how to make general policy?)
 
@@ -17,12 +14,6 @@ Automatic VC quantity calculation
 -packet/protocol class
 -routing class
 -virtual links
-
-Adaptive Routing
--routing bits in packet
--move "routing" in JSON to "network"
--interface routing function, or option in regular one
--router provides link congestion state
 
 CustomPermutationTrafficPattern
 -take a mapping from the config file (external tool for generation)
