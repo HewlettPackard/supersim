@@ -21,6 +21,7 @@
 #include <cmath>
 
 #include "interface/InterfaceFactory.h"
+#include "network/cube/util.h"
 #include "network/torus/InjectionAlgorithmFactory.h"
 #include "network/torus/RoutingAlgorithmFactory.h"
 #include "network/torus/util.h"
@@ -240,23 +241,22 @@ Interface* Network::getInterface(u32 _id) const {
 
 void Network::translateTerminalIdToAddress(
     u32 _id, std::vector<u32>* _address) const {
-  computeAddress(_id, dimensionWidths_, concentration_, _address);
+  Cube::computeTerminalAddress(_id, dimensionWidths_, concentration_, _address);
 }
 
 u32 Network::translateTerminalAddressToId(
     const std::vector<u32>* _address) const {
-  return computeId(_address, dimensionWidths_, concentration_);
+  return Cube::computeTerminalId(_address, dimensionWidths_, concentration_);
 }
 
 void Network::translateRouterIdToAddress(
     u32 _id, std::vector<u32>* _address) const {
-  assert(false);  // TODO(nic): NOT YET IMPLEMENTED
+  Cube::computeRouterAddress(_id, dimensionWidths_, _address);
 }
 
 u32 Network::translateRouterAddressToId(
     const std::vector<u32>* _address) const {
-  assert(false);  // TODO(nic): NOT YET IMPLEMENTED
-  return 0;
+  return Cube::computeRouterId(_address, dimensionWidths_);
 }
 
 void Network::collectChannels(std::vector<Channel*>* _channels) {

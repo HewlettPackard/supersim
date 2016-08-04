@@ -13,20 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_TORUS_UTIL_H_
-#define NETWORK_TORUS_UTIL_H_
+#ifndef NETWORK_CUBE_UTIL_H_
+#define NETWORK_CUBE_UTIL_H_
 
 #include <prim/prim.h>
 
 #include <vector>
 
-namespace Torus {
+namespace Cube {
 
-// This function determines the dimension correspondance of an input port.
-//  This returns U32_MAX for terminal ports.
-u32 computeInputPortDim(const std::vector<u32>& _dimensionWidths,
-                        u32 _concentration, u32 _inputPort);
+void computeTerminalAddress(u32 _id, const std::vector<u32>& _widths,
+                            u32 _concentration, std::vector<u32>* _address);
 
-}  // namespace Torus
+u32 computeTerminalId(const std::vector<u32>* _address,
+                      const std::vector<u32>& _widths,
+                      u32 _concentration);
 
-#endif  // NETWORK_TORUS_UTIL_H_
+void computeRouterAddress(const u32 _id, const std::vector<u32>& _widths,
+                          std::vector<u32>* _address);
+
+u32 computeRouterId(const std::vector<u32>* _address,
+                    const std::vector<u32>& _widths);
+
+}  // namespace Cube
+
+#endif  // NETWORK_CUBE_UTIL_H_

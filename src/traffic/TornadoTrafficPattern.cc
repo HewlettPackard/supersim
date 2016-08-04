@@ -19,7 +19,7 @@
 
 #include <vector>
 
-#include "network/torus/util.h"
+#include "network/cube/util.h"
 
 TornadoTrafficPattern::TornadoTrafficPattern(
     const std::string& _name, const Component* _parent,
@@ -40,7 +40,7 @@ TornadoTrafficPattern::TornadoTrafficPattern(
 
   // get self as a vector address
   std::vector<u32> addr;
-  Torus::computeAddress(_self, widths, concentration, &addr);
+  Cube::computeTerminalAddress(_self, widths, concentration, &addr);
 
   // compute the tornado destination vector address
   for (u32 dim = 0; dim < dimensions; dim++) {
@@ -50,7 +50,7 @@ TornadoTrafficPattern::TornadoTrafficPattern(
   }
 
   // compute the tornado destination id
-  dest_ = Torus::computeId(&addr, widths, concentration);
+  dest_ = Cube::computeTerminalId(&addr, widths, concentration);
 }
 
 TornadoTrafficPattern::~TornadoTrafficPattern() {}

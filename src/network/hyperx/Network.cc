@@ -21,6 +21,7 @@
 #include <cmath>
 
 #include "interface/InterfaceFactory.h"
+#include "network/cube/util.h"
 #include "network/hyperx/InjectionAlgorithmFactory.h"
 #include "network/hyperx/RoutingAlgorithmFactory.h"
 #include "router/RouterFactory.h"
@@ -238,35 +239,22 @@ Interface* Network::getInterface(u32 _id) const {
 
 void Network::translateTerminalIdToAddress(
     u32 _id, std::vector<u32>* _address) const {
-  _address->resize(dimensions_ + 1);
-  // addresses are in little endian format
-  u32 mod, div;
-  mod = _id % concentration_;
-  div = _id / concentration_;
-  _address->at(0) = mod;
-  for (u32 dim = 0; dim < dimensions_; dim++) {
-    u32 dimWidth = dimensionWidths_.at(dim);
-    mod = div % dimWidth;
-    div = div / dimWidth;
-    _address->at(dim + 1) = mod;
-  }
+  Cube::computeTerminalAddress(_id, dimensionWidths_, concentration_, _address);
 }
 
 u32 Network::translateTerminalAddressToId(
     const std::vector<u32>* _address) const {
-  assert(false);  // TODO(michael): NOT YET IMPLEMENTED
-  return 0;
+  return Cube::computeTerminalId(_address, dimensionWidths_, concentration_);
 }
 
 void Network::translateRouterIdToAddress(
     u32 _id, std::vector<u32>* _address) const {
-  assert(false);  // TODO(michael): NOT YET IMPLEMENTED
+  Cube::computeRouterAddress(_id, dimensionWidths_, _address);
 }
 
 u32 Network::translateRouterAddressToId(
     const std::vector<u32>* _address) const {
-  assert(false);  // TODO(michael): NOT YET IMPLEMENTED
-  return 0;
+  return Cube::computeRouterId(_address, dimensionWidths_);
 }
 
 void Network::collectChannels(std::vector<Channel*>* _channels) {
