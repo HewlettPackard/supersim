@@ -13,22 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "traffic/BitReverseTrafficPattern.h"
+#ifndef TRAFFIC_DIMCOMPLEMENTREVERSETRAFFICPATTERN_H_
+#define TRAFFIC_DIMCOMPLEMENTREVERSETRAFFICPATTERN_H_
 
-#include <bits/bits.h>
+#include <json/json.h>
+#include <prim/prim.h>
 
-#include <cassert>
+#include <string>
 
-BitReverseTrafficPattern::BitReverseTrafficPattern(
-    const std::string& _name, const Component* _parent,
-    u32 _numTerminals, u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {
-  assert(bits::isPow2(numTerminals));
-  dest_ = bits::reverse<u32>(self, bits::ceilLog2(numTerminals));
-}
+#include "traffic/TrafficPattern.h"
 
-BitReverseTrafficPattern::~BitReverseTrafficPattern() {}
+class DimComplementReverseTrafficPattern : public TrafficPattern {
+ public:
+  DimComplementReverseTrafficPattern(
+      const std::string& _name, const Component* _parent, u32 _numTerminals,
+      u32 _self, Json::Value _settings);
+  ~DimComplementReverseTrafficPattern();
 
-u32 BitReverseTrafficPattern::nextDestination() {
-  return dest_;
-}
+  u32 nextDestination() override;
+
+ private:
+  u32 dest_;
+};
+
+#endif  // TRAFFIC_DIMCOMPLEMENTREVERSETRAFFICPATTERN_H_

@@ -13,18 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "traffic/BitPermutationTrafficPattern.h"
+#include "traffic/BitTransposeTrafficPattern.h"
 
 #include <bits/bits.h>
 
 #include <cassert>
 
-BitPermutationTrafficPattern::BitPermutationTrafficPattern(
+BitTransposeTrafficPattern::BitTransposeTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
-    : PermutationTrafficPattern(_name, _parent, _numTerminals, _self,
-                                _settings) {
+    : TrafficPattern(_name, _parent, _numTerminals, _self) {
   assert(bits::isPow2(numTerminals));
+
+  u32 bitsNum = bits::ceilLog2(numTerminals);
+  assert(bitsNum % 2 == 0);
+  u32 bitsNumHalf = bitsNum / 2;
+
+  u32 left = _self >> bitsNumHalf;
+  u32 right = _self & ((1 << bitsNumHalf) - 1);
+  dest_ = (right << bitsNumHalf) | left;
 }
 
-BitPermutationTrafficPattern::~BitPermutationTrafficPattern() {}
+BitTransposeTrafficPattern::~BitTransposeTrafficPattern() {}
+
+u32 BitTransposeTrafficPattern::nextDestination() {
+  return dest_;
+}

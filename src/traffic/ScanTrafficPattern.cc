@@ -20,8 +20,10 @@
 ScanTrafficPattern::ScanTrafficPattern(
     const std::string& _name, const Component* _parent, u32 _numTerminals,
     u32 _self, Json::Value _settings)
-    : AlternatingTrafficPattern(_name, _parent, _numTerminals, _self,
-                                _settings) {
+    : TrafficPattern(_name, _parent, _numTerminals, _self) {
+  assert(_settings.isMember("send_to_self"));
+  sendToSelf_ = _settings["send_to_self"].asBool();
+
   // set the direction of scan
   assert(_settings.isMember("direction"));
   std::string dir = _settings["direction"].asString();
@@ -42,11 +44,11 @@ ScanTrafficPattern::ScanTrafficPattern(
       (_settings["initial"].asString() == "random")) {
     do {
       next_ = gSim->rnd.nextU64(0, numTerminals - 1);
-    } while (!sendToSelf && next_ == self);
+    } while (!sendToSelf_ && next_ == self);
   } else if ((_settings["initial"].isUInt()) &&
              (_settings["initial"].asUInt() < numTerminals)) {
     next_ = _settings["initial"].asUInt();
-    if (next_ == self && !sendToSelf) {
+    if (next_ == self && !sendToSelf_) {
       advance();
       assert(next_ != self);  // is this even possible?
     }
@@ -62,7 +64,7 @@ u32 ScanTrafficPattern::nextDestination() {
   u32 dest = next_;
   do {
     advance();
-  } while (!sendToSelf && next_ == self);
+  } while (!sendToSelf_ && next_ == self);
   return dest;
 }
 

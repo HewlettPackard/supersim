@@ -18,8 +18,7 @@
 RandomExchangeTrafficPattern::RandomExchangeTrafficPattern(
     const std::string& _name, const Component* _parent, u32 _numTerminals,
     u32 _self, Json::Value _settings)
-    : AlternatingTrafficPattern(_name, _parent, _numTerminals, _self,
-                                _settings) {}
+    : TrafficPattern(_name, _parent, _numTerminals, _self) {}
 
 RandomExchangeTrafficPattern::~RandomExchangeTrafficPattern() {}
 

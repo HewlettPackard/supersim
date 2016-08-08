@@ -22,8 +22,8 @@
 BitRotateTrafficPattern::BitRotateTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
-    : BitPermutationTrafficPattern(_name, _parent, _numTerminals, _self,
-                                   _settings) {
+    : TrafficPattern(_name, _parent, _numTerminals, _self) {
+  assert(bits::isPow2(numTerminals));
   assert(_settings.isMember("direction"));
   assert(_settings["direction"].isString());
   std::string dir = _settings["direction"].asString();

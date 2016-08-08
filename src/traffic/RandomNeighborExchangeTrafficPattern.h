@@ -13,22 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef TRAFFIC_BITPERMUTATIONTRAFFICPATTERN_H_
-#define TRAFFIC_BITPERMUTATIONTRAFFICPATTERN_H_
+#ifndef TRAFFIC_RANDOMNEIGHBOREXCHANGETRAFFICPATTERN_H_
+#define TRAFFIC_RANDOMNEIGHBOREXCHANGETRAFFICPATTERN_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>
+#include <vector>
 
-#include "traffic/PermutationTrafficPattern.h"
+#include "traffic/TrafficPattern.h"
 
-class BitPermutationTrafficPattern : public PermutationTrafficPattern {
+class RandomNeighborExchangeTrafficPattern : public TrafficPattern {
  public:
-  BitPermutationTrafficPattern(
+  RandomNeighborExchangeTrafficPattern(
       const std::string& _name, const Component* _parent, u32 _numTerminals,
       u32 _self, Json::Value _settings);
-  virtual ~BitPermutationTrafficPattern();
+
+  ~RandomNeighborExchangeTrafficPattern();
+
+  u32 nextDestination() override;
+
+ private:
+  std::vector<u32> dstVect_;
 };
 
-#endif  // TRAFFIC_BITPERMUTATIONTRAFFICPATTERN_H_
+#endif  // TRAFFIC_RANDOMNEIGHBOREXCHANGETRAFFICPATTERN_H_

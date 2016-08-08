@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef TRAFFIC_PERMUTATIONTRAFFICPATTERN_H_
-#define TRAFFIC_PERMUTATIONTRAFFICPATTERN_H_
+#ifndef TRAFFIC_BITTRANSPOSETRAFFICPATTERN_H_
+#define TRAFFIC_BITTRANSPOSETRAFFICPATTERN_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -23,12 +23,17 @@
 
 #include "traffic/TrafficPattern.h"
 
-class PermutationTrafficPattern : public TrafficPattern {
+class BitTransposeTrafficPattern : public TrafficPattern {
  public:
-  PermutationTrafficPattern(const std::string& _name, const Component* _parent,
-                            u32 _numTerminals, u32 _self,
-                            Json::Value _settings);
-  virtual ~PermutationTrafficPattern();
+  BitTransposeTrafficPattern(
+      const std::string& _name, const Component* _parent, u32 _numTerminals,
+      u32 _self, Json::Value _settings);
+  ~BitTransposeTrafficPattern();
+
+  u32 nextDestination() override;
+
+ private:
+  u32 dest_;
 };
 
-#endif  // TRAFFIC_PERMUTATIONTRAFFICPATTERN_H_
+#endif  // TRAFFIC_BITTRANSPOSETRAFFICPATTERN_H_

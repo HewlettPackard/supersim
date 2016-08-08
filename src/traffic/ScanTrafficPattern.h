@@ -22,9 +22,9 @@
 #include <string>
 
 #include "event/Component.h"
-#include "traffic/AlternatingTrafficPattern.h"
+#include "traffic/TrafficPattern.h"
 
-class ScanTrafficPattern : public AlternatingTrafficPattern {
+class ScanTrafficPattern : public TrafficPattern {
  public:
   ScanTrafficPattern(const std::string& _name, const Component* _parent,
                      u32 _numTerminals, u32 _self, Json::Value _settings);
@@ -36,6 +36,7 @@ class ScanTrafficPattern : public AlternatingTrafficPattern {
 
   bool ascend_;
   u32 next_;
+  bool sendToSelf_;
 };
 
 #endif  // TRAFFIC_SCANTRAFFICPATTERN_H_

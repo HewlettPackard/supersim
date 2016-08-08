@@ -15,11 +15,15 @@
  */
 #include "traffic/UniformRandomTrafficPattern.h"
 
+#include <cassert>
+
 UniformRandomTrafficPattern::UniformRandomTrafficPattern(
     const std::string& _name, const Component* _parent, u32 _numTerminals,
     u32 _self, Json::Value _settings)
-    : AlternatingTrafficPattern(_name, _parent, _numTerminals, _self,
-                                _settings) {}
+    : TrafficPattern(_name, _parent, _numTerminals, _self) {
+  assert(_settings.isMember("send_to_self"));
+  sendToSelf_ = _settings["send_to_self"].asBool();
+    }
 
 UniformRandomTrafficPattern::~UniformRandomTrafficPattern() {}
 
@@ -27,6 +31,6 @@ u32 UniformRandomTrafficPattern::nextDestination() {
   u32 dest;
   do {
     dest = gSim->rnd.nextU64(0, numTerminals - 1);
-  } while (!sendToSelf && dest == self);
+  } while (!sendToSelf_ && dest == self);
   return dest;
 }

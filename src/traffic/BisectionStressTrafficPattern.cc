@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "traffic/TornadoTrafficPattern.h"
+#include "traffic/BisectionStressTrafficPattern.h"
 
 #include <cassert>
 
@@ -21,7 +21,7 @@
 
 #include "network/cube/util.h"
 
-TornadoTrafficPattern::TornadoTrafficPattern(
+BisectionStressTrafficPattern::BisectionStressTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
     : TrafficPattern(_name, _parent, _numTerminals, _self) {
@@ -37,35 +37,53 @@ TornadoTrafficPattern::TornadoTrafficPattern(
   }
   const u32 concentration = _settings["concentration"].asUInt();
 
-  std::vector<bool> dimMask(dimensions, false);
-  if (_settings.isMember("enabled_dimensions") &&
-      _settings["enabled_dimensions"].isArray()) {
-    for (u32 dim = 0;  dim < dimensions; ++dim) {
-      dimMask.at(dim) = _settings["enabled_dimensions"][dim].asBool();
-    }
-  } else {
-    dimMask.at(0) = true;
+  assert(_settings.isMember("mode") &&
+         _settings["mode"].isString());
+  for (u32 i = 0; i < dimensions; i++) {
+    assert(widths.at(i) % 2 == 0);
   }
 
   // get self as a vector address
   std::vector<u32> addr;
   Cube::computeTerminalAddress(_self, widths, concentration, &addr);
 
-  // compute the tornado destination vector address
+  u32 nodeGroup = 0;
+  if (_settings["mode"] == "parity") {
+    assert(concentration % 2 == 0);
+    nodeGroup = addr.at(0) % 2;
+  } else if (_settings["mode"] == "half") {
+    assert(widths.at(dimensions - 1) % 2 == 0);
+    nodeGroup = _self < _numTerminals / 2 ? 0 : 1;
+  } else if (_settings["mode"] == "quadrant") {
+    u32 paritySum = 0;
+    for (u32 i = 0; i < dimensions; i++) {
+      paritySum = addr.at(i+1) < (widths.at(i) / 2) ? paritySum : paritySum + 1;
+    }
+    nodeGroup = paritySum % 2;
+  } else {
+    fprintf(stderr, "Unknown bisection stress mode\n");
+    assert(false);
+  }
+
   for (u32 dim = 0; dim < dimensions; dim++) {
-    if (dimMask.at(dim)) {
-      u32 dimOffset = (widths.at(dim) - 1) / 2;
-      u32 idx = dim + 1;
-      addr.at(idx) = (addr.at(idx) + dimOffset) % widths.at(dim);
+    if (nodeGroup > 0) {
+      // Send in Exchange manner half width across the bisection
+      if (addr.at(dim + 1) < (widths.at(dim) / 2)) {
+        addr.at(dim + 1) += (widths.at(dim) + 1) / 2;
+      } else if (addr.at(dim + 1) > ((widths.at(dim) - 1) / 2)) {
+        addr.at(dim + 1) -= (widths.at(dim) + 1) / 2;
+      }
+    } else {
+      addr.at(dim + 1)  = widths.at(dim) - 1 - addr.at(dim + 1);
     }
   }
 
-  // compute the tornado destination id
+  // compute the destination id
   dest_ = Cube::computeTerminalId(&addr, widths, concentration);
 }
 
-TornadoTrafficPattern::~TornadoTrafficPattern() {}
+BisectionStressTrafficPattern:: ~BisectionStressTrafficPattern() {}
 
-u32 TornadoTrafficPattern::nextDestination() {
+u32 BisectionStressTrafficPattern::nextDestination() {
   return dest_;
 }

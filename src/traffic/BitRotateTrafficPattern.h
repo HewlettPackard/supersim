@@ -21,9 +21,9 @@
 
 #include <string>
 
-#include "traffic/BitPermutationTrafficPattern.h"
+#include "traffic/TrafficPattern.h"
 
-class BitRotateTrafficPattern : public BitPermutationTrafficPattern {
+class BitRotateTrafficPattern : public TrafficPattern {
  public:
   BitRotateTrafficPattern(
       const std::string& _name, const Component* _parent, u32 _numTerminals,

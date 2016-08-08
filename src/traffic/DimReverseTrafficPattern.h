@@ -13,13 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "traffic/PermutationTrafficPattern.h"
+#ifndef TRAFFIC_DIMREVERSETRAFFICPATTERN_H_
+#define TRAFFIC_DIMREVERSETRAFFICPATTERN_H_
 
-#include <cassert>
+#include <json/json.h>
+#include <prim/prim.h>
 
-PermutationTrafficPattern::PermutationTrafficPattern(
-    const std::string& _name, const Component* _parent,
-    u32 _numTerminals, u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {}
+#include <string>
 
-PermutationTrafficPattern::~PermutationTrafficPattern() {}
+#include "traffic/TrafficPattern.h"
+
+class DimReverseTrafficPattern : public TrafficPattern {
+ public:
+  DimReverseTrafficPattern(
+      const std::string& _name, const Component* _parent, u32 _numTerminals,
+      u32 _self, Json::Value _settings);
+  ~DimReverseTrafficPattern();
+
+  u32 nextDestination() override;
+
+ private:
+  u32 dest_;
+};
+
+#endif  // TRAFFIC_DIMREVERSETRAFFICPATTERN_H_

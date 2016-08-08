@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "traffic/TornadoTrafficPattern.h"
+#include "traffic/NeighborTrafficPattern.h"
 
 #include <cassert>
 
@@ -21,7 +21,7 @@
 
 #include "network/cube/util.h"
 
-TornadoTrafficPattern::TornadoTrafficPattern(
+NeighborTrafficPattern::NeighborTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
     : TrafficPattern(_name, _parent, _numTerminals, _self) {
@@ -47,25 +47,38 @@ TornadoTrafficPattern::TornadoTrafficPattern(
     dimMask.at(0) = true;
   }
 
+  assert(_settings.isMember("direction"));
+  assert(_settings["direction"].isString());
+  std::string dir = _settings["direction"].asString();
+
   // get self as a vector address
   std::vector<u32> addr;
   Cube::computeTerminalAddress(_self, widths, concentration, &addr);
 
-  // compute the tornado destination vector address
+  // compute the destination vector address
   for (u32 dim = 0; dim < dimensions; dim++) {
     if (dimMask.at(dim)) {
-      u32 dimOffset = (widths.at(dim) - 1) / 2;
+      u32 dimOffset;
+      if (dir == "right") {
+        dimOffset = 1;
+      } else if (dir == "left") {
+        dimOffset = widths.at(dim) - 1;
+      } else {
+        fprintf(stderr, "invalid direction spec: %s\n", dir.c_str());
+        assert(false);
+      }
+
       u32 idx = dim + 1;
       addr.at(idx) = (addr.at(idx) + dimOffset) % widths.at(dim);
     }
   }
 
-  // compute the tornado destination id
+  // compute the  destination id
   dest_ = Cube::computeTerminalId(&addr, widths, concentration);
 }
 
-TornadoTrafficPattern::~TornadoTrafficPattern() {}
+NeighborTrafficPattern::~NeighborTrafficPattern() {}
 
-u32 TornadoTrafficPattern::nextDestination() {
+u32 NeighborTrafficPattern::nextDestination() {
   return dest_;
 }

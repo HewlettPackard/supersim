@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "traffic/TornadoTrafficPattern.h"
+#include "traffic/DimTransposeTrafficPattern.h"
 
 #include <cassert>
 
@@ -21,7 +21,7 @@
 
 #include "network/cube/util.h"
 
-TornadoTrafficPattern::TornadoTrafficPattern(
+DimTransposeTrafficPattern::DimTransposeTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
     : TrafficPattern(_name, _parent, _numTerminals, _self) {
@@ -31,41 +31,55 @@ TornadoTrafficPattern::TornadoTrafficPattern(
   assert(_settings.isMember("concentration") &&
          _settings["concentration"].isUInt());
   const u32 dimensions = _settings["dimensions"].size();
+  assert(dimensions > 1);
   std::vector<u32> widths(dimensions);
   for (u32 i = 0; i < dimensions; i++) {
     widths.at(i) = _settings["dimensions"][i].asUInt();
   }
   const u32 concentration = _settings["concentration"].asUInt();
 
+  std::vector<u32> workingDims(2);
   std::vector<bool> dimMask(dimensions, false);
   if (_settings.isMember("enabled_dimensions") &&
       _settings["enabled_dimensions"].isArray()) {
+    u32 trueCntr = 0;
     for (u32 dim = 0;  dim < dimensions; ++dim) {
       dimMask.at(dim) = _settings["enabled_dimensions"][dim].asBool();
+      if (dimMask.at(dim) == true) {
+        trueCntr++;
+      }
     }
+    assert(trueCntr == 2);
   } else {
     dimMask.at(0) = true;
+    dimMask.at(1) = true;
   }
+
+  u32 idx = 0;
+  for (u32 dim = 0;  dim < dimensions; ++dim) {
+    if (dimMask.at(dim) == true) {
+      workingDims.at(idx) = dim;
+      idx++;
+    }
+  }
+  assert(widths.at(workingDims.at(0)) == widths.at(workingDims.at(1)));
 
   // get self as a vector address
   std::vector<u32> addr;
   Cube::computeTerminalAddress(_self, widths, concentration, &addr);
 
-  // compute the tornado destination vector address
-  for (u32 dim = 0; dim < dimensions; dim++) {
-    if (dimMask.at(dim)) {
-      u32 dimOffset = (widths.at(dim) - 1) / 2;
-      u32 idx = dim + 1;
-      addr.at(idx) = (addr.at(idx) + dimOffset) % widths.at(dim);
-    }
-  }
+  u32 idx0 = workingDims.at(0) + 1;
+  u32 idx1 = workingDims.at(1) + 1;
+  u32 tmp = addr.at(idx0);
+  addr.at(idx0) = addr.at(idx1);
+  addr.at(idx1) = tmp;
 
   // compute the tornado destination id
   dest_ = Cube::computeTerminalId(&addr, widths, concentration);
 }
 
-TornadoTrafficPattern::~TornadoTrafficPattern() {}
+DimTransposeTrafficPattern::~DimTransposeTrafficPattern() {}
 
-u32 TornadoTrafficPattern::nextDestination() {
+u32 DimTransposeTrafficPattern::nextDestination() {
   return dest_;
 }

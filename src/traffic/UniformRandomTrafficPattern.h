@@ -21,15 +21,18 @@
 
 #include <string>
 
-#include "traffic/AlternatingTrafficPattern.h"
+#include "traffic/TrafficPattern.h"
 
-class UniformRandomTrafficPattern : public AlternatingTrafficPattern {
+class UniformRandomTrafficPattern : public TrafficPattern {
  public:
   UniformRandomTrafficPattern(
       const std::string& _name, const Component* _parent, u32 _numTerminals,
       u32 _self, Json::Value _settings);
   ~UniformRandomTrafficPattern();
   u32 nextDestination() override;
+
+ private:
+  bool sendToSelf_;
 };
 
 #endif  // TRAFFIC_UNIFORMRANDOMTRAFFICPATTERN_H_

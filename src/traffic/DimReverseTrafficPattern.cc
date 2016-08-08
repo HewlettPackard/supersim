@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "traffic/TornadoTrafficPattern.h"
+#include "traffic/DimReverseTrafficPattern.h"
 
 #include <cassert>
 
@@ -21,7 +21,7 @@
 
 #include "network/cube/util.h"
 
-TornadoTrafficPattern::TornadoTrafficPattern(
+DimReverseTrafficPattern::DimReverseTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
     : TrafficPattern(_name, _parent, _numTerminals, _self) {
@@ -37,35 +37,27 @@ TornadoTrafficPattern::TornadoTrafficPattern(
   }
   const u32 concentration = _settings["concentration"].asUInt();
 
-  std::vector<bool> dimMask(dimensions, false);
-  if (_settings.isMember("enabled_dimensions") &&
-      _settings["enabled_dimensions"].isArray()) {
-    for (u32 dim = 0;  dim < dimensions; ++dim) {
-      dimMask.at(dim) = _settings["enabled_dimensions"][dim].asBool();
-    }
-  } else {
-    dimMask.at(0) = true;
+  for (u32 i = 1; i < dimensions/2; i++) {
+    assert(widths.at(i) == widths.at(dimensions - i - 1));
   }
 
   // get self as a vector address
   std::vector<u32> addr;
   Cube::computeTerminalAddress(_self, widths, concentration, &addr);
 
-  // compute the tornado destination vector address
-  for (u32 dim = 0; dim < dimensions; dim++) {
-    if (dimMask.at(dim)) {
-      u32 dimOffset = (widths.at(dim) - 1) / 2;
-      u32 idx = dim + 1;
-      addr.at(idx) = (addr.at(idx) + dimOffset) % widths.at(dim);
-    }
+  for (u32 dim = 0; dim < dimensions/2; dim++) {
+    u32 tmp = addr.at(dim + 1);
+    addr.at(dim + 1) = addr.at(dimensions - dim);
+    addr.at(dimensions - dim) = tmp;
   }
 
   // compute the tornado destination id
   dest_ = Cube::computeTerminalId(&addr, widths, concentration);
 }
 
-TornadoTrafficPattern::~TornadoTrafficPattern() {}
+DimReverseTrafficPattern::~DimReverseTrafficPattern() {}
 
-u32 TornadoTrafficPattern::nextDestination() {
+u32 DimReverseTrafficPattern::nextDestination() {
   return dest_;
 }
+

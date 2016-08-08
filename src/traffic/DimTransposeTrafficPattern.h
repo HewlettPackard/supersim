@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef TRAFFIC_ALTERNATINGTRAFFICPATTERN_H_
-#define TRAFFIC_ALTERNATINGTRAFFICPATTERN_H_
+#ifndef TRAFFIC_DIMTRANSPOSETRAFFICPATTERN_H_
+#define TRAFFIC_DIMTRANSPOSETRAFFICPATTERN_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -23,15 +23,17 @@
 
 #include "traffic/TrafficPattern.h"
 
-class AlternatingTrafficPattern : public TrafficPattern {
+class DimTransposeTrafficPattern : public TrafficPattern {
  public:
-  AlternatingTrafficPattern(const std::string& _name, const Component* _parent,
-                            u32 _numTerminals, u32 _self,
-                            Json::Value _settings);
-  virtual ~AlternatingTrafficPattern();
+  DimTransposeTrafficPattern(
+      const std::string& _name, const Component* _parent, u32 _numTerminals,
+      u32 _self, Json::Value _settings);
+  ~DimTransposeTrafficPattern();
 
- protected:
-  bool sendToSelf;
+  u32 nextDestination() override;
+
+ private:
+  u32 dest_;
 };
 
-#endif  // TRAFFIC_ALTERNATINGTRAFFICPATTERN_H_
+#endif  // TRAFFIC_DIMTRANSPOSETRAFFICPATTERN_H_

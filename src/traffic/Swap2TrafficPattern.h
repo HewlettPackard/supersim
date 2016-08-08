@@ -13,16 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "traffic/AlternatingTrafficPattern.h"
+#ifndef TRAFFIC_SWAP2TRAFFICPATTERN_H_
+#define TRAFFIC_SWAP2TRAFFICPATTERN_H_
 
-#include <cassert>
+#include <json/json.h>
+#include <prim/prim.h>
 
-AlternatingTrafficPattern::AlternatingTrafficPattern(
-    const std::string& _name, const Component* _parent,
-    u32 _numTerminals, u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {
-  assert(_settings.isMember("send_to_self"));
-  sendToSelf = _settings["send_to_self"].asBool();
-}
+#include <string>
 
-AlternatingTrafficPattern::~AlternatingTrafficPattern() {}
+#include "traffic/TrafficPattern.h"
+
+class Swap2TrafficPattern : public TrafficPattern {
+ public:
+  Swap2TrafficPattern(
+      const std::string& _name, const Component* _parent, u32 _numTerminals,
+      u32 _self, Json::Value _settings);
+  ~Swap2TrafficPattern();
+
+  u32 nextDestination() override;
+
+ private:
+  u32 dest_;
+};
+
+#endif  // TRAFFIC_SWAP2TRAFFICPATTERN_H_

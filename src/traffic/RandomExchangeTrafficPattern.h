@@ -21,9 +21,9 @@
 
 #include <string>
 
-#include "traffic/AlternatingTrafficPattern.h"
+#include "traffic/TrafficPattern.h"
 
-class RandomExchangeTrafficPattern : public AlternatingTrafficPattern {
+class RandomExchangeTrafficPattern : public TrafficPattern {
  public:
   RandomExchangeTrafficPattern(
       const std::string& _name, const Component* _parent, u32 _numTerminals,
