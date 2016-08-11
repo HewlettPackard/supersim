@@ -26,10 +26,10 @@
 #include "network/Channel.h"
 #include "network/RoutingAlgorithm.h"
 #include "network/RoutingAlgorithmFactory.h"
-#include "router/common/CongestionStatus.h"
 #include "router/common/Crossbar.h"
 #include "router/common/CrossbarScheduler.h"
 #include "router/common/VcScheduler.h"
+#include "router/common/congestion/CongestionStatus.h"
 #include "router/Router.h"
 #include "types/Credit.h"
 #include "types/Flit.h"
@@ -48,8 +48,10 @@ class Router : public ::Router {
   ~Router();
 
   // Network
-  void setInputChannel(u32 _index, Channel* _channel) override;
-  void setOutputChannel(u32 _index, Channel* _channel) override;
+  void setInputChannel(u32 _port, Channel* _channel) override;
+  Channel* getInputChannel(u32 _port) override;
+  void setOutputChannel(u32 _port, Channel* _channel) override;
+  Channel* getOutputChannel(u32 _port) override;
 
   void receiveFlit(u32 _port, Flit* _flit) override;
   void receiveCredit(u32 _port, Credit* _credit) override;
@@ -57,7 +59,7 @@ class Router : public ::Router {
   void sendCredit(u32 _port, u32 _vc) override;
   void sendFlit(u32 _port, Flit* _flit) override;
 
-  f64 congestionStatus(u32 _vcIdx) const override;
+  f64 congestionStatus(u32 _port, u32 _vc) const override;
 
  private:
   std::vector<InputQueue*> inputQueues_;

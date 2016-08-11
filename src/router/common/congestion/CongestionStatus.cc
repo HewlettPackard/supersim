@@ -13,46 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "router/common/CongestionStatus.h"
+#include "router/common/congestion/CongestionStatus.h"
 
 #include <cassert>
 #include <cmath>
 
-const s32 INCR = 0x50;
-const s32 DECR = 0xAF;
+#include "router/Router.h"
 
 CongestionStatus::CongestionStatus(
-    const std::string& _name, const Component* _parent, u32 _totalVcs,
+    const std::string& _name, const Component* _parent, Router* _router,
     Json::Value _settings)
-    : Component(_name, _parent), totalVcs_(_totalVcs),
+    : Component(_name, _parent), router_(_router),
+      numPorts_(router_->numPorts()), numVcs_(router_->numVcs()),
       latency_(_settings["latency"].asUInt()),
       granularity_(_settings["granularity"].asUInt()) {
   assert(latency_ > 0);
   assert(!_settings["granularity"].isNull());
-
-  maximums_.resize(totalVcs_);
-  counts_.resize(totalVcs_);
 }
 
 CongestionStatus::~CongestionStatus() {}
 
-void CongestionStatus::initCredits(u32 _vcIdx, u32 _credits) {
+void CongestionStatus::initCredits(u32 _port, u32 _vc, u32 _credits) {
+  assert(_port < numPorts_);
+  assert(_vc < numVcs_);
   assert(_credits > 0);
-  maximums_.at(_vcIdx) = _credits;
-  counts_.at(_vcIdx) = _credits;
+  performInitCredits(_port, _vc, _credits);
 }
 
-void CongestionStatus::increment(u32 _vcIdx) {
-  createEvent(_vcIdx, INCR);
+void CongestionStatus::incrementCredit(u32 _port, u32 _vc) {
+  createEvent(_port, _vc, INCR);
 }
 
-void CongestionStatus::decrement(u32 _vcIdx) {
-  createEvent(_vcIdx, DECR);
+void CongestionStatus::decrementCredit(u32 _port, u32 _vc) {
+  createEvent(_port, _vc, DECR);
 }
 
-f64 CongestionStatus::status(u32 _vcIdx) const {
+f64 CongestionStatus::status(u32 _port, u32 _vc) const {
   assert(gSim->epsilon() == 0);
-  f64 value = (f64)counts_.at(_vcIdx) / (f64)maximums_.at(_vcIdx);
+  f64 value = computeStatus(_port, _vc);
+  assert(value >= 0.0);
+  assert(value <= 1.0);
   if (granularity_ > 0) {
     value = round(value * granularity_) / granularity_;
   }
@@ -62,24 +62,25 @@ f64 CongestionStatus::status(u32 _vcIdx) const {
 void CongestionStatus::processEvent(void* _event, s32 _type) {
   assert(gSim->epsilon() > 0);
   u32 vcIdx = static_cast<u32>(reinterpret_cast<u64>(_event));
+  u32 port, vc;
+  router_->vcIndexInv(vcIdx, &port, &vc);
   switch (_type) {
-    case INCR:
-      dbgprintf("incr %u from %u", vcIdx, counts_.at(vcIdx));
-      assert(counts_.at(vcIdx) < maximums_.at(vcIdx));
-      counts_.at(vcIdx)++;
+    case CongestionStatus::INCR:
+      performIncrementCredit(port, vc);
       break;
-    case DECR:
-      dbgprintf("decr %u from %u", vcIdx, counts_.at(vcIdx));
-      assert(counts_.at(vcIdx) > 0);
-      counts_.at(vcIdx)--;
+    case CongestionStatus::DECR:
+      performDecrementCredit(port, vc);
       break;
     default:
       assert(false);
   }
 }
 
-void CongestionStatus::createEvent(u32 _vcIdx, s32 _type) {
+void CongestionStatus::createEvent(u32 _port, u32 _vc, s32 _type) {
   assert(gSim->epsilon() > 0);
+  assert(_port < numPorts_);
+  assert(_vc < numVcs_);
   u64 time = latency_ == 1 ? gSim->time() : gSim->futureCycle(latency_ - 1);
-  addEvent(time, gSim->epsilon() + 1, reinterpret_cast<void*>(_vcIdx), _type);
+  u32 vcIdx = router_->vcIndex(_port, _vc);
+  addEvent(time, gSim->epsilon() + 1, reinterpret_cast<void*>(vcIdx), _type);
 }

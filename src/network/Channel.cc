@@ -29,8 +29,8 @@
 
 Channel::Channel(const std::string& _name, const Component* _parent,
                  Json::Value _settings)
-    : Component(_name, _parent) {
-  latency_ = _settings["latency"].asUInt();
+    : Component(_name, _parent), latency_(_settings["latency"].asUInt()) {
+  assert(!_settings["latency"].isNull());
   assert(latency_ > 0);
 
   nextFlitTime_ = U64_MAX;

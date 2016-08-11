@@ -72,7 +72,8 @@ class Channel : public Component {
   u64 setNextCredit(Credit* _credit);
 
  private:
-  u32 latency_;
+  const u32 latency_;
+
   u64 nextFlitTime_;
   Flit* nextFlit_;
   u64 nextCreditTime_;

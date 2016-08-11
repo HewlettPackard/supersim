@@ -56,19 +56,21 @@ class Simulator {
   rnd::Random rnd;
 
  protected:
+  const bool printProgress_;
+  const f64 printInterval_;
+
   u64 time_;
   u8 epsilon_;
   bool quit_;
-  bool printProgress_;
-  f64 printInterval_;
 
   // this function must set time_, epsilon_, and quit_ on every call
   virtual void runNextEvent() = 0;
 
  private:
+  const u64 cycleTime_;
+
   bool initial_;
   bool running_;
-  u64 cycleTime_;
 
   Network* net_;
   Application* app_;

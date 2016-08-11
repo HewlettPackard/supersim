@@ -57,6 +57,6 @@ void Router::packetArrival(Packet* _packet) const {
   metadataHandler_->packetArrival(_packet);
 }
 
-f64 Router::congestionStatus(u32 _vcIdx) const {
+f64 Router::congestionStatus(u32 _port, u32 _vc) const {
   assert(false);  // subclasses should override this if it needs to be supported
 }

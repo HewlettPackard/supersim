@@ -86,8 +86,7 @@ void LcaRoutingAlgorithm::processRequest(
           f64 availability = 0.0;
           if (debug) printf("port %u\n", port);
           for (u32 vc = 0; vc < numVcs_; vc++) {
-            u32 vcIdx = router_->vcIndex(port, vc);
-            f64 avail = router_->congestionStatus(vcIdx);
+            f64 avail = router_->congestionStatus(port, vc);
             availability += avail;
             if (debug) printf("  vc %u = %f\n", vc, avail);
           }

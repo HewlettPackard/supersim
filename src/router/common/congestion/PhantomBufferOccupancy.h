@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef ROUTER_COMMON_CONGESTIONSTATUS_H_
-#define ROUTER_COMMON_CONGESTIONSTATUS_H_
+#ifndef ROUTER_COMMON_CONGESTION_PHANTOMBUFFEROCCUPANCY_H_
+#define ROUTER_COMMON_CONGESTION_PHANTOMBUFFEROCCUPANCY_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -22,34 +22,28 @@
 #include <string>
 #include <vector>
 
-#include "event/Component.h"
+#include "router/common/congestion/CongestionStatus.h"
 
-class CongestionStatus : public Component {
+class PhantomBufferOccupancy : public CongestionStatus {
  public:
-  CongestionStatus(const std::string& _name, const Component* _parent,
-                   u32 _totalVcs, Json::Value _settings);
-  ~CongestionStatus();
-
-  // configuration
-  void initCredits(u32 _vcIdx, u32 _credits);
-
-  // operation
-  void increment(u32 _vcIdx);
-  void decrement(u32 _vcIdx);
-
-  // this returns creditCount/maxCredits (buffer availability)
-  f64 status(u32 _vcIdx) const;  // (must be epsilon >= 1)
+  PhantomBufferOccupancy(const std::string& _name, const Component* _parent,
+                         Router* _router, Json::Value _settings);
+  ~PhantomBufferOccupancy();
 
   void processEvent(void* _event, s32 _type);
 
- private:
-  void createEvent(u32 _vcIdx, s32 _type);
+ protected:
+  void performInitCredits(u32 _port, u32 _vc, u32 _credits) override;
+  void performIncrementCredit(u32 _port, u32 _vc) override;
+  void performDecrementCredit(u32 _port, u32 _vc) override;
+  f64 computeStatus(u32 _port, u32 _vc) const override;
 
-  const u32 totalVcs_;
-  const u32 latency_;
-  const u32 granularity_;
+ private:
+  const f64 valueCoeff_;
+  const f64 lengthCoeff_;
   std::vector<u32> maximums_;
   std::vector<u32> counts_;
+  std::vector<u32> windows_;
 };
 
-#endif  // ROUTER_COMMON_CONGESTIONSTATUS_H_
+#endif  // ROUTER_COMMON_CONGESTION_PHANTOMBUFFEROCCUPANCY_H_

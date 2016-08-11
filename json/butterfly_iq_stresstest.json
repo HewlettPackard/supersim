@@ -46,6 +46,7 @@
       "architecture": "input_queued",
       "num_ports": 4,
       "congestion_status": {
+        "algorithm": "buffer_occupancy",
         "latency": 1,
         "granularity": 0
       },

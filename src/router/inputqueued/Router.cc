@@ -18,6 +18,7 @@
 #include <cassert>
 
 #include "network/RoutingAlgorithmFactory.h"
+#include "router/common/congestion/CongestionStatusFactory.h"
 #include "router/inputqueued/Ejector.h"
 #include "router/inputqueued/InputQueue.h"
 
@@ -36,9 +37,8 @@ Router::Router(
   bool vcaSwaWait = _settings["vca_swa_wait"].asBool();
 
   // create a congestion status device
-  congestionStatus_ = new CongestionStatus(
-      "CongestionStatus", this, numPorts_ * numVcs_,
-      _settings["congestion_status"]);
+  congestionStatus_ = CongestionStatusFactory::createCongestionStatus(
+      "CongestionStatus", this, this, _settings["congestion_status"]);
 
   // create the crossbar and schedulers
   crossbar_ = new Crossbar("Crossbar", this, numPorts_ * numVcs_, numPorts_,
@@ -62,7 +62,7 @@ Router::Router(
       crossbarScheduler_->initCreditCount(vcIdx, inputQueueDepth);
 
       // initialize the credit count in the CongestionStatus
-      congestionStatus_->initCredits(vcIdx, inputQueueDepth);
+      congestionStatus_->initCredits(port, vc, inputQueueDepth);
 
       // create the name suffix
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
@@ -119,16 +119,24 @@ Router::~Router() {
   }
 }
 
-void Router::setInputChannel(u32 _index, Channel* _channel) {
-  assert(inputChannels_.at(_index) == nullptr);
-  inputChannels_.at(_index) = _channel;
-  _channel->setSink(this, _index);
+void Router::setInputChannel(u32 _port, Channel* _channel) {
+  assert(inputChannels_.at(_port) == nullptr);
+  inputChannels_.at(_port) = _channel;
+  _channel->setSink(this, _port);
 }
 
-void Router::setOutputChannel(u32 _index, Channel* _channel) {
-  assert(outputChannels_.at(_index) == nullptr);
-  outputChannels_.at(_index) = _channel;
-  _channel->setSource(this, _index);
+Channel* Router::getInputChannel(u32 _port) {
+  return inputChannels_.at(_port);
+}
+
+void Router::setOutputChannel(u32 _port, Channel* _channel) {
+  assert(outputChannels_.at(_port) == nullptr);
+  outputChannels_.at(_port) = _channel;
+  _channel->setSource(this, _port);
+}
+
+Channel* Router::getOutputChannel(u32 _port) {
+  return outputChannels_.at(_port);
 }
 
 void Router::receiveFlit(u32 _port, Flit* _flit) {
@@ -147,7 +155,7 @@ void Router::receiveCredit(u32 _port, Credit* _credit) {
     u32 vc = _credit->getNum();
     u32 vcIdx = vcIndex(_port, vc);
     crossbarScheduler_->incrementCreditCount(vcIdx);
-    congestionStatus_->increment(vcIdx);
+    congestionStatus_->incrementCredit(_port, vc);
   }
   delete _credit;
 }
@@ -168,11 +176,11 @@ void Router::sendCredit(u32 _port, u32 _vc) {
 void Router::sendFlit(u32 _port, Flit* _flit) {
   assert(outputChannels_.at(_port)->getNextFlit() == nullptr);
   outputChannels_.at(_port)->setNextFlit(_flit);
-  congestionStatus_->decrement(vcIndex(_port, _flit->getVc()));
+  congestionStatus_->decrementCredit(_port, _flit->getVc());
 }
 
-f64 Router::congestionStatus(u32 _vcIdx) const {
-  return congestionStatus_->status(_vcIdx);
+f64 Router::congestionStatus(u32 _port, u32 _vc) const {
+  return congestionStatus_->status(_port, _vc);
 }
 
 }  // namespace InputQueued

@@ -21,7 +21,7 @@
     "routing": {
       "algorithm": "most_common_ancestor",
       "latency": 1,  // cycles
-      "adaptive": false
+      "adaptive": true
     },
     "interface": {
       "type": "standard",
@@ -48,8 +48,11 @@
       "architecture": "input_queued",
       "num_ports": 6,
       "congestion_status": {
+        "algorithm": "phantom_buffer_occupancy",
         "latency": 1,
-        "granularity": 0
+        "granularity": 0,
+        "value_coeff": 1.23,
+        "length_coeff": 2.5
       },
       "input_queue_depth": 16,
       "vca_swa_wait": false,

@@ -24,13 +24,20 @@
 #include "application/Application.h"
 
 Simulator::Simulator(Json::Value _settings)
-    : time_(0), epsilon_(0), quit_(false), initial_(true), running_(false),
+    : printProgress_(_settings["print_progress"].asBool()),
+      printInterval_(_settings["print_interval"].asDouble()),
+      time_(0), epsilon_(0), quit_(false),
+      cycleTime_(_settings["cycle_time"].asUInt64()),
+      initial_(true), running_(false), net_(nullptr), app_(nullptr),
       monitoring_(false) {
-  cycleTime_ = _settings["cycle_time"].asUInt64();
-  printProgress_ = _settings["print_progress"].asBool();
-  printInterval_ = _settings["print_interval"].asDouble();
+  assert(!_settings["print_progress"].isNull());
+  assert(!_settings["print_interval"].isNull());
+  assert(!_settings["cycle_time"].isNull());
+  assert(!_settings["random_seed"].isNull());
+  assert(cycleTime_ > 0);
+  assert(printInterval_ > 0);
+
   rnd.seed(_settings["random_seed"].asUInt64());
-  app_ = nullptr;
 }
 
 Simulator::~Simulator() {}

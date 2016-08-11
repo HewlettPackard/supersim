@@ -30,6 +30,7 @@ TestSetup::TestSetup(u64 _cycleTime, u64 _randomSeed) {
       "  \"simulator\": {\n" +
       "     \"cycle_time\": " + std::to_string(_cycleTime) + ",\n" +
       "     \"print_progress\": false,\n" +
+      "     \"print_interval\": 1.0,\n" +
       "     \"random_seed\": " + std::to_string(_randomSeed) + "\n" +
       "  }\n" +
       "}\n" +

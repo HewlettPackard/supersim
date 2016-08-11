@@ -61,8 +61,7 @@ void McaRoutingAlgorithm::processRequest(
       for (u32 port = numPorts_ / 2; port < numPorts_; port++) {
         f64 availability = 0.0;
         for (u32 vc = 0; vc < numVcs_; vc++) {
-          u32 vcIdx = router_->vcIndex(port, vc);
-          availability += router_->congestionStatus(vcIdx);
+          availability += router_->congestionStatus(port, vc);
         }
         availability /= numVcs_;  // average
         if (availability > maxAvailability) {

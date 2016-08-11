@@ -48,6 +48,7 @@
     "router": {
       "architecture": "input_queued",
       "congestion_status": {
+        "algorithm": "buffer_occupancy",
         "latency": 1,
         "granularity": 0
       },
