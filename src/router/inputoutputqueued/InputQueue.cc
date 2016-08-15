@@ -117,7 +117,8 @@ void InputQueue::vcSchedulerResponse(u32 _vcIdx) {
     vca_.fsm = ePipelineFsm::kReadyToAdvance;
     vca_.allocatedVcIdx = _vcIdx;
     router_->vcIndexInv(_vcIdx, &vca_.allocatedPort, &vca_.allocatedVc);
-    // dbgprintf("VcSch p=%u v=%u", vca_.allocatedPort, vca_.allocatedVc);
+    routingAlgorithm_->vcScheduled(vca_.flit, vca_.allocatedPort,
+                                   vca_.allocatedVc);
   } else {
     // denied
     vca_.fsm = ePipelineFsm::kWaitingToRequest;

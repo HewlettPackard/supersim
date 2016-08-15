@@ -68,6 +68,7 @@ class RoutingAlgorithm : public Component {
   virtual ~RoutingAlgorithm();
   u32 latency() const;
   void request(Client* _client, Flit* _flit, Response* _response);
+  virtual void vcScheduled(Flit* _flit, u32 _port, u32 _vc);
   void processEvent(void* _event, s32 _type) override;
 
  protected:

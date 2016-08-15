@@ -75,6 +75,8 @@ void RoutingAlgorithm::request(Client* _client, Flit* _flit,
   addEvent(respTime, 0, evt, 0);
 }
 
+void RoutingAlgorithm::vcScheduled(Flit* _flit, u32 _port, u32 _vc) {}
+
 void RoutingAlgorithm::processEvent(void* _event, s32 _type) {
   EventPackage* evt = reinterpret_cast<EventPackage*>(_event);
   processRequest(evt->flit, evt->response);
