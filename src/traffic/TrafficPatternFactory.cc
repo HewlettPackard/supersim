@@ -19,7 +19,7 @@
 
 #include "traffic/UniformRandomTrafficPattern.h"
 #include "traffic/RandomExchangeTrafficPattern.h"
-#include "traffic/RandomQuadrantExchangeTrafficPattern.h"
+#include "traffic/RandomExchangeQuadrantTrafficPattern.h"
 #include "traffic/RandomNeighborExchangeTrafficPattern.h"
 #include "traffic/BitComplementTrafficPattern.h"
 #include "traffic/BitReverseTrafficPattern.h"
@@ -83,8 +83,8 @@ TrafficPattern* TrafficPatternFactory::createTrafficPattern(
   } else if (type == "random_exchange") {
     return new RandomExchangeTrafficPattern(
         _name, _parent, _numTerminals, _self, _settings);
-  } else if (type == "random_quadrant_exchange") {
-    return new RandomQuadrantExchangeTrafficPattern(
+  } else if (type == "random_exchange_quadrant") {
+    return new RandomExchangeQuadrantTrafficPattern(
       _name, _parent, _numTerminals, _self, _settings);
   } else if (type == "random_neighbor_exchange") {
     return new RandomNeighborExchangeTrafficPattern(

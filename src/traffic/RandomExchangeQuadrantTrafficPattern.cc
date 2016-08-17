@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "traffic/RandomQuadrantExchangeTrafficPattern.h"
+#include "traffic/RandomExchangeQuadrantTrafficPattern.h"
 
 #include <cassert>
 
@@ -21,8 +21,8 @@
 
 #include "network/cube/util.h"
 
-RandomQuadrantExchangeTrafficPattern::
-  RandomQuadrantExchangeTrafficPattern(
+RandomExchangeQuadrantTrafficPattern::
+  RandomExchangeQuadrantTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
     : TrafficPattern(_name, _parent, _numTerminals, _self) {
@@ -43,8 +43,6 @@ RandomQuadrantExchangeTrafficPattern::
   for (u32 i = 0; i < dimensions; i++) {
     assert(widths.at(i) % 2 == 0);
   }
-
-  // dstVect_.resize(_numTerminals / (1 << dimensions));
 
   std::vector<u32> addr;
   // get self as a vector address
@@ -73,9 +71,9 @@ RandomQuadrantExchangeTrafficPattern::
   }
 }
 
-RandomQuadrantExchangeTrafficPattern::
-  ~RandomQuadrantExchangeTrafficPattern() {}
+RandomExchangeQuadrantTrafficPattern::
+  ~RandomExchangeQuadrantTrafficPattern() {}
 
-u32 RandomQuadrantExchangeTrafficPattern::nextDestination() {
+u32 RandomExchangeQuadrantTrafficPattern::nextDestination() {
   return dstVect_.at(gSim->rnd.nextU64(0, dstVect_.size() - 1));
 }

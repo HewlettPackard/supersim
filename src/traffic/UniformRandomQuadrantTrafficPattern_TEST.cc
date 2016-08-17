@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "traffic/RandomQuadrantExchangeTrafficPattern.h"
+#include "traffic/UniformRandomQuadrantTrafficPattern.h"
 
 #include <gtest/gtest.h>
 #include <json/json.h>
@@ -27,7 +27,7 @@
 #include "network/cube/util.h"
 #include "test/TestSetup_TEST.h"
 
-TEST(RandomQuadrantExchangeTrafficPattern, evenSpread) {
+TEST(UniformRandomQuadrantTrafficPattern, evenSpread) {
   TestSetup test(1, 0xBAADF00D);
   Json::Value settings;
 
@@ -43,9 +43,9 @@ TEST(RandomQuadrantExchangeTrafficPattern, evenSpread) {
   const u32 kRounds = 10000;
   const bool DEBUG = false;
 
-  std::vector<RandomQuadrantExchangeTrafficPattern*> tps(numTerminals);
+  std::vector<UniformRandomQuadrantTrafficPattern*> tps(numTerminals);
   for (u32 idx = 0; idx < numTerminals; idx++) {
-    tps.at(idx) = new RandomQuadrantExchangeTrafficPattern(
+    tps.at(idx) = new UniformRandomQuadrantTrafficPattern(
         "TP_"+std::to_string(idx), nullptr, numTerminals, idx, settings);
   }
 
@@ -85,7 +85,7 @@ TEST(RandomQuadrantExchangeTrafficPattern, evenSpread) {
         }
       }
 
-      if ((bktQuadrant + idxQuadrant) == 3) {
+      if (bktQuadrant == idxQuadrant) {
         // copy out count in valid region
         val.insert(vals.at(idx).at(bkt));
         sum += vals.at(idx).at(bkt);
