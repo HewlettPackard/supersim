@@ -42,6 +42,7 @@ TEST(CrSeparableAllocator, lslp) {
 
   // test
   AllocatorTest(allocSettings, verify, false);
+  AllocatorLoadBalanceTest(allocSettings);
 }
 
 TEST(CrSeparableAllocator, greater) {
@@ -59,6 +60,7 @@ TEST(CrSeparableAllocator, greater) {
 
   // test
   AllocatorTest(allocSettings, verify, false);
+  AllocatorLoadBalanceTest(allocSettings);
 }
 
 TEST(CrSeparableAllocator, lesser) {
@@ -69,13 +71,14 @@ TEST(CrSeparableAllocator, lesser) {
   Json::Value allocSettings;
   allocSettings["resource_arbiter"] = arbSettings;
   allocSettings["client_arbiter"] = arbSettings;
-  allocSettings["iterations"] = 1;
+  allocSettings["iterations"] = 2;
   allocSettings["slip_latch"] = true;
   allocSettings["type"] = "cr_separable";
   // printf("%s\n", toString(&allocSettings).c_str());
 
   // test
   AllocatorTest(allocSettings, verify, false);
+  AllocatorLoadBalanceTest(allocSettings);
 }
 
 TEST(CrSeparableAllocator, random) {
@@ -85,11 +88,12 @@ TEST(CrSeparableAllocator, random) {
   Json::Value allocSettings;
   allocSettings["resource_arbiter"] = arbSettings;
   allocSettings["client_arbiter"] = arbSettings;
-  allocSettings["iterations"] = 1;
+  allocSettings["iterations"] = 2;
   allocSettings["slip_latch"] = true;
   allocSettings["type"] = "cr_separable";
   // printf("%s\n", toString(&allocSettings).c_str());
 
   // test
   AllocatorTest(allocSettings, verify, false);
+  AllocatorLoadBalanceTest(allocSettings);
 }

@@ -69,14 +69,19 @@ void DimOrderRoutingAlgorithm::processRequest(
     }
     u32 offset = (dst - src - 1) * dimensionWeights_.at(dim);
     // add all ports where the two routers are connecting
+
     for (u32 weight = 0; weight < dimensionWeights_.at(dim); weight++) {
-      bool res = outputPorts.insert(portBase + offset + weight).second;
+      u32 outputPort = portBase + offset + weight;
+      bool res = outputPorts.insert(outputPort).second;
       (void)res;
       assert(res);
     }
   }
 
   assert(outputPorts.size() > 0);
+  if (dim != routerAddress.size()) {
+    assert(outputPorts.size() == dimensionWeights_.at(dim));
+  }
   for (auto it = outputPorts.cbegin(); it != outputPorts.cend(); ++it) {
     u32 outputPort = *it;
     // select all VCs in the output port

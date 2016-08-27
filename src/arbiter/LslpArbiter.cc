@@ -18,30 +18,26 @@
 LslpArbiter::LslpArbiter(const std::string& _name, const Component* _parent,
                          u32 _size, Json::Value _settings)
     : Arbiter(_name, _parent, _size) {
-  prevPriority_ = static_cast<u32>(gSim->rnd.nextU64(0, size_));
+  nextPriority_ = gSim->rnd.nextU64(0, size_ - 1);
   latch();
 }
 
 LslpArbiter::~LslpArbiter() {}
 
 void LslpArbiter::latch() {
-  priority_ = prevPriority_;
+  priority_ = nextPriority_;
 }
 
 u32 LslpArbiter::arbitrate() {
   u32 winner = U32_MAX;
   for (u32 idx = priority_; idx < (size_ + priority_); idx++) {
     u32 client = idx % size_;
-    if (*requests_[client]) {  // requesting
+    if (*requests_[client]) {
       winner = client;
       *grants_[client] = true;
+      nextPriority_ = (winner + 1) % size_;
       break;
     }
-  }
-  if (winner != U32_MAX) {
-    prevPriority_ = (winner + 1) % size_;
-  } else {
-    prevPriority_ = priority_;
   }
   return winner;
 }

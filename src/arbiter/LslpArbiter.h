@@ -20,7 +20,6 @@
 #include <prim/prim.h>
 
 #include <string>
-#include <vector>
 
 #include "arbiter/Arbiter.h"
 #include "event/Component.h"
@@ -37,7 +36,7 @@ class LslpArbiter : public Arbiter {
 
  private:
   u32 priority_;
-  u32 prevPriority_;
+  u32 nextPriority_;
 };
 
 #endif  // ARBITER_LSLPARBITER_H_

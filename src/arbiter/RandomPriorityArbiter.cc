@@ -13,30 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef ARBITER_RANDOMARBITER_H_
-#define ARBITER_RANDOMARBITER_H_
+#include "arbiter/RandomPriorityArbiter.h"
 
-#include <json/json.h>
-#include <prim/prim.h>
+RandomPriorityArbiter::RandomPriorityArbiter(
+    const std::string& _name, const Component* _parent, u32 _size,
+    Json::Value _settings)
+    : Arbiter(_name, _parent, _size) {}
 
-#include <string>
-#include <vector>
+RandomPriorityArbiter::~RandomPriorityArbiter() {}
 
-#include "arbiter/Arbiter.h"
-#include "event/Component.h"
-
-// choose random request
-class RandomArbiter : public Arbiter {
- public:
-  RandomArbiter(const std::string& _name, const Component* _parent,
-                u32 _size, Json::Value _settings);
-  ~RandomArbiter();
-
-  u32 arbitrate() override;
-
- private:
-  std::vector<u32> temp_;
-};
-
-
-#endif  // ARBITER_RANDOMARBITER_H_
+u32 RandomPriorityArbiter::arbitrate() {
+  u32 winner = U32_MAX;
+  u32 offset = gSim->rnd.nextU64(0, size_ - 1);
+  for (u32 idx = 0; idx < size_; idx++) {
+    u32 client = (idx + offset) % size_;
+    if (*requests_[client]) {
+      winner = client;
+      *grants_[winner] = true;
+      break;
+    }
+  }
+  return winner;
+}

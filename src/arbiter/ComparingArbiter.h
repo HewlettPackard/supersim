@@ -36,6 +36,7 @@ class ComparingArbiter : public Arbiter {
 
  private:
   bool greater_;
+  std::vector<u32> temp_;
 };
 
 

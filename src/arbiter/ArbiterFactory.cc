@@ -20,6 +20,7 @@
 #include "arbiter/ComparingArbiter.h"
 #include "arbiter/LslpArbiter.h"
 #include "arbiter/RandomArbiter.h"
+#include "arbiter/RandomPriorityArbiter.h"
 
 Arbiter* ArbiterFactory::createArbiter(
     const std::string& _name, const Component* _parent,
@@ -32,6 +33,8 @@ Arbiter* ArbiterFactory::createArbiter(
     return new ComparingArbiter(_name, _parent, _size, _settings);
   } else if (type == "random") {
     return new RandomArbiter(_name, _parent, _size, _settings);
+  } else if (type == "random_priority") {
+    return new RandomPriorityArbiter(_name, _parent, _size, _settings);
   } else {
     fprintf(stderr, "unknown Arbiter 'type': %s\n", type.c_str());
     assert(false);

@@ -15,28 +15,27 @@
  */
 #include "arbiter/RandomArbiter.h"
 
-RandomArbiter::RandomArbiter(const std::string& _name, const Component* _parent,
-                             u32 _size, Json::Value _settings)
-    : Arbiter(_name, _parent, _size) {}
+RandomArbiter::RandomArbiter(
+    const std::string& _name, const Component* _parent, u32 _size,
+    Json::Value _settings)
+    : Arbiter(_name, _parent, _size) {
+  temp_.reserve(size_);
+}
 
 RandomArbiter::~RandomArbiter() {}
 
 u32 RandomArbiter::arbitrate() {
-  u32 winner = U32_MAX;
   for (u32 client = 0; client < size_; client++) {
-    if (*requests_[client]) {  // requesting
-      // input enabled
-      if (winner == U32_MAX) {
-        // first contender
-        winner = client;
-      } else if (gSim->rnd.nextBool()) {
-        // won random tie-breaker
-        winner = client;
-      }
+    if (*requests_[client]) {
+      temp_.push_back(client);
     }
   }
-  if (winner != U32_MAX) {
+  u32 winner = U32_MAX;
+  if (temp_.size() > 0) {
+    u32 idx = gSim->rnd.nextU64(0, temp_.size() - 1);
+    winner = temp_.at(idx);
     *grants_[winner] = true;
   }
+  temp_.clear();
   return winner;
 }

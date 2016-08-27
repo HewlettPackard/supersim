@@ -42,6 +42,7 @@ TEST(RcSeparableAllocator, lslp) {
 
   // test
   AllocatorTest(allocSettings, verify, false);
+  AllocatorLoadBalanceTest(allocSettings);
 }
 
 TEST(RcSeparableAllocator, greater) {
@@ -59,6 +60,7 @@ TEST(RcSeparableAllocator, greater) {
 
   // test
   AllocatorTest(allocSettings, verify, false);
+  AllocatorLoadBalanceTest(allocSettings);
 }
 
 TEST(RcSeparableAllocator, lesser) {
@@ -76,6 +78,7 @@ TEST(RcSeparableAllocator, lesser) {
 
   // test
   AllocatorTest(allocSettings, verify, false);
+  AllocatorLoadBalanceTest(allocSettings);
 }
 
 TEST(RcSeparableAllocator, random) {
@@ -92,4 +95,5 @@ TEST(RcSeparableAllocator, random) {
 
   // test
   AllocatorTest(allocSettings, verify, false);
+  AllocatorLoadBalanceTest(allocSettings);
 }

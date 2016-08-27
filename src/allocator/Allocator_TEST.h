@@ -27,5 +27,6 @@ u64 AllocatorIndex(u64 _numClients, u64 _client, u64 _resource);
 
 void AllocatorTest(Json::Value _settings, AllocatorVerifier _verifier,
                    bool _singleRequest);
+void AllocatorLoadBalanceTest(Json::Value _settings);
 
 #endif  // ALLOCATOR_ALLOCATOR_TEST_H_

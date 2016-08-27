@@ -112,7 +112,7 @@ void VcScheduler::processEvent(void* _event, s32 _type) {
   assert(gSim->epsilon() == 0);
   allocEventSet_ = false;
 
-  // check VC availability, make out unavailable VC requests
+  // check VC availability, mask out unavailable VC requests
   for (u32 c = 0; c < numClients_; c++) {
     if (clientRequested_[c]) {
       for (u32 v = 0; v < totalVcs_; v++) {
@@ -137,13 +137,15 @@ void VcScheduler::processEvent(void* _event, s32 _type) {
       u32 granted = U32_MAX;
       for (u32 v = 0; v < totalVcs_; v++) {
         u64 idx = index(c, v);
+
+        // multiple grants to the same client? BAD
+        assert(!((granted != U32_MAX) && (grants_[idx])));
+
+        // check for granted
         if ((granted == U32_MAX) && (grants_[idx])) {
           granted = v;
           assert(vcTaken_[v] == false);
           vcTaken_[v] = true;
-        } else {
-          // multiple grants to the same client? BAD
-          assert(!((granted != U32_MAX) && (grants_[idx])));
         }
         requests_[idx] = false;
       }

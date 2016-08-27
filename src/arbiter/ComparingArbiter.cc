@@ -20,35 +20,45 @@ ComparingArbiter::ComparingArbiter(
     u32 _size, Json::Value _settings)
     : Arbiter(_name, _parent, _size) {
   greater_ = _settings["greater"].asBool();
+  temp_.reserve(size_);
 }
 
 ComparingArbiter::~ComparingArbiter() {}
 
 u32 ComparingArbiter::arbitrate() {
-  u32 winner = U32_MAX;
+  bool one = false;
   u64 best = U64_MAX;
   for (u32 client = 0; client < size_; client++) {
     if (*requests_[client]) {
       u64 cmeta = *metadatas_[client];
-      // input enabled
-      if (winner == U32_MAX) {
-        // first contender
+      if (!one) {
+        // handle the first one
+        one = true;
         best = cmeta;
-        winner = client;
+        temp_.push_back(client);
       } else {
-        // secondary contender
+        // handle remaining
         if (((greater_) && (cmeta > best)) ||
-            ((!greater_) && (cmeta < best)) ||
-            ((cmeta == best) && (gSim->rnd.nextBool()))) {
-          // better metadata or won tie breaker
+            ((!greater_) && (cmeta < best))) {
+          // new best
           best = cmeta;
-          winner = client;
+          temp_.clear();
+          temp_.push_back(client);
+        } else if (cmeta == best) {
+          // match best
+          temp_.push_back(client);
         }
       }
     }
   }
-  if (winner != U32_MAX) {
+
+  // randomly choose winner from compared best set
+  u32 winner = U32_MAX;
+  if (temp_.size() > 0) {
+    u32 idx = gSim->rnd.nextU64(0, temp_.size() - 1);
+    winner = temp_.at(idx);
     *grants_[winner] = true;
   }
+  temp_.clear();
   return winner;
 }

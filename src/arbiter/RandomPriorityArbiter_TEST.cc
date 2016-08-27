@@ -21,12 +21,12 @@
 #include <vector>
 
 #include "arbiter/Arbiter.h"
-#include "arbiter/RandomArbiter.h"
+#include "arbiter/RandomPriorityArbiter.h"
 
 #include "arbiter/Arbiter_TEST.h"
 #include "test/TestSetup_TEST.h"
 
-TEST(RandomArbiter, full) {
+TEST(RandomPriorityArbiter, full) {
   TestSetup testSetup(1, 123);
 
   for (u32 size = 1; size < 100; size++) {
@@ -45,7 +45,7 @@ TEST(RandomArbiter, full) {
       }
       putc('\n', stdout);*/
 
-    Arbiter* arb = new RandomArbiter(
+    Arbiter* arb = new RandomPriorityArbiter(
         "Arb", nullptr, size, Json::Value());
     assert(arb->size() == size);
     for (u32 idx = 0; idx < size; idx++) {
@@ -79,65 +79,5 @@ TEST(RandomArbiter, full) {
     delete[] metadata;
     delete[] grant;
     delete arb;
-  }
-}
-
-TEST(RandomArbiter, dist) {
-  for (u8 quads = 1; quads <= 4; quads *= 2) {
-    for (u32 size = 32; size <= 64; size += 8) {
-      TestSetup testSetup(1, 123);
-
-      bool* request = new bool[size];
-      u64* metadata = new u64[size];
-      bool* grant = new bool[size];
-      u32* count = new u32[size];
-
-      for (u32 idx = 0; idx < size; idx++) {
-        u32 quad = idx % quads;
-        request[idx] = quad == 0;
-        metadata[idx] = 0;
-        count[idx] = 0;
-      }
-
-      Arbiter* arb = new RandomArbiter(
-          "Arb", nullptr, size, Json::Value());
-      assert(arb->size() == size);
-      for (u32 idx = 0; idx < size; idx++) {
-        arb->setRequest(idx, &request[idx]);
-        arb->setMetadata(idx, &metadata[idx]);
-        arb->setGrant(idx, &grant[idx]);
-      }
-
-      const u32 ROUNDS = 500000;
-      for (u32 round = 0; round < ROUNDS; round++) {
-        // reset grants and arbitrate
-        memset(grant, false, size);
-        arb->arbitrate();
-
-        // check one hot and perform count
-        ASSERT_EQ(hotCount(grant, size), 1u);
-        u32 awinner = winnerId(grant, size);
-        count[awinner]++;
-      }
-
-      // verify count distribution
-      for (u32 idx = 0; idx < size; idx++) {
-        u32 quad = idx % quads;
-        if (quad != 0) {
-          ASSERT_EQ(count[idx], 0u);
-        } else {
-          f64 percent = (f64)count[idx] / ROUNDS;
-          f64 expected = ((ROUNDS * quads) / (f64)size) / ROUNDS;
-          ASSERT_NEAR(percent, expected, 0.001);
-        }
-      }
-
-      // cleanup
-      delete[] request;
-      delete[] metadata;
-      delete[] grant;
-      delete[] count;
-      delete arb;
-    }
   }
 }

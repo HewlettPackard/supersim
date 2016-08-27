@@ -268,11 +268,11 @@ void InputQueue::processPipeline() {
     // request everything of the VC alloc
     u32 responseSize = vca_.route.size();
     assert(responseSize > 0);
+    u32 metadata = vca_.flit->getPacket()->getMetadata();
     for (u32 r = 0; r < responseSize; r++) {
       u32 requestPort, requestVc;
       vca_.route.get(r, &requestPort, &requestVc);
       u32 vcIdx = router_->vcIndex(requestPort, requestVc);
-      u32 metadata = vca_.flit->getPacket()->getMetadata();
       vcScheduler_->request(vcSchedulerIndex_, vcIdx, metadata);
     }
   }
