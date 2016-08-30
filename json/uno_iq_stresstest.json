@@ -95,8 +95,8 @@
       "warmup_window": 15,
       "warmup_attempts": 20,
       "traffic_pattern": {
-        "type": "uniform_random",
-        "send_to_self": false
+        "type": "matrix",
+        "file": "json/trafficmatrix.csv.gz"
       }
     },
     "message_log": {

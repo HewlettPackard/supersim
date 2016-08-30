@@ -23,7 +23,7 @@ UniformRandomTrafficPattern::UniformRandomTrafficPattern(
     : TrafficPattern(_name, _parent, _numTerminals, _self) {
   assert(_settings.isMember("send_to_self"));
   sendToSelf_ = _settings["send_to_self"].asBool();
-    }
+}
 
 UniformRandomTrafficPattern::~UniformRandomTrafficPattern() {}
 

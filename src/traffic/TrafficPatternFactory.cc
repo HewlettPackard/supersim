@@ -17,24 +17,25 @@
 
 #include <cassert>
 
-#include "traffic/UniformRandomTrafficPattern.h"
-#include "traffic/RandomExchangeTrafficPattern.h"
-#include "traffic/RandomExchangeQuadrantTrafficPattern.h"
-#include "traffic/RandomNeighborExchangeTrafficPattern.h"
+#include "traffic/BisectionStressTrafficPattern.h"
 #include "traffic/BitComplementTrafficPattern.h"
 #include "traffic/BitReverseTrafficPattern.h"
 #include "traffic/BitRotateTrafficPattern.h"
 #include "traffic/BitTransposeTrafficPattern.h"
-#include "traffic/LoopbackTrafficPattern.h"
-#include "traffic/ScanTrafficPattern.h"
-#include "traffic/DimTransposeTrafficPattern.h"
+#include "traffic/DimComplementReverseTrafficPattern.h"
 #include "traffic/DimReverseTrafficPattern.h"
 #include "traffic/DimRotateTrafficPattern.h"
-#include "traffic/DimComplementReverseTrafficPattern.h"
+#include "traffic/DimTransposeTrafficPattern.h"
+#include "traffic/LoopbackTrafficPattern.h"
+#include "traffic/MatrixTrafficPattern.h"
+#include "traffic/NeighborTrafficPattern.h"
+#include "traffic/RandomExchangeTrafficPattern.h"
+#include "traffic/RandomExchangeQuadrantTrafficPattern.h"
+#include "traffic/RandomNeighborExchangeTrafficPattern.h"
+#include "traffic/ScanTrafficPattern.h"
 #include "traffic/Swap2TrafficPattern.h"
 #include "traffic/TornadoTrafficPattern.h"
-#include "traffic/NeighborTrafficPattern.h"
-#include "traffic/BisectionStressTrafficPattern.h"
+#include "traffic/UniformRandomTrafficPattern.h"
 
 TrafficPattern* TrafficPatternFactory::createTrafficPattern(
     const std::string& _name, const Component* _parent, u32 _numTerminals,
@@ -94,6 +95,9 @@ TrafficPattern* TrafficPatternFactory::createTrafficPattern(
         _name, _parent, _numTerminals, _self, _settings);
   } else if (type == "bisection_stress") {
     return new BisectionStressTrafficPattern(
+        _name, _parent, _numTerminals, _self, _settings);
+  } else if (type == "matrix") {
+    return new MatrixTrafficPattern(
         _name, _parent, _numTerminals, _self, _settings);
   } else {
     fprintf(stderr, "unknown traffic pattern: %s\n", type.c_str());
