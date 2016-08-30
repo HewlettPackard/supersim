@@ -30,7 +30,7 @@ class Application;
 class InjectionLimiter : public Component, public MessageReceiver {
  public:
   InjectionLimiter(const std::string& _name, const Component* _parent,
-                   Application* _app, u32 _id);
+                   Application* _app, u32 _id, f64 _maxInjectionRate);
   ~InjectionLimiter();
 
   void setMessageReceiver(MessageReceiver* _receiver);
@@ -40,9 +40,10 @@ class InjectionLimiter : public Component, public MessageReceiver {
  private:
   Application* app_;
   u32 id_;
-  bool enabled_;
-  f64 injectionRate_;
+  f64 maxInjectionRate_;
   MessageReceiver* receiver_;
+
+  bool enabled_;
   u64 lastTime_;
 };
 

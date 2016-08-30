@@ -26,10 +26,11 @@
 #include "types/MessageReceiver.h"
 
 Messenger::Messenger(const std::string& _name, const Component* _parent,
-                     Application* _app, u32 _id)
+                     Application* _app, u32 _id, f64 _maxInjectionRate)
     : Component(_name, _parent), app_(_app), id_(_id) {
   // create the injection limiter
-  injectionLimiter_ = new InjectionLimiter("InjectionLimiter", this, app_, _id);
+  injectionLimiter_ = new InjectionLimiter("InjectionLimiter", this, app_, _id,
+                                           _maxInjectionRate);
 
   // create the rate monitors
   supplyMonitor_ = new RateMonitor("SupplyMonitor", this);

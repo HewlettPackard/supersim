@@ -46,7 +46,7 @@ StreamTerminal::StreamTerminal(
 
     // choose a random number of cycles in the future to start
     // make an event to start the Terminal in the future
-    u64 cycles = getApplication()->cyclesToSend(maxMessageSize_);
+    u64 cycles = getApplication()->cyclesToSend(maxMessageSize_, 0.1);
     cycles = gSim->rnd.nextU64(1, cycles);
     u64 time = gSim->futureCycle(1) + ((cycles - 1) * gSim->cycleTime());
     dbgprintf("start time is %lu", time);

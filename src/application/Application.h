@@ -45,7 +45,7 @@ class Application : public Component {
   u64 transactionCreationTime(u64 _trans) const;
   void endTransaction(u64 _trans);
 
-  u64 cyclesToSend(u32 _numFlits) const;
+  u64 cyclesToSend(u32 _numFlits, f64 _maxInjectionRate) const;
 
   void startMonitoring();
   void endMonitoring();
@@ -58,7 +58,6 @@ class Application : public Component {
  private:
   std::vector<Terminal*> terminals_;
   std::vector<Messenger*> messengers_;
-  f64 maxInjectionRate_;
   MessageLog* messageLog_;
   RateLog* rateLog_;
   MetadataHandler* metadataHandler_;

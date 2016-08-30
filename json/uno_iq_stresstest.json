@@ -83,7 +83,7 @@
   },
   "application": {
     "type": "stress_test",
-    "max_injection_rate": 0.5,
+    "max_injection_rate": "json/injectionrates.csv.gz",
     "warmup_threshold": 0.99,
     "kill_fast": false,
     "blast_terminal": {

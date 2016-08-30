@@ -21,9 +21,9 @@
 
 InjectionLimiter::InjectionLimiter(
     const std::string& _name, const Component* _parent,
-    Application* _app, u32 _id)
+    Application* _app, u32 _id, f64 _maxInjectionRate)
     : Component(_name, _parent), app_(_app), id_(_id),
-      lastTime_(0) {}
+      maxInjectionRate_(_maxInjectionRate), lastTime_(0) {}
 
 InjectionLimiter::~InjectionLimiter() {}
 
@@ -32,7 +32,7 @@ void InjectionLimiter::setMessageReceiver(MessageReceiver* _receiver) {
 }
 
 void InjectionLimiter::receiveMessage(Message* _message) {
-  u64 cycles = app_->cyclesToSend(_message->numFlits());
+  u64 cycles = app_->cyclesToSend(_message->numFlits(), maxInjectionRate_);
 
   // determine when this message should be delivered to the message receiver
   u64 nextTime = lastTime_ + (cycles * gSim->cycleTime());

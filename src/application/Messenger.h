@@ -36,7 +36,7 @@ class Terminal;
 class Messenger : public Component {
  public:
   Messenger(const std::string& _name, const Component* _parent,
-            Application* _app, u32 _id);
+            Application* _app, u32 _id, f64 _maxInjectionRate);
   ~Messenger();
   void linkInterface(Interface* _interface);
   void linkTerminal(Terminal* _terminal);

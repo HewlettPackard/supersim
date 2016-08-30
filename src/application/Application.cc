@@ -15,6 +15,9 @@
  */
 #include "application/Application.h"
 
+#include <fio/InFile.h>
+#include <strop/strop.h>
+
 #include <cassert>
 #include <cmath>
 
@@ -33,16 +36,47 @@ Application::Application(const std::string& _name, const Component* _parent,
   messengers_.resize(radix, nullptr);
 
   // extract maximum injection rate
-  maxInjectionRate_ = _settings["max_injection_rate"].asDouble();
-  if (maxInjectionRate_ <= 0.0) {
-    maxInjectionRate_ = INFINITY;
+  std::vector<f64> maxInjectionRates(radix);
+  assert(_settings.isMember("max_injection_rate"));
+  if (_settings["max_injection_rate"].isDouble()) {
+    // if a single f64 is given, all terminals have the same rate
+    f64 maxInjectionRate = _settings["max_injection_rate"].asDouble();
+    if (maxInjectionRate <= 0.0) {
+      maxInjectionRate = INFINITY;
+    }
+    for (f64& mir : maxInjectionRates) {
+      mir = maxInjectionRate;
+    }
+  } else if (_settings["max_injection_rate"].isString()) {
+    // if a file is given, it is a csv of injection rates
+    fio::InFile inf(_settings["max_injection_rate"].asString());
+    std::string line;
+    u32 lineNum = 0;
+    fio::InFile::Status sts = fio::InFile::Status::OK;
+    for (lineNum = 0; sts == fio::InFile::Status::OK;) {
+      sts = inf.getLine(&line);
+      assert(sts != fio::InFile::Status::ERROR);
+      if (sts == fio::InFile::Status::OK) {
+        if (line.size() > 0) {
+          std::vector<std::string> strs = strop::split(line, ',');
+          assert(strs.size() == 1);
+          f64 mir = std::stod(strs.at(0));
+          maxInjectionRates.at(lineNum) = mir;
+          lineNum++;
+        }
+      }
+    }
+    assert(lineNum == radix);
+  } else {
+    assert(false);
   }
 
   // instantiate the messengers
   for (u32 id = 0; id < radix; id++) {
     // create the messenger
     std::string cname = "Messenger_" + std::to_string(id);
-    messengers_.at(id) = new Messenger(cname, this, this, id);
+    messengers_.at(id) = new Messenger(cname, this, this, id,
+                                       maxInjectionRates.at(id));
 
     // link the messenger to the network
     messengers_.at(id)->linkInterface(network->getInterface(id));
@@ -100,11 +134,11 @@ void Application::endTransaction(u64 _trans) {
 }
 
 
-u64 Application::cyclesToSend(u32 _numFlits) const {
-  if (std::isinf(maxInjectionRate_)) {
+u64 Application::cyclesToSend(u32 _numFlits, f64 _maxInjectionRate) const {
+  if (std::isinf(_maxInjectionRate)) {
     return 0;  // infinite injection rate
   }
-  f64 cycles = _numFlits / maxInjectionRate_;
+  f64 cycles = _numFlits / _maxInjectionRate;
 
   // if the number of cycles is not even, probablistic cycles must be computed
   f64 fraction = modf(cycles, &cycles);
