@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef TRAFFIC_RANDOMNEIGHBOREXCHANGETRAFFICPATTERN_H_
-#define TRAFFIC_RANDOMNEIGHBOREXCHANGETRAFFICPATTERN_H_
+#ifndef TRAFFIC_RANDOMEXCHANGENEIGHBORTRAFFICPATTERN_H_
+#define TRAFFIC_RANDOMEXCHANGENEIGHBORTRAFFICPATTERN_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -24,13 +24,13 @@
 
 #include "traffic/TrafficPattern.h"
 
-class RandomNeighborExchangeTrafficPattern : public TrafficPattern {
+class RandomExchangeNeighborTrafficPattern : public TrafficPattern {
  public:
-  RandomNeighborExchangeTrafficPattern(
+  RandomExchangeNeighborTrafficPattern(
       const std::string& _name, const Component* _parent, u32 _numTerminals,
       u32 _self, Json::Value _settings);
 
-  ~RandomNeighborExchangeTrafficPattern();
+  ~RandomExchangeNeighborTrafficPattern();
 
   u32 nextDestination() override;
 
@@ -38,4 +38,4 @@ class RandomNeighborExchangeTrafficPattern : public TrafficPattern {
   std::vector<u32> dstVect_;
 };
 
-#endif  // TRAFFIC_RANDOMNEIGHBOREXCHANGETRAFFICPATTERN_H_
+#endif  // TRAFFIC_RANDOMEXCHANGENEIGHBORTRAFFICPATTERN_H_

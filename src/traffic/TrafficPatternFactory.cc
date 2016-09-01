@@ -31,11 +31,12 @@
 #include "traffic/NeighborTrafficPattern.h"
 #include "traffic/RandomExchangeTrafficPattern.h"
 #include "traffic/RandomExchangeQuadrantTrafficPattern.h"
-#include "traffic/RandomNeighborExchangeTrafficPattern.h"
+#include "traffic/RandomExchangeNeighborTrafficPattern.h"
 #include "traffic/ScanTrafficPattern.h"
 #include "traffic/Swap2TrafficPattern.h"
 #include "traffic/TornadoTrafficPattern.h"
 #include "traffic/UniformRandomTrafficPattern.h"
+#include "traffic/UniformRandomQuadrantTrafficPattern.h"
 
 TrafficPattern* TrafficPatternFactory::createTrafficPattern(
     const std::string& _name, const Component* _parent, u32 _numTerminals,
@@ -50,6 +51,9 @@ TrafficPattern* TrafficPatternFactory::createTrafficPattern(
         _name, _parent, _numTerminals, _self, _settings);
   } else if (type == "uniform_random") {
     return new UniformRandomTrafficPattern(
+        _name, _parent, _numTerminals, _self, _settings);
+  } else if (type == "uniform_random_quadrant") {
+    return new UniformRandomQuadrantTrafficPattern(
         _name, _parent, _numTerminals, _self, _settings);
   } else if (type == "bit_complement") {
     return new BitComplementTrafficPattern(
@@ -87,8 +91,8 @@ TrafficPattern* TrafficPatternFactory::createTrafficPattern(
   } else if (type == "random_exchange_quadrant") {
     return new RandomExchangeQuadrantTrafficPattern(
       _name, _parent, _numTerminals, _self, _settings);
-  } else if (type == "random_neighbor_exchange") {
-    return new RandomNeighborExchangeTrafficPattern(
+  } else if (type == "random_exchange_neighbor") {
+    return new RandomExchangeNeighborTrafficPattern(
       _name, _parent, _numTerminals, _self, _settings);
   } else if (type == "swap2") {
     return new Swap2TrafficPattern(

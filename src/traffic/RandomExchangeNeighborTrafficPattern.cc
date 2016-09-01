@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "traffic/RandomNeighborExchangeTrafficPattern.h"
+#include "traffic/RandomExchangeNeighborTrafficPattern.h"
 
 #include <cassert>
 
@@ -21,8 +21,8 @@
 
 #include "network/cube/util.h"
 
-RandomNeighborExchangeTrafficPattern::
-  RandomNeighborExchangeTrafficPattern(
+RandomExchangeNeighborTrafficPattern::
+  RandomExchangeNeighborTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
     : TrafficPattern(_name, _parent, _numTerminals, _self) {
@@ -38,7 +38,7 @@ RandomNeighborExchangeTrafficPattern::
     widths.at(i) = _settings["dimensions"][i].asUInt();
   }
   u32 concentration = _settings["concentration"].asUInt();
-  bool allConcentrators = _settings["all_concentrators"].asBool();
+  bool allTerminals = _settings["all_terminals"].asBool();
 
   std::vector<bool> dimMask(dimensions, false);
   if (_settings.isMember("enabled_dimensions") &&
@@ -62,34 +62,34 @@ RandomNeighborExchangeTrafficPattern::
       Cube::computeTerminalAddress(_self, widths, concentration, &addr);
       addr.at(dim + 1) = (addr.at(dim + 1) + widths.at(dim) - 1)
           % widths.at(dim);
-      if (allConcentrators) {
+      if (allTerminals) {
         for (u32 conc = 0; conc < concentration; ++conc) {
           addr.at(0) = conc;
-          u32 dstID = Cube::computeTerminalId(&addr, widths, concentration);
-          dstVect_.emplace_back(dstID);
+          u32 dstId = Cube::computeTerminalId(&addr, widths, concentration);
+          dstVect_.emplace_back(dstId);
         }
       } else {
-        u32 dstID = Cube::computeTerminalId(&addr, widths, concentration);
-        dstVect_.emplace_back(dstID);
+        u32 dstId = Cube::computeTerminalId(&addr, widths, concentration);
+        dstVect_.emplace_back(dstId);
       }
       addr.at(dim + 1) = (addr.at(dim + 1) + 2) % widths.at(dim);
-      if (allConcentrators) {
+      if (allTerminals) {
         for (u32 conc = 0; conc < concentration; ++conc) {
           addr.at(0) = conc;
-          u32 dstID = Cube::computeTerminalId(&addr, widths, concentration);
-          dstVect_.emplace_back(dstID);
+          u32 dstId = Cube::computeTerminalId(&addr, widths, concentration);
+          dstVect_.emplace_back(dstId);
         }
       } else {
-        u32 dstID = Cube::computeTerminalId(&addr, widths, concentration);
-        dstVect_.emplace_back(dstID);
+        u32 dstId = Cube::computeTerminalId(&addr, widths, concentration);
+        dstVect_.emplace_back(dstId);
       }
     }
   }
 }
 
-RandomNeighborExchangeTrafficPattern::
-  ~RandomNeighborExchangeTrafficPattern() {}
+RandomExchangeNeighborTrafficPattern::
+  ~RandomExchangeNeighborTrafficPattern() {}
 
-u32 RandomNeighborExchangeTrafficPattern::nextDestination() {
+u32 RandomExchangeNeighborTrafficPattern::nextDestination() {
   return dstVect_.at(gSim->rnd.nextU64(0, dstVect_.size() - 1));
 }

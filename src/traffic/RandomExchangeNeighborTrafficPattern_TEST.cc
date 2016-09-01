@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "traffic/RandomNeighborExchangeTrafficPattern.h"
+#include "traffic/RandomExchangeNeighborTrafficPattern.h"
 
 #include <gtest/gtest.h>
 #include <json/json.h>
@@ -27,7 +27,7 @@
 #include "network/cube/util.h"
 #include "test/TestSetup_TEST.h"
 
-TEST(RandomNeighborExchangeTrafficPattern, evenSpread_1d) {
+TEST(RandomExchangeNeighborTrafficPattern, evenSpread_1d) {
   TestSetup test(1, 0xBAADF00D);
   Json::Value settings;
 
@@ -42,9 +42,9 @@ TEST(RandomNeighborExchangeTrafficPattern, evenSpread_1d) {
   const u32 kRounds = 10000;
   const bool DEBUG = false;
 
-  std::vector<RandomNeighborExchangeTrafficPattern*> tps(numTerminals);
+  std::vector<RandomExchangeNeighborTrafficPattern*> tps(numTerminals);
   for (u32 idx = 0; idx < numTerminals; idx++) {
-    tps.at(idx) = new RandomNeighborExchangeTrafficPattern(
+    tps.at(idx) = new RandomExchangeNeighborTrafficPattern(
         "TP_"+std::to_string(idx), nullptr, numTerminals, idx, settings);
   }
 
@@ -104,7 +104,7 @@ TEST(RandomNeighborExchangeTrafficPattern, evenSpread_1d) {
   }
 }
 
-TEST(RandomNeighborExchangeTrafficPattern, evenSpread_1d_all_concentrators) {
+TEST(RandomExchangeNeighborTrafficPattern, evenSpread_1d_all_terminals) {
   TestSetup test(1, 0xBAADF00D);
   Json::Value settings;
 
@@ -112,7 +112,7 @@ TEST(RandomNeighborExchangeTrafficPattern, evenSpread_1d_all_concentrators) {
   settings["dimensions"][1] = Json::Value(4);
   settings["concentration"] = Json::Value(4);
   settings["enabled_dimensions"][0] = true;
-  settings["all_concentrators"] = true;
+  settings["all_terminals"] = true;
 
   std::vector<u32> widths = {4, 4};
 
@@ -120,9 +120,9 @@ TEST(RandomNeighborExchangeTrafficPattern, evenSpread_1d_all_concentrators) {
   const u32 kRounds = 10000;
   const bool DEBUG = false;
 
-  std::vector<RandomNeighborExchangeTrafficPattern*> tps(numTerminals);
+  std::vector<RandomExchangeNeighborTrafficPattern*> tps(numTerminals);
   for (u32 idx = 0; idx < numTerminals; idx++) {
-    tps.at(idx) = new RandomNeighborExchangeTrafficPattern(
+    tps.at(idx) = new RandomExchangeNeighborTrafficPattern(
         "TP_"+std::to_string(idx), nullptr, numTerminals, idx, settings);
   }
 
@@ -182,7 +182,7 @@ TEST(RandomNeighborExchangeTrafficPattern, evenSpread_1d_all_concentrators) {
   }
 }
 
-TEST(RandomNeighborExchangeTrafficPattern, evenSpread_2d_all_concentrators) {
+TEST(RandomExchangeNeighborTrafficPattern, evenSpread_2d_all_terminals) {
   TestSetup test(1, 0xBAADF00D);
   Json::Value settings;
 
@@ -191,7 +191,7 @@ TEST(RandomNeighborExchangeTrafficPattern, evenSpread_2d_all_concentrators) {
   settings["concentration"] = Json::Value(4);
   settings["enabled_dimensions"][0] = true;
   settings["enabled_dimensions"][1] = true;
-  settings["all_concentrators"] = true;
+  settings["all_terminals"] = true;
 
   std::vector<u32> widths = {4, 4};
 
@@ -199,9 +199,9 @@ TEST(RandomNeighborExchangeTrafficPattern, evenSpread_2d_all_concentrators) {
   const u32 kRounds = 10000;
   const bool DEBUG = false;
 
-  std::vector<RandomNeighborExchangeTrafficPattern*> tps(numTerminals);
+  std::vector<RandomExchangeNeighborTrafficPattern*> tps(numTerminals);
   for (u32 idx = 0; idx < numTerminals; idx++) {
-    tps.at(idx) = new RandomNeighborExchangeTrafficPattern(
+    tps.at(idx) = new RandomExchangeNeighborTrafficPattern(
         "TP_"+std::to_string(idx), nullptr, numTerminals, idx, settings);
   }
 
