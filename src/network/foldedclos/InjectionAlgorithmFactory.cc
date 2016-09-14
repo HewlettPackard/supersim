@@ -33,10 +33,7 @@ InjectionAlgorithm* InjectionAlgorithmFactory::createInjectionAlgorithm(
   std::string algorithm = settings_["algorithm"].asString();
   u32 latency = settings_["latency"].asUInt();
 
-  if (algorithm == "most_common_ancestor") {
-    return new FoldedClos::AnyInjectionAlgorithm(
-        _name, _parent, _interface, latency, numVcs_);
-  } else if (algorithm == "least_common_ancestor") {
+  if (algorithm == "common_ancestor") {
     return new FoldedClos::AnyInjectionAlgorithm(
         _name, _parent, _interface, latency, numVcs_);
   } else {

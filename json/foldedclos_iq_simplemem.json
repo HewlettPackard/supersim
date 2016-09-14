@@ -19,8 +19,10 @@
       "file": "/dev/null"  // "channels.csv"
     },
     "routing": {
-      "algorithm": "most_common_ancestor",
+      "algorithm": "common_ancestor",
       "latency": 1,  // cycles
+      "least_common_ancestor": false,
+      "mode": "port",
       "adaptive": true
     },
     "interface": {

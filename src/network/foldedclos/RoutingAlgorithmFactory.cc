@@ -17,8 +17,7 @@
 
 #include <cassert>
 
-#include "network/foldedclos/McaRoutingAlgorithm.h"
-#include "network/foldedclos/LcaRoutingAlgorithm.h"
+#include "network/foldedclos/CommonAncestorRoutingAlgorithm.h"
 #include "network/RoutingAlgorithm.h"
 
 namespace FoldedClos {
@@ -38,17 +37,11 @@ RoutingAlgorithm* RoutingAlgorithmFactory::createRoutingAlgorithm(
   std::string algorithm = settings_["algorithm"].asString();
   assert(settings_.isMember("latency"));
   u32 latency = settings_["latency"].asUInt();
-  assert(settings_.isMember("adaptive"));
-  bool adaptive = settings_["adaptive"].asBool();
 
-  if (algorithm == "most_common_ancestor") {
-    return new McaRoutingAlgorithm(_name, _parent, _router, latency,
-                                   numVcs_, numPorts_, numLevels_, level_,
-                                   _inputPort, adaptive);
-  } else if (algorithm == "least_common_ancestor") {
-    return new LcaRoutingAlgorithm(_name, _parent, _router, latency,
-                                   numVcs_, numPorts_, numLevels_, level_,
-                                   _inputPort, adaptive);
+  if (algorithm == "common_ancestor") {
+    return new CommonAncestorRoutingAlgorithm(
+        _name, _parent, _router, latency, numVcs_, numPorts_, numLevels_,
+        level_, _inputPort, settings_);
   } else {
     fprintf(stderr, "Unknown routing algorithm: '%s'\n", algorithm.c_str());
     assert(false);
