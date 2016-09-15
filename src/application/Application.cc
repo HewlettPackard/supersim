@@ -35,21 +35,23 @@ Application::Application(const std::string& _name, const Component* _parent,
   terminals_.resize(radix, nullptr);
   messengers_.resize(radix, nullptr);
 
-  // extract maximum injection rate
+  // extract maximum injection rate per terminal
   std::vector<f64> maxInjectionRates(radix);
+
+  // get the base injection rate
   assert(_settings.isMember("max_injection_rate"));
-  if (_settings["max_injection_rate"].isDouble()) {
-    // if a single f64 is given, all terminals have the same rate
-    f64 maxInjectionRate = _settings["max_injection_rate"].asDouble();
-    if (maxInjectionRate <= 0.0) {
-      maxInjectionRate = INFINITY;
-    }
-    for (f64& mir : maxInjectionRates) {
-      mir = maxInjectionRate;
-    }
-  } else if (_settings["max_injection_rate"].isString()) {
+  f64 baseInjection = _settings["max_injection_rate"].asDouble();
+  if (baseInjection <= 0.0) {
+    baseInjection = INFINITY;
+  }
+  for (f64& mir : maxInjectionRates) {
+    mir = baseInjection;
+  }
+
+  // if necessary, apply relative rates
+  if (_settings.isMember("relative_injection")) {
     // if a file is given, it is a csv of injection rates
-    fio::InFile inf(_settings["max_injection_rate"].asString());
+    fio::InFile inf(_settings["relative_injection"].asString());
     std::string line;
     u32 lineNum = 0;
     fio::InFile::Status sts = fio::InFile::Status::OK;
@@ -60,8 +62,8 @@ Application::Application(const std::string& _name, const Component* _parent,
         if (line.size() > 0) {
           std::vector<std::string> strs = strop::split(line, ',');
           assert(strs.size() == 1);
-          f64 mir = std::stod(strs.at(0));
-          maxInjectionRates.at(lineNum) = mir;
+          f64 ri = std::stod(strs.at(0));
+          maxInjectionRates.at(lineNum) *= ri;
           lineNum++;
         }
       }
