@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+import site
+import subprocess
+
+def doit(cmd, failsafe=False, quiet=False):
+  print('EXEC: {0}'.format(cmd))
+  try:
+    func = subprocess.check_call if not quiet else subprocess.check_output
+    func(cmd, shell=True)
+    return True
+  except:
+    if failsafe:
+      return False
+    else:
+      print('ERROR: "{0}" failed'.format(cmd))
+      exit(-1)
+
+
+def clone(loc, url, commit):
+  if not os.path.isdir(loc):
+    doit('git clone {0} {1}'.format(url, loc))
+  else:
+    print('INFO: {0} is already cloned'.format(loc))
+  if commit:
+    doit('cd {0} && git checkout {1}'.format(loc, commit))
+
+def install(loc, url, commit):
+  userbin = os.path.join(site.USER_BASE, 'bin')
+  if userbin not in os.environ['PATH'].split(':'):
+    print(('\nThis environment requires some Python packages installed\n'
+           'locally as \'user\' packages. You must add \'{0}\'\n'
+           'to your PATH environment variable. Add the following to your\n'
+           'startup script (e.g., ~/.bashrc) and try again:\n'
+           '\n'
+           'For bash:\n'
+           '  PATH="{0}:$PATH"\n'
+           'For csh/tcsh:\n'
+           '  setenv PATH {0}\:$PATH\n'
+           '\n').format(userbin))
+    exit(-1)
+  if os.path.isdir(loc):
+    doit('cd {0} && python3 setup.py install --user --record files.txt'
+         .format(loc))
+  else:
+    print('ERROR: {0} isn\'t cloned'.format(loc))
+    exit(-1)
+
+def files(loc, url, commit):
+  if not os.path.isdir(loc):
+    print('INFO: {0} is not cloned'.format(loc))
+  elif not os.path.isfile(os.path.join(loc, 'files.txt')):
+    print('INFO: {0} is not installed'.format(loc))
+  else:
+    doit('cd {0} && cat files.txt'.format(loc))
+
+def uninstall(loc, url, commit):
+  if not os.path.isdir(loc):
+    print('INFO: {0} is not cloned'.format(loc))
+  elif not os.path.isfile(os.path.join(loc, 'files.txt')):
+    print('INFO: {0} is not installed'.format(loc))
+  else:
+    doit('cd {0} && cat files.txt | xargs rm -rf'.format(loc))
+
+def delete(loc, url, commit):
+  doit('rm -rf {0}'.format(loc))
+
+
+def main(args):
+  repos = [('percentile', 'github.com', 'nicmcd/percentile', None),
+           ('ssplot', 'github.com', 'nicmcd/ssplot', None),
+           ('taskrun', 'github.com', 'nicmcd/taskrun', None)]
+
+  for command in args.command:
+    for repo in repos:
+      # parse the tuple
+      loc = repo[0]
+      if args.mode == 'git':
+        url = 'git@' + repo[1] + ':' + repo[2]
+      elif args.mode == 'https':
+        url = 'https://' + repo[1] + '/' + repo[2]
+      else:
+        assert False, 'bad programmer'
+      commit = repo[3]
+
+      # run the command
+      if command == 'list':
+        print('{0} url={1} commit={2}'.format(loc, url, commit))
+      elif command == 'clone':
+        clone(loc, url, commit)
+      elif command == 'install':
+        install(loc, url, commit)
+      elif command == 'files':
+        files(loc, url, commit)
+      elif command == 'uninstall':
+        uninstall(loc, url, commit)
+      elif command == 'delete':
+        delete(loc, url, commit)
+      else:
+        print('ERROR: invalid command: {0}'.format(command))
+        exit(-1)
+
+
+
+if __name__ == '__main__':
+  ap = argparse.ArgumentParser()
+  ap.add_argument('command', nargs='+',
+                  choices=['list', 'clone', 'install', 'files', 'uninstall',
+                           'delete'],
+                  help='command to be run')
+  ap.add_argument('-m', '--mode', choices=['git', 'https'], default='https',
+                  help='use https urls (default) or git urls')
+  args = ap.parse_args()
+  main(args)

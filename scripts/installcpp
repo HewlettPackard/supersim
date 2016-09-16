@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+import subprocess
+
+
+def doit(cmd, failsafe=False):
+  print('EXEC: {0}'.format(cmd))
+  try:
+    subprocess.check_call(cmd, shell=True)
+    return True
+  except:
+    if failsafe:
+      return False
+    else:
+      print('ERROR: "{0}" failed'.format(cmd))
+      exit(-1)
+
+
+def clone(loc, url, commit):
+  if not os.path.isdir(loc):
+    doit('git clone {0} {1}'.format(url, loc))
+    if commit:
+      doit('cd {0} && git checkout {1}'.format(loc, commit))
+  else:
+    print('INFO: {0} is already cloned'.format(loc))
+
+
+def build(loc, url, commit):
+  if os.path.isdir(loc):
+    doit('cd {0} && make -j {1}'.format(loc, os.cpu_count()))
+  else:
+    print('ERROR: {0} isn\'t cloned'.format(loc))
+    exit(-1)
+
+def check(loc, url, commit):
+  if os.path.isdir(loc):
+    doit('cd {0} && make check'.format(loc))
+  else:
+    print('ERROR: {0} isn\'t cloned'.format(loc))
+    exit(-1)
+
+def clean(loc, url, commit):
+  if os.path.isdir(loc):
+    doit('cd {0} && make clean'.format(loc))
+  else:
+    print('WARNING: {0} isn\'t cloned'.format(loc))
+
+def delete(loc, url, commit):
+  doit('rm -rf {0}'.format(loc))
+
+
+def main(args):
+  repos = [('libprim', 'github.com', 'nicmcd/libprim', None),
+           ('librnd', 'github.com', 'nicmcd/librnd', None),
+           ('libmut', 'github.com', 'nicmcd/libmut', None),
+           ('libbits', 'github.com', 'nicmcd/libbits', None),
+           ('libjson', 'github.com', 'nicmcd/libjson', None),
+           ('libstrop', 'github.com', 'nicmcd/libstrop', None),
+           ('libsettings', 'github.com', 'nicmcd/libsettings', None),
+           ('libgrid', 'github.com', 'nicmcd/libgrid', None),
+           ('libcolhash', 'github.com', 'nicmcd/libcolhash', None),
+           ('libfio', 'github.com', 'nicmcd/libfio', None),
+           ('supersim', 'github.com', 'hewlettpackardlabs/supersim', 'dev'),
+           ('sslatency', 'github.com', 'nicmcd/sslatency', None),
+           ('hyperxsearch', 'github.com', 'nicmcd/hyperxsearch', None)]
+
+  for command in args.command:
+    for repo in repos:
+      # parse the tuple
+      loc = repo[0]
+      if args.mode == 'git':
+        url = 'git@' + repo[1] + ':' + repo[2]
+      elif args.mode == 'https':
+        url = 'https://' + repo[1] + '/' + repo[2]
+      else:
+        assert False, 'bad programmer'
+      commit = repo[3]
+
+      # check for make-c-cpp
+      if command in ['build', 'check', 'clean']:
+        mkccppdir = os.path.join(os.path.expanduser('~'), '.makeccpp')
+        if not os.path.isdir(mkccppdir):
+          print('ERROR: ~/.makeccpp does not exist. Why not?')
+          exit(-1)
+
+      # run the command
+      if command == 'list':
+        print('{0} url={1} commit={2}'.format(loc, url, commit))
+      elif command == 'clone':
+        clone(loc, url, commit)
+      elif command == 'build':
+        build(loc, url, commit)
+      elif command == 'check':
+        check(loc, url, commit)
+      elif command == 'clean':
+        clean(loc, url, commit)
+      elif command == 'delete':
+        delete(loc, url, commit)
+      else:
+        print('ERROR: invalid command: {0}'.format(command))
+        exit(-1)
+
+
+
+if __name__ == '__main__':
+  ap = argparse.ArgumentParser()
+  ap.add_argument('command', nargs='+',
+                  choices=['list', 'clone', 'build', 'check', 'clean',
+                           'delete'],
+                  help='command to be run')
+  ap.add_argument('-m', '--mode', choices=['git', 'https'], default='https',
+                  help='use https urls (default) or git urls')
+  args = ap.parse_args()
+  main(args)
