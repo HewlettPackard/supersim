@@ -69,8 +69,6 @@ Application::Application(const std::string& _name, const Component* _parent,
       }
     }
     assert(lineNum == radix);
-  } else {
-    assert(false);
   }
 
   // instantiate the messengers
