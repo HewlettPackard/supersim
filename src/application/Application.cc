@@ -36,7 +36,7 @@ Application::Application(const std::string& _name, const Component* _parent,
   messengers_.resize(radix, nullptr);
 
   // extract maximum injection rate per terminal
-  std::vector<f64> maxInjectionRates(radix);
+  maxInjectionRates_.resize(radix, F64_NAN);
 
   // get the base injection rate
   assert(_settings.isMember("max_injection_rate"));
@@ -44,7 +44,7 @@ Application::Application(const std::string& _name, const Component* _parent,
   if (baseInjection <= 0.0) {
     baseInjection = INFINITY;
   }
-  for (f64& mir : maxInjectionRates) {
+  for (f64& mir : maxInjectionRates_) {
     mir = baseInjection;
   }
 
@@ -63,7 +63,7 @@ Application::Application(const std::string& _name, const Component* _parent,
           std::vector<std::string> strs = strop::split(line, ',');
           assert(strs.size() == 1);
           f64 ri = std::stod(strs.at(0));
-          maxInjectionRates.at(lineNum) *= ri;
+          maxInjectionRates_.at(lineNum) *= ri;
           lineNum++;
         }
       }
@@ -73,10 +73,12 @@ Application::Application(const std::string& _name, const Component* _parent,
 
   // instantiate the messengers
   for (u32 id = 0; id < radix; id++) {
+    assert(maxInjectionRates_.at(id) > 0.0);
+
     // create the messenger
     std::string cname = "Messenger_" + std::to_string(id);
     messengers_.at(id) = new Messenger(cname, this, this, id,
-                                       maxInjectionRates.at(id));
+                                       maxInjectionRates_.at(id));
 
     // link the messenger to the network
     messengers_.at(id)->linkInterface(network->getInterface(id));
@@ -133,6 +135,9 @@ void Application::endTransaction(u64 _trans) {
   assert(res == 1);
 }
 
+f64 Application::maxInjectionRate(u32 _id) const {
+  return maxInjectionRates_.at(_id);
+}
 
 u64 Application::cyclesToSend(u32 _numFlits, f64 _maxInjectionRate) const {
   if (std::isinf(_maxInjectionRate)) {

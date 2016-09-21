@@ -65,8 +65,9 @@ BlastTerminal::BlastTerminal(const std::string& _name, const Component* _parent,
 
   // choose a random number of cycles in the future to start
   // make an event to start the BlastTerminal in the future
-  u64 cycles = getApplication()->cyclesToSend(maxMessageSize_, 0.1);
-  cycles = gSim->rnd.nextU64(1, 1 + cycles);
+  f64 mir = getApplication()->maxInjectionRate(_id);
+  u64 cycles = getApplication()->cyclesToSend(maxMessageSize_, mir);
+  cycles = gSim->rnd.nextU64(1, 1 + cycles * 3);
   u64 time = gSim->futureCycle(1) + ((cycles - 1) * gSim->cycleTime());
   dbgprintf("start time is %lu", time);
   addEvent(time, 0, nullptr, 0);
