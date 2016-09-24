@@ -10,7 +10,7 @@ main steps:
 This document walks through this process step-by-step with a basic example.
 
 ## Generating the simulation settings
-The settings system of SuperSim uses [libsettings][] which is a JSON-based
+The configuration system of SuperSim uses [libsettings][] which is a JSON-based
 settings file system that allows command line modifications. Let's take an
 example settings file from the SuperSim project. We'll modify the settings
 on the command line when we run the simulator.
@@ -44,42 +44,40 @@ simulation completes is prints out a statistics summary of the simulation.
 You can view the channel utilization with the following command:
 
 ``` sh
-column -t -s, channels.csv
+column -t -s, channels.csv | less
 ```
 
 You can view the injection and ejection rates with the following command:
 
 ``` sh
-column -t -s, rates.csv
+column -t -s, rates.csv | less
 ```
 
-The time based information related to flits, packets, and messages is
-contained in the `message_log` which is a custom file format. In this
-example, we've also compressed it. Let's view it's structure with the
-following command:
+The time based information related to flits, packets, messages, and transactions
+is contained in the `message_log` which is a custom file format. In this
+example, we've also SuperSim to compress the file by giving it a `.gz` file
+extension. View its structure with the following command:
 
 ``` sh
 gzip -c -d messages.mpf.gz | less
 ```
 
-You'll be able to notice a hierarchy of transactions, messages, packets,
-and flits. This file can be used to generate all types latency-based
-analyses.
+Scroll down until you see lines that start with `+M`, `+P`, and `F`. Notice the
+hierarchy of transactions, messages, packets, and flits. This file can be used
+to generate all types latency-based analyses.
 
 ## Parsing the results
-Run the parsing program [SSLatency][] to get prepared for plotting the results.
-We can also use this program to provide a basic analysis. Run the following
-command:
+Assuming we care about packet latency as our metric, let's run the parsing
+program [SSLatency][] to get prepared for plotting the results. We can also use
+this program to provide a basic analysis. Run the following command:
 
 ``` sh
 cd ~/ssdev
-sslatency/bin/sslatency -a aggregate.csv -p packets.csv.gz -m messages.csv.gz \
-    messages.mpf.gz
+sslatency/bin/sslatency -a aggregate.csv -p packets.csv.gz messages.mpf.gz
 ```
-The outputs of this command are 3 files:
+The outputs of this command are 2 files:
 1. aggregate.csv - Simple analysis info in a CSV format
 2. packets.csv.gz - Packet latency info in a compressed CSV format
-3. messages.csv.gz - Message latency info in a compressed CSV format
 
 Take a look in the aggregate.csv file to discover how our network performed
 with the specified traffic pattern:
@@ -88,12 +86,15 @@ with the specified traffic pattern:
 column -t -s, aggregate.csv
 ```
 
+Note: you can also tell SSLatency to generate message latency data and
+transaction latency data using the `-m` and `-t` flags, respectively.
+
 ## Plotting the resuls
-Assuming we care about packet latency as our metric, let's plot the results
-using the [SSPlot][] plotting package. This package has 3 executables:
+Let's plot the packet latency results using the [SSPlot][] plotting package.
+This package has 3 executables:
 1. sslqp - Latency quad plot focused on latency distribution
 2. ssllp - Standard load vs. latency plot
-3. sslcp - Load vs. latency comparison across multiple sweeps.
+3. sslcp - Load vs. latency comparison across multiple sweeps
 
 We only ran one simulation so the only tool we can use at this point is sslqp.
 Run it and view the plot with the following commands:
