@@ -2,9 +2,10 @@
 
 The process from running a simulation to receiving useful results contains 4
 main steps:
+
 1. Generating the simulation settings
 2. Running the simulator
-3. Parsing the results
+3. Analyzing the data
 4. Plotting the results
 
 This document walks through this process step-by-step with a basic example.
@@ -66,7 +67,7 @@ Scroll down until you see lines that start with `+M`, `+P`, and `F`. Notice the
 hierarchy of transactions, messages, packets, and flits. This file can be used
 to generate all types latency-based analyses.
 
-## Parsing the results
+## Analyzing the data
 Assuming we care about packet latency as our metric, let's run the parsing
 program [SSLatency][] to get prepared for plotting the results. We can also use
 this program to provide a basic analysis. Run the following command:
