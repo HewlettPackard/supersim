@@ -24,19 +24,17 @@
 #include "types/Message.h"
 #include "types/MessageReceiver.h"
 
-class RateMonitor : public Component, public MessageReceiver {
+class RateMonitor : public Component {
  public:
   RateMonitor(const std::string& _name, const Component* _parent);
   ~RateMonitor();
 
-  void setMessageReceiver(MessageReceiver* _receiver);
-  void receiveMessage(Message* _message);
+  void monitorMessage(const Message* _message);
   void start();
   void end();
   f64 rate() const;
 
  private:
-  MessageReceiver* messageReceiver_;
   u64 flitCount_;
 
   u64 startTime_;

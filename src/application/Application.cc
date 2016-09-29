@@ -159,17 +159,17 @@ u64 Application::cyclesToSend(u32 _numFlits, f64 _maxInjectionRate) const {
 }
 
 void Application::startMonitoring() {
-  for (u32 i = 0; i < messengers_.size(); i++) {
-    messengers_.at(i)->startRateMonitors();
+  for (u32 i = 0; i < terminals_.size(); i++) {
+    terminals_.at(i)->startRateMonitors();
   }
 }
 
 void Application::endMonitoring() {
-  for (u32 i = 0; i < messengers_.size(); i++) {
-    messengers_.at(i)->endRateMonitors();
+  for (u32 i = 0; i < terminals_.size(); i++) {
+    terminals_.at(i)->endRateMonitors();
   }
-  for (u32 i = 0; i < messengers_.size(); i++) {
-    messengers_.at(i)->logRates(rateLog_);
+  for (u32 i = 0; i < terminals_.size(); i++) {
+    terminals_.at(i)->logRates(rateLog_);
   }
 }
 

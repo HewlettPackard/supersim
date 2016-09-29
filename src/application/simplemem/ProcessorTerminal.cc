@@ -49,7 +49,10 @@ void ProcessorTerminal::processEvent(void* _event, s32 _type) {
   startNextMemoryAccess();
 }
 
-void ProcessorTerminal::handleMessage(Message* _message) {
+void ProcessorTerminal::receiveMessage(Message* _message) {
+  // any override of this function must call the base class's function
+  ::Terminal::receiveMessage(_message);
+
   dbgprintf("received message");
 
   // log the message
@@ -85,6 +88,8 @@ void ProcessorTerminal::handleMessage(Message* _message) {
 }
 
 void ProcessorTerminal::messageEnteredInterface(Message* _message) {
+  // any override of this function must call the base class's function
+  ::Terminal::messageEnteredInterface(_message);
 }
 
 void ProcessorTerminal::messageExitedNetwork(Message* _message) {

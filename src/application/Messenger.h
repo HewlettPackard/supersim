@@ -25,7 +25,6 @@
 
 class Application;
 class InjectionLimiter;
-class RateMonitor;
 class EnterNotifier;
 class ExitNotifier;
 
@@ -40,17 +39,11 @@ class Messenger : public Component {
   ~Messenger();
   void linkInterface(Interface* _interface);
   void linkTerminal(Terminal* _terminal);
-  void startRateMonitors();
-  void endRateMonitors();
-  void logRates(RateLog* _rateLog);
 
  private:
   Application* app_;
   u32 id_;
   InjectionLimiter* injectionLimiter_;
-  RateMonitor* supplyMonitor_;
-  RateMonitor* injectionMonitor_;
-  RateMonitor* ejectionMonitor_;
   EnterNotifier* enterNotifier_;
   ExitNotifier* exitNotifier_;
 };

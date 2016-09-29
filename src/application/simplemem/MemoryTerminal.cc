@@ -47,7 +47,10 @@ void MemoryTerminal::processEvent(void* _event, s32 _type) {
   sendMemoryResponse();
 }
 
-void MemoryTerminal::handleMessage(Message* _message) {
+void MemoryTerminal::receiveMessage(Message* _message) {
+  // any override of this function must call the base class's function
+  ::Terminal::receiveMessage(_message);
+
   dbgprintf("received message");
 
   // log the message
@@ -79,6 +82,8 @@ void MemoryTerminal::handleMessage(Message* _message) {
 }
 
 void MemoryTerminal::messageEnteredInterface(Message* _message) {
+  // any override of this function must call the base class's function
+  ::Terminal::messageEnteredInterface(_message);
 }
 
 void MemoryTerminal::messageExitedNetwork(Message* _message) {

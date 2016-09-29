@@ -21,15 +21,10 @@ RateMonitor::RateMonitor(const std::string& _name, const Component* _parent)
 
 RateMonitor::~RateMonitor() {}
 
-void RateMonitor::setMessageReceiver(MessageReceiver* _receiver) {
-  messageReceiver_ = _receiver;
-}
-
-void RateMonitor::receiveMessage(Message* _message) {
+void RateMonitor::monitorMessage(const Message* _message) {
   if (running_) {
     flitCount_ += _message->numFlits();
   }
-  messageReceiver_->receiveMessage(_message);
 }
 
 void RateMonitor::start() {

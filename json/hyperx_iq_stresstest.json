@@ -90,7 +90,8 @@
     "type": "stress_test",
     "max_injection_rate": 0.90,
     "warmup_threshold": 0.99,
-    "kill_fast": false,
+    "kill_on_saturation": false,
+    "log_during_saturation": false,
     "blast_terminal": {
       "num_messages": 50,
       "min_message_size": 1,

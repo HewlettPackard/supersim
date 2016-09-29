@@ -29,8 +29,15 @@ Application::Application(const std::string& _name, const Component* _parent,
                          MetadataHandler* _metadataHandler,
                          Json::Value _settings)
     : ::Application(_name, _parent, _metadataHandler, _settings),
-      killFast_(_settings["kill_fast"].asBool()) {
-  assert(!_settings["kill_fast"].isNull());
+      killOnSaturation_(_settings["kill_on_saturation"].asBool()),
+      logDuringSaturation_(_settings["log_during_saturation"].asBool()),
+      maxSaturationCycles_(_settings["max_saturation_cycles"].asUInt()) {
+  // check settings
+  assert(!_settings["kill_on_saturation"].isNull());
+  assert(!_settings["log_during_saturation"].isNull());
+  if (logDuringSaturation_) {
+    assert(!_settings["max_saturation_cycles"].isNull());
+  }
 
   // all terminals are the same
   for (u32 t = 0; t < numTerminals(); t++) {
@@ -45,6 +52,7 @@ Application::Application(const std::string& _name, const Component* _parent,
   warmedTerminals_ = 0;
   saturatedTerminals_ = 0;
   warmupComplete_ = false;
+  logComplete_ = false;
   completedTerminals_ = 0;
   warmupThreshold_ = _settings["warmup_threshold"].asDouble();
   assert(warmupThreshold_ > 0);
@@ -78,17 +86,36 @@ void Application::terminalSaturated(u32 _id) {
   assert(saturatedTerminals_ <= numTerminals());
   f64 percentSaturated = saturatedTerminals_ / static_cast<f64>(numTerminals());
   if (percentSaturated > (1.0 - warmupThreshold_)) {
+    // the network is saturated
     warmupComplete_ = true;
-    if (killFast_) {
+    if (killOnSaturation_) {
+      // just kill the simulator right here
       printf("Saturation threshold %f reached, initiating kill fast\n",
              1.0 - warmupThreshold_);
       exit(0);
-    }
-    printf("Saturation threshold %f reached, now draining the network\n",
-           1.0 - warmupThreshold_);
-    for (u32 idx = 0; idx < numTerminals(); idx++) {
-      BlastTerminal* t = reinterpret_cast<BlastTerminal*>(getTerminal(idx));
-      t->stopSending();
+    } else if (logDuringSaturation_) {
+      // start the logging phase
+      printf("Saturation threshold %f reached, continuing anyway\n",
+             1.0 - warmupThreshold_);
+      gSim->startMonitoring();
+      for (u32 idx = 0; idx < numTerminals(); idx++) {
+        BlastTerminal* t = reinterpret_cast<BlastTerminal*>(getTerminal(idx));
+        t->startLogging();
+      }
+
+      // set the maximum number of cycles to stay within the logging phase
+      printf("setting timeout from %lu to %lu\n",
+             gSim->time(), gSim->futureCycle(maxSaturationCycles_));
+      addEvent(gSim->futureCycle(maxSaturationCycles_), 0, nullptr, 0);
+    } else {
+      // drain all the packets from the network
+      printf("Saturation threshold %f reached, now draining the network\n",
+             1.0 - warmupThreshold_);
+      for (u32 idx = 0; idx < numTerminals(); idx++) {
+        BlastTerminal* t = reinterpret_cast<BlastTerminal*>(getTerminal(idx));
+        t->stopSending();
+      }
+      logComplete_ = true;
     }
   }
 }
@@ -97,13 +124,14 @@ void Application::terminalComplete(u32 _id) {
   completedTerminals_++;
   dbgprintf("Terminal %u is done (%u total)", _id, completedTerminals_);
   assert(completedTerminals_ <= numTerminals());
-  if (completedTerminals_ == numTerminals()) {
+  if (!logComplete_ && (completedTerminals_ == numTerminals())) {
     printf("All terminals have completed, now draining the network\n");
     for (u32 idx = 0; idx < numTerminals(); idx++) {
       BlastTerminal* t = reinterpret_cast<BlastTerminal*>(getTerminal(idx));
       t->stopSending();
     }
     gSim->endMonitoring();
+    logComplete_ = true;
   }
 }
 
@@ -114,6 +142,18 @@ f64 Application::percentComplete() const {
     percentSum += t->percentComplete();
   }
   return percentSum / numTerminals();
+}
+
+void Application::processEvent(void* _event, s32 _type) {
+  if (!logComplete_) {
+    printf("Max saturation time reached, draining network\n");
+    for (u32 idx = 0; idx < numTerminals(); idx++) {
+      BlastTerminal* t = reinterpret_cast<BlastTerminal*>(getTerminal(idx));
+      t->stopSending();
+    }
+    gSim->endMonitoring();
+    logComplete_ = true;
+  }
 }
 
 }  // namespace StressTest

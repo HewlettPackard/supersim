@@ -39,7 +39,7 @@ class StreamTerminal : public Terminal {
                  Json::Value _settings);
   ~StreamTerminal();
   void processEvent(void* _event, s32 _type) override;
-  void handleMessage(Message* _message) override;
+  void receiveMessage(Message* _message) override;
   void messageEnteredInterface(Message* _message) override;
   void messageExitedNetwork(Message* _message) override;
   f64 percentComplete() const;

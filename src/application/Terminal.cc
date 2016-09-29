@@ -24,13 +24,23 @@
 Terminal::Terminal(const std::string& _name, const Component* _parent, u32 _id,
                    const std::vector<u32>& _address, Application* _app)
     : Component(_name, _parent), id_(_id), address_(_address), app_(_app),
-      messagesSent_(0), messagesReceived_(0), transactionsCreated_(0) {}
+      messagesSent_(0), messagesReceived_(0), transactionsCreated_(0) {
+  // create the rate monitors
+  supplyMonitor_ = new RateMonitor("SupplyMonitor", this);
+  injectionMonitor_ = new RateMonitor("InjectionMonitor", this);
+  deliveredMonitor_ = new RateMonitor("DeliveredMonitor", this);
+  ejectionMonitor_ = new RateMonitor("EjectionMonitor", this);
+}
 
 Terminal::~Terminal() {
   for (auto it = outstandingMessages_.begin(); it != outstandingMessages_.end();
        ++it) {
     delete *it;
   }
+  delete supplyMonitor_;
+  delete injectionMonitor_;
+  delete deliveredMonitor_;
+  delete ejectionMonitor_;
 }
 
 u32 Terminal::getId() const {
@@ -39,6 +49,28 @@ u32 Terminal::getId() const {
 
 const std::vector<u32>& Terminal::getAddress() const {
   return address_;
+}
+
+void Terminal::startRateMonitors() {
+  supplyMonitor_->start();
+  injectionMonitor_->start();
+  deliveredMonitor_->start();
+  ejectionMonitor_->start();
+}
+
+void Terminal::endRateMonitors() {
+  supplyMonitor_->end();
+  injectionMonitor_->end();
+  deliveredMonitor_->end();
+  ejectionMonitor_->end();
+}
+
+void Terminal::logRates(RateLog* _rateLog) {
+  _rateLog->logRates(id_, name(),
+                     supplyMonitor_->rate(),
+                     injectionMonitor_->rate(),
+                     deliveredMonitor_->rate(),
+                     ejectionMonitor_->rate());
 }
 
 u32 Terminal::messagesSent() const {
@@ -62,14 +94,23 @@ Application* Terminal::getApplication() const {
 }
 
 void Terminal::receiveMessage(Message* _message) {
+  // log this occurrence
+  ejectionMonitor_->monitorMessage(_message);
+
   // change the owner of the message to this terminal
   _message->setOwner(this);
+}
 
-  // deliver message to terminal subclass
-  handleMessage(_message);
+void Terminal::messageEnteredInterface(Message* _message) {
+  // log this occurrence
+  injectionMonitor_->monitorMessage(_message);
 }
 
 void Terminal::messageExitedNetwork(Message* _message) {
+  // log this occurrence
+  deliveredMonitor_->monitorMessage(_message);
+
+  // remove this message from the outstanding list and count it
   assert(outstandingMessages_.erase(_message) == 1);
   messagesReceived_++;
 }
@@ -87,6 +128,9 @@ void Terminal::enrouteCount(u32* _messages, u32* _packets, u32* _flits) const {
 }
 
 u32 Terminal::sendMessage(Message* _message, u32 _destinationId) {
+  // log this occurrence
+  supplyMonitor_->monitorMessage(_message);
+
   // set each packet's metadata
   u32 numPackets = _message->numPackets();
   for (u32 pkt = 0; pkt < numPackets; pkt++) {

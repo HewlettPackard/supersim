@@ -87,7 +87,10 @@ void BlastTerminal::processEvent(void* _event, s32 _type) {
   sendNextMessage();
 }
 
-void BlastTerminal::handleMessage(Message* _message) {
+void BlastTerminal::receiveMessage(Message* _message) {
+  // any override of this function must call the base class's function
+  ::Terminal::receiveMessage(_message);
+
   // end the transaction
   endTransaction(_message->getTransaction());
 
@@ -95,6 +98,9 @@ void BlastTerminal::handleMessage(Message* _message) {
 }
 
 void BlastTerminal::messageEnteredInterface(Message* _message) {
+  // any override of this function must call the base class's function
+  ::Terminal::messageEnteredInterface(_message);
+
   if (messagesToLog_.count(_message->getId()) == 1) {
     loggableEnteredCount_++;
     dbgprintf("loggable entered network (%u of %u)",

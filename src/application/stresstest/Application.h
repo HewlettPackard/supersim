@@ -38,11 +38,17 @@ class Application : public ::Application {
   void terminalComplete(u32 _id);
   f64 percentComplete() const override;
 
+  void processEvent(void* _event, s32 _type) override;
+
  private:
-  const bool killFast_;
+  const bool killOnSaturation_;
+  const bool logDuringSaturation_;
+  const u64 maxSaturationCycles_;
+
   u32 warmedTerminals_;
   u32 saturatedTerminals_;
   bool warmupComplete_;
+  bool logComplete_;
   f64 warmupThreshold_;
   u32 completedTerminals_;
 };

@@ -65,7 +65,10 @@ void StreamTerminal::processEvent(void* _event, s32 _type) {
   sendNextMessage();
 }
 
-void StreamTerminal::handleMessage(Message* _message) {
+void StreamTerminal::receiveMessage(Message* _message) {
+  // any override of this function must call the base class's function
+  ::Terminal::receiveMessage(_message);
+
   dbgprintf("received message %u", _message->getId());
 
   // end the transaction
@@ -85,6 +88,9 @@ void StreamTerminal::handleMessage(Message* _message) {
 }
 
 void StreamTerminal::messageEnteredInterface(Message* _message) {
+  // any override of this function must call the base class's function
+  ::Terminal::messageEnteredInterface(_message);
+
   // determine if more messages should be created and sent
   u64 now = gSim->time();
   assert(lastSendTime_ <= now);

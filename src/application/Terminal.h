@@ -22,7 +22,9 @@
 #include <string>
 #include <vector>
 
+#include "application/RateMonitor.h"
 #include "event/Component.h"
+#include "stats/RateLog.h"
 #include "types/Message.h"
 #include "types/MessageReceiver.h"
 
@@ -35,6 +37,9 @@ class Terminal : public Component, public MessageReceiver {
   virtual ~Terminal();
   u32 getId() const;
   const std::vector<u32>& getAddress() const;
+  void startRateMonitors();
+  void endRateMonitors();
+  void logRates(RateLog* _rateLog);
   u32 messagesSent() const;
   u32 messagesReceived() const;
   u32 transactionsCreated() const;
@@ -44,6 +49,7 @@ class Terminal : public Component, public MessageReceiver {
   /*
    * This function is called by the network when a message is being given
    * to this terminal.
+   * NOTE: THIS MUST BE EXPLICITLY CALLED BY SUBCLASSES
    */
   void receiveMessage(Message* _message) override;
 
@@ -51,13 +57,15 @@ class Terminal : public Component, public MessageReceiver {
    * This informs this terminal that the message has entered
    * the network interface. This allows the owner to generate messages
    * back-to-back without being concerned about message queuing.
+   * NOTE: THIS MUST BE EXPLICITLY CALLED BY SUBCLASSES
    */
-  virtual void messageEnteredInterface(Message* _message) = 0;
+  virtual void messageEnteredInterface(Message* _message);
 
   /*
    * This informs this terminal that the message has exited the network and
    * that this terminal doesn't need to worry about memory deallocation.
    * Overriding implementation must call this!
+   * NOTE: THIS MUST BE EXPLICITLY CALLED BY SUBCLASSES
    */
   virtual void messageExitedNetwork(Message* _message);
 
@@ -84,14 +92,6 @@ class Terminal : public Component, public MessageReceiver {
   u32 sendMessage(Message* _message, u32 _destinationId);
 
   /*
-   * This function must be implemented by the subclass. This function is called
-   *  right after the terminal receives a message with receiveMessage(). This
-   *  class will perform some receive logic then call this subclass function to
-   *  handle the message.
-   */
-  virtual void handleMessage(Message* _message) = 0;
-
-  /*
    * Subclass implementations can use this to generate new transaction IDs.
    */
   u64 createTransaction();
@@ -106,6 +106,12 @@ class Terminal : public Component, public MessageReceiver {
   const std::vector<u32> address_;
   Application* app_;
   MessageReceiver* messageReceiver_;
+
+  RateMonitor* supplyMonitor_;
+  RateMonitor* injectionMonitor_;
+  RateMonitor* deliveredMonitor_;
+  RateMonitor* ejectionMonitor_;
+
   u32 messagesSent_;
   u32 messagesReceived_;
   u32 transactionsCreated_;
