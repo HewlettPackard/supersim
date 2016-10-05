@@ -20,7 +20,7 @@
 
 class TestSetup {
  public:
-  TestSetup(u64 _cycleTime, u64 _randomSeed);
+  TestSetup(u64 _channelCycleTime, u64 _coreCycleTime, u64 _randomSeed);
   ~TestSetup();
 };
 

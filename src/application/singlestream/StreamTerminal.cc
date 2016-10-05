@@ -49,7 +49,8 @@ StreamTerminal::StreamTerminal(
     f64 mir = getApplication()->maxInjectionRate(_id);
     u64 cycles = getApplication()->cyclesToSend(maxMessageSize_, mir);
     cycles = gSim->rnd.nextU64(1, 1 + cycles * 3);
-    u64 time = gSim->futureCycle(1) + ((cycles - 1) * gSim->cycleTime());
+    u64 time = gSim->futureCycle(Simulator::Clock::CHANNEL, 1) +
+        ((cycles - 1) * gSim->cycleTime(Simulator::Clock::CHANNEL));
     dbgprintf("start time is %lu", time);
     addEvent(time, 0, nullptr, 0);
     remainingMessages_--;  // decrement for first message
@@ -97,7 +98,7 @@ void StreamTerminal::messageEnteredInterface(Message* _message) {
   if (remainingMessages_ > 0) {
     remainingMessages_--;
     if (now == lastSendTime_) {
-      addEvent(gSim->futureCycle(1), 0, nullptr, 0);
+      addEvent(gSim->futureCycle(Simulator::Clock::CHANNEL, 1), 0, nullptr, 0);
     } else {
       sendNextMessage();
     }

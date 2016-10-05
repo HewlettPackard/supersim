@@ -35,15 +35,14 @@ void InjectionLimiter::receiveMessage(Message* _message) {
   u64 cycles = app_->cyclesToSend(_message->numFlits(), maxInjectionRate_);
 
   // determine when this message should be delivered to the message receiver
-  u64 nextTime = lastTime_ + (cycles * gSim->cycleTime());
+  u64 nextTime = lastTime_ +
+      (cycles * gSim->cycleTime(Simulator::Clock::CHANNEL));
   u64 nowTime = gSim->time();
   if (nextTime == nowTime) {
     receiver_->receiveMessage(_message);
   } else {
     if (nextTime < nowTime) {
-      dbgprintf("compensating time %lu -> %lu", nextTime,
-                gSim->futureCycle(1));
-      nextTime = gSim->futureCycle(1);
+      nextTime = gSim->futureCycle(Simulator::Clock::CHANNEL, 1);
     }
     addEvent(nextTime, 0, _message, 0);
   }

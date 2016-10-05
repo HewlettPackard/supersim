@@ -24,11 +24,14 @@
 #include "event/Simulator.h"
 #include "event/VectorQueue.h"
 
-TestSetup::TestSetup(u64 _cycleTime, u64 _randomSeed) {
+TestSetup::TestSetup(u64 _channelCycleTime, u64 _coreCycleTime,
+                     u64 _randomSeed) {
   std::string str =
       std::string("{\n") +
       "  \"simulator\": {\n" +
-      "     \"cycle_time\": " + std::to_string(_cycleTime) + ",\n" +
+      "     \"channel_cycle_time\": " + std::to_string(_channelCycleTime) +
+      ",\n" +
+      "     \"core_cycle_time\": " + std::to_string(_coreCycleTime) + ",\n" +
       "     \"print_progress\": false,\n" +
       "     \"print_interval\": 1.0,\n" +
       "     \"random_seed\": " + std::to_string(_randomSeed) + "\n" +

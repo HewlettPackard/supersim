@@ -28,7 +28,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(RandomExchangeNeighborTrafficPattern, evenSpread_1d) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   Json::Value settings;
 
   settings["dimensions"][0] = Json::Value(4);
@@ -105,7 +105,7 @@ TEST(RandomExchangeNeighborTrafficPattern, evenSpread_1d) {
 }
 
 TEST(RandomExchangeNeighborTrafficPattern, evenSpread_1d_all_terminals) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   Json::Value settings;
 
   settings["dimensions"][0] = Json::Value(4);
@@ -183,7 +183,7 @@ TEST(RandomExchangeNeighborTrafficPattern, evenSpread_1d_all_terminals) {
 }
 
 TEST(RandomExchangeNeighborTrafficPattern, evenSpread_2d_all_terminals) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   Json::Value settings;
 
   settings["dimensions"][0] = Json::Value(4);

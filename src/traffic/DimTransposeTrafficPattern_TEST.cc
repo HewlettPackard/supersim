@@ -25,7 +25,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(DimTransposeTrafficPattern, no_enabled_dims) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   DimTransposeTrafficPattern* tp;
@@ -84,7 +84,7 @@ TEST(DimTransposeTrafficPattern, no_enabled_dims) {
 }
 
 TEST(DimTransposeTrafficPattern, enabled_dims_0_1) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   DimTransposeTrafficPattern* tp;
@@ -145,7 +145,7 @@ TEST(DimTransposeTrafficPattern, enabled_dims_0_1) {
 }
 
 TEST(DimTransposeTrafficPattern, enabled_dims_0_2) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   DimTransposeTrafficPattern* tp;

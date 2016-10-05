@@ -125,7 +125,7 @@ TEST(MatrixTrafficPattern, full) {
     const f64* testDist = std::get<1>(test);
 
     // set up
-    TestSetup testSetup(1234, 1234);
+    TestSetup testSetup(1234, 1234, 456789);
     writeCSV(makeCSV(testDist, testSize).c_str(), TMPFILE);
     Json::Value settings;
     settings["file"] = TMPFILE;
@@ -138,7 +138,7 @@ TEST(MatrixTrafficPattern, full) {
     // testing
     f64* counts = new f64[testSize * testSize]();
     u32* srcCounts = new u32[testSize]();
-    for (u32 r = 0; r < 10000000; r++) {
+    for (u32 r = 0; r < 20000000; r++) {
       u32 src = gSim->rnd.nextU64(0, testSize - 1);
       u32 dst = tps.at(src)->nextDestination();
       srcCounts[src]++;

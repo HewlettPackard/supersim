@@ -79,7 +79,7 @@ void PhantomBufferOccupancy::performDecrementCredit(u32 _port, u32 _vc) {
   windows_.at(vcIdx)++;
   Channel* ch = router_->getOutputChannel(_port);
   u32 windowLength = (u32)(ch->latency() * lengthCoeff_);
-  u64 time = gSim->futureCycle(windowLength);
+  u64 time = gSim->futureCycle(Simulator::Clock::CORE, windowLength);
   addEvent(time, gSim->epsilon(), reinterpret_cast<void*>(vcIdx), PHANTOM);
 }
 

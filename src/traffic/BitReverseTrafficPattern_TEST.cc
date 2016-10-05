@@ -23,7 +23,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(BitReverseTrafficPattern, simple) {
-  TestSetup test(123, 123);
+  TestSetup test(123, 123, 456789);
 
   const u32 TERMS = 1 << 8;
   for (u32 idx = 0; idx < TERMS; idx++) {

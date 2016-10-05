@@ -16,6 +16,7 @@
 #include "router/inputoutputqueued/Router.h"
 
 #include <cassert>
+#include <cmath>
 
 #include "network/RoutingAlgorithmFactory.h"
 #include "router/common/congestion/CongestionStatusFactory.h"
@@ -31,6 +32,12 @@ Router::Router(
     RoutingAlgorithmFactory* _routingAlgorithmFactory,
     MetadataHandler* _metadataHandler, Json::Value _settings)
     : ::Router(_name, _parent, _address, _metadataHandler, _settings) {
+  // determine the size of credits
+  creditSize_ = numVcs_ * (u32)std::ceil(
+      (f64)gSim->cycleTime(Simulator::Clock::CHANNEL) /
+      (f64)gSim->cycleTime(Simulator::Clock::CORE));
+
+  // queue depths and pipeline control
   u32 inputQueueDepth = _settings["input_queue_depth"].asUInt();
   assert(inputQueueDepth > 0);
   assert(_settings.isMember("vca_swa_wait") &&
@@ -46,13 +53,14 @@ Router::Router(
   // create crossbar and schedulers
   crossbar_ = new Crossbar(
       "Crossbar", this, numPorts_ * numVcs_, numPorts_ * numVcs_,
-      _settings["crossbar"]);
+      Simulator::Clock::CORE, _settings["crossbar"]);
   vcScheduler_ = new VcScheduler(
       "VcScheduler", this, numPorts_ * numVcs_, numPorts_ * numVcs_,
-      _settings["vc_scheduler"]);
+      Simulator::Clock::CORE, _settings["vc_scheduler"]);
   crossbarScheduler_ = new CrossbarScheduler(
       "CrossbarScheduler", this, numPorts_ * numVcs_, numPorts_ * numVcs_,
-      numPorts_ * numVcs_, _settings["crossbar_scheduler"]);
+      numPorts_ * numVcs_, Simulator::Clock::CORE,
+      _settings["crossbar_scheduler"]);
 
   // create routing algorithms, input queues, link to routing algorithm,
   //  crossbar, and schedulers
@@ -106,12 +114,12 @@ Router::Router(
         "OutputCrossbarScheduler_" + std::to_string(port);
     outputCrossbarSchedulers_.at(port) = new CrossbarScheduler(
         outputCrossbarSchedulerName, this, numVcs_, numVcs_, 1,
-        _settings["output_crossbar_scheduler"]);
+        Simulator::Clock::CHANNEL, _settings["output_crossbar_scheduler"]);
 
     // output crossbar
     std::string outputCrossbarName = "OutputCrossbar_" + std::to_string(port);
     outputCrossbars_.at(port) = new Crossbar(
-        outputCrossbarName, this, numVcs_, 1,
+        outputCrossbarName, this, numVcs_, 1, Simulator::Clock::CHANNEL,
         _settings["output_crossbar"]);
 
     // ejector
@@ -216,7 +224,7 @@ void Router::sendCredit(u32 _port, u32 _vc) {
   assert(_vc < numVcs_);
   Credit* credit = inputChannels_.at(_port)->getNextCredit();
   if (credit == nullptr) {
-    credit = new Credit(numVcs_);
+    credit = new Credit(creditSize_);
     inputChannels_.at(_port)->setNextCredit(credit);
   }
 

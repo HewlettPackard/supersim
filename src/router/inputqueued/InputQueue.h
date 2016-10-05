@@ -79,11 +79,11 @@ class InputQueue : public Component, public FlitReceiver,
   Router* router_;
   RoutingAlgorithm* routingAlgorithm_;
   VcScheduler* vcScheduler_;
-  u32 vcSchedulerIndex_;
+  const u32 vcSchedulerIndex_;
   CrossbarScheduler* crossbarScheduler_;
-  u32 crossbarSchedulerIndex_;
+  const u32 crossbarSchedulerIndex_;
   Crossbar* crossbar_;
-  u32 crossbarIndex_;
+  const u32 crossbarIndex_;
 
   // single flit per clock input limit assurance
   u64 lastReceivedTime_;

@@ -335,7 +335,7 @@ void InputQueue::processPipeline() {
       (rfe_.fsm == ePipelineFsm::kReadyToAdvance) ||    // body flit
       (buffer_.size() > 0)) {   // more flits in buffer
     // set a pipeline event for the next cycle
-    eventTime_ = gSim->futureCycle(1);
+    eventTime_ = gSim->futureCycle(Simulator::Clock::CORE, 1);
     addEvent(eventTime_, 2, nullptr, PROCESS_PIPELINE);
   }
 }

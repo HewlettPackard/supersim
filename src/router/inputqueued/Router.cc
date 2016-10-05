@@ -19,8 +19,8 @@
 
 #include "network/RoutingAlgorithmFactory.h"
 #include "router/common/congestion/CongestionStatusFactory.h"
-#include "router/inputqueued/Ejector.h"
 #include "router/inputqueued/InputQueue.h"
+#include "router/inputqueued/OutputQueue.h"
 
 namespace InputQueued {
 
@@ -30,11 +30,19 @@ Router::Router(
     RoutingAlgorithmFactory* _routingAlgorithmFactory,
     MetadataHandler* _metadataHandler, Json::Value _settings)
     : ::Router(_name, _parent, _address, _metadataHandler, _settings) {
+  // determine the size of credits
+  creditSize_ = numVcs_ * (u32)std::ceil(
+      (f64)gSim->cycleTime(Simulator::Clock::CHANNEL) /
+      (f64)gSim->cycleTime(Simulator::Clock::CORE));
+
+  // queue depths and pipeline control
   u32 inputQueueDepth = _settings["input_queue_depth"].asUInt();
   assert(inputQueueDepth > 0);
   assert(_settings.isMember("vca_swa_wait") &&
          _settings["vca_swa_wait"].isBool());
   bool vcaSwaWait = _settings["vca_swa_wait"].asBool();
+  u32 outputQueueDepth = _settings["output_queue_depth"].asUInt();
+  assert(outputQueueDepth > 0);
 
   // create a congestion status device
   congestionStatus_ = CongestionStatusFactory::createCongestionStatus(
@@ -42,13 +50,13 @@ Router::Router(
 
   // create the crossbar and schedulers
   crossbar_ = new Crossbar("Crossbar", this, numPorts_ * numVcs_, numPorts_,
-                           _settings["crossbar"]);
+                           Simulator::Clock::CORE, _settings["crossbar"]);
   vcScheduler_ = new VcScheduler(
       "VcScheduler", this, numPorts_ * numVcs_, numPorts_ * numVcs_,
-      _settings["vc_scheduler"]);
+      Simulator::Clock::CORE, _settings["vc_scheduler"]);
   crossbarScheduler_ = new CrossbarScheduler(
       "CrossbarScheduler", this, numPorts_ * numVcs_, numPorts_ * numVcs_,
-      numPorts_, _settings["crossbar_scheduler"]);
+      numPorts_, Simulator::Clock::CORE, _settings["crossbar_scheduler"]);
 
   // create routing algorithms, input queues, link to routing algorithm,
   //  crossbar, and schedulers
@@ -91,13 +99,14 @@ Router::Router(
     }
   }
 
-  // ejectors, link to crossbar
-  ejectors_.resize(numPorts_, nullptr);
+  // output queues, link to crossbar
+  outputQueues_.resize(numPorts_, nullptr);
   for (u32 port = 0; port < numPorts_; port++) {
-    std::string ejName = "Ejector_" + std::to_string(port);
-    Ejector* ej = new Ejector(ejName, this, port);
-    ejectors_.at(port) = ej;
-    crossbar_->setReceiver(port, ej, 0);  // ejectors only have 1 port
+    std::string oqName = "OutputQueue_" + std::to_string(port);
+    OutputQueue* oq = new OutputQueue(oqName, this, this,
+                                      outputQueueDepth, port);
+    outputQueues_.at(port) = oq;
+    crossbar_->setReceiver(port, oq, 0);  // output queues only have 1 port
   }
 
   // allocate slots for I/O channels
@@ -115,7 +124,7 @@ Router::~Router() {
     delete inputQueues_.at(vc);
   }
   for (u32 port = 0; port < numPorts_; port++) {
-    delete ejectors_.at(port);
+    delete outputQueues_.at(port);
   }
 }
 
@@ -165,7 +174,7 @@ void Router::sendCredit(u32 _port, u32 _vc) {
   assert(_vc < numVcs_);
   Credit* credit = inputChannels_.at(_port)->getNextCredit();
   if (credit == nullptr) {
-    credit = new Credit(numVcs_);
+    credit = new Credit(creditSize_);
     inputChannels_.at(_port)->setNextCredit(credit);
   }
 

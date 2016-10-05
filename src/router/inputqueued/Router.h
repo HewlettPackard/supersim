@@ -37,7 +37,7 @@
 namespace InputQueued {
 
 class InputQueue;
-class Ejector;
+class OutputQueue;
 
 class Router : public ::Router {
  public:
@@ -62,13 +62,15 @@ class Router : public ::Router {
   f64 congestionStatus(u32 _port, u32 _vc) const override;
 
  private:
+  u32 creditSize_;
+
   std::vector<InputQueue*> inputQueues_;
   std::vector<RoutingAlgorithm*> routingAlgorithms_;
   CongestionStatus* congestionStatus_;
   Crossbar* crossbar_;
   CrossbarScheduler* crossbarScheduler_;
   VcScheduler* vcScheduler_;
-  std::vector<Ejector*> ejectors_;
+  std::vector<OutputQueue*> outputQueues_;
 
   std::vector<Channel*> inputChannels_;
   std::vector<Channel*> outputChannels_;

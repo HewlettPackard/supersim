@@ -65,7 +65,7 @@ u32 InjectionAlgorithm::latency() const {
 
 void InjectionAlgorithm::request(Client* _client, Message* _message,
                                  Response* _response) {
-  u64 respTime = gSim->futureCycle(latency_);
+  u64 respTime = gSim->futureCycle(Simulator::Clock::CHANNEL, latency_);
   EventPackage* evt = new EventPackage();
   evt->client = _client;
   evt->message = _message;

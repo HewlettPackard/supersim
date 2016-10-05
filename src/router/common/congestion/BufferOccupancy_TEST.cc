@@ -23,7 +23,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(BufferOccupancy, statusCheck) {
-  TestSetup test(1, 1234);
+  TestSetup test(1, 1, 1234);
 
   const bool debug = false;
   const u32 numPorts = 5;

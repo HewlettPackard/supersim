@@ -76,7 +76,8 @@ void Channel::endMonitoring() {
 f64 Channel::utilization() const {
   assert(monitoring_ == false);
   assert(monitorTime_ != U64_MAX);
-  return (f64)monitorCount_ / ((f64)monitorTime_ / gSim->cycleTime());
+  return (f64)monitorCount_ / ((f64)monitorTime_ / gSim->cycleTime(
+      Simulator::Clock::CHANNEL));
 }
 
 void Channel::processEvent(void* _event, s32 _type) {
@@ -104,7 +105,7 @@ void Channel::processEvent(void* _event, s32 _type) {
 
 Flit* Channel::getNextFlit() const {
   // determine the next time slot to send a flit
-  u64 nextSlot = gSim->futureCycle(1);
+  u64 nextSlot = gSim->futureCycle(Simulator::Clock::CHANNEL, 1);
 
   // return nullptr if the next flit hasn't been set
   if (nextFlitTime_ != nextSlot) {
@@ -117,7 +118,7 @@ Flit* Channel::getNextFlit() const {
 
 u64 Channel::setNextFlit(Flit* _flit) {
   // determine the next time slot to send a flit
-  u64 nextSlot = gSim->futureCycle(1);
+  u64 nextSlot = gSim->futureCycle(Simulator::Clock::CHANNEL, 1);
   assert(nextSlot != nextFlitTime_);
 
   // set the time and value
@@ -125,7 +126,7 @@ u64 Channel::setNextFlit(Flit* _flit) {
   nextFlit_ = _flit;
 
   // add the event of when the flit will arrive on the other end
-  u64 nextTime = gSim->futureCycle(latency_);
+  u64 nextTime = gSim->futureCycle(Simulator::Clock::CHANNEL, latency_);
   addEvent(nextTime, 1, _flit, FLIT);
 
   // increment the count when monitoring
@@ -139,7 +140,7 @@ u64 Channel::setNextFlit(Flit* _flit) {
 
 Credit* Channel::getNextCredit() const {
   // determine the next time slot to send a credit
-  u64 nextSlot = gSim->futureCycle(1);
+  u64 nextSlot = gSim->futureCycle(Simulator::Clock::CHANNEL, 1);
 
   // return nullptr if the next credit hasn't been set
   if (nextCreditTime_ != nextSlot) {
@@ -152,7 +153,7 @@ Credit* Channel::getNextCredit() const {
 
 u64 Channel::setNextCredit(Credit* _credit) {
   // determine the next time slot to send a credit
-  u64 nextSlot = gSim->futureCycle(1);
+  u64 nextSlot = gSim->futureCycle(Simulator::Clock::CHANNEL, 1);
   assert(nextSlot != nextCreditTime_);
 
   // set the time and value
@@ -160,7 +161,7 @@ u64 Channel::setNextCredit(Credit* _credit) {
   nextCredit_ = _credit;
 
   // add the event of when the credit will arrive on the other end
-  u64 nextTime = gSim->futureCycle(latency_);
+  u64 nextTime = gSim->futureCycle(Simulator::Clock::CHANNEL, latency_);
   addEvent(nextTime, 1, _credit, CRDT);
 
   // return the injection time

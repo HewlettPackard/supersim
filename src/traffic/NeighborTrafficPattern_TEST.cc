@@ -25,7 +25,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(NeighborTrafficPattern, no_dimMask) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborTrafficPattern* tp;
@@ -63,7 +63,7 @@ TEST(NeighborTrafficPattern, no_dimMask) {
 }
 
 TEST(NeighborTrafficPattern, dimension_0_right) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborTrafficPattern* tp;
@@ -102,7 +102,7 @@ TEST(NeighborTrafficPattern, dimension_0_right) {
 }
 
 TEST(NeighborTrafficPattern, dimension_0_left) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborTrafficPattern* tp;
@@ -141,7 +141,7 @@ TEST(NeighborTrafficPattern, dimension_0_left) {
 }
 
 TEST(NeighborTrafficPattern, dimension_1_left) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborTrafficPattern* tp;
@@ -179,7 +179,7 @@ TEST(NeighborTrafficPattern, dimension_1_left) {
 }
 
 TEST(NeighborTrafficPattern, dimension_1_left_3d) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborTrafficPattern* tp;
@@ -218,7 +218,7 @@ TEST(NeighborTrafficPattern, dimension_1_left_3d) {
 }
 
 TEST(NeighborTrafficPattern, dimension_1_left_3d_1) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborTrafficPattern* tp;
@@ -257,7 +257,7 @@ TEST(NeighborTrafficPattern, dimension_1_left_3d_1) {
 }
 
 TEST(NeighborTrafficPattern, 2d_left) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborTrafficPattern* tp;
@@ -303,7 +303,7 @@ TEST(NeighborTrafficPattern, 2d_left) {
 }
 
 TEST(NeighborTrafficPattern, 2d_right) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborTrafficPattern* tp;
@@ -349,7 +349,7 @@ TEST(NeighborTrafficPattern, 2d_right) {
 }
 
 TEST(NeighborTrafficPattern, 3d_right) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborTrafficPattern* tp;

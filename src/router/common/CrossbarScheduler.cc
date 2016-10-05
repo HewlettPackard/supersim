@@ -29,9 +29,10 @@ CrossbarScheduler::Client::~Client() {}
 
 CrossbarScheduler::CrossbarScheduler(
     const std::string& _name, const Component* _parent, u32 _numClients,
-    u32 _totalVcs, u32 _crossbarPorts, Json::Value _settings)
+    u32 _totalVcs, u32 _crossbarPorts, Simulator::Clock _clock,
+    Json::Value _settings)
     : Component(_name, _parent), numClients_(_numClients),
-      totalVcs_(_totalVcs), crossbarPorts_(_crossbarPorts),
+      totalVcs_(_totalVcs), crossbarPorts_(_crossbarPorts), clock_(_clock),
       fullPacket_(_settings["full_packet"].asBool()),
       packetLock_(_settings["packet_lock"].asBool()),
       idleUnlock_(_settings["idle_unlock"].asBool()) {
@@ -136,7 +137,7 @@ void CrossbarScheduler::request(u32 _client, u32 _port, u32 _vcIdx,
   // upgrade event
   if (eventAction_ == EventAction::NONE) {
     eventAction_ = EventAction::RUNALLOC;
-    addEvent(gSim->futureCycle(1), 0, nullptr, 0);
+    addEvent(gSim->futureCycle(clock_, 1), 0, nullptr, 0);
   } else if (eventAction_ == EventAction::CREDITS) {
     eventAction_ = EventAction::RUNALLOC;
   }
@@ -158,7 +159,7 @@ void CrossbarScheduler::incrementCreditCount(u32 _vcIdx) {
   // upgrade event
   if (eventAction_ == EventAction::NONE) {
     eventAction_ = EventAction::CREDITS;
-    addEvent(gSim->futureCycle(1), 0, nullptr, 0);
+    addEvent(gSim->futureCycle(clock_, 1), 0, nullptr, 0);
   }
 }
 

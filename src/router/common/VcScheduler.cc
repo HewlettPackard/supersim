@@ -27,9 +27,10 @@ VcScheduler::Client::~Client() {}
 const s32 kAllocEvent = 123;
 
 VcScheduler::VcScheduler(const std::string& _name, const Component* _parent,
-                         u32 _numClients, u32 _totalVcs, Json::Value _settings)
+                         u32 _numClients, u32 _totalVcs,
+                         Simulator::Clock _clock, Json::Value _settings)
     : Component(_name, _parent),
-      numClients_(_numClients), totalVcs_(_totalVcs) {
+      numClients_(_numClients), totalVcs_(_totalVcs), clock_(_clock) {
   assert(numClients_ > 0 && numClients_ != U32_MAX);
   assert(totalVcs_ > 0 && totalVcs_ != U32_MAX);
 
@@ -97,7 +98,7 @@ void VcScheduler::request(u32 _client, u32 _vcIdx, u64 _metadata) {
   // ensure there is an event set to perform scheduling
   if (!allocEventSet_) {
     allocEventSet_ = true;
-    addEvent(gSim->futureCycle(1), 0, nullptr, kAllocEvent);
+    addEvent(gSim->futureCycle(clock_, 1), 0, nullptr, kAllocEvent);
   }
 }
 

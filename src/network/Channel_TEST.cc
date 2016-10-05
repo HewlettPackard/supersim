@@ -103,10 +103,11 @@ void Source::load(u32 _count, u64 _totalCycles) {
     std::advance(it, gSim->rnd.nextU64(0, injectCycles.size() - 1));
     u64 injectCycle = *it;
     injectCycles.erase(it);
-    u64 injectTime = gSim->futureCycle(injectCycle);
+    u64 injectTime = gSim->futureCycle(Simulator::Clock::CHANNEL, injectCycle);
     dbgprintf("source inject at %lu(%lu)", injectCycle, injectTime);
     addEvent(injectTime, 0, nullptr, 0);
-    sink_->expect(gSim->futureCycle(injectCycle + channel_->latency()));
+    sink_->expect(gSim->futureCycle(Simulator::Clock::CHANNEL,
+                                    injectCycle + channel_->latency()));
   }
 }
 
@@ -163,10 +164,11 @@ void Sink::load(u32 _count, u64 _totalCycles) {
     std::advance(it, gSim->rnd.nextU64(0, injectCycles.size() - 1));
     u64 injectCycle = *it;
     injectCycles.erase(it);
-    u64 injectTime = gSim->futureCycle(injectCycle);
+    u64 injectTime = gSim->futureCycle(Simulator::Clock::CHANNEL, injectCycle);
     dbgprintf("sink inject at %lu(%lu)", injectCycle, injectTime);
     addEvent(injectTime, 0, nullptr, 0);
-    source_->expect(gSim->futureCycle(injectCycle + channel_->latency()));
+    source_->expect(gSim->futureCycle(Simulator::Clock::CHANNEL,
+                                      injectCycle + channel_->latency()));
   }
 }
 
@@ -198,7 +200,8 @@ class EndMonitoring : public Component {
   EndMonitoring(Channel* _channel, u32 _cycles)
       : Component("Timer", nullptr), channel_(_channel) {
     channel_->startMonitoring();
-    addEvent(gSim->futureCycle(_cycles), 0, nullptr, 0);
+    addEvent(gSim->futureCycle(Simulator::Clock::CHANNEL, _cycles),
+             0, nullptr, 0);
   }
 
   ~EndMonitoring() {}
@@ -217,7 +220,7 @@ class EndMonitoring : public Component {
 TEST(Channel, full) {
   u64 seed = 12345678;
   for (u32 cycleTime = 1; cycleTime <= 100; cycleTime += 26) {
-    TestSetup setup(cycleTime, seed++);
+    TestSetup setup(cycleTime, cycleTime, seed++);
 
     const u32 latency = gSim->rnd.nextU64(1, 5);
 

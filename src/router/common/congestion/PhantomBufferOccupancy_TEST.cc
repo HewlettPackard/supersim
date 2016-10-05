@@ -35,7 +35,7 @@ TEST(PhantomBufferOccupancy, statusCheck) {
   for (f64 valueCoeff = 0.5; valueCoeff < 3.0; valueCoeff += 0.34) {
     for (f64 lengthCoeff = 0.5; lengthCoeff < 3.0; lengthCoeff += 0.34) {
       for (u32 channelLatency = 3; channelLatency <= 40; channelLatency += 3) {
-        TestSetup test(1, 1234);
+        TestSetup test(1, 1, 1234);
 
         Json::Value routerSettings;
         routerSettings["num_ports"] = numPorts;

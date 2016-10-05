@@ -331,11 +331,11 @@ void InputQueue::processPipeline() {
    *  3. more flits in the queue, need to pull one out
    * if any of these cases are true, create an event to handle the next cycle
    */
-  if ((vca_.fsm == ePipelineFsm::kReadyToAdvance) ||     // body flit
+  if ((vca_.fsm == ePipelineFsm::kReadyToAdvance) ||    // body flit
       (rfe_.fsm == ePipelineFsm::kReadyToAdvance) ||    // body flit
       (buffer_.size() > 0)) {   // more flits in buffer
     // set a pipeline event for the next cycle
-    eventTime_ = gSim->futureCycle(1);
+    eventTime_ = gSim->futureCycle(Simulator::Clock::CORE, 1);
     addEvent(eventTime_, 2, nullptr, PROCESS_PIPELINE);
   }
 }

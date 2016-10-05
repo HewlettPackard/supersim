@@ -25,7 +25,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(TornadoTrafficPattern, no_dimMask) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   TornadoTrafficPattern* tp;
@@ -63,7 +63,7 @@ TEST(TornadoTrafficPattern, no_dimMask) {
 }
 
 TEST(TornadoTrafficPattern, dimension_0) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   TornadoTrafficPattern* tp;
@@ -102,7 +102,7 @@ TEST(TornadoTrafficPattern, dimension_0) {
 }
 
 TEST(TornadoTrafficPattern, dimension_1) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   TornadoTrafficPattern* tp;
@@ -140,7 +140,7 @@ TEST(TornadoTrafficPattern, dimension_1) {
 }
 
 TEST(TornadoTrafficPattern, dimension_1_3d) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   TornadoTrafficPattern* tp;
@@ -179,7 +179,7 @@ TEST(TornadoTrafficPattern, dimension_1_3d) {
 }
 
 TEST(TornadoTrafficPattern, dimension_1_3d_1) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   TornadoTrafficPattern* tp;
@@ -218,7 +218,7 @@ TEST(TornadoTrafficPattern, dimension_1_3d_1) {
 }
 
 TEST(TornadoTrafficPattern, 2d) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   TornadoTrafficPattern* tp;
@@ -271,7 +271,7 @@ TEST(TornadoTrafficPattern, 2d) {
 }
 
 TEST(TornadoTrafficPattern, 3d) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   TornadoTrafficPattern* tp;

@@ -31,7 +31,7 @@
 class Crossbar : public Component {
  public:
   Crossbar(const std::string& _name, const Component* _parent,
-           u32 _numInputs, u32 _numOutputs,
+           u32 _numInputs, u32 _numOutputs, Simulator::Clock _clock,
            Json::Value _settings);
   ~Crossbar();
   u32 numInputs() const;
@@ -42,9 +42,10 @@ class Crossbar : public Component {
   void processEvent(void* _event, s32 _type) override;
 
  private:
-  u64 latency_;
-  u32 numInputs_;
-  u32 numOutputs_;
+  const Simulator::Clock clock_;
+  const u64 latency_;
+  const u32 numInputs_;
+  const u32 numOutputs_;
   std::vector<std::pair<u32, FlitReceiver*> > receivers_;
   u64 nextTime_;
   std::list<std::vector<Flit*> > destMaps_;

@@ -25,7 +25,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(ScanTrafficPattern, ascend_self_random) {
-  TestSetup test(123, 123);
+  TestSetup test(123, 123, 456789);
 
   const u32 TOTAL = 5000;
   const u32 ME = 50;
@@ -47,7 +47,7 @@ TEST(ScanTrafficPattern, ascend_self_random) {
 }
 
 TEST(ScanTrafficPattern, ascend_self_321) {
-  TestSetup test(123, 123);
+  TestSetup test(123, 123, 345678);
 
   const u32 TOTAL = 5000;
   const u32 ME = 50;
@@ -67,7 +67,7 @@ TEST(ScanTrafficPattern, ascend_self_321) {
 }
 
 TEST(ScanTrafficPattern, descend_self_random) {
-  TestSetup test(123, 123);
+  TestSetup test(123, 123, 456789);
 
   const u32 TOTAL = 5000;
   const u32 ME = 50;
@@ -90,7 +90,7 @@ TEST(ScanTrafficPattern, descend_self_random) {
 }
 
 TEST(ScanTrafficPattern, descend_self_321) {
-  TestSetup test(123, 123);
+  TestSetup test(123, 123, 45678);
 
   const u32 TOTAL = 5000;
   const u32 ME = 50;
@@ -111,7 +111,7 @@ TEST(ScanTrafficPattern, descend_self_321) {
 }
 
 TEST(ScanTrafficPattern, ascend_noself_random) {
-  TestSetup test(123, 123);
+  TestSetup test(123, 123, 456789);
 
   const u32 TOTAL = 5000;
   const u32 ME = 50;
@@ -137,7 +137,7 @@ TEST(ScanTrafficPattern, ascend_noself_random) {
 }
 
 TEST(ScanTrafficPattern, ascend_noself_321) {
-  TestSetup test(123, 123);
+  TestSetup test(123, 123, 456789);
 
   const u32 TOTAL = 5000;
   const u32 ME = 50;
@@ -162,7 +162,7 @@ TEST(ScanTrafficPattern, ascend_noself_321) {
 }
 
 TEST(ScanTrafficPattern, descend_noself_random) {
-  TestSetup test(123, 123);
+  TestSetup test(123, 123, 456789);
 
   const u32 TOTAL = 5000;
   const u32 ME = 50;
@@ -189,7 +189,7 @@ TEST(ScanTrafficPattern, descend_noself_random) {
 }
 
 TEST(ScanTrafficPattern, descend_noself_321) {
-  TestSetup test(123, 123);
+  TestSetup test(123, 123, 456789);
 
   const u32 TOTAL = 5000;
   const u32 ME = 50;

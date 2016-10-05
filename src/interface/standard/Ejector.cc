@@ -30,7 +30,7 @@ Ejector::~Ejector() {}
 
 void Ejector::receiveFlit(u32 _port, Flit* _flit) {
   // this is overkill checking!
-  u64 nextTime = gSim->futureCycle(1);
+  u64 nextTime = gSim->futureCycle(Simulator::Clock::CHANNEL, 1);
   assert((lastSetTime_ != nextTime) || (lastSetTime_ == U32_MAX));
   interface_->sendFlit(0, _flit);
   lastSetTime_ = nextTime;

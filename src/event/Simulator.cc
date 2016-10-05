@@ -27,14 +27,17 @@ Simulator::Simulator(Json::Value _settings)
     : printProgress_(_settings["print_progress"].asBool()),
       printInterval_(_settings["print_interval"].asDouble()),
       time_(0), epsilon_(0), quit_(false),
-      cycleTime_(_settings["cycle_time"].asUInt64()),
+      channelCycleTime_(_settings["channel_cycle_time"].asUInt64()),
+      coreCycleTime_(_settings["core_cycle_time"].asUInt64()),
       initial_(true), running_(false), net_(nullptr), app_(nullptr),
       monitoring_(false) {
   assert(!_settings["print_progress"].isNull());
   assert(!_settings["print_interval"].isNull());
-  assert(!_settings["cycle_time"].isNull());
+  assert(!_settings["channel_cycle_time"].isNull());
+  assert(!_settings["core_cycle_time"].isNull());
   assert(!_settings["random_seed"].isNull());
-  assert(cycleTime_ > 0);
+  assert(channelCycleTime_ > 0);
+  assert(coreCycleTime_ > 0);
   assert(printInterval_ > 0);
 
   rnd.seed(_settings["random_seed"].asUInt64());
@@ -165,21 +168,22 @@ u8 Simulator::epsilon() const {
   return epsilon_;
 }
 
-u64 Simulator::cycle() const {
-  return time_ / cycleTime_;
+u64 Simulator::cycleTime(Simulator::Clock _clock) const {
+  return _clock == Simulator::Clock::CHANNEL ?
+      channelCycleTime_ : coreCycleTime_;
 }
 
-u64 Simulator::cycleTime() const {
-  return cycleTime_;
+u64 Simulator::cycle(Simulator::Clock _clock) const {
+  return time_ / cycleTime(_clock);
 }
 
-u64 Simulator::futureCycle(u32 _cycles) const {
+u64 Simulator::futureCycle(Simulator::Clock _clock, u32 _cycles) const {
   assert(_cycles > 0);
 
-  u64 time;
-  time = gSim->time();
-  time = time / gSim->cycleTime();
-  time = (time + (u64)_cycles) * gSim->cycleTime();
+  u64 cycleTimeV = cycleTime(_clock);
+  u64 time = gSim->time();
+  time = time / cycleTimeV;
+  time = (time + (u64)_cycles) * cycleTimeV;
   return time;
 }
 

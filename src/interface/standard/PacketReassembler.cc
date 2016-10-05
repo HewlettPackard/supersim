@@ -38,6 +38,10 @@ Packet* PacketReassembler::receiveFlit(Flit* _flit) {
   u32 packetId = _flit->getPacket()->getId();
   u32 flitId   = _flit->getId();
 
+  dbgprintf("src=%u pkt=%u flit=%u/%u",
+            sourceId, packetId, flitId,
+            _flit->getPacket()->numFlits());
+
   // if expected packet id isn't yet set, set it
   if (expPacketId_ == U32_MAX) {
     assert(flitId == 0);
@@ -47,6 +51,7 @@ Packet* PacketReassembler::receiveFlit(Flit* _flit) {
 
   // check sourceId, packetId, and flitId
   if (sourceId != expSourceId_) {
+    fprintf(stderr, "error name: %s\n", fullName().c_str());
     assert(false);
   }
   if (packetId != expPacketId_) {

@@ -105,7 +105,8 @@ f64 ProcessorTerminal::percentComplete() const {
 
 void ProcessorTerminal::startProcessing() {
   dbgprintf("starting processing");
-  addEvent(gSim->futureCycle(latency_), 0, nullptr, 0);
+  addEvent(gSim->futureCycle(Simulator::Clock::CHANNEL, latency_),
+           0, nullptr, 0);
   fsm_ = eState::kProcessing;
 }
 

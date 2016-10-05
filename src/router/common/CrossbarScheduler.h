@@ -48,7 +48,7 @@ class CrossbarScheduler : public Component {
   // constructor and destructor
   CrossbarScheduler(const std::string& _name, const Component* _parent,
                     u32 _numClients, u32 _totalVcs, u32 _crossbarPorts,
-                    Json::Value _settings);
+                    Simulator::Clock _clock, Json::Value _settings);
   ~CrossbarScheduler();
 
   // constant attributes
@@ -75,6 +75,7 @@ class CrossbarScheduler : public Component {
   const u32 numClients_;
   const u32 totalVcs_;
   const u32 crossbarPorts_;
+  const Simulator::Clock clock_;
 
   std::vector<Client*> clients_;
   std::vector<u32> clientRequestPorts_;

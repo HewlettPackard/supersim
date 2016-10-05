@@ -253,7 +253,7 @@ TEST(CongestionStatus, latencyAndGranularity) {
     for (u32 granularity = 0; granularity <= 16; granularity += 2) {
       // printf("latency=%u granularity=%u\n", latency, granularity);
 
-      TestSetup setup(1, 1234);
+      TestSetup setup(1, 1, 1234);
 
       Json::Value routerSettings;
       routerSettings["num_ports"] = numPorts;

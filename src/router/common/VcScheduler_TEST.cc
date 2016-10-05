@@ -34,14 +34,14 @@ class VcSchedulerTestClient : public VcScheduler::Client, public Component {
   enum class Fsm : u8 { REQUESTING = 1, WAITING = 2, USING = 3, DONE = 4 };
 
   VcSchedulerTestClient(u32 _id, VcScheduler* _vcSch, u32 _totalVcs,
-                        u32 _allocs, u32 _numRequests,
+                        Simulator::Clock _clock, u32 _allocs, u32 _numRequests,
                         const std::unordered_set<u32>& _fixedRequests,
                         std::unordered_map<u32, u32>* _holdingCount)
       : Component("TestClient_" + std::to_string(_id), nullptr),
-        id_(_id), vcSch_(_vcSch), totalVcs_(_totalVcs), fsm_(Fsm::REQUESTING),
-        numRequests_(_numRequests), fixedRequests_(_fixedRequests),
-        grantedVc_(U32_MAX), remaining_(_allocs), totalGrants_(0),
-        holdingCount_(_holdingCount) {
+        id_(_id), vcSch_(_vcSch), totalVcs_(_totalVcs), clock_(_clock),
+        fsm_(Fsm::REQUESTING), numRequests_(_numRequests),
+        fixedRequests_(_fixedRequests), grantedVc_(U32_MAX),
+        remaining_(_allocs), totalGrants_(0), holdingCount_(_holdingCount) {
     vcSch_->setClient(id_, this);
     addEvent(gSim->time(), 1, nullptr, RequestVcsEvent);
   }
@@ -138,7 +138,7 @@ class VcSchedulerTestClient : public VcScheduler::Client, public Component {
       (*holdingCount_)[_vc]++;
 
       // release later
-      u64 releaseTime = gSim->futureCycle(gSim->rnd.nextU64(1, 5));
+      u64 releaseTime = gSim->futureCycle(clock_, gSim->rnd.nextU64(1, 5));
       addEvent(releaseTime, 1, nullptr, ReleaseVcEvent);
       fsm_ = Fsm::USING;
     } else {
@@ -166,6 +166,7 @@ class VcSchedulerTestClient : public VcScheduler::Client, public Component {
   u32 id_;
   VcScheduler* vcSch_;
   u32 totalVcs_;
+  Simulator::Clock clock_;
   Fsm fsm_;
   u32 numRequests_;
   const std::unordered_set<u32>& fixedRequests_;
@@ -184,7 +185,7 @@ TEST(VcScheduler, basic) {
     for (u32 V = 1; V < 16; V += 2) {
       for (u32 R = 1; R < V; R += 2) {
         // setup
-        TestSetup testSetup(12, 0x1234567890abcdf);
+        TestSetup testSetup(12, 12, 0x1234567890abcdf);
         Json::Value arbSettings;
         arbSettings["type"] = "random";
         Json::Value allocSettings;
@@ -196,7 +197,7 @@ TEST(VcScheduler, basic) {
         Json::Value schSettings;
         schSettings["allocator"] = allocSettings;
         VcScheduler* vcSch = new VcScheduler(
-            "VcSch", nullptr, C, V, schSettings);
+            "VcSch", nullptr, C, V, Simulator::Clock::CORE, schSettings);
         assert(vcSch->numClients() == C);
         assert(vcSch->totalVcs() == V);
 
@@ -204,7 +205,8 @@ TEST(VcScheduler, basic) {
         std::unordered_map<u32, u32> holdingCount;
         for (u32 c = 0; c < C; c++) {
           clients[c] = new VcSchedulerTestClient(
-              c, vcSch, V, ALLOCS_PER_CLIENT, R, {}, &holdingCount);
+              c, vcSch, V, Simulator::Clock::CORE, ALLOCS_PER_CLIENT, R, {},
+              &holdingCount);
         }
 
         // run the simulator
@@ -232,7 +234,7 @@ TEST(VcScheduler, dist) {
 
   for (const std::string& arb : {"random", "comparing", "lslp"}) {
     for (u32 N : {1, 4, 12}) {
-      TestSetup testSetup(12, 0x1234567890abcdf * N);
+      TestSetup testSetup(12, 12, 0x1234567890abcdf * N);
 
       std::unordered_set<u32> requests;
 
@@ -260,7 +262,7 @@ TEST(VcScheduler, dist) {
       Json::Value schSettings;
       schSettings["allocator"] = allocSettings;
       VcScheduler* vcSch = new VcScheduler(
-          "VcSch", nullptr, C, V, schSettings);
+          "VcSch", nullptr, C, V, Simulator::Clock::CORE, schSettings);
       assert(vcSch->numClients() == C);
       assert(vcSch->totalVcs() == V);
 
@@ -268,7 +270,8 @@ TEST(VcScheduler, dist) {
       std::unordered_map<u32, u32> holdingCount;
       for (u32 c = 0; c < C; c++) {
         clients[c] = new VcSchedulerTestClient(
-            c, vcSch, V, ALLOCS_PER_CLIENT, R, requests, &holdingCount);
+            c, vcSch, V, Simulator::Clock::CORE, ALLOCS_PER_CLIENT, R, requests,
+            &holdingCount);
       }
 
       // run the simulator

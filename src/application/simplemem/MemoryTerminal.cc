@@ -92,7 +92,8 @@ void MemoryTerminal::messageExitedNetwork(Message* _message) {
 }
 
 void MemoryTerminal::startMemoryAccess() {
-  addEvent(gSim->futureCycle(latency_), 0, nullptr, 0);
+  addEvent(gSim->futureCycle(Simulator::Clock::CHANNEL, latency_),
+           0, nullptr, 0);
   fsm_ = eState::kAccessing;
 }
 

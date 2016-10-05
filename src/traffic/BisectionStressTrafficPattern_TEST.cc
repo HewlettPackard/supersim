@@ -25,7 +25,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(BisectionStressTrafficPattern, parity) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   BisectionStressTrafficPattern* tp;
@@ -101,7 +101,7 @@ TEST(BisectionStressTrafficPattern, parity) {
 }
 
 TEST(BisectionStressTrafficPattern, half) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   BisectionStressTrafficPattern* tp;
@@ -150,7 +150,7 @@ TEST(BisectionStressTrafficPattern, half) {
 }
 
 TEST(BisectionStressTrafficPattern, quadrant) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   BisectionStressTrafficPattern* tp;

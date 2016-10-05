@@ -63,6 +63,8 @@ class Router : public ::Router {
   f64 congestionStatus(u32 _port, u32 _vc) const override;
 
  private:
+  u32 creditSize_;
+
   std::vector<InputQueue*> inputQueues_;
   std::vector<RoutingAlgorithm*> routingAlgorithms_;
   CongestionStatus* congestionStatus_;

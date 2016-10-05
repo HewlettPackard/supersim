@@ -43,7 +43,8 @@ class VcScheduler : public Component {
 
   // constructor and destructor
   VcScheduler(const std::string& _name, const Component* _parent,
-              u32 _numClients, u32 _totalVcs, Json::Value _settings);
+              u32 _numClients, u32 _totalVcs, Simulator::Clock _clock,
+              Json::Value _settings);
   ~VcScheduler();
 
   // constant attributes
@@ -63,6 +64,7 @@ class VcScheduler : public Component {
  private:
   const u32 numClients_;
   const u32 totalVcs_;
+  const Simulator::Clock clock_;
 
   std::vector<Client*> clients_;
   std::vector<bool> clientRequested_;

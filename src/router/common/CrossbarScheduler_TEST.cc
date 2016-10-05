@@ -37,10 +37,10 @@ class CrossbarSchedulerTestClient : public CrossbarScheduler::Client,
 
   CrossbarSchedulerTestClient(
       u32 _id, CrossbarScheduler* _xbarSch, u32 _totalVcs, u32 _crossbarPorts,
-      u32 _allocs)
+      Simulator::Clock _clock, u32 _allocs)
       : Component("TestClient_" + std::to_string(_id), nullptr),
         id_(_id), xbarSch_(_xbarSch), totalVcs_(_totalVcs),
-        crossbarPorts_(_crossbarPorts), fsm_(Fsm::REQUESTING),
+        crossbarPorts_(_crossbarPorts), clock_(_clock), fsm_(Fsm::REQUESTING),
         request_(std::make_tuple(U32_MAX, U32_MAX, nullptr)),
         remaining_(_allocs) {
     debug_ = !true;
@@ -121,7 +121,7 @@ class CrossbarSchedulerTestClient : public CrossbarScheduler::Client,
       remaining_--;
 
       // release later
-      u64 releaseTime = gSim->futureCycle(gSim->rnd.nextU64(2, 6));
+      u64 releaseTime = gSim->futureCycle(clock_, gSim->rnd.nextU64(2, 6));
       u32* vcPtr = new u32;
       *vcPtr = vcIdx;
       addEvent(releaseTime, 1, vcPtr, GiveBackCreditEvent);
@@ -140,6 +140,7 @@ class CrossbarSchedulerTestClient : public CrossbarScheduler::Client,
   CrossbarScheduler* xbarSch_;
   u32 totalVcs_;
   u32 crossbarPorts_;
+  Simulator::Clock clock_;
   Fsm fsm_;
   std::tuple<u32, u32, Flit*> request_;
   u32 remaining_;
@@ -166,7 +167,7 @@ TEST(CrossbarScheduler, basic) {
           u32 V = P * Vd;
 
           // setup
-          TestSetup testSetup(12, 0x1234567890abcdf);
+          TestSetup testSetup(12, 12, 0x1234567890abcdf);
           Json::Value arbSettings;
           arbSettings["type"] = "random";
           Json::Value allocSettings;
@@ -179,7 +180,9 @@ TEST(CrossbarScheduler, basic) {
           schSettings["packet_lock"] = std::get<1>(style);
           schSettings["idle_unlock"] = std::get<2>(style);
           CrossbarScheduler* xbarSch =
-              new CrossbarScheduler("XbarSch", nullptr, C, V, P, schSettings);
+              new CrossbarScheduler(
+                  "XbarSch", nullptr, C, V, P, Simulator::Clock::CORE,
+                  schSettings);
           assert(xbarSch->numClients() == C);
           assert(xbarSch->totalVcs() == V);
           assert(xbarSch->crossbarPorts() == P);
@@ -189,8 +192,8 @@ TEST(CrossbarScheduler, basic) {
 
           std::vector<CrossbarSchedulerTestClient*> clients(C);
           for (u32 c = 0; c < C; c++) {
-            clients[c] = new CrossbarSchedulerTestClient(c, xbarSch, V, P,
-                                                         ALLOCS_PER_CLIENT);
+            clients[c] = new CrossbarSchedulerTestClient(
+                c, xbarSch, V, P, Simulator::Clock::CORE, ALLOCS_PER_CLIENT);
           }
 
           // run the simulator

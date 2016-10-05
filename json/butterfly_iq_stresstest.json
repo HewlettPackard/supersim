@@ -1,6 +1,7 @@
 {
   "simulator": {
-    "cycle_time": 500,  // picoseconds
+    "channel_cycle_time": 1,
+    "core_cycle_time": 1,
     "print_progress": true,
     "print_interval": 1.0,  // seconds
     "random_seed": 12345678
@@ -37,7 +38,7 @@
         "packet_lock": false,
         "idle_unlock": false
       },
-      "init_credits": 16,
+      "init_credits": "$&(network.router.input_queue_depth)&$",
       "crossbar": {
         "latency": 1  // cycles
       }
@@ -52,6 +53,7 @@
       },
       "input_queue_depth": 16,
       "vca_swa_wait": false,
+      "output_queue_depth": 16,
       "crossbar": {
         "latency": 1  // cycles
       },

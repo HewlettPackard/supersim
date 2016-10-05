@@ -80,7 +80,8 @@ void CongestionStatus::createEvent(u32 _port, u32 _vc, s32 _type) {
   assert(gSim->epsilon() > 0);
   assert(_port < numPorts_);
   assert(_vc < numVcs_);
-  u64 time = latency_ == 1 ? gSim->time() : gSim->futureCycle(latency_ - 1);
+  u64 time = latency_ == 1 ? gSim->time() :
+      gSim->futureCycle(Simulator::Clock::CORE, latency_ - 1);
   u32 vcIdx = router_->vcIndex(_port, _vc);
   addEvent(time, gSim->epsilon() + 1, reinterpret_cast<void*>(vcIdx), _type);
 }

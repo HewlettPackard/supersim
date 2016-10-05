@@ -40,15 +40,21 @@ class Simulator {
   void stop();
   bool initial() const;
   bool running() const;
+
   u64 time() const;
   u8 epsilon() const;
-  u64 cycle() const;
-  u64 cycleTime() const;
-  u64 futureCycle(u32 _cycles) const;
+
+  enum class Clock : u8 {CHANNEL = 0, CORE = 1};
+
+  u64 cycleTime(Clock _clock) const;
+  u64 cycle(Clock _clock) const;
+  u64 futureCycle(Clock _clock, u32 _cycles) const;
+
   void setNetwork(Network* _network);
   Network* getNetwork() const;
   void setApplication(Application* _app);
   Application* getApplication() const;
+
   bool getMonitoring() const;
   void startMonitoring();
   void endMonitoring();
@@ -67,7 +73,8 @@ class Simulator {
   virtual void runNextEvent() = 0;
 
  private:
-  const u64 cycleTime_;
+  const u64 channelCycleTime_;
+  const u64 coreCycleTime_;
 
   bool initial_;
   bool running_;

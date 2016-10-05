@@ -42,10 +42,11 @@ Interface::Interface(
   fixedMsgVc_ = _settings["fixed_msg_vc"].asBool();
 
   inputQueues_.resize(numVcs_);
-  crossbar_ = new Crossbar("Crossbar", this, numVcs_, 1, _settings["crossbar"]);
+  crossbar_ = new Crossbar("Crossbar", this, numVcs_, 1,
+                           Simulator::Clock::CHANNEL, _settings["crossbar"]);
   crossbarScheduler_ = new CrossbarScheduler(
       "CrossbarScheduler", this, numVcs_, numVcs_, 1,
-      _settings["crossbar_scheduler"]);
+      Simulator::Clock::CHANNEL, _settings["crossbar_scheduler"]);
 
   for (u32 vc = 0; vc < numVcs_; vc++) {
     // initialize the credit count in the CrossbarScheduler

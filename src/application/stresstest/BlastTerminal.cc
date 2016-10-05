@@ -68,7 +68,8 @@ BlastTerminal::BlastTerminal(const std::string& _name, const Component* _parent,
   f64 mir = getApplication()->maxInjectionRate(_id);
   u64 cycles = getApplication()->cyclesToSend(maxMessageSize_, mir);
   cycles = gSim->rnd.nextU64(1, 1 + cycles * 3);
-  u64 time = gSim->futureCycle(1) + ((cycles - 1) * gSim->cycleTime());
+  u64 time = gSim->futureCycle(Simulator::Clock::CHANNEL, 1) +
+      ((cycles - 1) * gSim->cycleTime(Simulator::Clock::CHANNEL));
   dbgprintf("start time is %lu", time);
   addEvent(time, 0, nullptr, 0);
 
@@ -112,7 +113,7 @@ void BlastTerminal::messageEnteredInterface(Message* _message) {
     u64 now = gSim->time();
     assert(lastSendTime_ <= now);
     if (now == lastSendTime_) {
-      addEvent(gSim->futureCycle(1), 0, nullptr, 0);
+      addEvent(gSim->futureCycle(Simulator::Clock::CHANNEL, 1), 0, nullptr, 0);
     } else {
       sendNextMessage();
     }
@@ -140,7 +141,7 @@ void BlastTerminal::messageExitedNetwork(Message* _message) {
 
       // push this sample into the cyclic buffers
       if (enrouteSampleTimes_.size() < warmupWindow_) {
-        enrouteSampleTimes_.push_back(gSim->cycle());
+        enrouteSampleTimes_.push_back(gSim->cycle(Simulator::Clock::CHANNEL));
         enrouteSampleValues_.push_back(flits);
       } else {
         enrouteSampleTimes_.at(enrouteSamplePos_) = gSim->time();

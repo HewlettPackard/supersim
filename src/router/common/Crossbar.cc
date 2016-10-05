@@ -20,11 +20,11 @@
 #include "event/Simulator.h"
 
 Crossbar::Crossbar(const std::string& _name, const Component* _parent,
-                   u32 _numInputs, u32 _numOutputs,
+                   u32 _numInputs, u32 _numOutputs, Simulator::Clock _clock,
                    Json::Value _settings)
-    : Component(_name, _parent),
+    : Component(_name, _parent), clock_(_clock),
+      latency_(_settings["latency"].asUInt()),
       numInputs_(_numInputs), numOutputs_(_numOutputs) {
-  latency_ = _settings["latency"].asUInt();  // latency is in cycles
   assert(latency_ > 0);
 
   std::pair<u32, FlitReceiver*> def(U32_MAX, nullptr);
@@ -53,7 +53,7 @@ void Crossbar::inject(Flit* _flit, u32 _srcId, u32 _destId) {
   assert(_srcId < numInputs_);
 
   // determine if this is a new cycle
-  u64 nextTime = gSim->futureCycle(1);
+  u64 nextTime = gSim->futureCycle(clock_, 1);
   if (nextTime_ != nextTime) {
     nextTime_ = nextTime;
 
@@ -61,7 +61,7 @@ void Crossbar::inject(Flit* _flit, u32 _srcId, u32 _destId) {
     destMaps_.push_front(std::vector<Flit*>(numOutputs_, nullptr));
 
     // schedule an event for the new map
-    addEvent(gSim->futureCycle(latency_), 1, nullptr, 0);
+    addEvent(gSim->futureCycle(clock_, latency_), 1, nullptr, 0);
   }
 
   std::vector<Flit*>& map = destMaps_.front();

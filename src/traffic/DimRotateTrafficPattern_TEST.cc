@@ -25,7 +25,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(DimRotateTrafficPattern, right) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   DimRotateTrafficPattern* tp;
@@ -85,7 +85,7 @@ TEST(DimRotateTrafficPattern, right) {
 }
 
 TEST(DimRotateTrafficPattern, left) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   DimRotateTrafficPattern* tp;

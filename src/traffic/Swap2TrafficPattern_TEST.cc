@@ -25,7 +25,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(Swap2TrafficPattern, no_enabled_dims) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   Swap2TrafficPattern* tp;
@@ -92,7 +92,7 @@ TEST(Swap2TrafficPattern, no_enabled_dims) {
 }
 
 TEST(Swap2TrafficPattern, enabled_dims_0_1) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   Swap2TrafficPattern* tp;
@@ -161,7 +161,7 @@ TEST(Swap2TrafficPattern, enabled_dims_0_1) {
 }
 
 TEST(Swap2TrafficPattern, enabled_dims_1_0_3d) {
-  TestSetup test(1, 0xBAADF00D);
+  TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   Swap2TrafficPattern* tp;

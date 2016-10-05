@@ -22,7 +22,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(LoopbackTrafficPattern, self) {
-  TestSetup test(123, 123);
+  TestSetup test(123, 123, 456789);
 
   const u32 TOTAL = 5000;
   const u32 ME = 50;

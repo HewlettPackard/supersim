@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef ROUTER_INPUTOUTPUTQUEUED_OUTPUTQUEUE_H_
-#define ROUTER_INPUTOUTPUTQUEUED_OUTPUTQUEUE_H_
+#ifndef ROUTER_INPUTQUEUED_OUTPUTQUEUE_H_
+#define ROUTER_INPUTQUEUED_OUTPUTQUEUE_H_
 
 #include <prim/prim.h>
 
@@ -23,25 +23,17 @@
 #include <vector>
 
 #include "event/Component.h"
-#include "router/common/Crossbar.h"
-#include "router/common/CrossbarScheduler.h"
 #include "types/Flit.h"
 #include "types/FlitReceiver.h"
 
-namespace InputOutputQueued {
+namespace InputQueued {
 
 class Router;
 
-class OutputQueue : public Component, public FlitReceiver,
-                    public CrossbarScheduler::Client {
+class OutputQueue : public Component, public FlitReceiver {
  public:
   OutputQueue(const std::string& _name, const Component* _parent,
-              u32 _depth, u32 _port, u32 _vc,
-              CrossbarScheduler* _outputCrossbarScheduler,
-              u32 _crossbarSchedulerIndex,
-              Crossbar* _crossbar, u32 _crossbarIndex,
-              CrossbarScheduler* _mainCrossbarScheduler,
-              u32 _mainCrossbarVcId);
+              Router* _router, u32 _depth, u32 _port);
   ~OutputQueue();
 
   // called by main router crossbar
@@ -50,25 +42,15 @@ class OutputQueue : public Component, public FlitReceiver,
   // event system (Component)
   void processEvent(void* _event, s32 _type) override;
 
-  // response from CrossbarScheduler
-  void crossbarSchedulerResponse(u32 _port, u32 _vc) override;
-
  private:
-  void setPipelineEvent();
   void processPipeline();
 
   // attributes
   const u32 depth_;
   const u32 port_;
-  const u32 vc_;
 
-  // external devices
-  CrossbarScheduler* outputCrossbarScheduler_;
-  const u32 crossbarSchedulerIndex_;
-  Crossbar* crossbar_;
-  const u32 crossbarIndex_;
-  CrossbarScheduler* mainCrossbarScheduler_;
-  const u32 mainCrossbarVcId_;
+  // external components
+  Router* router_;
 
   // single flit per clock input limit assurance
   u64 lastReceivedTime_;
@@ -80,20 +62,10 @@ class OutputQueue : public Component, public FlitReceiver,
   // remembers if an event is set to process the pipeline
   u64 eventTime_;
 
-  // The following variables represent the pipeline registers
-
   // buffer
   std::queue<Flit*> buffer_;  // insertion time & inserted flit
-
-  // Switch allocation [swa_] pipeline stage
-  struct {
-    ePipelineFsm fsm;
-    Flit* flit;
-  } swa_;
-
-  // Crossbar traversal [xtr_] stage (no state needed)
 };
 
-}  // namespace InputOutputQueued
+}  // namespace InputQueued
 
-#endif  // ROUTER_INPUTOUTPUTQUEUED_OUTPUTQUEUE_H_
+#endif  // ROUTER_INPUTQUEUED_OUTPUTQUEUE_H_

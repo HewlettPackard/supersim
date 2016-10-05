@@ -104,9 +104,10 @@ void Application::terminalSaturated(u32 _id) {
       }
 
       // set the maximum number of cycles to stay within the logging phase
-      printf("setting timeout from %lu to %lu\n",
-             gSim->time(), gSim->futureCycle(maxSaturationCycles_));
-      addEvent(gSim->futureCycle(maxSaturationCycles_), 0, nullptr, 0);
+      u64 timeout = gSim->futureCycle(Simulator::Clock::CHANNEL,
+                                      maxSaturationCycles_);
+      printf("setting timeout from %lu to %lu\n", gSim->time(), timeout);
+      addEvent(timeout, 0, nullptr, 0);
     } else {
       // drain all the packets from the network
       printf("Saturation threshold %f reached, now draining the network\n",
