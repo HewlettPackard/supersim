@@ -7,16 +7,10 @@ Variable crossbar input speedup
 Variable crossbar output speedup
 -This is doable because only a single VC can be allocated at one time.
 
-Multi-frequency designs
--speedup via frequency
-
 Automatic VC quantity calculation
 -packet/protocol class
 -routing class
 -virtual links
-
-CustomPermutationTrafficPattern
--take a mapping from the config file (external tool for generation)
 
 Multiple simultaneous applications
 -basic desire is to have background traffic (stresstest)
