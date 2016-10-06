@@ -23,6 +23,7 @@
 #include "types/Packet.h"
 
 // event types
+#define INJECTED_FLIT (0x33)
 #define PROCESS_PIPELINE (0xB7)
 
 namespace InputQueued {
@@ -68,6 +69,8 @@ InputQueue::InputQueue(
 InputQueue::~InputQueue() {}
 
 void InputQueue::receiveFlit(u32 _port, Flit* _flit) {
+  assert(gSim->epsilon() == 1);
+
   // 'port' is unused
   assert(_port == 0);
 
@@ -83,12 +86,19 @@ void InputQueue::receiveFlit(u32 _port, Flit* _flit) {
   buffer_.push(_flit);
   assert(buffer_.size() <= depth_);  // overflow check
 
-  // ensure an event is set to process the pipeline
-  setPipelineEvent();
+  // queue an event to be notified about the injected flit
+  //  this synchronized the two clock domains
+  addEvent(gSim->futureCycle(Simulator::Clock::CORE, 1),
+           1, _flit, INJECTED_FLIT);
 }
 
 void InputQueue::processEvent(void* _event, s32 _type) {
   switch (_type) {
+    case (INJECTED_FLIT):
+      assert(gSim->epsilon() == 1);
+      setPipelineEvent();
+      break;
+
     case (PROCESS_PIPELINE):
       assert(gSim->epsilon() == 2);
       processPipeline();
@@ -151,6 +161,9 @@ void InputQueue::setPipelineEvent() {
 }
 
 void InputQueue::processPipeline() {
+  // make sure the pipeline is being processed on clock cycle boundaries
+  assert(gSim->time() % gSim->cycleTime(Simulator::Clock::CORE) == 0);
+
   /*
    * attempt to load the crossbar
    */

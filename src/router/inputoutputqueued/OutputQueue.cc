@@ -121,6 +121,9 @@ void OutputQueue::setPipelineEvent() {
 }
 
 void OutputQueue::processPipeline() {
+  // make sure the pipeline is being processed on clock cycle boundaries
+  assert(gSim->time() % gSim->cycleTime(Simulator::Clock::CHANNEL) == 0);
+
   /*
    * attempt to load the crossbar
    */

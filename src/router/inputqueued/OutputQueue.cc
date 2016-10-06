@@ -78,6 +78,9 @@ void OutputQueue::processEvent(void* _event, s32 _type) {
 }
 
 void OutputQueue::processPipeline() {
+  // make sure the pipeline is being processed on clock cycle boundaries
+  assert(gSim->time() % gSim->cycleTime(Simulator::Clock::CHANNEL) == 0);
+
   /*
    * Send the next flit on the output channel
    */
