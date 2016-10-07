@@ -60,4 +60,3 @@ DimReverseTrafficPattern::~DimReverseTrafficPattern() {}
 u32 DimReverseTrafficPattern::nextDestination() {
   return dest_;
 }
-

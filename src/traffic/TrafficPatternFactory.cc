@@ -26,6 +26,7 @@
 #include "traffic/DimReverseTrafficPattern.h"
 #include "traffic/DimRotateTrafficPattern.h"
 #include "traffic/DimTransposeTrafficPattern.h"
+#include "traffic/DragonflyWorstCaseTrafficPattern.h"
 #include "traffic/LoopbackTrafficPattern.h"
 #include "traffic/MatrixTrafficPattern.h"
 #include "traffic/NeighborTrafficPattern.h"
@@ -99,6 +100,9 @@ TrafficPattern* TrafficPatternFactory::createTrafficPattern(
         _name, _parent, _numTerminals, _self, _settings);
   } else if (type == "bisection_stress") {
     return new BisectionStressTrafficPattern(
+        _name, _parent, _numTerminals, _self, _settings);
+  } else if (type == "dragonfly_worst_case") {
+    return new DragonflyWorstCaseTrafficPattern(
         _name, _parent, _numTerminals, _self, _settings);
   } else if (type == "matrix") {
     return new MatrixTrafficPattern(
