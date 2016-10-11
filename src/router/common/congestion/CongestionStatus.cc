@@ -33,19 +33,22 @@ CongestionStatus::CongestionStatus(
 
 CongestionStatus::~CongestionStatus() {}
 
-void CongestionStatus::initCredits(u32 _port, u32 _vc, u32 _credits) {
-  assert(_port < numPorts_);
-  assert(_vc < numVcs_);
+void CongestionStatus::initCredits(u32 _vcIdx, u32 _credits) {
+  u32 port, vc;
+  router_->vcIndexInv(_vcIdx, &port, &vc);
+
+  assert(port < numPorts_);
+  assert(vc < numVcs_);
   assert(_credits > 0);
-  performInitCredits(_port, _vc, _credits);
+  performInitCredits(port, vc, _credits);
 }
 
-void CongestionStatus::incrementCredit(u32 _port, u32 _vc) {
-  createEvent(_port, _vc, INCR);
+void CongestionStatus::incrementCredit(u32 _vcIdx) {
+  createEvent(_vcIdx, INCR);
 }
 
-void CongestionStatus::decrementCredit(u32 _port, u32 _vc) {
-  createEvent(_port, _vc, DECR);
+void CongestionStatus::decrementCredit(u32 _vcIdx) {
+  createEvent(_vcIdx, DECR);
 }
 
 f64 CongestionStatus::status(u32 _port, u32 _vc) const {
@@ -76,12 +79,9 @@ void CongestionStatus::processEvent(void* _event, s32 _type) {
   }
 }
 
-void CongestionStatus::createEvent(u32 _port, u32 _vc, s32 _type) {
+void CongestionStatus::createEvent(u32 _vcIdx, s32 _type) {
   assert(gSim->epsilon() > 0);
-  assert(_port < numPorts_);
-  assert(_vc < numVcs_);
   u64 time = latency_ == 1 ? gSim->time() :
       gSim->futureCycle(Simulator::Clock::CORE, latency_ - 1);
-  u32 vcIdx = router_->vcIndex(_port, _vc);
-  addEvent(time, gSim->epsilon() + 1, reinterpret_cast<void*>(vcIdx), _type);
+  addEvent(time, gSim->epsilon() + 1, reinterpret_cast<void*>(_vcIdx), _type);
 }

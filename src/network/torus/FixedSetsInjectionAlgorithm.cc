@@ -28,6 +28,7 @@ FixedSetsInjectionAlgorithm::FixedSetsInjectionAlgorithm(
     : InjectionAlgorithm(_name, _parent, _interface, _latency),
       numVcs_(_numVcs), numSets_(_numSets), sets_(_sets) {
   for (auto set : sets_) {
+    (void)set;  // unused
     assert(set < numSets_);
   }
 }

@@ -55,6 +55,7 @@ Message* MessageReassembler::receivePacket(Packet* _packet) {
   if (messageData.receivedCount == message->numPackets()) {
     // remove the message from the map
     s32 erased = messages_.erase(mid);
+    (void)erased;  // unused
     assert(erased == 1);
     return message;
   } else {

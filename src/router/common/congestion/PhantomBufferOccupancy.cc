@@ -34,8 +34,8 @@ PhantomBufferOccupancy::PhantomBufferOccupancy(
   assert(!_settings["length_coeff"].isNull());
 
   u32 totalVcs = numPorts_ * numVcs_;
-  maximums_.resize(totalVcs);
-  counts_.resize(totalVcs);
+  maximums_.resize(totalVcs, 0);
+  counts_.resize(totalVcs, 0);
   windows_.resize(totalVcs, 0);
 }
 
@@ -56,8 +56,8 @@ void PhantomBufferOccupancy::processEvent(void* _event, s32 _type) {
 void PhantomBufferOccupancy::performInitCredits(
     u32 _port, u32 _vc, u32 _credits) {
   u32 vcIdx = router_->vcIndex(_port, _vc);
-  maximums_.at(vcIdx) = _credits;
-  counts_.at(vcIdx) = _credits;
+  maximums_.at(vcIdx) += _credits;
+  counts_.at(vcIdx) += _credits;
 }
 
 void PhantomBufferOccupancy::performIncrementCredit(u32 _port, u32 _vc) {

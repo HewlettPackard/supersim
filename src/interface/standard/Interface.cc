@@ -45,7 +45,7 @@ Interface::Interface(
   crossbar_ = new Crossbar("Crossbar", this, numVcs_, 1,
                            Simulator::Clock::CHANNEL, _settings["crossbar"]);
   crossbarScheduler_ = new CrossbarScheduler(
-      "CrossbarScheduler", this, numVcs_, numVcs_, 1,
+      "CrossbarScheduler", this, numVcs_, numVcs_, 1, 0,
       Simulator::Clock::CHANNEL, _settings["crossbar_scheduler"]);
 
   for (u32 vc = 0; vc < numVcs_; vc++) {
@@ -154,6 +154,7 @@ void Interface::receiveFlit(u32 _port, Flit* _flit) {
 
   // check destination is correct
   u32 dest = _flit->getPacket()->getMessage()->getDestinationId();
+  (void)dest;  // unused
   assert(dest == getId());
 
   // mark the receive time

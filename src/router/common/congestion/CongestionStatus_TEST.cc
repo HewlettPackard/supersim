@@ -85,8 +85,8 @@ class CongestionStatusTest : public CongestionStatus {
       const std::string& _name, const Component* _parent, Router* _router,
       Json::Value _settings)
       : CongestionStatus(_name, _parent, _router, _settings), ok_(true) {
-    maxCredits_.resize(numPorts_ * numVcs_);
-    currCredits_.resize(numPorts_ * numVcs_);
+    maxCredits_.resize(numPorts_ * numVcs_, 0);
+    currCredits_.resize(numPorts_ * numVcs_, 0);
   }
 
   ~CongestionStatusTest() {}
@@ -98,8 +98,8 @@ class CongestionStatusTest : public CongestionStatus {
   void performInitCredits(u32 _port, u32 _vc, u32 _credits) override {
     assert(_credits > 0);
     u32 vcIdx = router_->vcIndex(_port, _vc);
-    maxCredits_.at(vcIdx) = _credits;
-    currCredits_.at(vcIdx) = _credits;
+    maxCredits_.at(vcIdx) += _credits;
+    currCredits_.at(vcIdx) += _credits;
   }
 
   void performIncrementCredit(u32 _port, u32 _vc) override {
@@ -199,12 +199,12 @@ void CreditHandler::processEvent(void* _event, s32 _type) {
   switch (_type) {
     case CongestionStatus::INCR:
       dbgprintf("incrementing port=%u vc=%u", port, vc);
-      congestionStatus_->incrementCredit(port, vc);
+      congestionStatus_->incrementCredit(vcIdx);
       break;
 
     case CongestionStatus::DECR:
       dbgprintf("decrementing port=%u vc=%u", port, vc);
-      congestionStatus_->decrementCredit(port, vc);
+      congestionStatus_->decrementCredit(vcIdx);
       break;
 
     default:
@@ -278,7 +278,7 @@ TEST(CongestionStatus, latencyAndGranularity) {
           u32 max = port * 100 + vc + 1;
           maxCredits.at(router.vcIndex(port, vc)) = max;
           currCredits.at(router.vcIndex(port, vc)) = max;
-          status.initCredits(port, vc, max);
+          status.initCredits(router.vcIndex(port, vc), max);
         }
       }
 

@@ -181,7 +181,7 @@ TEST(CrossbarScheduler, basic) {
           schSettings["idle_unlock"] = std::get<2>(style);
           CrossbarScheduler* xbarSch =
               new CrossbarScheduler(
-                  "XbarSch", nullptr, C, V, P, Simulator::Clock::CORE,
+                  "XbarSch", nullptr, C, V, P, 0, Simulator::Clock::CORE,
                   schSettings);
           assert(xbarSch->numClients() == C);
           assert(xbarSch->totalVcs() == V);

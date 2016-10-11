@@ -58,7 +58,7 @@ NeighborTrafficPattern::NeighborTrafficPattern(
   // compute the destination vector address
   for (u32 dim = 0; dim < dimensions; dim++) {
     if (dimMask.at(dim)) {
-      u32 dimOffset;
+      u32 dimOffset = 0;
       if (dir == "right") {
         dimOffset = 1;
       } else if (dir == "left") {

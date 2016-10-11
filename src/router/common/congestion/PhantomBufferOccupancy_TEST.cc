@@ -58,7 +58,7 @@ TEST(PhantomBufferOccupancy, statusCheck) {
                                       statusSettings);
         status.setDebug(debug);
 
-        status.initCredits(0, 0, bufferDepth);
+        status.initCredits(router.vcIndex(0, 0), bufferDepth);
 
         CreditHandler crediter("CreditHandler", nullptr, &status, &router);
         crediter.setDebug(debug);

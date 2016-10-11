@@ -39,7 +39,7 @@ CXX           := g++
 SRC_EXTS      := .cc
 HDR_EXTS      := .h .tcc
 CXX_FLAGS     := -Wall -Wextra -pedantic -Wfatal-errors -std=c++11
-CXX_FLAGS     += -Wno-unused-parameter -Wno-variadic-macros
+CXX_FLAGS     += -Wno-unused-parameter
 CXX_FLAGS     += -march=native -g -O3 -flto
 LINK_FLAGS    := -lz
 

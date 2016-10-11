@@ -25,6 +25,7 @@
 
 #include "allocator/Allocator.h"
 #include "event/Component.h"
+#include "router/common/CreditWatcher.h"
 #include "types/Flit.h"
 
 class CrossbarScheduler : public Component {
@@ -48,7 +49,8 @@ class CrossbarScheduler : public Component {
   // constructor and destructor
   CrossbarScheduler(const std::string& _name, const Component* _parent,
                     u32 _numClients, u32 _totalVcs, u32 _crossbarPorts,
-                    Simulator::Clock _clock, Json::Value _settings);
+                    u32 _globalVcOffset, Simulator::Clock _clock,
+                    Json::Value _settings);
   ~CrossbarScheduler();
 
   // constant attributes
@@ -58,6 +60,9 @@ class CrossbarScheduler : public Component {
 
   // links a client to the scheduler
   void setClient(u32 _id, Client* _client);
+
+  // sets a credit watcher
+  void addCreditWatcher(CreditWatcher* _watcher);
 
   // requests to send a flit to a VC
   void request(u32 _client, u32 _port, u32 _vcIdx, Flit* _flit);
@@ -75,12 +80,15 @@ class CrossbarScheduler : public Component {
   const u32 numClients_;
   const u32 totalVcs_;
   const u32 crossbarPorts_;
+  const u32 globalVcOffset_;
   const Simulator::Clock clock_;
 
   std::vector<Client*> clients_;
   std::vector<u32> clientRequestPorts_;
   std::vector<u32> clientRequestVcs_;
   std::vector<const Flit*> clientRequestFlits_;
+
+  std::vector<CreditWatcher*> watchers_;
 
   std::vector<u32> credits_;
   std::vector<u32> maxCredits_;

@@ -56,7 +56,10 @@ Router::Router(
       Simulator::Clock::CORE, _settings["vc_scheduler"]);
   crossbarScheduler_ = new CrossbarScheduler(
       "CrossbarScheduler", this, numPorts_ * numVcs_, numPorts_ * numVcs_,
-      numPorts_, Simulator::Clock::CORE, _settings["crossbar_scheduler"]);
+      numPorts_, 0, Simulator::Clock::CORE, _settings["crossbar_scheduler"]);
+
+  // set the congestion status to watch the credits of the scheduler
+  crossbarScheduler_->addCreditWatcher(congestionStatus_);
 
   // create routing algorithms, input queues, link to routing algorithm,
   //  crossbar, and schedulers
@@ -68,9 +71,6 @@ Router::Router(
 
       // initialize the credit count in the CrossbarScheduler
       crossbarScheduler_->initCreditCount(vcIdx, inputQueueDepth);
-
-      // initialize the credit count in the CongestionStatus
-      congestionStatus_->initCredits(port, vc, inputQueueDepth);
 
       // create the name suffix
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
@@ -164,7 +164,6 @@ void Router::receiveCredit(u32 _port, Credit* _credit) {
     u32 vc = _credit->getNum();
     u32 vcIdx = vcIndex(_port, vc);
     crossbarScheduler_->incrementCreditCount(vcIdx);
-    congestionStatus_->incrementCredit(_port, vc);
   }
   delete _credit;
 }
@@ -185,7 +184,6 @@ void Router::sendCredit(u32 _port, u32 _vc) {
 void Router::sendFlit(u32 _port, Flit* _flit) {
   assert(outputChannels_.at(_port)->getNextFlit() == nullptr);
   outputChannels_.at(_port)->setNextFlit(_flit);
-  congestionStatus_->decrementCredit(_port, _flit->getVc());
 }
 
 f64 Router::congestionStatus(u32 _port, u32 _vc) const {

@@ -59,8 +59,11 @@ Router::Router(
       Simulator::Clock::CORE, _settings["vc_scheduler"]);
   crossbarScheduler_ = new CrossbarScheduler(
       "CrossbarScheduler", this, numPorts_ * numVcs_, numPorts_ * numVcs_,
-      numPorts_ * numVcs_, Simulator::Clock::CORE,
+      numPorts_ * numVcs_, 0, Simulator::Clock::CORE,
       _settings["crossbar_scheduler"]);
+
+  // set the congestion status to watch the credits of the main scheduler
+  crossbarScheduler_->addCreditWatcher(congestionStatus_);
 
   // create routing algorithms, input queues, link to routing algorithm,
   //  crossbar, and schedulers
@@ -72,9 +75,6 @@ Router::Router(
 
       // initialize the credit count in the CrossbarScheduler
       crossbarScheduler_->initCreditCount(vcIdx, outputQueueDepth);
-
-      // initialize the credit count in the CongestionStatus
-      congestionStatus_->initCredits(port, vc, inputQueueDepth);
 
       // create the name suffix
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
@@ -113,8 +113,11 @@ Router::Router(
     std::string outputCrossbarSchedulerName =
         "OutputCrossbarScheduler_" + std::to_string(port);
     outputCrossbarSchedulers_.at(port) = new CrossbarScheduler(
-        outputCrossbarSchedulerName, this, numVcs_, numVcs_, 1,
+        outputCrossbarSchedulerName, this, numVcs_, numVcs_, 1, port * numVcs_,
         Simulator::Clock::CHANNEL, _settings["output_crossbar_scheduler"]);
+
+    // set the congestion status to watch the credits of the output scheduler
+    outputCrossbarSchedulers_.at(port)->addCreditWatcher(congestionStatus_);
 
     // output crossbar
     std::string outputCrossbarName = "OutputCrossbar_" + std::to_string(port);
@@ -214,7 +217,6 @@ void Router::receiveCredit(u32 _port, Credit* _credit) {
   while (_credit->more()) {
     u32 vc = _credit->getNum();
     outputCrossbarSchedulers_.at(_port)->incrementCreditCount(vc);
-    congestionStatus_->incrementCredit(_port, vc);
   }
   delete _credit;
 }
@@ -235,7 +237,6 @@ void Router::sendCredit(u32 _port, u32 _vc) {
 void Router::sendFlit(u32 _port, Flit* _flit) {
   assert(outputChannels_.at(_port)->getNextFlit() == nullptr);
   outputChannels_.at(_port)->setNextFlit(_flit);
-  congestionStatus_->decrementCredit(_port, _flit->getVc());
 }
 
 f64 Router::congestionStatus(u32 _port, u32 _vc) const {

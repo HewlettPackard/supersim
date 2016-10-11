@@ -23,21 +23,20 @@
 #include <vector>
 
 #include "event/Component.h"
+#include "router/common/CreditWatcher.h"
 
 class Router;
 
-class CongestionStatus : public Component {
+class CongestionStatus : public Component, public CreditWatcher {
  public:
   CongestionStatus(const std::string& _name, const Component* _parent,
                    Router* _router, Json::Value _settings);
   virtual ~CongestionStatus();
 
-  // configuration
-  void initCredits(u32 _port, u32 _vc, u32 _credits);
-
-  // operation
-  void incrementCredit(u32 _port, u32 _vc);  // a credit came from downstream
-  void decrementCredit(u32 _port, u32 _vc);  // a credit was consumed locally
+  // CreditWatcher interface
+  void initCredits(u32 _vcIdx, u32 _credits) override;  // called per source
+  void incrementCredit(u32 _vcIdx) override;  // a credit came from downstream
+  void decrementCredit(u32 _vcIdx) override;  // a credit was consumed locally
 
   // this returns congestion status (i.e. 0=empty 1=congested)
   f64 status(u32 _port, u32 _vc) const;  // (must be epsilon >= 1)
@@ -62,7 +61,7 @@ class CongestionStatus : public Component {
   virtual f64 computeStatus(u32 _port, u32 _vc) const = 0;
 
  private:
-  void createEvent(u32 _port, u32 _vc, s32 _type);
+  void createEvent(u32 _vcIdx, s32 _type);
 
   const u32 latency_;
   const u32 granularity_;

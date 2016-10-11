@@ -118,6 +118,7 @@ Network::Network(const std::string& _name, const Component* _parent,
         u32 thatGroup = c / thatGroupSize;
         u32 thatBase = thatGroup * thatGroupSize;
         u32 thatOffset = c - thatBase;
+        (void)thatOffset;  // unused
         assert(thatOffset == (c % thatGroupSize));
 
         u32 thisRow    = r;

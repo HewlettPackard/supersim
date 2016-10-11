@@ -25,16 +25,17 @@ BufferOccupancy::BufferOccupancy(
     Json::Value _settings)
     : CongestionStatus(_name, _parent, _router, _settings) {
   u32 totalVcs = numPorts_ * numVcs_;
-  maximums_.resize(totalVcs);
-  counts_.resize(totalVcs);
+  maximums_.resize(totalVcs, 0);
+  counts_.resize(totalVcs, 0);
 }
 
 BufferOccupancy::~BufferOccupancy() {}
 
 void BufferOccupancy::performInitCredits(u32 _port, u32 _vc, u32 _credits) {
   u32 vcIdx = router_->vcIndex(_port, _vc);
-  maximums_.at(vcIdx) = _credits;
-  counts_.at(vcIdx) = _credits;
+  maximums_.at(vcIdx) += _credits;
+  counts_.at(vcIdx) += _credits;
+  dbgprintf("max & count on %u is now %u", vcIdx, counts_.at(vcIdx));
 }
 
 void BufferOccupancy::performIncrementCredit(u32 _port, u32 _vc) {

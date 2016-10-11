@@ -48,7 +48,7 @@ TEST(BufferOccupancy, statusCheck) {
   for (u32 port = 0; port < numPorts; port++) {
     for (u32 vc = 0; vc < numVcs; vc++) {
       u32 max = port * 10 + vc + 2;
-      status.initCredits(port, vc, max);
+      status.initCredits(router.vcIndex(port, vc), max);
     }
   }
 
