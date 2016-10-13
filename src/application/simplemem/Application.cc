@@ -33,9 +33,6 @@ Application::Application(const std::string& _name, const Component* _parent,
                          MetadataHandler* _metadataHandler,
                          Json::Value _settings)
     : ::Application(_name, _parent, _metadataHandler, _settings) {
-  numVcs_ = gSim->getNetwork()->numVcs();
-  assert(numVcs_ > 0);
-
   // check the memory system setup
   memorySlice_ = _settings["memory_slice"].asUInt();
   totalMemory_ = memorySlice_ * (numTerminals() / 2);
@@ -88,10 +85,6 @@ f64 Application::percentComplete() const {
     processorCount++;
   }
   return percentSum / processorCount;
-}
-
-u32 Application::numVcs() const {
-  return numVcs_;
 }
 
 u32 Application::totalMemory() const {

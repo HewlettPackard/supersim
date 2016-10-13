@@ -34,7 +34,6 @@ class Application : public ::Application {
               MetadataHandler* _metadataHandler, Json::Value _settings);
   ~Application();
   f64 percentComplete() const override;
-  u32 numVcs() const;
   u32 totalMemory() const;
   u32 memorySlice() const;
   u32 blockSize() const;
@@ -45,7 +44,6 @@ class Application : public ::Application {
   void processEvent(void* _event, s32 _type) override;
 
  private:
-  u32 numVcs_;
   u32 totalMemory_;
   u32 memorySlice_;
   u32 blockSize_;
