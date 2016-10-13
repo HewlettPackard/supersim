@@ -34,11 +34,7 @@ Network::Network(const std::string& _name, const Component* _parent,
   dbgprintf("concentration_ = %u", concentration_);
 
   // router radix
-  assert(_settings["router"].isMember("num_ports") == false);
   u32 routerRadix = concentration_;
-  _settings["router"]["num_ports"] = Json::Value(routerRadix);
-  _settings["router"]["num_vcs"] = Json::Value(numVcs_);
-  _settings["interface"]["num_vcs"] = Json::Value(numVcs_);
 
   // create a routing algorithm factory to give to the routers
   RoutingAlgorithmFactory* routingAlgorithmFactory =
@@ -47,8 +43,8 @@ Network::Network(const std::string& _name, const Component* _parent,
 
   // create the router
   router_ = RouterFactory::createRouter(
-      "Router", this, std::vector<u32>(), routingAlgorithmFactory,
-      _metadataHandler, _settings["router"]);
+      "Router", this, routerRadix, numVcs_, std::vector<u32>(),
+      _metadataHandler, routingAlgorithmFactory, _settings["router"]);
   delete routingAlgorithmFactory;
 
   // create an injection algorithm factory to give to the interfaces
@@ -61,7 +57,7 @@ Network::Network(const std::string& _name, const Component* _parent,
     // create the interface
     std::string interfaceName = "Interface_" + std::to_string(id);
     Interface* interface = InterfaceFactory::createInterface(
-        interfaceName, this, id, injectionAlgorithmFactory,
+        interfaceName, this, numVcs_, id, injectionAlgorithmFactory,
         _settings["interface"]);
     interfaces_.at(id) = interface;
 

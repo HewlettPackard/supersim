@@ -32,10 +32,8 @@ TEST(BufferOccupancy, statusCheck) {
   const u32 granularity = 0;
 
   Json::Value routerSettings;
-  routerSettings["num_ports"] = numPorts;
-  routerSettings["num_vcs"] = numVcs;
-  CongestionTestRouter router("Router", nullptr, std::vector<u32>({}),
-                              nullptr, routerSettings);
+  CongestionTestRouter router("Router", nullptr, numPorts, numVcs,
+                              std::vector<u32>({}), nullptr, routerSettings);
   router.setDebug(debug);
 
   Json::Value statusSettings;

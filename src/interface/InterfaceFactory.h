@@ -27,7 +27,7 @@
 class InterfaceFactory {
  public:
   static Interface* createInterface(
-      const std::string& _name, const Component* _parent, u32 _id,
+      const std::string& _name, const Component* _parent, u32 _numVcs, u32 _id,
       InjectionAlgorithmFactory* _injectionAlgorithmFactory,
       Json::Value _settings);
 };

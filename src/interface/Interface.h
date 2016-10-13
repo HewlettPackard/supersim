@@ -38,8 +38,8 @@ class Interface : public Component, public FlitSender, public FlitReceiver,
                   public CreditSender, public CreditReceiver,
                   public MessageReceiver {
  public:
-  Interface(const std::string& _name, const Component* _parent, u32 _id,
-            Json::Value _settings);
+  Interface(const std::string& _name, const Component* _parent, u32 _numVcs,
+            u32 _id, Json::Value _settings);
   virtual ~Interface();
   u32 getId() const;
   u32 numVcs() const;
@@ -49,8 +49,8 @@ class Interface : public Component, public FlitSender, public FlitReceiver,
   virtual void setOutputChannel(Channel* _channel) = 0;
 
  protected:
-  const u32 id_;
   const u32 numVcs_;
+  const u32 id_;
 
  private:
   MessageReceiver* messageReceiver_;

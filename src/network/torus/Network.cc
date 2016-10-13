@@ -49,9 +49,6 @@ Network::Network(const std::string& _name, const Component* _parent,
 
   // router radix
   u32 routerRadix = concentration_ + (dimensions_ * 2);
-  _settings["router"]["num_ports"] = Json::Value(routerRadix);
-  _settings["router"]["num_vcs"] = Json::Value(numVcs_);
-  _settings["interface"]["num_vcs"] = Json::Value(numVcs_);
 
   // create a routing algorithm factory to give to the routers
   RoutingAlgorithmFactory* routingAlgorithmFactory =
@@ -71,8 +68,8 @@ Network::Network(const std::string& _name, const Component* _parent,
 
     // use the router factory to create a router
     routers_.at(routerAddress) = RouterFactory::createRouter(
-        routerName, this, routerAddress, routingAlgorithmFactory,
-        _metadataHandler, _settings["router"]);
+        routerName, this, routerRadix, numVcs_, routerAddress,
+        _metadataHandler, routingAlgorithmFactory, _settings["router"]);
   }
   delete routingAlgorithmFactory;
 
@@ -171,7 +168,7 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // create the interface
       Interface* interface = InterfaceFactory::createInterface(
-          interfaceName, this, interfaceId, injectionAlgorithmFactory,
+          interfaceName, this, numVcs_, interfaceId, injectionAlgorithmFactory,
           _settings["interface"]);
       interfaces_.at(interfaceAddress) = interface;
       interfaceId++;

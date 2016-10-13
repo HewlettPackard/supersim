@@ -43,8 +43,8 @@ class MessageReassembler;
 
 class Interface : public ::Interface, public InjectionAlgorithm::Client {
  public:
-  Interface(const std::string& _name, const Component* _parent, u32 _id,
-            InjectionAlgorithmFactory* _injectionAlgorithmFactory,
+  Interface(const std::string& _name, const Component* _parent, u32 _numVcs,
+            u32 _id, InjectionAlgorithmFactory* _injectionAlgorithmFactory,
             Json::Value _settings);
   ~Interface();
   void setInputChannel(Channel* _channel) override;

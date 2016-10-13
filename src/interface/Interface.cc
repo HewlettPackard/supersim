@@ -18,11 +18,8 @@
 #include <cassert>
 
 Interface::Interface(const std::string& _name, const Component* _parent,
-                     u32 _id, Json::Value _settings)
-    : Component(_name, _parent), id_(_id),
-      numVcs_(_settings["num_vcs"].asUInt()) {
-  assert(numVcs_ > 0);
-}
+                     u32 _numVcs, u32 _id, Json::Value _settings)
+    : Component(_name, _parent), numVcs_(_numVcs), id_(_id) {}
 
 Interface::~Interface() {}
 

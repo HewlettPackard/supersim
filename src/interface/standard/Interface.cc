@@ -28,10 +28,10 @@
 namespace Standard {
 
 Interface::Interface(
-    const std::string& _name, const Component* _parent, u32 _id,
+    const std::string& _name, const Component* _parent, u32 _numVcs, u32 _id,
     InjectionAlgorithmFactory* _injectionAlgorithmFactory,
     Json::Value _settings)
-    : ::Interface(_name, _parent, _id, _settings) {
+    : ::Interface(_name, _parent, _numVcs, _id, _settings) {
   injectionAlgorithm_ = _injectionAlgorithmFactory->createInjectionAlgorithm(
       "InjectionAlgorithm", this, this);
 

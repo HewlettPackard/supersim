@@ -54,6 +54,10 @@ class Network : public ::Network {
   void collectChannels(std::vector<Channel*>* _channels) override;
 
  private:
+  u32 halfRadix_;
+  u32 numLevels_;
+  u32 rowRouters_;
+
   // [row][col]
   std::vector<std::vector<Router*> > routers_;
   // [col][conc]
@@ -61,12 +65,6 @@ class Network : public ::Network {
 
   std::vector<Channel*> internalChannels_;
   std::vector<Channel*> externalChannels_;
-
-  u32 routerRadix_;
-  u32 halfRadix_;
-  u32 numLevels_;
-  u32 rowRouters_;
-  u32 numPorts_;
 };
 
 }  // namespace FoldedClos

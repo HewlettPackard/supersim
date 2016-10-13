@@ -21,20 +21,21 @@
 #include "router/inputqueued/Router.h"
 
 Router* RouterFactory::createRouter(
-    const std::string& _name, const Component* _parent,
-    const std::vector<u32>& _address,
+    const std::string& _name, const Component* _parent, u32 _numPorts,
+    u32 _numVcs, const std::vector<u32>& _address,
+    MetadataHandler* _metadataHandler,
     RoutingAlgorithmFactory* _routingAlgorithmFactory,
-    MetadataHandler* _metadataHandler, Json::Value _settings) {
+    Json::Value _settings) {
   std::string architecture = _settings["architecture"].asString();
 
   if (architecture == "input_queued") {
     return new InputQueued::Router(
-        _name, _parent, _address, _routingAlgorithmFactory, _metadataHandler,
-        _settings);
+        _name, _parent, _numPorts, _numVcs, _address, _metadataHandler,
+        _routingAlgorithmFactory, _settings);
   } else if (architecture == "input_output_queued") {
     return new InputOutputQueued::Router(
-        _name, _parent, _address, _routingAlgorithmFactory, _metadataHandler,
-        _settings);
+        _name, _parent, _numPorts, _numVcs, _address, _metadataHandler,
+        _routingAlgorithmFactory, _settings);
   } else {
     fprintf(stderr, "unknown router architecture: %s\n", architecture.c_str());
     assert(false);

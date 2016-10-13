@@ -28,15 +28,14 @@ namespace FoldedClos {
 Network::Network(const std::string& _name, const Component* _parent,
                  MetadataHandler* _metadataHandler, Json::Value _settings)
     : ::Network(_name, _parent, _metadataHandler, _settings) {
-  assert(_settings["router"].isMember("num_ports") == true);
-  routerRadix_ = _settings["router"]["num_ports"].asUInt();
-  _settings["router"]["num_vcs"] = Json::Value(numVcs_);
-  _settings["interface"]["num_vcs"] = Json::Value(numVcs_);
-  assert(routerRadix_ % 2 == 0);
-  halfRadix_   = routerRadix_ / 2;
+  // network structure and router radix
+  u32 routerRadix = _settings["radix"].asUInt();
+  assert(routerRadix >= 2);
+  assert(routerRadix % 2 == 0);
+  halfRadix_   = routerRadix / 2;
   numLevels_   = _settings["levels"].asUInt();
+  assert(numLevels_ >= 1);
   rowRouters_  = (u32)pow(halfRadix_, numLevels_-1);
-  numPorts_    = (u32)pow(halfRadix_, numLevels_);
 
   // create all routers
   routers_.resize(numLevels_);
@@ -78,13 +77,13 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // create a routing algorithm factory
       RoutingAlgorithmFactory* routingAlgorithmFactory =
-          new RoutingAlgorithmFactory(numVcs_, routerRadix_, numLevels_, row,
+          new RoutingAlgorithmFactory(numVcs_, routerRadix, numLevels_, row,
                                       _settings["routing"]);
 
       // make router
       routers_.at(row).at(col) = RouterFactory::createRouter(
-          rname, this, routerAddress, routingAlgorithmFactory,
-          _metadataHandler, _settings["router"]);
+          rname, this, routerRadix, numVcs_, routerAddress,
+          _metadataHandler, routingAlgorithmFactory, _settings["router"]);
 
       // delete the routing algorithm factory
       delete routingAlgorithmFactory;
@@ -176,7 +175,7 @@ Network::Network(const std::string& _name, const Component* _parent,
       std::string interfaceName = "Interface_" + std::to_string(c) + ":" +
           std::to_string(p);
       Interface* interface = InterfaceFactory::createInterface(
-          interfaceName, this, interfaceId, injectionAlgorithmFactory,
+          interfaceName, this, numVcs_, interfaceId, injectionAlgorithmFactory,
           _settings["interface"]);
       interfaces_.at(c).at(p) = interface;
       interfaceId++;

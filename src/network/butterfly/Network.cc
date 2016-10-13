@@ -31,15 +31,11 @@ Network::Network(const std::string& _name, const Component* _parent,
                  MetadataHandler* _metadataHandler, Json::Value _settings)
     : ::Network(_name, _parent, _metadataHandler, _settings) {
   // radix and stages
-  routerRadix_ = _settings["router"]["num_ports"].asUInt();
+  routerRadix_ = _settings["radix"].asUInt();
   assert(routerRadix_ >= 2);
   numStages_ = _settings["stages"].asUInt();
   assert(numStages_ >= 1);
   stageWidth_ = (u32)pow(routerRadix_, numStages_ - 1);
-
-  // num VCs for subcomponents
-  _settings["router"]["num_vcs"] = Json::Value(numVcs_);
-  _settings["interface"]["num_vcs"] = Json::Value(numVcs_);
 
   // create the routers
   routers_.resize(numStages_);
@@ -58,8 +54,8 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // create the router
       routers_.at(stage).at(column) = RouterFactory::createRouter(
-          rname, this, std::vector<u32>({stage, column}),
-          routingAlgorithmFactory, _metadataHandler, _settings["router"]);
+          rname, this, routerRadix_, numVcs_, std::vector<u32>({stage, column}),
+          _metadataHandler, routingAlgorithmFactory, _settings["router"]);
       delete routingAlgorithmFactory;
     }
   }
@@ -105,7 +101,7 @@ Network::Network(const std::string& _name, const Component* _parent,
     // create the interface
     std::string interfaceName = "Interface_" + std::to_string(id);
     Interface* interface = InterfaceFactory::createInterface(
-        interfaceName, this, id, injectionAlgorithmFactory,
+        interfaceName, this, numVcs_, id, injectionAlgorithmFactory,
         _settings["interface"]);
     interfaces_.at(id) = interface;
 

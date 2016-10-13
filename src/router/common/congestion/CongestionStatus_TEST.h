@@ -31,9 +31,9 @@
 class CongestionTestRouter : public Router {
  public:
   CongestionTestRouter(
-      const std::string& _name, const Component* _parent,
-      const std::vector<u32>& _address, MetadataHandler* _metadataHandler,
-      Json::Value _settings);
+      const std::string& _name, const Component* _parent, u32 _numPorts,
+      u32 _numVcs, const std::vector<u32>& _address,
+      MetadataHandler* _metadataHandler, Json::Value _settings);
   ~CongestionTestRouter();
 
   void setCongestionStatus(CongestionStatus* _congestionStatus);

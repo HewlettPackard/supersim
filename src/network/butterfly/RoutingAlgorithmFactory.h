@@ -34,7 +34,7 @@ class RoutingAlgorithmFactory : public ::RoutingAlgorithmFactory {
   ~RoutingAlgorithmFactory();
   RoutingAlgorithm* createRoutingAlgorithm(
       const std::string& _name, const Component* _parent, Router* _router,
-      u32 inputPort);
+      u32 inputPort) override;
 
  private:
   const u32 numVcs_;

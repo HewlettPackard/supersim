@@ -27,11 +27,13 @@
 namespace InputOutputQueued {
 
 Router::Router(
-    const std::string& _name, const Component* _parent,
-    const std::vector<u32>& _address,
+    const std::string& _name, const Component* _parent, u32 _numPorts,
+    u32 _numVcs, const std::vector<u32>& _address,
+    MetadataHandler* _metadataHandler,
     RoutingAlgorithmFactory* _routingAlgorithmFactory,
-    MetadataHandler* _metadataHandler, Json::Value _settings)
-    : ::Router(_name, _parent, _address, _metadataHandler, _settings) {
+    Json::Value _settings)
+    : ::Router(_name, _parent, _numPorts, _numVcs, _address, _metadataHandler,
+               _settings) {
   // determine the size of credits
   creditSize_ = numVcs_ * (u32)std::ceil(
       (f64)gSim->cycleTime(Simulator::Clock::CHANNEL) /

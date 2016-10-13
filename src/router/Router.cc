@@ -18,16 +18,10 @@
 #include <cassert>
 
 Router::Router(const std::string& _name, const Component* _parent,
-               const std::vector<u32>& _address,
+               u32 _numPorts, u32 _numVcs, const std::vector<u32>& _address,
                MetadataHandler* _metadataHandler, Json::Value _settings)
-    : Component(_name, _parent),
-      metadataHandler_(_metadataHandler),
-      address_(_address),
-      numPorts_(_settings["num_ports"].asUInt()),
-      numVcs_(_settings["num_vcs"].asUInt()) {
-  assert(numPorts_ > 0);
-  assert(numVcs_ > 0);
-}
+    : Component(_name, _parent), numPorts_(_numPorts), numVcs_(_numVcs),
+      address_(_address), metadataHandler_(_metadataHandler) {}
 
 Router::~Router() {}
 

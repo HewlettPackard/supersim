@@ -10,6 +10,7 @@
     "topology": "folded_clos",
     "num_vcs": 4,
     "levels": 3,
+    "radix": 6,
     "internal_channel": {
       "latency": 1  // cycles
     },
@@ -49,7 +50,6 @@
     },
     "router": {
       "architecture": "input_queued",
-      "num_ports": 6,
       "congestion_status": {
         "algorithm": "phantom_buffer_occupancy",
         "latency": 1,
