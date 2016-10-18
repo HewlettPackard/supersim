@@ -29,17 +29,18 @@ namespace Uno {
 
 class RoutingAlgorithmFactory : public ::RoutingAlgorithmFactory {
  public:
-  RoutingAlgorithmFactory(u32 _numVcs, u32 _concentration,
+  RoutingAlgorithmFactory(u32 _baseVc, u32 _numVcs, u32 _concentration,
                           Json::Value _settings);
   ~RoutingAlgorithmFactory();
   RoutingAlgorithm* createRoutingAlgorithm(
       const std::string& _name, const Component* _parent, Router* _router,
-      u32 inputPort) override;
+      u32 _inputPort) override;
 
  private:
+  const u32 baseVc_;
   const u32 numVcs_;
   const u32 concentration_;
-  Json::Value settings_;
+  const Json::Value settings_;
 };
 
 }  // namespace Uno

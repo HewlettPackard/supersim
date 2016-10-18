@@ -17,11 +17,11 @@
 
 #include <cassert>
 
-#include "application/Terminal.h"
+#include "workload/Terminal.h"
 #include "types/Packet.h"
 
 Message::Message(u32 _numPackets, void* _data)
-    : data_(_data), transaction_(U32_MAX),
+    : data_(_data), transaction_(U32_MAX), trafficClass_(U32_MAX),
       sourceId_(U32_MAX), destinationId_(U32_MAX) {
   packets_.resize(_numPackets);
 }
@@ -42,7 +42,7 @@ void Message::setOwner(Terminal* _owner) {
   owner_ = _owner;
 }
 
-u32 Message::getId() const {
+u32 Message::id() const {
   return id_;
 }
 
@@ -62,7 +62,7 @@ u32 Message::numFlits() const {
   return numFlits;
 }
 
-Packet* Message::getPacket(u32 _index) const {
+Packet* Message::packet(u32 _index) const {
   return packets_.at(_index);
 }
 
@@ -84,6 +84,14 @@ u64 Message::getTransaction() const {
 
 void Message::setTransaction(u64 _trans) {
   transaction_ = _trans;
+}
+
+u32 Message::getTrafficClass() const {
+  return trafficClass_;
+}
+
+void Message::setTrafficClass(u32 _class) {
+  trafficClass_ = _class;
 }
 
 u32 Message::getSourceId() const {

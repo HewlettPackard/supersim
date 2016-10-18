@@ -23,10 +23,11 @@
 namespace Butterfly {
 
 RoutingAlgorithmFactory::RoutingAlgorithmFactory(
-    u32 _numVcs, u32 _numPorts, u32 _numStages, u32 _stage,
+    u32 _baseVc, u32 _numVcs, u32 _numPorts, u32 _numStages, u32 _stage,
     Json::Value _settings)
-    : ::RoutingAlgorithmFactory(), numVcs_(_numVcs), numPorts_(_numPorts),
-      numStages_(_numStages), stage_(_stage), settings_(_settings) {}
+    : ::RoutingAlgorithmFactory(), baseVc_(_baseVc), numVcs_(_numVcs),
+      numPorts_(_numPorts), numStages_(_numStages), stage_(_stage),
+      settings_(_settings) {}
 
 RoutingAlgorithmFactory::~RoutingAlgorithmFactory() {}
 
@@ -38,8 +39,8 @@ RoutingAlgorithm* RoutingAlgorithmFactory::createRoutingAlgorithm(
 
   if (algorithm == "destination_tag") {
     return new Butterfly::DestinationTagRoutingAlgorithm(
-        _name, _parent, _router, latency, numVcs_, numPorts_, numStages_,
-        stage_);
+        _name, _parent, _router, latency, baseVc_, numVcs_, numPorts_,
+        numStages_, stage_);
   } else {
     fprintf(stderr, "Unknown routing algorithm: '%s'\n", algorithm.c_str());
     assert(false);

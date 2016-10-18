@@ -20,9 +20,9 @@
 TrafficPattern::TrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self)
-    : Component(_name, _parent), numTerminals(_numTerminals), self(_self) {
-  assert(numTerminals > 0);
-  assert(self < numTerminals);
+    : Component(_name, _parent), numTerminals_(_numTerminals), self_(_self) {
+  assert(numTerminals_ > 0);
+  assert(self_ < numTerminals_);
 }
 
 TrafficPattern::~TrafficPattern() {}

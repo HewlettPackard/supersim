@@ -20,13 +20,15 @@
 #include <prim/prim.h>
 
 #include <string>
+#include <tuple>
 #include <vector>
 
+#include "architecture/PortedDevice.h"
 #include "event/Component.h"
-#include "types/FlitReceiver.h"
-#include "types/FlitSender.h"
 #include "types/CreditReceiver.h"
 #include "types/CreditSender.h"
+#include "types/FlitReceiver.h"
+#include "types/FlitSender.h"
 #include "types/Message.h"
 #include "types/MessageReceiver.h"
 #include "network/Channel.h"
@@ -34,23 +36,21 @@
 class PacketReassembler;
 class MessageReassembler;
 
-class Interface : public Component, public FlitSender, public FlitReceiver,
-                  public CreditSender, public CreditReceiver,
-                  public MessageReceiver {
+class Interface : public Component, public PortedDevice, public FlitSender,
+                  public FlitReceiver, public CreditSender,
+                  public CreditReceiver, public MessageReceiver {
  public:
-  Interface(const std::string& _name, const Component* _parent, u32 _numVcs,
-            u32 _id, Json::Value _settings);
+  Interface(const std::string& _name, const Component* _parent, u32 _id,
+            const std::vector<u32>& _address, u32 _numVcs,
+            const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
+            Json::Value _settings);
   virtual ~Interface();
-  u32 getId() const;
-  u32 numVcs() const;
+
   void setMessageReceiver(MessageReceiver* _receiver);
-  MessageReceiver* getMessageReceiver() const;
-  virtual void setInputChannel(Channel* _channel) = 0;
-  virtual void setOutputChannel(Channel* _channel) = 0;
+  MessageReceiver* messageReceiver() const;
 
  protected:
-  const u32 numVcs_;
-  const u32 id_;
+  const std::vector<std::tuple<u32, u32> > trafficClassVcs_;
 
  private:
   MessageReceiver* messageReceiver_;

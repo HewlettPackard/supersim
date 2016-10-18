@@ -16,6 +16,7 @@
 #ifndef NETWORK_UNO_DIRECTROUTINGALGORITHM_H_
 #define NETWORK_UNO_DIRECTROUTINGALGORITHM_H_
 
+#include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>
@@ -30,8 +31,9 @@ namespace Uno {
 class DirectRoutingAlgorithm : public RoutingAlgorithm {
  public:
   DirectRoutingAlgorithm(const std::string& _name, const Component* _parent,
-                         Router* _router, u64 _latency, u32 _numVcs,
-                         u32 _concentration);
+                         Router* _router, u64 _latency, u32 _baseVc,
+                         u32 _numVcs, u32 _concentration,
+                         Json::Value _settings);
   ~DirectRoutingAlgorithm();
 
  protected:
@@ -39,8 +41,8 @@ class DirectRoutingAlgorithm : public RoutingAlgorithm {
       Flit* _flit, RoutingAlgorithm::Response* _response) override;
 
  private:
-  const u32 numVcs_;
   const u32 concentration_;
+  const bool adaptive_;
 };
 
 }  // namespace Uno

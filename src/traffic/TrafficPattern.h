@@ -30,8 +30,8 @@ class TrafficPattern : public Component {
   virtual u32 nextDestination() = 0;
 
  protected:
-  const u32 numTerminals;
-  const u32 self;
+  const u32 numTerminals_;
+  const u32 self_;
 };
 
 #endif  // TRAFFIC_TRAFFICPATTERN_H_

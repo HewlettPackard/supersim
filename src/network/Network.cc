@@ -17,9 +17,22 @@
 
 #include <cassert>
 
+static u32 computeNumVcs(const Json::Value& _trafficClasses) {
+  u32 sum = 0;
+  for (u32 idx = 0; idx < _trafficClasses.size(); idx++) {
+    const Json::Value& trafficClass = _trafficClasses[idx];
+    assert(trafficClass.isMember("num_vcs") &&
+           trafficClass["num_vcs"].isUInt() &&
+           trafficClass["num_vcs"].asUInt() > 0);
+    sum += trafficClass["num_vcs"].asUInt();
+  }
+  return sum;
+}
+
 Network::Network(const std::string& _name, const Component* _parent,
                  MetadataHandler* _metadataHandler, Json::Value _settings)
-    : Component(_name, _parent), numVcs_(_settings["num_vcs"].asUInt()),
+    : Component(_name, _parent),
+      numVcs_(computeNumVcs(_settings["traffic_classes"])),
       metadataHandler_(_metadataHandler) {
   // check settings
   assert(numVcs_ > 0);
@@ -36,7 +49,7 @@ u32 Network::numVcs() const {
   return numVcs_;
 }
 
-MetadataHandler* Network::getMetadataHandler() const {
+MetadataHandler* Network::metadataHandler() const {
   return metadataHandler_;
 }
 

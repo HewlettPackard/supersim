@@ -26,7 +26,7 @@ MatrixTrafficPattern::MatrixTrafficPattern(
     : TrafficPattern(_name, _parent, _numTerminals, _self) {
 
   // make space to hold a distribution
-  dist_.resize(numTerminals, F64_POS_INF);
+  dist_.resize(numTerminals_, F64_POS_INF);
 
   // parse the distribution from the settings file
   assert(_settings.isMember("file") && _settings["file"].isString());
@@ -39,9 +39,9 @@ MatrixTrafficPattern::MatrixTrafficPattern(
     assert(sts != fio::InFile::Status::ERROR);
     if (sts == fio::InFile::Status::OK) {
       if (line.size() > 0) {
-        if (lineNum == self) {
+        if (lineNum == self_) {
           std::vector<std::string> strs = strop::split(line, ',');
-          assert(strs.size() == numTerminals);
+          assert(strs.size() == numTerminals_);
           for (u32 idx = 0; idx < strs.size(); idx++) {
             dist_.at(idx) = std::stod(strs.at(idx));
           }
@@ -50,7 +50,7 @@ MatrixTrafficPattern::MatrixTrafficPattern(
       }
     }
   }
-  assert(lineNum == numTerminals);
+  assert(lineNum == numTerminals_);
 
   // verify the current distribution sums to 1.0
   // reformat distribution for a binary search
@@ -60,9 +60,9 @@ MatrixTrafficPattern::MatrixTrafficPattern(
     f = sum;
     sum += t;
   }
-  if (fabs(1.0 - sum) >= 0.000001) {
-    printf("lineNum=%u tol=%f\n", lineNum, fabs(1.0 - sum));
-  }
+  // if (fabs(1.0 - sum) >= 0.000001) {
+  //   printf("lineNum=%u tol=%f\n", lineNum, fabs(1.0 - sum));
+  // }
   assert(abs(1.0 - sum) < 0.000001);
 }
 
@@ -70,18 +70,14 @@ MatrixTrafficPattern::~MatrixTrafficPattern() {}
 
 u32 MatrixTrafficPattern::nextDestination() {
   f64 rnd = gSim->rnd.nextF64();
-  // printf("rnd=%f\n", rnd);
 
   u32 bot = 0;
-  u32 top = numTerminals;
+  u32 top = numTerminals_;
 
   while (true) {
     assert(top > bot);
     u32 span = top - bot;
     u32 mid = (span / 2) + bot;
-    // printf("top=%u bot=%u mid=%u\n", top, bot, mid);
-    // printf("dist_[mid]=%f\n", dist_[mid]);
-
     if (span == 1) {
       // done! return the index
       return mid;

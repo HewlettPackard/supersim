@@ -23,14 +23,14 @@ BitTransposeTrafficPattern::BitTransposeTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
     : TrafficPattern(_name, _parent, _numTerminals, _self) {
-  assert(bits::isPow2(numTerminals));
+  assert(bits::isPow2(numTerminals_));
 
-  u32 bitsNum = bits::ceilLog2(numTerminals);
+  u32 bitsNum = bits::ceilLog2(numTerminals_);
   assert(bitsNum % 2 == 0);
   u32 bitsNumHalf = bitsNum / 2;
 
-  u32 left = _self >> bitsNumHalf;
-  u32 right = _self & ((1 << bitsNumHalf) - 1);
+  u32 left = self_ >> bitsNumHalf;
+  u32 right = self_ & ((1 << bitsNumHalf) - 1);
   dest_ = (right << bitsNumHalf) | left;
 }
 

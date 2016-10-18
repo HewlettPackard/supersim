@@ -45,7 +45,7 @@ BisectionStressTrafficPattern::BisectionStressTrafficPattern(
 
   // get self as a vector address
   std::vector<u32> addr;
-  Cube::computeTerminalAddress(_self, widths, concentration, &addr);
+  Cube::computeTerminalAddress(self_, widths, concentration, &addr);
 
   u32 nodeGroup = 0;
   if (_settings["mode"] == "parity") {
@@ -53,7 +53,7 @@ BisectionStressTrafficPattern::BisectionStressTrafficPattern(
     nodeGroup = addr.at(0) % 2;
   } else if (_settings["mode"] == "half") {
     assert(widths.at(dimensions - 1) % 2 == 0);
-    nodeGroup = _self < _numTerminals / 2 ? 0 : 1;
+    nodeGroup = self_ < numTerminals_ / 2 ? 0 : 1;
   } else if (_settings["mode"] == "quadrant") {
     u32 paritySum = 0;
     for (u32 i = 0; i < dimensions; i++) {

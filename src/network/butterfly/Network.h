@@ -41,9 +41,9 @@ class Network : public ::Network {
   u32 numInterfaces() const override;
   Router* getRouter(u32 _id) const override;
   Interface* getInterface(u32 _id) const override;
-  void translateTerminalIdToAddress(
+  void translateInterfaceIdToAddress(
       u32 _id, std::vector<u32>* _address) const override;
-  u32 translateTerminalAddressToId(
+  u32 translateInterfaceAddressToId(
       const std::vector<u32>* _address) const override;
   void translateRouterIdToAddress(
       u32 _id, std::vector<u32>* _address) const override;
@@ -58,7 +58,7 @@ class Network : public ::Network {
   u32 numStages_;
   u32 stageWidth_;
 
-  std::vector<std::vector<Router*> > routers_;  // [stage][column]
+  std::vector<Router*> routers_;
 
   std::vector<Channel*> externalChannels_;
   std::vector<Channel*> internalChannels_;

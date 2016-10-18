@@ -24,7 +24,7 @@
 #include "types/Flit.h"
 
 MessageLog::MessageLog(Json::Value _settings)
-  : outFile_(_settings["file"].asString()) {
+    : outFile_(_settings["file"].asString()) {
   assert(!_settings["file"].isNull());
 }
 
@@ -33,19 +33,20 @@ MessageLog::~MessageLog() {}
 void MessageLog::logMessage(const Message* _message) {
   std::stringstream ss;
   ss << "+M" << ',';
-  ss << _message->getId() << ',';
+  ss << _message->id() << ',';
   ss << _message->getSourceId() << ',';
   ss << _message->getDestinationId() << ',';
-  ss << _message->getTransaction() << '\n';
+  ss << _message->getTransaction() << ',';
+  ss << _message->getTrafficClass() << '\n';
   for (u32 p = 0; p < _message->numPackets(); p++) {
-    Packet* packet = _message->getPacket(p);
+    Packet* packet = _message->packet(p);
     ss << " +P" << ',';
-    ss << packet->getId() << ',';
+    ss << packet->id() << ',';
     ss << packet->getHopCount() << '\n';
     for (u32 f = 0; f < packet->numFlits(); f++) {
       Flit* flit = packet->getFlit(f);
       ss << "   F" << ',';
-      ss << flit->getId() << ',';
+      ss << flit->id() << ',';
       ss << flit->getSendTime() << ',';
       ss << flit->getReceiveTime() << '\n';
     }

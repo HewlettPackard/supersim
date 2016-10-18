@@ -314,8 +314,8 @@ TEST(TornadoTrafficPattern, 3d) {
       src = p.first + conc + 4 * 4 * 5;
       dst = p.second + conc + 2 * 4 * 4 * 5;
       tp = new TornadoTrafficPattern(
-        "TP", nullptr, numTerminals, src, settings);
-    for (u32 idx = 0; idx < 100; ++idx) {
+          "TP", nullptr, numTerminals, src, settings);
+      for (u32 idx = 0; idx < 100; ++idx) {
         u32 next = tp->nextDestination();
         ASSERT_LT(next, numTerminals);
         ASSERT_EQ(next, dst);

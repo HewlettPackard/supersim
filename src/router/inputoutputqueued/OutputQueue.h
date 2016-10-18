@@ -23,8 +23,8 @@
 #include <vector>
 
 #include "event/Component.h"
-#include "router/common/Crossbar.h"
-#include "router/common/CrossbarScheduler.h"
+#include "architecture/Crossbar.h"
+#include "architecture/CrossbarScheduler.h"
 #include "types/Flit.h"
 #include "types/FlitReceiver.h"
 

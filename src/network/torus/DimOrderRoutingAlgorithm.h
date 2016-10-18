@@ -31,8 +31,9 @@ class DimOrderRoutingAlgorithm : public RoutingAlgorithm {
  public:
   DimOrderRoutingAlgorithm(
       const std::string& _name, const Component* _parent, Router* _router,
-      u64 _latency, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
-      u32 _concentration, u32 _inputPort);
+      u64 _latency, u32 _baseVc, u32 _numVcs,
+      const std::vector<u32>& _dimensionWidths, u32 _concentration,
+      u32 _inputPort);
   ~DimOrderRoutingAlgorithm();
 
  protected:
@@ -40,7 +41,6 @@ class DimOrderRoutingAlgorithm : public RoutingAlgorithm {
       Flit* _flit, RoutingAlgorithm::Response* _response) override;
 
  private:
-  const u32 numVcs_;
   const std::vector<u32> dimensionWidths_;
   const u32 concentration_;
   const u32 inputPort_;

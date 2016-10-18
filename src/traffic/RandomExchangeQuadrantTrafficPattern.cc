@@ -22,7 +22,7 @@
 #include "network/cube/util.h"
 
 RandomExchangeQuadrantTrafficPattern::
-  RandomExchangeQuadrantTrafficPattern(
+RandomExchangeQuadrantTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
     : TrafficPattern(_name, _parent, _numTerminals, _self) {
@@ -46,7 +46,7 @@ RandomExchangeQuadrantTrafficPattern::
 
   std::vector<u32> addr;
   // get self as a vector address
-  Cube::computeTerminalAddress(_self, widths, concentration, &addr);
+  Cube::computeTerminalAddress(self_, widths, concentration, &addr);
 
   u32 selfQuadrant = 0;
   for (u32 i = 0; i < dimensions; ++i) {
@@ -55,7 +55,7 @@ RandomExchangeQuadrantTrafficPattern::
     }
   }
 
-  for (u32 dstIdx = 0; dstIdx < _numTerminals; ++dstIdx) {
+  for (u32 dstIdx = 0; dstIdx < numTerminals_; ++dstIdx) {
     std::vector<u32> dstAddr;
     Cube::computeTerminalAddress(dstIdx, widths, concentration, &dstAddr);
     u32 dstQuadrant = 0;
@@ -72,7 +72,7 @@ RandomExchangeQuadrantTrafficPattern::
 }
 
 RandomExchangeQuadrantTrafficPattern::
-  ~RandomExchangeQuadrantTrafficPattern() {}
+~RandomExchangeQuadrantTrafficPattern() {}
 
 u32 RandomExchangeQuadrantTrafficPattern::nextDestination() {
   return dstVect_.at(gSim->rnd.nextU64(0, dstVect_.size() - 1));

@@ -49,10 +49,12 @@ InputQueue::InputQueue(
   rfe_.fsm = ePipelineFsm::kEmpty;
   rfe_.flit = nullptr;
   rfe_.route.clear();
+  rfe_.route.link(routingAlgorithm_);
 
   vca_.fsm = ePipelineFsm::kEmpty;
   vca_.flit = nullptr;
   vca_.route.clear();
+  vca_.route.link(routingAlgorithm_);
   vca_.allocatedVcIdx = U32_MAX;
   vca_.allocatedPort = U32_MAX;
   vca_.allocatedVc = U32_MAX;
@@ -281,7 +283,7 @@ void InputQueue::processPipeline() {
     // request everything of the VC alloc
     u32 responseSize = vca_.route.size();
     assert(responseSize > 0);
-    u32 metadata = vca_.flit->getPacket()->getMetadata();
+    u32 metadata = vca_.flit->packet()->getMetadata();
     for (u32 r = 0; r < responseSize; r++) {
       u32 requestPort, requestVc;
       vca_.route.get(r, &requestPort, &requestVc);

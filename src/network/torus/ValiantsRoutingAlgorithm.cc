@@ -27,11 +27,12 @@ namespace Torus {
 
 ValiantsRoutingAlgorithm::ValiantsRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u64 _latency, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
-    u32 _concentration, u32 _inputPort)
-    : RoutingAlgorithm(_name, _parent, _router, _latency),
-      numVcs_(_numVcs), dimensionWidths_(_dimensionWidths),
-      concentration_(_concentration), inputPort_(_inputPort),
+    u64 _latency, u32 _baseVc, u32 _numVcs,
+    const std::vector<u32>& _dimensionWidths, u32 _concentration,
+    u32 _inputPort)
+    : RoutingAlgorithm(_name, _parent, _router, _latency, _baseVc, _numVcs),
+      dimensionWidths_(_dimensionWidths), concentration_(_concentration),
+      inputPort_(_inputPort),
       inputPortDim_(computeInputPortDim(dimensionWidths_, concentration_,
                                         inputPort_)) {
   // VC set mapping:
@@ -48,12 +49,12 @@ void ValiantsRoutingAlgorithm::processRequest(
     Flit* _flit, RoutingAlgorithm::Response* _response) {
   u32 outputPort;
 
-  Packet* packet = _flit->getPacket();
-  Message* message = packet->getMessage();
+  Packet* packet = _flit->packet();
+  Message* message = packet->message();
 
   // this is the current router's address
   // ex: [x,y,z]
-  const std::vector<u32>& routerAddress = router_->getAddress();
+  const std::vector<u32>& routerAddress = router_->address();
 
   // create the routing extension if needed
   if (packet->getRoutingExtension() == nullptr) {
@@ -89,7 +90,7 @@ void ValiantsRoutingAlgorithm::processRequest(
     assert(packet->getHopCount() == 1);
     stage = 0;
   } else {
-    stage = ((_flit->getVc() % 4) < 2) ? 0 : 1;
+    stage = (((_flit->getVc() - baseVc_) % 4) < 2) ? 0 : 1;
   }
 
   // intermediate dimension to work on
@@ -144,7 +145,7 @@ void ValiantsRoutingAlgorithm::processRequest(
     outputPort = routingTo->at(0);
 
     // on ejection, any dateline VcSet is ok within any stage VcSet
-    for (u32 vc = 0; vc < numVcs_; vc++) {
+    for (u32 vc = baseVc_; vc < baseVc_ + numVcs_; vc++) {
       _response->add(outputPort, vc);
     }
 
@@ -191,7 +192,7 @@ void ValiantsRoutingAlgorithm::processRequest(
     assert(next != src);
 
     // the output port is now determined, now figure out which VC set to use
-    u32 vcSet = _flit->getVc() % 4;
+    u32 vcSet = (_flit->getVc() - baseVc_) % 4;
 
     // reset to VC set 0 (stage 0) or 2 (stage 1) when switching dimensions or
     //  when after a stage transition. this also occurs on an injection port
@@ -206,7 +207,7 @@ void ValiantsRoutingAlgorithm::processRequest(
     }
 
     // use VCs in the corresponding set
-    for (u32 vc = vcSet; vc < numVcs_; vc += 4) {
+    for (u32 vc = baseVc_ + vcSet; vc < baseVc_ + numVcs_; vc += 4) {
       _response->add(outputPort, vc);
     }
   }

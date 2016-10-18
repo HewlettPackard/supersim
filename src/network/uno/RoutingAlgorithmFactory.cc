@@ -23,8 +23,8 @@
 namespace Uno {
 
 RoutingAlgorithmFactory::RoutingAlgorithmFactory(
-    u32 _numVcs, u32 _concentration, Json::Value _settings)
-    : ::RoutingAlgorithmFactory(), numVcs_(_numVcs),
+    u32 _baseVc, u32 _numVcs, u32 _concentration, Json::Value _settings)
+    : ::RoutingAlgorithmFactory(), baseVc_(_baseVc), numVcs_(_numVcs),
       concentration_(_concentration), settings_(_settings) {}
 
 RoutingAlgorithmFactory::~RoutingAlgorithmFactory() {}
@@ -37,7 +37,8 @@ RoutingAlgorithm* RoutingAlgorithmFactory::createRoutingAlgorithm(
 
   if (algorithm == "direct") {
     return new Uno::DirectRoutingAlgorithm(
-        _name, _parent, _router, latency, numVcs_, concentration_);
+        _name, _parent, _router, latency, baseVc_, numVcs_, concentration_,
+        settings_);
   } else {
     fprintf(stderr, "Unknown routing algorithm: '%s'\n", algorithm.c_str());
     assert(false);

@@ -50,8 +50,8 @@ TEST(DragonflyWorstCaseTrafficPattern, permutation) {
 
       DragonflyWorstCaseTrafficPattern* tp =
           new DragonflyWorstCaseTrafficPattern(
-          "TP", nullptr, groupCount * groupSize * concentration, self,
-          settings);
+              "TP", nullptr, groupCount * groupSize * concentration, self,
+              settings);
 
       u32 expDestGroup = (selfGroup + (groupCount / 2)) % groupCount;
       u32 expDestLocal = selfLocal;
@@ -118,8 +118,8 @@ TEST(DragonflyWorstCaseTrafficPattern, random) {
 
       DragonflyWorstCaseTrafficPattern* tp =
           new DragonflyWorstCaseTrafficPattern(
-          "TP", nullptr, groupCount * groupSize * concentration, self,
-          settings);
+              "TP", nullptr, groupCount * groupSize * concentration, self,
+              settings);
 
       u32 expDestGroup = (selfGroup + (groupCount / 2)) % groupCount;
 

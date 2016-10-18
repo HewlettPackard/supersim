@@ -31,7 +31,8 @@ class DestinationTagRoutingAlgorithm : public RoutingAlgorithm {
  public:
   DestinationTagRoutingAlgorithm(
       const std::string& _name, const Component* _parent, Router* _router,
-      u64 _latency, u32 _numVcs, u32 _numPorts, u32 _numStages, u32 _stage);
+      u64 _latency, u32 _baseVc, u32 _numVcs, u32 _numPorts, u32 _numStages,
+      u32 _stage);
   ~DestinationTagRoutingAlgorithm();
 
  protected:
@@ -39,7 +40,6 @@ class DestinationTagRoutingAlgorithm : public RoutingAlgorithm {
       Flit* _flit, RoutingAlgorithm::Response* _response) override;
 
  private:
-  const u32 numVcs_;
   const u32 numPorts_;
   const u32 numStages_;
   const u32 stage_;

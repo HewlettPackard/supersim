@@ -29,10 +29,10 @@
 class RouterFactory {
  public:
   static Router* createRouter(
-      const std::string& _name, const Component* _parent, u32 _numPorts,
-      u32 _numVcs, const std::vector<u32>& _address,
+      const std::string& _name, const Component* _parent, u32 _id,
+      const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
       MetadataHandler* _metadataHandler,
-      RoutingAlgorithmFactory* _routingAlgorithmFactory,
+      std::vector<RoutingAlgorithmFactory*>* _routingAlgorithmFactories,
       Json::Value _settings);
 };
 

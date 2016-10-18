@@ -24,24 +24,24 @@ namespace Butterfly {
 
 DestinationTagRoutingAlgorithm::DestinationTagRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u64 _latency, u32 _numVcs, u32 _numPorts, u32 _numStages, u32 _stage)
-    : RoutingAlgorithm(_name, _parent, _router, _latency),
-      numVcs_(_numVcs), numPorts_(_numPorts), numStages_(_numStages),
-      stage_(_stage) {}
+    u64 _latency, u32 _baseVc, u32 _numVcs, u32 _numPorts, u32 _numStages,
+    u32 _stage)
+    : RoutingAlgorithm(_name, _parent, _router, _latency, _baseVc, _numVcs),
+      numPorts_(_numPorts), numStages_(_numStages), stage_(_stage) {}
 
 DestinationTagRoutingAlgorithm::~DestinationTagRoutingAlgorithm() {}
 
 void DestinationTagRoutingAlgorithm::processRequest(
     Flit* _flit, RoutingAlgorithm::Response* _response) {
   const std::vector<u32>* destinationAddress =
-      _flit->getPacket()->getMessage()->getDestinationAddress();
+      _flit->packet()->message()->getDestinationAddress();
   assert(destinationAddress->size() == numStages_);
 
   // pick the output port using the "tag" in the address
   u32 outputPort = destinationAddress->at(stage_);
 
   // select all VCs in the output port
-  for (u32 vc = 0; vc < numVcs_; vc++) {
+  for (u32 vc = baseVc_; vc < baseVc_ + numVcs_; vc++) {
     _response->add(outputPort, vc);
   }
 }

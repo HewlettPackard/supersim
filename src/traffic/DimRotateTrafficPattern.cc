@@ -47,7 +47,7 @@ DimRotateTrafficPattern::DimRotateTrafficPattern(
 
   // get self as a vector address
   std::vector<u32> addr;
-  Cube::computeTerminalAddress(_self, widths, concentration, &addr);
+  Cube::computeTerminalAddress(self_, widths, concentration, &addr);
 
   if (dir == "left") {
     u32 tmp = addr.at(1);

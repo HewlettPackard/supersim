@@ -30,16 +30,15 @@ there are 113 tasks run.
 Let's create a directory to hold this investigation.
 
 ``` sh
-mkdir ~/ssdev/foldedclosrouting
-cd ~/ssdev/foldedclosrouting
+mkdir ~/ssdev/auto_sims
+cd ~/ssdev/auto_sims
 
 ```
 
 Now fetch the TaskRun script that we'll use for automated simulations.
 
 ``` sh
-wget https://raw.githubusercontent.com/hewlettpackardlabs/supersim/master/scripts/auto_sims.py
-chmod +x auto_sims.py
+cp ../supersim/scripts/auto_sims.py .
 ```
 
 Let's look through this script to get a better understanding of how TaskRun
@@ -123,6 +122,12 @@ completed so far, and an estimate of the remaining time to finish all tasks.
 After all tasks have completed a summary is shown of how many tasks were
 successful, bypassed, and failed.
 
+Take a look at the resulting plots:
+
+``` sh
+eog lplot*png cplot*png
+```
+
 TaskRun is designed to only run tasks that need to be run. Let's re-run our
 script:
 
@@ -134,7 +139,7 @@ TaskRun will check the status of all tasks and determine that all of the tasks
 should be bypassed. This is really useful for situations where you want to run a
 coarse grain simulation to see a general trend. Then when all looks good you can
 increase the granularity and re-run the TaskRun script. Only the missing tasks
-will be run while the rest of them will be bypassed. Let's incrase the
+will be run while the rest of them will be bypassed. Let's increase the
 simulation granularity and re-run the script:
 
 ``` sh
@@ -142,7 +147,12 @@ simulation granularity and re-run the script:
 ```
 
 After it completes, you'll see in the summary the prior tasks were bypassed and
-only the new tasks were executed.
+only the new tasks were executed. You can now see the resulting plots have
+higher granularity:
+
+``` sh
+eog lplot*png cplot*png
+```
 
 [TaskRun]: https://github.com/nicmcd/taskrun
 [SSLatency]: https://github.com/nicmcd/sslatency

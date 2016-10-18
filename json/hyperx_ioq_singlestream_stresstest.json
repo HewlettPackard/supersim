@@ -1,0 +1,167 @@
+{
+  "simulator": {
+    "channel_cycle_time": 1,
+    "core_cycle_time": 1,
+    "print_progress": true,
+    "print_interval": 1.0,  // seconds
+    "random_seed": 12345678
+  },
+  "network": {
+    "topology": "hyperx",
+    "dimension_widths": [4],
+    "dimension_weights": [3],
+    "concentration": 3,
+    "traffic_classes": [
+      {
+        "num_vcs": 8,
+        "routing": {
+          "algorithm": "dimension_order",
+          "latency": 1
+        }
+      }
+    ],
+    "internal_channel": {
+      "latency": 5  // cycles
+    },
+    "external_channel": {
+      "latency": 5  // cycles
+    },
+    "channel_log": {
+      "file": "/dev/null"  // "channels.csv"
+    },
+    "router": {
+      "architecture": "input_output_queued",
+      "congestion_status": {
+        "algorithm": "buffer_occupancy",
+        "latency": 1,
+        "granularity": 0
+      },
+      "input_queue_depth": 12,
+      "vca_swa_wait": true,
+      "output_queue_depth": 2,
+      "crossbar": {
+        "latency": 1  // cycles
+      },
+      "vc_scheduler": {
+        "allocator": {
+          "type": "rc_separable",
+          "slip_latch": true,
+          "iterations": 1,
+          "resource_arbiter": {
+            "type": "comparing",
+            "greater": false
+          },
+          "client_arbiter": {
+            "type": "lslp"
+          }
+        }
+      },
+      "crossbar_scheduler": {
+        "allocator": {
+          "type": "r_separable",
+          "slip_latch": true,
+          "resource_arbiter": {
+            "type": "comparing",
+            "greater": false
+          }
+        },
+        "full_packet": false,
+        "packet_lock": true,
+        "idle_unlock": true
+      },
+      "output_crossbar": {
+        "latency": 1  // cycles
+      },
+      "output_crossbar_scheduler": {
+        "allocator": {
+          "type": "r_separable",
+          "slip_latch": true,
+          "resource_arbiter": {
+            "type": "comparing",
+            "greater": false
+          }
+        },
+        "full_packet": false,
+        "packet_lock": true,
+        "idle_unlock": true
+      }
+    },
+    "interface": {
+      "type": "standard",
+      "adaptive": false,
+      "fixed_msg_vc": false,
+      "crossbar_scheduler": {
+        "allocator": {
+          "type": "r_separable",
+          "slip_latch": true,
+          "resource_arbiter": {
+            "type": "comparing",
+            "greater": false
+          }
+        },
+        "full_packet": false,
+        "packet_lock": true,
+        "idle_unlock": true
+      },
+      "init_credits": 12,
+      "crossbar": {
+        "latency": 1  // cycles
+      }
+    }
+  },
+  "metadata_handler": {
+    "type": "zero"
+  },
+  "workload": {
+    "message_log": {
+      "file": "/dev/null"  // "data.mpf.gz"
+    },
+    "applications": [
+      {
+        "type": "single_stream",
+        "max_injection_rate": 0.85,
+        "stream_terminal": {
+          "traffic_class": 0,
+          "num_messages": 0,
+          "min_message_size": 3000,
+          "max_message_size": 3000,
+          "max_packet_size": 3000
+        },
+        "rate_log": {
+          "file": "/dev/null"  // "rates.csv"
+        },
+        "source_terminal": 0,  // < 0 is random
+        "destination_terminal": 11  // < 0 is random
+      },
+      {
+        "type": "stress_test",
+        "max_injection_rate": 0.15,
+        "warmup_threshold": 0.90,
+        "kill_on_saturation": false,
+        "log_during_saturation": false,
+        "blast_terminal": {
+          "traffic_class": 0,
+          "num_messages": 400,
+          "min_message_size": 1,
+          "max_message_size": 64,
+          "max_packet_size": 16,
+          "warmup_interval": 200,  // delivered flits
+          "warmup_window": 15,
+          "warmup_attempts": 20,
+          "traffic_pattern": {
+            "type": "uniform_random",
+            "send_to_self": false
+          }
+        },
+        "rate_log": {
+          "file": "/dev/null"  // "rates.csv"
+        }
+      }
+    ]
+  },
+  "debug": [
+    "Workload",
+    "Workload.Application_0",
+    "Workload.Application_1"
+  ]
+}

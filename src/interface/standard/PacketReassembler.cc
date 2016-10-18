@@ -34,13 +34,13 @@ PacketReassembler::~PacketReassembler() {}
 
 Packet* PacketReassembler::receiveFlit(Flit* _flit) {
   Packet* packet = nullptr;
-  u32 sourceId = _flit->getPacket()->getMessage()->getSourceId();
-  u32 packetId = _flit->getPacket()->getId();
-  u32 flitId   = _flit->getId();
+  u32 sourceId = _flit->packet()->message()->getSourceId();
+  u32 packetId = _flit->packet()->id();
+  u32 flitId   = _flit->id();
 
   dbgprintf("src=%u pkt=%u flit=%u/%u",
             sourceId, packetId, flitId,
-            _flit->getPacket()->numFlits());
+            _flit->packet()->numFlits());
 
   // if expected packet id isn't yet set, set it
   if (expPacketId_ == U32_MAX) {
@@ -61,15 +61,15 @@ Packet* PacketReassembler::receiveFlit(Flit* _flit) {
     assert(false);
   }
 
-  assert(flitId < _flit->getPacket()->numFlits());
-  assert(packetId < _flit->getPacket()->getMessage()->numPackets());
+  assert(flitId < _flit->packet()->numFlits());
+  assert(packetId < _flit->packet()->message()->numPackets());
 
   // if this is the last flit of the packet
-  if (flitId == (_flit->getPacket()->numFlits() - 1)) {
+  if (flitId == (_flit->packet()->numFlits() - 1)) {
     expSourceId_ = U32_MAX;  // clear expected source id
     expPacketId_ = U32_MAX;  // clear expected packet id
     expFlitId_ = 0;  // expect flit 0 on the next packet
-    packet = _flit->getPacket();
+    packet = _flit->packet();
   } else {
     expFlitId_ = flitId + 1;
   }

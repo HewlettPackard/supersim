@@ -30,7 +30,7 @@ UniformRandomTrafficPattern::~UniformRandomTrafficPattern() {}
 u32 UniformRandomTrafficPattern::nextDestination() {
   u32 dest;
   do {
-    dest = gSim->rnd.nextU64(0, numTerminals - 1);
-  } while (!sendToSelf_ && dest == self);
+    dest = gSim->rnd.nextU64(0, numTerminals_ - 1);
+  } while (!sendToSelf_ && dest == self_);
   return dest;
 }

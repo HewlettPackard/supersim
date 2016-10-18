@@ -137,8 +137,8 @@ TEST(BisectionStressTrafficPattern, half) {
       src = p.first * 2 + conc;
       dst = p.second * 2 + conc;
       tp = new BisectionStressTrafficPattern(
-        "TP", nullptr, numTerminals, src, settings);
-    for (u32 idx = 0; idx < 100; ++idx) {
+          "TP", nullptr, numTerminals, src, settings);
+      for (u32 idx = 0; idx < 100; ++idx) {
         u32 next = tp->nextDestination();
         ASSERT_LT(next, numTerminals);
         ASSERT_EQ(next, dst);
@@ -186,8 +186,8 @@ TEST(BisectionStressTrafficPattern, quadrant) {
       src = p.first * 2 + conc;
       dst = p.second * 2 + conc;
       tp = new BisectionStressTrafficPattern(
-        "TP", nullptr, numTerminals, src, settings);
-    for (u32 idx = 0; idx < 100; ++idx) {
+          "TP", nullptr, numTerminals, src, settings);
+      for (u32 idx = 0; idx < 100; ++idx) {
         u32 next = tp->nextDestination();
         ASSERT_LT(next, numTerminals);
         ASSERT_EQ(next, dst);

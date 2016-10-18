@@ -65,7 +65,7 @@ Swap2TrafficPattern::Swap2TrafficPattern(
 
   // get self as a vector address
   std::vector<u32> addr;
-  Cube::computeTerminalAddress(_self, widths, concentration, &addr);
+  Cube::computeTerminalAddress(self_, widths, concentration, &addr);
 
   // compute the destination vector address
   u32 nodeGroup = _self % 2;

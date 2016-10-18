@@ -21,12 +21,10 @@
 #include <tuple>
 #include <vector>
 
+#include "architecture/Crossbar.h"
+#include "architecture/CrossbarScheduler.h"
 #include "interface/Interface.h"
 #include "network/Channel.h"
-#include "network/InjectionAlgorithm.h"
-#include "network/InjectionAlgorithmFactory.h"
-#include "router/common/Crossbar.h"
-#include "router/common/CrossbarScheduler.h"
 #include "types/Credit.h"
 #include "types/CreditReceiver.h"
 #include "types/Flit.h"
@@ -36,36 +34,46 @@
 
 namespace Standard {
 
-class InputQueue;
+class OutputQueue;
 class Ejector;
 class PacketReassembler;
 class MessageReassembler;
 
-class Interface : public ::Interface, public InjectionAlgorithm::Client {
+class Interface : public ::Interface {
  public:
-  Interface(const std::string& _name, const Component* _parent, u32 _numVcs,
-            u32 _id, InjectionAlgorithmFactory* _injectionAlgorithmFactory,
+  Interface(const std::string& _name, const Component* _parent, u32 _id,
+            const std::vector<u32>& _address, u32 _numVcs,
+            const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
             Json::Value _settings);
   ~Interface();
-  void setInputChannel(Channel* _channel) override;
-  void setOutputChannel(Channel* _channel) override;
+
+  void setInputChannel(u32 _port, Channel* _channel) override;
+  Channel* getInputChannel(u32 _port) const override;
+  void setOutputChannel(u32 _port, Channel* _channel) override;
+  Channel* getOutputChannel(u32 _port) const override;
+
   void receiveMessage(Message* _message) override;
-  void injectionAlgorithmResponse(
-      Message* _message, InjectionAlgorithm::Response* _response) override;
 
   void sendFlit(u32 _port, Flit* _flit) override;
   void receiveFlit(u32 _port, Flit* _flit) override;
   void sendCredit(u32 _port, u32 _vc) override;
   void receiveCredit(u32 _port, Credit* _credit) override;
 
+  void incrementCredit(u32 _vc);
+
+  void processEvent(void* _event, s32 _type) override;
+
  private:
+  void injectMessage(Message* _message);
+
   Channel* inputChannel_;
   Channel* outputChannel_;
 
-  InjectionAlgorithm* injectionAlgorithm_;
+  bool adaptive_;  // choose injection VC adaptively
   bool fixedMsgVc_;  // all pkts of a msg have same VC
 
-  std::vector<InputQueue*> inputQueues_;
+  std::vector<OutputQueue*> outputQueues_;
+  std::vector<u32> queueOccupancy_;  // used for adaptive injection
   Crossbar* crossbar_;
   CrossbarScheduler* crossbarScheduler_;
   Ejector* ejector_;

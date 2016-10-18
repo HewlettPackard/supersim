@@ -10,6 +10,15 @@ main steps:
 
 This document walks through this process step-by-step with a basic example.
 
+## Setup
+Let's create a directory to hold this investigation.
+
+``` sh
+mkdir ~/ssdev/basic_sims
+cd ~/ssdev/basic_sims
+
+```
+
 ## Generating the simulation settings
 The configuration system of SuperSim uses [libsettings][] which is a JSON-based
 settings file system that allows command line modifications. Let's take an
@@ -17,8 +26,7 @@ example settings file from the SuperSim project. We'll modify the settings
 on the command line when we run the simulator.
 
 ``` sh
-cd ~/ssdev
-cp supersim/json/foldedclos_iq_stresstest.json sample.json
+cp ../supersim/json/foldedclos_iq_stresstest.json sample.json
 ```
 
 ## Running the simulator
@@ -27,12 +35,11 @@ modifications will set the desired output files as well as the traffic
 pattern to use in the simulation.
 
 ``` sh
-cd ~/ssdev
-supersim/bin/supersim sample.json \
+../supersim/bin/supersim sample.json \
   network.channel_log.file=string=channels.csv \
-  application.message_log.file=string=messages.mpf.gz \
-  application.rate_log.file=string=rates.csv \
-  application.blast_terminal.traffic_pattern.type=string=random_exchange
+  workload.message_log.file=string=messages.mpf.gz \
+  workload.application[0].rate_log.file=string=rates.csv \
+  workload.application[0].blast_terminal.traffic_pattern.type=string=random_exchange
 ```
 
 The first thing SuperSim does is prints the settings as it interprets them.
@@ -73,8 +80,7 @@ program [SSLatency][] to get prepared for plotting the results. We can also use
 this program to provide a basic analysis. Run the following command:
 
 ``` sh
-cd ~/ssdev
-sslatency/bin/sslatency -a aggregate.csv -p packets.csv.gz messages.mpf.gz
+../sslatency/bin/sslatency -a aggregate.csv -p packets.csv.gz messages.mpf.gz
 ```
 The outputs of this command are 2 files:
 1. aggregate.csv - Simple analysis info in a CSV format

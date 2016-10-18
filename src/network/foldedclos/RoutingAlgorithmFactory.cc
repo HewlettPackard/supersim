@@ -23,10 +23,10 @@
 namespace FoldedClos {
 
 RoutingAlgorithmFactory::RoutingAlgorithmFactory(
-    u32 _numVcs, u32 _numPorts, u32 _numLevels, u32 _level,
+    u32 _baseVc, u32 _numVcs, u32 _numPorts, u32 _numLevels,
     Json::Value _settings)
-    : ::RoutingAlgorithmFactory(), numVcs_(_numVcs), numPorts_(_numPorts),
-      numLevels_(_numLevels), level_(_level), settings_(_settings) {}
+    : ::RoutingAlgorithmFactory(), baseVc_(_baseVc), numVcs_(_numVcs),
+      numPorts_(_numPorts), numLevels_(_numLevels), settings_(_settings) {}
 
 RoutingAlgorithmFactory::~RoutingAlgorithmFactory() {}
 
@@ -40,8 +40,8 @@ RoutingAlgorithm* RoutingAlgorithmFactory::createRoutingAlgorithm(
 
   if (algorithm == "common_ancestor") {
     return new CommonAncestorRoutingAlgorithm(
-        _name, _parent, _router, latency, numVcs_, numPorts_, numLevels_,
-        level_, _inputPort, settings_);
+        _name, _parent, _router, latency, baseVc_, numVcs_, numPorts_,
+        numLevels_, _inputPort, settings_);
   } else {
     fprintf(stderr, "Unknown routing algorithm: '%s'\n", algorithm.c_str());
     assert(false);

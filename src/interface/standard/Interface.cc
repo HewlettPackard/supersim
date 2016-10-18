@@ -17,48 +17,55 @@
 
 #include <cassert>
 
-#include "application/Application.h"
-#include "interface/standard/InputQueue.h"
-#include "interface/standard/MessageReassembler.h"
+#include "workload/Application.h"
 #include "interface/standard/Ejector.h"
+#include "interface/standard/MessageReassembler.h"
+#include "interface/standard/OutputQueue.h"
 #include "interface/standard/PacketReassembler.h"
-#include "network/InjectionAlgorithm.h"
 #include "types/MessageOwner.h"
+
+// event types
+#define INJECT_MESSAGE (0x45)
 
 namespace Standard {
 
 Interface::Interface(
-    const std::string& _name, const Component* _parent, u32 _numVcs, u32 _id,
-    InjectionAlgorithmFactory* _injectionAlgorithmFactory,
+    const std::string& _name, const Component* _parent, u32 _id,
+    const std::vector<u32>& _address, u32 _numVcs,
+    const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
     Json::Value _settings)
-    : ::Interface(_name, _parent, _numVcs, _id, _settings) {
-  injectionAlgorithm_ = _injectionAlgorithmFactory->createInjectionAlgorithm(
-      "InjectionAlgorithm", this, this);
-
+    : ::Interface(_name, _parent, _id, _address, _numVcs, _trafficClassVcs,
+                  _settings) {
   u32 initCredits = _settings["init_credits"].asUInt();
   assert(initCredits > 0);
+
+  assert(_settings.isMember("adaptive"));
+  adaptive_ = _settings["adaptive"].asBool();
 
   assert(_settings.isMember("fixed_msg_vc"));
   fixedMsgVc_ = _settings["fixed_msg_vc"].asBool();
 
-  inputQueues_.resize(numVcs_);
+  // create the crossbar and scheduler
   crossbar_ = new Crossbar("Crossbar", this, numVcs_, 1,
                            Simulator::Clock::CHANNEL, _settings["crossbar"]);
   crossbarScheduler_ = new CrossbarScheduler(
       "CrossbarScheduler", this, numVcs_, numVcs_, 1, 0,
       Simulator::Clock::CHANNEL, _settings["crossbar_scheduler"]);
 
+  // create the output queues
+  outputQueues_.resize(numVcs_, nullptr);
+  queueOccupancy_.resize(numVcs_, 0);
   for (u32 vc = 0; vc < numVcs_; vc++) {
     // initialize the credit count in the CrossbarScheduler
     crossbarScheduler_->initCreditCount(vc, initCredits);
 
-    // create the input queue
-    inputQueues_.at(vc) = new InputQueue(
-        "InputQueue_" + std::to_string(vc), this, crossbarScheduler_, vc,
+    // create the output queue
+    outputQueues_.at(vc) = new OutputQueue(
+        "OutputQueue_" + std::to_string(vc), this, crossbarScheduler_, vc,
         crossbar_, vc, vc);
 
     // link queue to scheduler
-    crossbarScheduler_->setClient(vc, inputQueues_.at(vc));
+    crossbarScheduler_->setClient(vc, outputQueues_.at(vc));
   }
 
   ejector_ = new Ejector("Ejector", this);
@@ -76,67 +83,108 @@ Interface::Interface(
 }
 
 Interface::~Interface() {
-  delete injectionAlgorithm_;
   delete ejector_;
   delete crossbarScheduler_;
   delete crossbar_;
   for (u32 i = 0; i < numVcs_; i++) {
-    delete inputQueues_.at(i);
+    delete outputQueues_.at(i);
     delete packetReassemblers_.at(i);
   }
   delete messageReassembler_;
 }
 
-void Interface::setInputChannel(Channel* _channel) {
+void Interface::setInputChannel(u32 _port, Channel* _channel) {
+  assert(_port == 0);
   inputChannel_ = _channel;
   _channel->setSink(this, 0);
 }
 
-void Interface::setOutputChannel(Channel* _channel) {
+Channel* Interface::getInputChannel(u32 _port) const {
+  assert(_port == 0);
+  return inputChannel_;
+}
+
+void Interface::setOutputChannel(u32 _port, Channel* _channel) {
+  assert(_port == 0);
   outputChannel_ = _channel;
   _channel->setSource(this, 0);
 }
 
+Channel* Interface::getOutputChannel(u32 _port) const {
+  assert(_port == 0);
+  return outputChannel_;
+}
+
 void Interface::receiveMessage(Message* _message) {
-  dbgprintf("received message from terminal");
   assert(_message != nullptr);
+  assert(gSim->epsilon() == 0);
+
   u64 now = gSim->time();
 
   // mark all flit send times
   for (u32 p = 0; p < _message->numPackets(); p++) {
-    Packet* packet = _message->getPacket(p);
+    Packet* packet = _message->packet(p);
     for (u32 f = 0; f < packet->numFlits(); f++) {
       Flit* flit = packet->getFlit(f);
       flit->setSendTime(now);
     }
   }
 
-  // issue an injection algorithm request
-  InjectionAlgorithm::Response* resp = new InjectionAlgorithm::Response();
-  injectionAlgorithm_->request(this, _message, resp);
-}
+  // retrieve the traffic class of the message
+  u32 trafficClass = _message->getTrafficClass();
+  assert(trafficClass < trafficClassVcs_.size());
 
-void Interface::injectionAlgorithmResponse(
-    Message* _message, InjectionAlgorithm::Response* _response) {
-  // push all flits into the corresponding input queue
+  // use the traffic class to set the injection VC(s)
   u32 pktVc = U32_MAX;
   for (u32 p = 0; p < _message->numPackets(); p++) {
-    Packet* packet = _message->getPacket(p);
+    Packet* packet = _message->packet(p);
 
     // get the packet's VC
     if (!fixedMsgVc_ || pktVc == U32_MAX) {
-      _response->get(gSim->rnd.nextU64(0, _response->size()-1), &pktVc);
+      // retrieve the VC range based on traffic class specification
+      u32 baseVc = std::get<0>(trafficClassVcs_.at(trafficClass));
+      u32 numVcs = std::get<1>(trafficClassVcs_.at(trafficClass));
+
+      // choose VC
+      if (adaptive_) {
+        // find all minimally congested VCs within the traffic class
+        std::vector<u32> minOccupancyVcs;
+        u32 minOccupancy = U32_MAX;
+        for (u32 vc = baseVc; vc < baseVc + numVcs; vc++) {
+          u32 occupancy = queueOccupancy_.at(vc);
+          if (occupancy < minOccupancy) {
+            minOccupancy = occupancy;
+            minOccupancyVcs.clear();
+          }
+          if (occupancy <= minOccupancy) {
+            minOccupancyVcs.push_back(vc);
+          }
+        }
+
+        // choose randomly among the minimally congested VCs
+        assert(minOccupancyVcs.size() > 0);
+        u32 rnd = gSim->rnd.nextU64(0, minOccupancyVcs.size() - 1);
+        pktVc = minOccupancyVcs.at(rnd);
+      } else {
+        // choose a random VC within the traffic class
+        pktVc = gSim->rnd.nextU64(baseVc, baseVc + numVcs - 1);
+      }
     }
 
     // apply VC and inject
     for (u32 f = 0; f < packet->numFlits(); f++) {
       Flit* flit = packet->getFlit(f);
       flit->setVc(pktVc);
-      inputQueues_.at(pktVc)->receiveFlit(flit);
     }
+
+    // update credit counts
+    assert(queueOccupancy_.at(pktVc) < U32_MAX - packet->numFlits());
+    queueOccupancy_.at(pktVc) += packet->numFlits();
   }
 
-  delete _response;
+  // create an event to inject the message into the queues
+  assert(gSim->epsilon() == 0);
+  addEvent(gSim->time(), 1, _message, INJECT_MESSAGE);
 }
 
 void Interface::sendFlit(u32 _port, Flit* _flit) {
@@ -149,13 +197,15 @@ void Interface::receiveFlit(u32 _port, Flit* _flit) {
   assert(_port == 0);
   assert(_flit != nullptr);
 
+  dbgprintf("received flit from network");
+
   // send a credit back
   sendCredit(_port, _flit->getVc());
 
   // check destination is correct
-  u32 dest = _flit->getPacket()->getMessage()->getDestinationId();
+  u32 dest = _flit->packet()->message()->getDestinationId();
   (void)dest;  // unused
-  assert(dest == getId());
+  assert(dest == id_);
 
   // mark the receive time
   _flit->setReceiveTime(gSim->time());
@@ -167,7 +217,7 @@ void Interface::receiveFlit(u32 _port, Flit* _flit) {
     // process packet, attempt to create message
     Message* message = messageReassembler_->receivePacket(packet);
     if (message) {
-      getMessageReceiver()->receiveMessage(message);
+      messageReceiver()->receiveMessage(message);
     }
   }
 }
@@ -193,6 +243,34 @@ void Interface::receiveCredit(u32 _port, Credit* _credit) {
     crossbarScheduler_->incrementCreditCount(vc);
   }
   delete _credit;
+}
+
+void Interface::incrementCredit(u32 _vc) {
+  assert(_vc < numVcs_);
+  assert(queueOccupancy_.at(_vc) > 0);
+  queueOccupancy_.at(_vc)--;
+}
+
+void Interface::processEvent(void* _event, s32 _type) {
+  switch (_type) {
+    case INJECT_MESSAGE:
+      assert(gSim->epsilon() == 1);
+      injectMessage(reinterpret_cast<Message*>(_event));
+      break;
+
+    default:
+      assert(false);
+  }
+}
+
+void Interface::injectMessage(Message* _message) {
+  for (u32 p = 0; p < _message->numPackets(); p++) {
+    Packet* packet = _message->packet(p);
+    for (u32 f = 0; f < packet->numFlits(); f++) {
+      Flit* flit = packet->getFlit(f);
+      outputQueues_.at(flit->getVc())->receiveFlit(0, flit);
+    }
+  }
 }
 
 }  // namespace Standard

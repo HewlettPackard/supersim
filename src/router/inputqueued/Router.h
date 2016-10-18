@@ -22,14 +22,14 @@
 #include <string>
 #include <vector>
 
+#include "architecture/Crossbar.h"
+#include "architecture/CrossbarScheduler.h"
+#include "architecture/VcScheduler.h"
+#include "congestion/CongestionStatus.h"
 #include "event/Component.h"
 #include "network/Channel.h"
 #include "network/RoutingAlgorithm.h"
 #include "network/RoutingAlgorithmFactory.h"
-#include "router/common/Crossbar.h"
-#include "router/common/CrossbarScheduler.h"
-#include "router/common/VcScheduler.h"
-#include "router/common/congestion/CongestionStatus.h"
 #include "router/Router.h"
 #include "types/Credit.h"
 #include "types/Flit.h"
@@ -41,18 +41,18 @@ class OutputQueue;
 
 class Router : public ::Router {
  public:
-  Router(const std::string& _name, const Component* _parent, u32 _numPorts,
-         u32 _numVcs, const std::vector<u32>& _address,
+  Router(const std::string& _name, const Component* _parent, u32 _id,
+         const std::vector<u32>& _address,  u32 _numPorts, u32 _numVcs,
          MetadataHandler* _metadataHandler,
-         RoutingAlgorithmFactory* _routingAlgorithmFactory,
+         std::vector<RoutingAlgorithmFactory*>* _routingAlgorithmFactories,
          Json::Value _settings);
   ~Router();
 
   // Network
   void setInputChannel(u32 _port, Channel* _channel) override;
-  Channel* getInputChannel(u32 _port) override;
+  Channel* getInputChannel(u32 _port) const override;
   void setOutputChannel(u32 _port, Channel* _channel) override;
-  Channel* getOutputChannel(u32 _port) override;
+  Channel* getOutputChannel(u32 _port) const override;
 
   void receiveFlit(u32 _port, Flit* _flit) override;
   void receiveCredit(u32 _port, Credit* _credit) override;

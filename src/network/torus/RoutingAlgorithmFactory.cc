@@ -24,9 +24,9 @@
 namespace Torus {
 
 RoutingAlgorithmFactory::RoutingAlgorithmFactory(
-    u32 _numVcs, const std::vector<u32>& _dimensionWidths, u32 _concentration,
-    Json::Value _settings)
-    : ::RoutingAlgorithmFactory(), numVcs_(_numVcs),
+    u32 _baseVc, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
+    u32 _concentration, Json::Value _settings)
+    : ::RoutingAlgorithmFactory(), baseVc_(_baseVc), numVcs_(_numVcs),
       dimensionWidths_(_dimensionWidths), concentration_(_concentration),
       settings_(_settings) {}
 
@@ -40,11 +40,11 @@ RoutingAlgorithm* RoutingAlgorithmFactory::createRoutingAlgorithm(
 
   if (algorithm == "dimension_order") {
     return new Torus::DimOrderRoutingAlgorithm(
-        _name, _parent, _router, latency, numVcs_, dimensionWidths_,
+        _name, _parent, _router, latency, baseVc_, numVcs_, dimensionWidths_,
         concentration_, _inputPort);
   } else if (algorithm == "valiants") {
     return new Torus::ValiantsRoutingAlgorithm(
-        _name, _parent, _router, latency, numVcs_, dimensionWidths_,
+        _name, _parent, _router, latency, baseVc_, numVcs_, dimensionWidths_,
         concentration_, _inputPort);
   } else {
     fprintf(stderr, "Unknown routing algorithm: '%s'\n", algorithm.c_str());

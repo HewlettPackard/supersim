@@ -25,5 +25,5 @@ LoopbackTrafficPattern::LoopbackTrafficPattern(
 LoopbackTrafficPattern::~LoopbackTrafficPattern() {}
 
 u32 LoopbackTrafficPattern::nextDestination() {
-  return self;
+  return self_;
 }

@@ -18,20 +18,20 @@
 #include <cassert>
 
 #include "network/RoutingAlgorithmFactory.h"
-#include "router/common/congestion/CongestionStatusFactory.h"
+#include "congestion/CongestionStatusFactory.h"
 #include "router/inputqueued/InputQueue.h"
 #include "router/inputqueued/OutputQueue.h"
 
 namespace InputQueued {
 
 Router::Router(
-    const std::string& _name, const Component* _parent, u32 _numPorts,
-    u32 _numVcs, const std::vector<u32>& _address,
+    const std::string& _name, const Component* _parent, u32 _id,
+    const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
     MetadataHandler* _metadataHandler,
-    RoutingAlgorithmFactory* _routingAlgorithmFactory,
+    std::vector<RoutingAlgorithmFactory*>* _routingAlgorithmFactories,
     Json::Value _settings)
-    : ::Router(_name, _parent, _numPorts, _numVcs, _address, _metadataHandler,
-               _settings) {
+    : ::Router(_name, _parent, _id, _address, _numPorts, _numVcs,
+               _metadataHandler, _settings) {
   // determine the size of credits
   creditSize_ = numVcs_ * (u32)std::ceil(
       (f64)gSim->cycleTime(Simulator::Clock::CHANNEL) /
@@ -80,8 +80,8 @@ Router::Router(
 
       // routing algorithm
       std::string rfname = "RoutingAlgorithm" + nameSuffix;
-      RoutingAlgorithm* rf = _routingAlgorithmFactory->createRoutingAlgorithm(
-          rfname, this, this, port);
+      RoutingAlgorithm* rf = _routingAlgorithmFactories->at(vc)->
+          createRoutingAlgorithm(rfname, this, this, port);
       routingAlgorithms_.at(vcIdx) = rf;
 
       // compute the client index (same for VC alloc, SW alloc, and Xbar)
@@ -136,7 +136,7 @@ void Router::setInputChannel(u32 _port, Channel* _channel) {
   _channel->setSink(this, _port);
 }
 
-Channel* Router::getInputChannel(u32 _port) {
+Channel* Router::getInputChannel(u32 _port) const {
   return inputChannels_.at(_port);
 }
 
@@ -146,7 +146,7 @@ void Router::setOutputChannel(u32 _port, Channel* _channel) {
   _channel->setSource(this, _port);
 }
 
-Channel* Router::getOutputChannel(u32 _port) {
+Channel* Router::getOutputChannel(u32 _port) const {
   return outputChannels_.at(_port);
 }
 
@@ -157,7 +157,7 @@ void Router::receiveFlit(u32 _port, Flit* _flit) {
 
   // give to metadata handler for router packet arrival
   if (_flit->isHead()) {
-    packetArrival(_flit->getPacket());
+    packetArrival(_flit->packet());
   }
 }
 

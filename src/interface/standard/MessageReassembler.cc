@@ -28,9 +28,9 @@ MessageReassembler::~MessageReassembler() {}
 
 Message* MessageReassembler::receivePacket(Packet* _packet) {
   // get the message and determine unqiue id
-  Message* message = _packet->getMessage();
+  Message* message = _packet->message();
   u32 sourceId = message->getSourceId();
-  u32 messageId = message->getId();
+  u32 messageId = message->id();
   u64 mid = ((u64)sourceId) << 32 | ((u64)messageId);
 
   // if non-existent, add a new table entry
@@ -47,8 +47,8 @@ Message* MessageReassembler::receivePacket(Packet* _packet) {
   assert(messageData.message == message);
 
   // mark the packet as received
-  assert(messageData.packetsReceived.at(_packet->getId()) == false);
-  messageData.packetsReceived.at(_packet->getId()) = true;
+  assert(messageData.packetsReceived.at(_packet->id()) == false);
+  messageData.packetsReceived.at(_packet->id()) = true;
   messageData.receivedCount++;
 
   // check if the full message has been received

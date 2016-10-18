@@ -23,10 +23,10 @@
 namespace HyperX {
 
 RoutingAlgorithmFactory::RoutingAlgorithmFactory(
-    u32 _numVcs, const std::vector<u32>& _dimensionWidths,
+    u32 _baseVc, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
     const std::vector<u32>& _dimensionWeights, u32 _concentration,
     Json::Value _settings)
-    : ::RoutingAlgorithmFactory(), numVcs_(_numVcs),
+    : ::RoutingAlgorithmFactory(), baseVc_(_baseVc), numVcs_(_numVcs),
       dimensionWidths_(_dimensionWidths), dimensionWeights_(_dimensionWeights),
       concentration_(_concentration), settings_(_settings) {}
 
@@ -40,7 +40,7 @@ RoutingAlgorithm* RoutingAlgorithmFactory::createRoutingAlgorithm(
 
   if (algorithm == "dimension_order") {
     return new HyperX::DimOrderRoutingAlgorithm(
-        _name, _parent, _router, latency, numVcs_, dimensionWidths_,
+        _name, _parent, _router, latency, baseVc_, numVcs_, dimensionWidths_,
         dimensionWeights_, concentration_);
   } else {
     fprintf(stderr, "Unknown routing algorithm: '%s'\n", algorithm.c_str());

@@ -24,9 +24,9 @@
 
 #include "event/Component.h"
 #include "network/RoutingAlgorithm.h"
-#include "router/common/Crossbar.h"
-#include "router/common/CrossbarScheduler.h"
-#include "router/common/VcScheduler.h"
+#include "architecture/Crossbar.h"
+#include "architecture/CrossbarScheduler.h"
+#include "architecture/VcScheduler.h"
 #include "types/Flit.h"
 #include "types/FlitReceiver.h"
 

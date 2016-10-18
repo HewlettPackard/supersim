@@ -87,7 +87,7 @@ void Channel::processEvent(void* _event, s32 _type) {
       {
         Flit* flit = reinterpret_cast<Flit*>(_event);
         if (flit->isHead()) {
-          flit->getPacket()->incrementHopCount();
+          flit->packet()->incrementHopCount();
         }
         sink_->receiveFlit(sinkPort_, flit);
       }

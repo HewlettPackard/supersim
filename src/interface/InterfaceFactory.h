@@ -20,15 +20,17 @@
 #include <prim/prim.h>
 
 #include <string>
+#include <tuple>
+#include <vector>
 
 #include "interface/Interface.h"
-#include "network/InjectionAlgorithmFactory.h"
 
 class InterfaceFactory {
  public:
   static Interface* createInterface(
-      const std::string& _name, const Component* _parent, u32 _numVcs, u32 _id,
-      InjectionAlgorithmFactory* _injectionAlgorithmFactory,
+      const std::string& _name, const Component* _parent, u32 _id,
+      const std::vector<u32>& _address, u32 _numVcs,
+      const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
       Json::Value _settings);
 };
 

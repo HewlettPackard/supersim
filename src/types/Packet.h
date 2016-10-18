@@ -30,13 +30,13 @@ class Packet {
   // this deletes all flit data as well (if they aren't nullptr)
   virtual ~Packet();
 
-  u32 getId() const;
+  u32 id() const;
 
   u32 numFlits() const;
   Flit* getFlit(u32 _index) const;
   void setFlit(u32 _index, Flit* _flit);
 
-  Message* getMessage() const;
+  Message* message() const;
 
   void incrementHopCount();
   u32 getHopCount() const;

@@ -42,9 +42,11 @@ class RoutingAlgorithm : public Component {
     void add(u32 _port, u32 _vc);
     u32 size() const;
     void get(u32 _index, u32* _port, u32* _vc) const;
+    void link(const RoutingAlgorithm* _algorithm);
 
    private:
     std::vector<std::pair<u32, u32> > response_;
+    const RoutingAlgorithm* algorithm_;
   };
 
   /*
@@ -64,9 +66,11 @@ class RoutingAlgorithm : public Component {
    *  must override the processRequest() function.
    */
   RoutingAlgorithm(const std::string& _name, const Component* _parent,
-                   Router* _router, u32 _latency);
+                   Router* _router, u32 _latency, u32 _baseVc, u32 _numVcs);
   virtual ~RoutingAlgorithm();
   u32 latency() const;
+  u32 baseVc() const;
+  u32 numVcs() const;
   void request(Client* _client, Flit* _flit, Response* _response);
   virtual void vcScheduled(Flit* _flit, u32 _port, u32 _vc);
   void processEvent(void* _event, s32 _type) override;
@@ -75,6 +79,8 @@ class RoutingAlgorithm : public Component {
   virtual void processRequest(Flit* _flit, Response* _response) = 0;
 
   Router* router_;
+  const u32 baseVc_;
+  const u32 numVcs_;
 
  private:
   class EventPackage {
@@ -83,7 +89,8 @@ class RoutingAlgorithm : public Component {
     Flit* flit;
     Response* response;
   };
-  u32 latency_;
+
+  const u32 latency_;
 };
 
 #endif  // NETWORK_ROUTINGALGORITHM_H_

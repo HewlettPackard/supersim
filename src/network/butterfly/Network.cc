@@ -20,9 +20,11 @@
 #include <cassert>
 #include <cmath>
 
+#include <tuple>
+
 #include "interface/InterfaceFactory.h"
-#include "network/butterfly/InjectionAlgorithmFactory.h"
 #include "network/butterfly/RoutingAlgorithmFactory.h"
+#include "network/butterfly/util.h"
 #include "router/RouterFactory.h"
 
 namespace Butterfly {
@@ -38,25 +40,37 @@ Network::Network(const std::string& _name, const Component* _parent,
   stageWidth_ = (u32)pow(routerRadix_, numStages_ - 1);
 
   // create the routers
-  routers_.resize(numStages_);
+  routers_.resize(stageWidth_ * numStages_, nullptr);
   for (u32 stage = 0; stage < numStages_; stage++) {
-    routers_.at(stage).resize(stageWidth_, nullptr);
-
     for (u32 column = 0; column < stageWidth_; column++) {
       // create the router name
       std::string rname = "Router_" + std::to_string(stage) + "-" +
           std::to_string(column);
 
-      // create a routing algorithm factory to give to the router
-      RoutingAlgorithmFactory* routingAlgorithmFactory =
-          new RoutingAlgorithmFactory(numVcs_, routerRadix_, numStages_, stage,
-                                      _settings["routing"]);
+      // parse the traffic classes description
+      std::vector<::RoutingAlgorithmFactory*> routingAlgorithmFactories;
+      for (u32 idx = 0; idx < _settings["traffic_classes"].size(); idx++) {
+        u32 numVcs = _settings["traffic_classes"][idx]["num_vcs"].asUInt();
+        u32 baseVc = routingAlgorithmFactories.size();
+        for (u32 vc = 0; vc < numVcs; vc++) {
+          routingAlgorithmFactories.push_back(
+              new RoutingAlgorithmFactory(
+                  baseVc, numVcs, routerRadix_, numStages_, stage,
+                  _settings["traffic_classes"][idx]["routing"]));
+        }
+      }
 
       // create the router
-      routers_.at(stage).at(column) = RouterFactory::createRouter(
-          rname, this, routerRadix_, numVcs_, std::vector<u32>({stage, column}),
-          _metadataHandler, routingAlgorithmFactory, _settings["router"]);
-      delete routingAlgorithmFactory;
+      u32 routerId = stage * stageWidth_ + column;
+      routers_.at(routerId) = RouterFactory::createRouter(
+          rname, this, routerId, {stage, column}, routerRadix_, numVcs_,
+          _metadataHandler, &routingAlgorithmFactories, _settings["router"]);
+
+      // we don't need the routing algorithm factories anymore
+      for (::RoutingAlgorithmFactory* raf : routingAlgorithmFactories) {
+        delete raf;
+      }
+      routingAlgorithmFactories.clear();
     }
   }
 
@@ -66,19 +80,21 @@ Network::Network(const std::string& _name, const Component* _parent,
     u32 nStage = cStage + 1;
     u32 nBaseUnit = (u32)pow(routerRadix_, numStages_ - 1 - nStage);
     for (u32 cColumn = 0; cColumn < stageWidth_; cColumn++) {
-      Router* sourceRouter = routers_.at(cStage).at(cColumn);
+      u32 sourceId = cStage * stageWidth_ + cColumn;
+      Router* sourceRouter = routers_.at(sourceId);
       u32 cBaseOffset = (cColumn / cBaseUnit) * cBaseUnit;
       u32 cBaseIndex = cColumn % cBaseUnit;
       for (u32 cOutputPort = 0; cOutputPort < routerRadix_; cOutputPort++) {
         u32 nColumn = cBaseOffset + (cBaseIndex % nBaseUnit) +
             (cOutputPort * nBaseUnit);
-        Router* destinationRouter = routers_.at(nStage).at(nColumn);
+        u32 destinationId = nStage * stageWidth_ + nColumn;
+        Router* destinationRouter = routers_.at(destinationId);
         u32 nInputPort = cBaseIndex / nBaseUnit;  // cBaseIndex / routerRadix_;
 
         // create channel
         std::string chname = "Channel_" +
-            strop::vecString<u32>(sourceRouter->getAddress(), '-') + "-to-" +
-            strop::vecString<u32>(destinationRouter->getAddress(), '-');
+            strop::vecString<u32>(sourceRouter->address(), '-') + "-to-" +
+            strop::vecString<u32>(destinationRouter->address(), '-');
         Channel* channel = new Channel(chname, this,
                                        _settings["internal_channel"]);
         internalChannels_.push_back(channel);
@@ -90,9 +106,14 @@ Network::Network(const std::string& _name, const Component* _parent,
     }
   }
 
-  // create an injection algorithm factory to give to the interfaces
-  InjectionAlgorithmFactory* injectionAlgorithmFactory =
-      new InjectionAlgorithmFactory(numVcs_, _settings["routing"]);
+  // parse the traffic classes description
+  std::vector<std::tuple<u32, u32> > trafficClassVcs;
+  for (u32 baseVc = 0, idx = 0; idx < _settings["traffic_classes"].size();
+       idx++) {
+    u32 numVcs = _settings["traffic_classes"][idx]["num_vcs"].asUInt();
+    trafficClassVcs.push_back(std::make_tuple(baseVc, numVcs));
+    baseVc += numVcs;
+  }
 
   // create the interfaces and external channels
   u32 ifaces = routerRadix_ * stageWidth_;
@@ -100,16 +121,20 @@ Network::Network(const std::string& _name, const Component* _parent,
   for (u32 id = 0; id < ifaces; id++) {
     // create the interface
     std::string interfaceName = "Interface_" + std::to_string(id);
+    std::vector<u32> interfaceAddress;
+    translateInterfaceIdToAddress(id, &interfaceAddress);
     Interface* interface = InterfaceFactory::createInterface(
-        interfaceName, this, numVcs_, id, injectionAlgorithmFactory,
+        interfaceName, this, id, interfaceAddress, numVcs_, trafficClassVcs,
         _settings["interface"]);
     interfaces_.at(id) = interface;
 
     // get references to the routers
     u32 routerIndex = id / routerRadix_;
     u32 routerPort = id % routerRadix_;
-    Router* inputRouter = routers_.at(0).at(routerIndex);
-    Router* outputRouter = routers_.at(numStages_-1).at(routerIndex);
+    u32 inputRouterId = 0 * stageWidth_ + routerIndex;
+    u32 outputRouterId = (numStages_ - 1) * stageWidth_ + routerIndex;
+    Router* inputRouter = routers_.at(inputRouterId);
+    Router* outputRouter = routers_.at(outputRouterId);
 
     // create the channels
     std::string inChannelName = "InChannel_" + std::to_string(id);
@@ -122,20 +147,17 @@ Network::Network(const std::string& _name, const Component* _parent,
     externalChannels_.push_back(outChannel);
 
     // link interfaces to router via channels
-    interface->setOutputChannel(inChannel);
+    interface->setOutputChannel(0, inChannel);
     inputRouter->setInputChannel(routerPort, inChannel);
-    interface->setInputChannel(outChannel);
+    interface->setInputChannel(0, outChannel);
     outputRouter->setOutputChannel(routerPort, outChannel);
   }
-
-  delete injectionAlgorithmFactory;
 }
 
 Network::~Network() {
-  for (u32 s = 0; s < numStages_; s++) {
-    for (u32 i = 0; i < stageWidth_; i++) {
-      delete routers_.at(s).at(i);
-    }
+  for (auto it = routers_.begin(); it != routers_.end(); ++it) {
+    Router* router = *it;
+    delete router;
   }
   for (auto it = interfaces_.begin(); it != interfaces_.end(); ++it) {
     Interface* interface = *it;
@@ -162,41 +184,35 @@ u32 Network::numInterfaces() const {
 }
 
 Router* Network::getRouter(u32 _id) const {
-  u32 stage = _id / numStages_;
-  u32 index = _id % numStages_;
-  return routers_.at(stage).at(index);
+  return routers_.at(_id);
 }
 
 Interface* Network::getInterface(u32 _id) const {
   return interfaces_.at(_id);
 }
 
-void Network::translateTerminalIdToAddress(
+void Network::translateInterfaceIdToAddress(
     u32 _id, std::vector<u32>* _address) const {
-  _address->resize(numStages_);
-  // work in reverse for little endian format
-  for (u32 exp = 0, row = numStages_ - 1; exp < numStages_; exp++, row--) {
-    u32 divisor = (u32)pow(routerRadix_, row);
-    _address->at(exp) = _id / divisor;
-    _id %= divisor;
-  }
+  Butterfly::translateInterfaceIdToAddress(
+      routerRadix_, numStages_, stageWidth_, _id, _address);
 }
 
-u32 Network::translateTerminalAddressToId(
+u32 Network::translateInterfaceAddressToId(
     const std::vector<u32>* _address) const {
-  assert(false);  // TODO(nic): NOT YET IMPLEMENTED
-  return 0;
+  return Butterfly::translateInterfaceAddressToId(
+      routerRadix_, numStages_, stageWidth_, _address);
 }
 
 void Network::translateRouterIdToAddress(
     u32 _id, std::vector<u32>* _address) const {
-  assert(false);  // TODO(nic): NOT YET IMPLEMENTED
+  Butterfly::translateRouterIdToAddress(
+      routerRadix_, numStages_, stageWidth_, _id, _address);
 }
 
 u32 Network::translateRouterAddressToId(
     const std::vector<u32>* _address) const {
-  assert(false);  // TODO(nic): NOT YET IMPLEMENTED
-  return 0;
+  return Butterfly::translateRouterAddressToId(
+      routerRadix_, numStages_, stageWidth_, _address);
 }
 
 void Network::collectChannels(std::vector<Channel*>* _channels) {

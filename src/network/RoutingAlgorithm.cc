@@ -18,6 +18,7 @@
 #include <cassert>
 
 #include "event/Simulator.h"
+#include "router/Router.h"
 
 /* RoutingAlgorithm::Response class */
 
@@ -30,6 +31,9 @@ void RoutingAlgorithm::Response::clear() {
 }
 
 void RoutingAlgorithm::Response::add(u32 _port, u32 _vc) {
+  assert(_port < algorithm_->router_->numPorts());
+  assert(_vc >= algorithm_->baseVc_);
+  assert(_vc < algorithm_->baseVc_ + algorithm_->numVcs_);
   response_.push_back({_port, _vc});
 }
 
@@ -43,6 +47,10 @@ void RoutingAlgorithm::Response::get(u32 _index, u32* _port, u32* _vc) const {
   *_vc   = val.second;
 }
 
+void RoutingAlgorithm::Response::link(const RoutingAlgorithm* _algorithm) {
+  algorithm_ = _algorithm;
+}
+
 /* RoutingAlgorithm::Client class */
 
 RoutingAlgorithm::Client::Client() {}
@@ -53,16 +61,27 @@ RoutingAlgorithm::Client::~Client() {}
 
 RoutingAlgorithm::RoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u32 _latency)
-    : Component(_name, _parent), router_(_router), latency_(_latency) {
+    u32 _latency, u32 _baseVc, u32 _numVcs)
+    : Component(_name, _parent), router_(_router), baseVc_(_baseVc),
+      numVcs_(_numVcs), latency_(_latency) {
   assert(router_ != nullptr);
   assert(latency_ > 0);
+  assert(numVcs_ <= router_->numVcs());
+  assert(baseVc_ <= router_->numVcs() - numVcs_);
 }
 
 RoutingAlgorithm::~RoutingAlgorithm() {}
 
 u32 RoutingAlgorithm::latency() const {
   return latency_;
+}
+
+u32 RoutingAlgorithm::baseVc() const {
+  return baseVc_;
+}
+
+u32 RoutingAlgorithm::numVcs() const {
+  return numVcs_;
 }
 
 void RoutingAlgorithm::request(Client* _client, Flit* _flit,

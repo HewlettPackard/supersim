@@ -29,20 +29,22 @@ namespace HyperX {
 
 class RoutingAlgorithmFactory : public ::RoutingAlgorithmFactory {
  public:
-  RoutingAlgorithmFactory(u32 _numVcs, const std::vector<u32>& _dimensionWidths,
-                          const std::vector<u32>& _dimensionWeights,
-                          u32 _concentration, Json::Value _settings);
+  RoutingAlgorithmFactory(
+      u32 _baseVc, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
+      const std::vector<u32>& _dimensionWeights, u32 _concentration,
+      Json::Value _settings);
   ~RoutingAlgorithmFactory();
   RoutingAlgorithm* createRoutingAlgorithm(
       const std::string& _name, const Component* _parent, Router* _router,
-      u32 inputPort) override;
+      u32 _inputPort) override;
 
  private:
+  const u32 baseVc_;
   const u32 numVcs_;
   const std::vector<u32> dimensionWidths_;
   const std::vector<u32> dimensionWeights_;
   const u32 concentration_;
-  Json::Value settings_;
+  const Json::Value settings_;
 };
 
 }  // namespace HyperX

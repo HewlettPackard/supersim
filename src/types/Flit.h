@@ -25,10 +25,10 @@ class Flit {
   Flit(u32 _id, bool _isHead, bool _isTail, Packet* _packet);
   virtual ~Flit();
 
-  u32 getId() const;
+  u32 id() const;
   bool isHead() const;
   bool isTail() const;
-  Packet* getPacket() const;
+  Packet* packet() const;
 
   u32 getVc() const;
   void setVc(u32 vc);

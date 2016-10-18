@@ -25,7 +25,7 @@ Flit::Flit(u32 _id, bool _isHead, bool _isTail, Packet* _packet)
 
 Flit::~Flit() {}
 
-u32 Flit::getId() const {
+u32 Flit::id() const {
   return id_;
 }
 
@@ -37,7 +37,7 @@ bool Flit::isTail() const {
   return tail_;
 }
 
-Packet* Flit::getPacket() const {
+Packet* Flit::packet() const {
   return packet_;
 }
 

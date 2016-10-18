@@ -8,9 +8,24 @@
   },
   "network": {
     "topology": "torus",
-    "num_vcs": 4,
     "dimensions": [5, 4, 3, 2],
-    "concentration": 3,
+    "concentration": 2,
+    "traffic_classes": [
+      {
+        "num_vcs": 2,
+        "routing": {
+          "algorithm": "dimension_order",
+          "latency": 1
+        }
+      },
+      {
+        "num_vcs": 2,
+        "routing": {
+          "algorithm": "dimension_order",
+          "latency": 1
+        }
+      }
+    ],
     "internal_channel": {
       "latency": 1  // cycles
     },
@@ -19,31 +34,6 @@
     },
     "channel_log": {
       "file": "/dev/null"  // "channels.csv"
-    },
-    "routing": {
-      "algorithm": "dimension_order",
-      "latency": 1
-    },
-    "interface": {
-      "type": "standard",
-      "fixed_msg_vc": false,
-      "crossbar_scheduler": {
-        "allocator": {
-          "type": "r_separable",
-          "slip_latch": true,
-          "resource_arbiter": {
-            "type": "comparing",
-            "greater": false
-          }
-        },
-        "full_packet": false,
-        "packet_lock": true,
-        "idle_unlock": false
-      },
-      "init_credits": "$&(network.router.input_queue_depth)&$",
-      "crossbar": {
-        "latency": 1  // cycles
-      }
     },
     "router": {
       "architecture": "input_queued",
@@ -85,32 +75,60 @@
         "packet_lock": true,
         "idle_unlock": false
       }
-    }
-  },
-  "application": {
-    "type": "simple_mem",
-    "max_injection_rate": -1,  // infinite injection rate
-    "memory_slice": 4096,
-    "block_size": 64,  // bytes
-    "bytes_per_flit": 4,
-    "header_overhead": 16,  // bytes
-    "max_packet_size": 16,  // flits
-    "processor_terminal": {
-      "latency": 10,
-      "memory_accesses": 100
     },
-    "memory_terminal": {
-      "latency": 15
-    },
-    "message_log": {
-      "file": "/dev/null"  // "data.mpf.gz"
-    },
-    "rate_log": {
-      "file": "/dev/null"  // "rates.csv"
+    "interface": {
+      "type": "standard",
+      "adaptive": false,
+      "fixed_msg_vc": false,
+      "crossbar_scheduler": {
+        "allocator": {
+          "type": "r_separable",
+          "slip_latch": true,
+          "resource_arbiter": {
+            "type": "comparing",
+            "greater": false
+          }
+        },
+        "full_packet": false,
+        "packet_lock": true,
+        "idle_unlock": false
+      },
+      "init_credits": "$&(network.router.input_queue_depth)&$",
+      "crossbar": {
+        "latency": 1  // cycles
+      }
     }
   },
   "metadata_handler": {
     "type": "zero"
+  },
+  "workload": {
+    "message_log": {
+      "file": "/dev/null"  // "data.mpf.gz"
+    },
+    "applications": [
+      {
+        "type": "simple_mem",
+        "max_injection_rate": -1,  // infinite injection rate
+        "memory_slice": 4096,
+        "block_size": 64,  // bytes
+        "bytes_per_flit": 4,
+        "header_overhead": 16,  // bytes
+        "max_packet_size": 16,  // flits
+        "processor_terminal": {
+          "traffic_class": 0,
+          "latency": 10,
+          "memory_accesses": 40
+        },
+        "memory_terminal": {
+          "traffic_class": 1,
+          "latency": 15
+        },
+        "rate_log": {
+          "file": "/dev/null"  // "rates.csv"
+        }
+      }
+    ]
   },
   "debug": []
 }

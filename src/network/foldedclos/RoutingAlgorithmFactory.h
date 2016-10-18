@@ -28,19 +28,19 @@ namespace FoldedClos {
 
 class RoutingAlgorithmFactory : public ::RoutingAlgorithmFactory {
  public:
-  RoutingAlgorithmFactory(u32 _numVcs, u32 _numPorts, u32 _numLevels,
-                          u32 _level, Json::Value _settings);
+  RoutingAlgorithmFactory(u32 _baseVc, u32 _numVcs, u32 _numPorts,
+                          u32 _numLevels, Json::Value _settings);
   ~RoutingAlgorithmFactory();
   RoutingAlgorithm* createRoutingAlgorithm(
       const std::string& _name, const Component* _parent, Router* _router,
-      u32 inputPort) override;
+      u32 _inputPort) override;
 
  private:
+  const u32 baseVc_;
   const u32 numVcs_;
   const u32 numPorts_;
   const u32 numLevels_;
-  const u32 level_;
-  Json::Value settings_;
+  const Json::Value settings_;
 };
 
 }  // namespace FoldedClos

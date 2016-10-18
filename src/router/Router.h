@@ -22,45 +22,30 @@
 #include <string>
 #include <vector>
 
+#include "architecture/PortedDevice.h"
 #include "event/Component.h"
 #include "metadata/MetadataHandler.h"
 #include "network/Channel.h"
-#include "types/FlitReceiver.h"
-#include "types/FlitSender.h"
 #include "types/CreditReceiver.h"
 #include "types/CreditSender.h"
+#include "types/FlitReceiver.h"
+#include "types/FlitSender.h"
 
-class Router : public Component, public FlitSender, public FlitReceiver,
-               public CreditSender, public CreditReceiver {
+class Router : public Component, public PortedDevice, public FlitSender,
+               public FlitReceiver, public CreditSender, public CreditReceiver {
  public:
-  Router(const std::string& _name, const Component* _parent, u32 _numPorts,
-         u32 _numVcs, const std::vector<u32>& _address,
+  Router(const std::string& _name, const Component* _parent, u32 _id,
+         const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
          MetadataHandler* _metadataHandler, Json::Value _settings);
   virtual ~Router();
 
-  u32 numPorts() const;
-  u32 numVcs() const;
-  const std::vector<u32>& getAddress() const;
-
-  u32 vcIndex(u32 _port, u32 _vc) const;
-  void vcIndexInv(u32 _index, u32* _port, u32* _vc) const;
-
-  virtual void setInputChannel(u32 _port, Channel* _channel) = 0;
-  virtual Channel* getInputChannel(u32 _port) = 0;
-  virtual void setOutputChannel(u32 port, Channel* _channel) = 0;
-  virtual Channel* getOutputChannel(u32 _port) = 0;
-
-  // this should be called by all subclasses when a packet's head flit arrives
+  // this must be called by all subclasses when a packet's head flit arrives
   //  on an input port.
   void packetArrival(Packet* _packet) const;
 
-  // this returns creditCount/maxCredits (buffer availability)
-  virtual f64 congestionStatus(u32 _port, u32 _vc) const;
+  virtual f64 congestionStatus(u32 _port, u32 _vc) const = 0;
 
  protected:
-  const u32 numPorts_;
-  const u32 numVcs_;
-  const std::vector<u32> address_;
   MetadataHandler* metadataHandler_;
 };
 

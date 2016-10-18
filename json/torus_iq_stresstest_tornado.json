@@ -1,6 +1,6 @@
 {
   "simulator": {
-    "channel_cycle_time": 1,
+    "channel_cycle_time": 3,
     "core_cycle_time": 1,
     "print_progress": true,
     "print_interval": 1.0,  // seconds
@@ -8,9 +8,17 @@
   },
   "network": {
     "topology": "torus",
-    "num_vcs": 4,
     "dimensions": [4, 3, 2],
     "concentration": 2,
+    "traffic_classes": [
+      {
+        "num_vcs": 4,
+        "routing": {
+          "algorithm": "valiants",
+          "latency": 1
+        }
+      }
+    ],
     "internal_channel": {
       "latency": 1  // cycles
     },
@@ -20,31 +28,6 @@
     "channel_log": {
       "file": "/dev/null"  // "channels.csv"
     },
-    "routing": {
-      "algorithm": "valiants",
-      "latency": 1
-    },
-    "interface": {
-      "type": "standard",
-      "fixed_msg_vc": true,
-      "crossbar_scheduler": {
-        "allocator": {
-          "type": "r_separable",
-          "slip_latch": true,
-          "resource_arbiter": {
-            "type": "comparing",
-            "greater": false
-          }
-        },
-        "full_packet": false,
-        "packet_lock": true,
-        "idle_unlock": true
-      },
-      "init_credits": "$&(network.router.input_queue_depth)&$",
-      "crossbar": {
-        "latency": 1  // cycles
-      }
-    },
     "router": {
       "architecture": "input_queued",
       "congestion_status": {
@@ -52,9 +35,9 @@
         "latency": 1,
         "granularity": 0
       },
-      "input_queue_depth": 16,
+      "input_queue_depth": 8,
       "vca_swa_wait": true,
-      "output_queue_depth": 64,
+      "output_queue_depth": 32,
       "crossbar": {
         "latency": 1  // cycles
       },
@@ -85,38 +68,65 @@
         "packet_lock": true,
         "idle_unlock": true
       }
-    }
-  },
-  "application": {
-    "type": "stress_test",
-    "max_injection_rate": 0.35,
-    "warmup_threshold": 0.99,
-    "kill_on_saturation": false,
-    "log_during_saturation": true,
-    "max_saturation_cycles": 10000,
-    "blast_terminal": {
-      "num_messages": 500,
-      "min_message_size": 1,
-      "max_message_size": 64,
-      "max_packet_size": 16,
-      "warmup_interval": 200,  // delivered flits
-      "warmup_window": 15,
-      "warmup_attempts": 20,
-      "traffic_pattern": {
-        "type": "tornado",
-        "dimensions": [4, 3, 2],
-        "concentration": 2
+    },
+    "interface": {
+      "type": "standard",
+      "adaptive": false,
+      "fixed_msg_vc": true,
+      "crossbar_scheduler": {
+        "allocator": {
+          "type": "r_separable",
+          "slip_latch": true,
+          "resource_arbiter": {
+            "type": "comparing",
+            "greater": false
+          }
+        },
+        "full_packet": false,
+        "packet_lock": true,
+        "idle_unlock": true
+      },
+      "init_credits": "$&(network.router.input_queue_depth)&$",
+      "crossbar": {
+        "latency": 1  // cycles
       }
-    },
-    "message_log": {
-      "file": "/dev/null"  // "data.mpf.gz"
-    },
-    "rate_log": {
-      "file": "/dev/null"  // "rates.csv"
     }
   },
   "metadata_handler": {
     "type": "zero"
+  },
+  "workload": {
+    "message_log": {
+      "file": "/dev/null"  // "data.mpf.gz"
+    },
+    "applications": [
+      {
+        "type": "stress_test",
+        "max_injection_rate": 0.31,
+        "warmup_threshold": 0.99,
+        "kill_on_saturation": false,
+        "log_during_saturation": true,
+        "max_saturation_cycles": 10000,
+        "blast_terminal": {
+          "traffic_class": 0,
+          "num_messages": 200,
+          "min_message_size": 1,
+          "max_message_size": 64,
+          "max_packet_size": 16,
+          "warmup_interval": 200,  // delivered flits
+          "warmup_window": 15,
+          "warmup_attempts": 3,
+          "traffic_pattern": {
+            "type": "tornado",
+            "dimensions": [4, 3, 2],
+            "concentration": 2
+          }
+        },
+        "rate_log": {
+          "file": "/dev/null"  // "rates.csv"
+        }
+      }
+    ]
   },
   "debug": []
 }

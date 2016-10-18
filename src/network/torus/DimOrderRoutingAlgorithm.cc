@@ -25,11 +25,12 @@ namespace Torus {
 
 DimOrderRoutingAlgorithm::DimOrderRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u64 _latency, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
-    u32 _concentration, u32 _inputPort)
-    : RoutingAlgorithm(_name, _parent, _router, _latency),
-      numVcs_(_numVcs), dimensionWidths_(_dimensionWidths),
-      concentration_(_concentration), inputPort_(_inputPort),
+    u64 _latency, u32 _baseVc, u32 _numVcs,
+    const std::vector<u32>& _dimensionWidths, u32 _concentration,
+    u32 _inputPort)
+    : RoutingAlgorithm(_name, _parent, _router, _latency, _baseVc, _numVcs),
+      dimensionWidths_(_dimensionWidths), concentration_(_concentration),
+      inputPort_(_inputPort),
       inputPortDim_(computeInputPortDim(dimensionWidths_, concentration_,
                                         inputPort_)) {
   assert(numVcs_ >= 2);
@@ -42,10 +43,10 @@ void DimOrderRoutingAlgorithm::processRequest(
   u32 outputPort;
 
   // ex: [x,y,z]
-  const std::vector<u32>& routerAddress = router_->getAddress();
+  const std::vector<u32>& routerAddress = router_->address();
   // ex: [c,x,y,z]
   const std::vector<u32>* destinationAddress =
-      _flit->getPacket()->getMessage()->getDestinationAddress();
+      _flit->packet()->message()->getDestinationAddress();
   assert(routerAddress.size() == (destinationAddress->size() - 1));
 
   // determine the next dimension to work on
@@ -63,7 +64,7 @@ void DimOrderRoutingAlgorithm::processRequest(
     outputPort = destinationAddress->at(0);
 
     // on ejection, any dateline VcSet is ok
-    for (u32 vc = 0; vc < numVcs_; vc++) {
+    for (u32 vc = baseVc_; vc < baseVc_ + numVcs_; vc++) {
       _response->add(outputPort, vc);
     }
   } else {
@@ -107,7 +108,7 @@ void DimOrderRoutingAlgorithm::processRequest(
 
     // the output port is now determined, now figure out which VC set to use
     assert(outputPort != inputPort_);  // this case is already checked
-    u32 vcSet = _flit->getVc() % 2;
+    u32 vcSet = (_flit->getVc() - baseVc_) % 2;
 
     // reset to VC set 0 when switching dimensions
     //  this also occurs on an injection port
@@ -122,7 +123,7 @@ void DimOrderRoutingAlgorithm::processRequest(
     }
 
     // use VCs in the corresponding set
-    for (u32 vc = vcSet; vc < numVcs_; vc += 2) {
+    for (u32 vc = baseVc_ + vcSet; vc < baseVc_ + numVcs_; vc += 2) {
       _response->add(outputPort, vc);
     }
   }

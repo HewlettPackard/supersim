@@ -15,12 +15,16 @@
  */
 #include "network/foldedclos/Network.h"
 
+#include <strop/strop.h>
+
 #include <cassert>
 #include <cmath>
 
+#include <tuple>
+
 #include "interface/InterfaceFactory.h"
-#include "network/foldedclos/InjectionAlgorithmFactory.h"
 #include "network/foldedclos/RoutingAlgorithmFactory.h"
+#include "network/foldedclos/util.h"
 #include "router/RouterFactory.h"
 
 namespace FoldedClos {
@@ -38,55 +42,38 @@ Network::Network(const std::string& _name, const Component* _parent,
   rowRouters_  = (u32)pow(halfRadix_, numLevels_-1);
 
   // create all routers
-  routers_.resize(numLevels_);
-  for (u32 r = 0; r < numLevels_; r++) {
-    u32 row = numLevels_ - r - 1;
-    u32 rowGroupSize = (u32)pow(halfRadix_, row);
-    routers_.at(row).resize(rowRouters_);
-
+  routers_.resize(numLevels_ * rowRouters_, nullptr);
+  for (u32 row = 0; row < numLevels_; row++) {
     for (u32 col = 0; col < rowRouters_; col++) {
-      std::vector<u32> routerAddress(numLevels_, U32_MAX);
-      if (row < (numLevels_ - 1)) {
-        // copy in upper router
-        const std::vector<u32>& upperRouterAddress =
-            routers_.at(row + 1).at(col)->getAddress();
-        auto itb = upperRouterAddress.cbegin();
-        auto ite = upperRouterAddress.cend();
-        routerAddress.assign(itb, ite);
+      // router info
+      u32 routerId = row * rowRouters_ + col;
+      std::vector<u32> routerAddress;
+      translateRouterIdToAddress(routerId, &routerAddress);
+      std::string rname = "Router_" + strop::vecString<u32>(routerAddress, '-');
 
-        // set the value of this level
-        // u32 dunno = col % rowGroupSize;
-        routerAddress.at(row+1) = (col / rowGroupSize) % halfRadix_;
-      }
-
-      // router name
-      std::string rname = "Router_" + std::to_string(row) + "-" +
-          std::to_string(col) + "_[";
-      for (u32 i = 0; i < routerAddress.size(); i++) {
-        if (routerAddress.at(i) == U32_MAX) {
-          rname +=  "*";
-        } else {
-          rname += std::to_string(routerAddress.at(i));
-        }
-
-        if (i < routerAddress.size() - 1) {
-          rname += '-';
+      // parse the traffic classes description
+      std::vector<::RoutingAlgorithmFactory*> routingAlgorithmFactories;
+      for (u32 idx = 0; idx < _settings["traffic_classes"].size(); idx++) {
+        u32 numVcs = _settings["traffic_classes"][idx]["num_vcs"].asUInt();
+        u32 baseVc = routingAlgorithmFactories.size();
+        for (u32 vc = 0; vc < numVcs; vc++) {
+          routingAlgorithmFactories.push_back(
+              new RoutingAlgorithmFactory(
+                  baseVc, numVcs, routerRadix, numLevels_,
+                  _settings["traffic_classes"][idx]["routing"]));
         }
       }
-      rname += ']';
-
-      // create a routing algorithm factory
-      RoutingAlgorithmFactory* routingAlgorithmFactory =
-          new RoutingAlgorithmFactory(numVcs_, routerRadix, numLevels_, row,
-                                      _settings["routing"]);
 
       // make router
-      routers_.at(row).at(col) = RouterFactory::createRouter(
-          rname, this, routerRadix, numVcs_, routerAddress,
-          _metadataHandler, routingAlgorithmFactory, _settings["router"]);
+      routers_.at(routerId) = RouterFactory::createRouter(
+          rname, this, routerId, routerAddress, routerRadix, numVcs_,
+          _metadataHandler, &routingAlgorithmFactories, _settings["router"]);
 
-      // delete the routing algorithm factory
-      delete routingAlgorithmFactory;
+      // we don't need the routing algorithm factories anymore
+      for (::RoutingAlgorithmFactory* raf : routingAlgorithmFactories) {
+        delete raf;
+      }
+      routingAlgorithmFactories.clear();
     }
   }
 
@@ -132,8 +119,10 @@ Network::Network(const std::string& _name, const Component* _parent,
                   thisRow, thisColumn, thisPort,
                   thatRow, thatColumn, thatPort);
 
-        Router* thisRouter = routers_.at(r).at(c);
-        Router* thatRouter = routers_.at(thatRow).at(thatColumn);
+        u32 thisId = thisRow * rowRouters_ + thisColumn;
+        u32 thatId = thatRow * rowRouters_ + thatColumn;
+        Router* thisRouter = routers_.at(thisId);
+        Router* thatRouter = routers_.at(thatId);
 
         thisRouter->setInputChannel(thisPort, down);
         thisRouter->setOutputChannel(thisPort, up);
@@ -143,14 +132,18 @@ Network::Network(const std::string& _name, const Component* _parent,
     }
   }
 
-  InjectionAlgorithmFactory* injectionAlgorithmFactory =
-      new InjectionAlgorithmFactory(numVcs_, _settings["routing"]);
+  // parse the traffic classes description
+  std::vector<std::tuple<u32, u32> > trafficClassVcs;
+  for (u32 baseVc = 0, idx = 0; idx < _settings["traffic_classes"].size();
+       idx++) {
+    u32 numVcs = _settings["traffic_classes"][idx]["num_vcs"].asUInt();
+    trafficClassVcs.push_back(std::make_tuple(baseVc, numVcs));
+    baseVc += numVcs;
+  }
 
   // create interfaces, external channels, link together
-  u32 interfaceId = 0;
-  interfaces_.resize(rowRouters_);
+  interfaces_.resize(rowRouters_ * halfRadix_, nullptr);
   for (u32 c = 0; c < rowRouters_; c++) {
-    interfaces_.at(c).resize(halfRadix_);
     for (u32 p = 0; p < halfRadix_; p++) {
       u32 r = 0;
 
@@ -167,26 +160,29 @@ Network::Network(const std::string& _name, const Component* _parent,
       externalChannels_.push_back(outChannel);
 
       // link to router
-      Router* router = routers_.at(r).at(c);
+      u32 routerId = r * rowRouters_ + c;
+      Router* router = routers_.at(routerId);
       router->setInputChannel(p, inChannel);
       router->setOutputChannel(p, outChannel);
+
+      // interface id and address
+      u32 interfaceId = c * halfRadix_ + p;
+      std::vector<u32> interfaceAddress;
+      translateInterfaceIdToAddress(interfaceId, &interfaceAddress);
 
       // create interface
       std::string interfaceName = "Interface_" + std::to_string(c) + ":" +
           std::to_string(p);
       Interface* interface = InterfaceFactory::createInterface(
-          interfaceName, this, numVcs_, interfaceId, injectionAlgorithmFactory,
-          _settings["interface"]);
-      interfaces_.at(c).at(p) = interface;
-      interfaceId++;
+          interfaceName, this, interfaceId, interfaceAddress, numVcs_,
+          trafficClassVcs, _settings["interface"]);
+      interfaces_.at(interfaceId) = interface;
 
       // link to interface
-      interface->setInputChannel(outChannel);
-      interface->setOutputChannel(inChannel);
+      interface->setInputChannel(0, outChannel);
+      interface->setOutputChannel(0, inChannel);
     }
   }
-
-  delete injectionAlgorithmFactory;
 
   for (u32 id = 0; id < numInterfaces(); id++) {
     assert(getInterface(id) != nullptr);
@@ -198,16 +194,14 @@ Network::Network(const std::string& _name, const Component* _parent,
 
 Network::~Network() {
   // delete routers
-  for (u32 r = 0; r < numLevels_; r++) {
-    for (u32 c = 0; c < rowRouters_; c++) {
-      delete routers_.at(r).at(c);
-    }
+  for (auto it = routers_.begin(); it != routers_.end(); ++it) {
+    Router* router = *it;
+    delete router;
   }
   // delete interfaces
-  for (u32 c = 0; c < rowRouters_; c++) {
-    for (u32 p = 0; p < halfRadix_; p++) {
-      delete interfaces_.at(c).at(p);
-    }
+  for (auto it = interfaces_.begin(); it != interfaces_.end(); ++it) {
+    Interface* interface = *it;
+    delete interface;
   }
   // delete channels
   for (auto it = internalChannels_.begin(); it != internalChannels_.end();
@@ -231,49 +225,35 @@ u32 Network::numInterfaces() const {
 }
 
 Router* Network::getRouter(u32 _id) const {
-  u32 row = _id / rowRouters_;
-  u32 col = _id % rowRouters_;
-  return routers_.at(row).at(col);
+  return routers_.at(_id);
 }
 
 Interface* Network::getInterface(u32 _id) const {
-  u32 col = _id / halfRadix_;
-  u32 port = _id % halfRadix_;
-  return interfaces_.at(col).at(port);
+  return interfaces_.at(_id);
 }
 
-void Network::translateTerminalIdToAddress(
+void Network::translateInterfaceIdToAddress(
     u32 _id, std::vector<u32>* _address) const {
-  _address->resize(numLevels_);
-  // work in reverse for little endian format
-  for (u32 exp = 0, row = numLevels_ - 1; exp < numLevels_; exp++, row--) {
-    u32 divisor = (u32)pow(halfRadix_, row);
-    _address->at(row) = _id / divisor;
-    _id %= divisor;
-  }
+  FoldedClos::translateInterfaceIdToAddress(halfRadix_, numLevels_, rowRouters_,
+                                            _id, _address);
 }
 
-u32 Network::translateTerminalAddressToId(
+u32 Network::translateInterfaceAddressToId(
     const std::vector<u32>* _address) const {
-  assert(false);  // TODO(nic): NOT YET TESTED (MOVE TO UTIL FILE)
-  u32 sum = 0;
-  // work in reverse for little endian format
-  for (u32 exp = 0, row = numLevels_ - 1; exp < numLevels_; exp++, row--) {
-    u32 multiplier = (u32)pow(halfRadix_, row);
-    sum += _address->at(row) * multiplier;
-  }
-  return sum;
+  return FoldedClos::translateInterfaceAddressToId(halfRadix_, numLevels_,
+                                                   rowRouters_, _address);
 }
 
 void Network::translateRouterIdToAddress(
     u32 _id, std::vector<u32>* _address) const {
-  assert(false);  // TODO(nic): NOT YET IMPLEMENTED
+  FoldedClos::translateRouterIdToAddress(halfRadix_, numLevels_, rowRouters_,
+                                         _id, _address);
 }
 
 u32 Network::translateRouterAddressToId(
     const std::vector<u32>* _address) const {
-  assert(false);  // TODO(nic): NOT YET IMPLEMENTED
-  return 0;
+  return FoldedClos::translateRouterAddressToId(halfRadix_, numLevels_,
+                                                rowRouters_, _address);
 }
 
 void Network::collectChannels(std::vector<Channel*>* _channels) {

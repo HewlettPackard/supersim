@@ -23,14 +23,14 @@ BitRotateTrafficPattern::BitRotateTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
     : TrafficPattern(_name, _parent, _numTerminals, _self) {
-  assert(bits::isPow2(numTerminals));
+  assert(bits::isPow2(numTerminals_));
   assert(_settings.isMember("direction"));
   assert(_settings["direction"].isString());
   std::string dir = _settings["direction"].asString();
   if (dir == "right") {
-    dest_ = bits::rotateRight<u32>(self, bits::floorLog2(numTerminals));
+    dest_ = bits::rotateRight<u32>(self_, bits::floorLog2(numTerminals_));
   } else if (dir == "left") {
-    dest_ = bits::rotateLeft<u32>(self, bits::floorLog2(numTerminals));
+    dest_ = bits::rotateLeft<u32>(self_, bits::floorLog2(numTerminals_));
   } else {
     fprintf(stderr, "invalid direction spec: %s\n", dir.c_str());
     assert(false);

@@ -91,10 +91,10 @@ TrafficPattern* TrafficPatternFactory::createTrafficPattern(
         _name, _parent, _numTerminals, _self, _settings);
   } else if (type == "random_exchange_quadrant") {
     return new RandomExchangeQuadrantTrafficPattern(
-      _name, _parent, _numTerminals, _self, _settings);
+        _name, _parent, _numTerminals, _self, _settings);
   } else if (type == "random_exchange_neighbor") {
     return new RandomExchangeNeighborTrafficPattern(
-      _name, _parent, _numTerminals, _self, _settings);
+        _name, _parent, _numTerminals, _self, _settings);
   } else if (type == "swap2") {
     return new Swap2TrafficPattern(
         _name, _parent, _numTerminals, _self, _settings);

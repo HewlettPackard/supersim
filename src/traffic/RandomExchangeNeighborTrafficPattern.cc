@@ -22,7 +22,7 @@
 #include "network/cube/util.h"
 
 RandomExchangeNeighborTrafficPattern::
-  RandomExchangeNeighborTrafficPattern(
+RandomExchangeNeighborTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
     : TrafficPattern(_name, _parent, _numTerminals, _self) {
@@ -59,7 +59,7 @@ RandomExchangeNeighborTrafficPattern::
     if (dimMask.at(dim)) {
       std::vector<u32> addr;
       // get self as a vector address
-      Cube::computeTerminalAddress(_self, widths, concentration, &addr);
+      Cube::computeTerminalAddress(self_, widths, concentration, &addr);
       addr.at(dim + 1) = (addr.at(dim + 1) + widths.at(dim) - 1)
           % widths.at(dim);
       if (allTerminals) {
@@ -88,7 +88,7 @@ RandomExchangeNeighborTrafficPattern::
 }
 
 RandomExchangeNeighborTrafficPattern::
-  ~RandomExchangeNeighborTrafficPattern() {}
+~RandomExchangeNeighborTrafficPattern() {}
 
 u32 RandomExchangeNeighborTrafficPattern::nextDestination() {
   return dstVect_.at(gSim->rnd.nextU64(0, dstVect_.size() - 1));

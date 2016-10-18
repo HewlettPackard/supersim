@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 
+import argparse
 import os
 import ssplot
 from taskrun import *
+
+ap = argparse.ArgumentParser()
+ap.add_argument('-g', '--granularity', type=int, default=6,
+                help='the granularity of the injection rate sweeps')
+args = ap.parse_args()
 
 # get the current amount of resources
 cpus = os.cpu_count()
@@ -20,7 +26,7 @@ tm = TaskManager(resource_manager=rm,
 # generate an array for the loads to be simulated
 sweep_start = 0
 sweep_stop = 100
-sweep_step = 5
+sweep_step = args.granularity
 loads = ['{0:.02f}'.format(x/100)
          for x in range(sweep_start, sweep_stop+1, sweep_step)]
 
@@ -34,11 +40,11 @@ for a in ['oblivious', 'adaptive']:
     sim_name = 'sim_' + id
     sim_cmd = ('../supersim/bin/supersim '
                'settings.json '
-               'network.routing.adaptive=bool={0} '
-               'application.max_injection_rate=float={1} '
+               'network.traffic_classes[0].routing.adaptive=bool={0} '
+               'workload.applications[0].max_injection_rate=float={1} '
                'network.channel_log.file=string={2} '
-               'application.rate_log.file=string={3} '
-               'application.message_log.file=string={4} '
+               'workload.applications[0].rate_log.file=string={3} '
+               'workload.message_log.file=string={4} '
                .format(
                  'true' if a == 'adaptive' else 'false',
                  '0.000001' if l == '0.00' else l,

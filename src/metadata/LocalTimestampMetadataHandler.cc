@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "application/Application.h"
+#include "workload/Application.h"
 #include "event/Simulator.h"
 #include "types/Message.h"
 #include "types/Packet.h"

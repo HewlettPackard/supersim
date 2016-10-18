@@ -53,7 +53,7 @@ NeighborTrafficPattern::NeighborTrafficPattern(
 
   // get self as a vector address
   std::vector<u32> addr;
-  Cube::computeTerminalAddress(_self, widths, concentration, &addr);
+  Cube::computeTerminalAddress(self_, widths, concentration, &addr);
 
   // compute the destination vector address
   for (u32 dim = 0; dim < dimensions; dim++) {

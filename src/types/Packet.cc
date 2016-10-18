@@ -35,7 +35,7 @@ Packet::~Packet() {
   assert(routingExtension_ == nullptr);
 }
 
-u32 Packet::getId() const {
+u32 Packet::id() const {
   return id_;
 }
 
@@ -51,7 +51,7 @@ void Packet::setFlit(u32 _index, Flit* _flit) {
   flits_.at(_index) = _flit;
 }
 
-Message* Packet::getMessage() const {
+Message* Packet::message() const {
   return message_;
 }
 

@@ -17,24 +17,21 @@
 
 #include <cassert>
 
-Interface::Interface(const std::string& _name, const Component* _parent,
-                     u32 _numVcs, u32 _id, Json::Value _settings)
-    : Component(_name, _parent), numVcs_(_numVcs), id_(_id) {}
+Interface::Interface(
+    const std::string& _name, const Component* _parent, u32 _id,
+    const std::vector<u32>& _address, u32 _numVcs,
+    const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
+    Json::Value _settings)
+    : Component(_name, _parent), PortedDevice(_id, _address, 1, _numVcs),
+      trafficClassVcs_(_trafficClassVcs), messageReceiver_(nullptr) {}
 
 Interface::~Interface() {}
 
-u32 Interface::getId() const {
-  return id_;
-}
-
-u32 Interface::numVcs() const {
-  return numVcs_;
-}
-
 void Interface::setMessageReceiver(MessageReceiver* _receiver) {
+  assert(messageReceiver_ == nullptr);
   messageReceiver_ = _receiver;
 }
 
-MessageReceiver* Interface::getMessageReceiver() const {
+MessageReceiver* Interface::messageReceiver() const {
   return messageReceiver_;
 }

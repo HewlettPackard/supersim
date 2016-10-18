@@ -28,7 +28,7 @@
 class RandomPriorityArbiter : public Arbiter {
  public:
   RandomPriorityArbiter(const std::string& _name, const Component* _parent,
-                u32 _size, Json::Value _settings);
+                        u32 _size, Json::Value _settings);
   ~RandomPriorityArbiter();
 
   u32 arbitrate() override;

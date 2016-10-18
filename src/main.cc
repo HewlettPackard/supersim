@@ -23,9 +23,8 @@
 #include <string>
 #include <vector>
 
-#include "application/Application.h"
-#include "application/ApplicationFactory.h"
-#include "application/Terminal.h"
+#include "workload/Workload.h"
+#include "workload/Terminal.h"
 #include "event/Simulator.h"
 #include "event/VectorQueue.h"
 #include "metadata/MetadataHandler.h"
@@ -77,11 +76,10 @@ s32 main(s32 _argc, char** _argv) {
          numVcs,
          numComponents);
 
-  // create an application
-  Application* application = ApplicationFactory::createApplication(
-      "Application", nullptr, metadataHandler, settings["application"]);
-  gSim->setApplication(application);
-  assert(application->numTerminals() == numInterfaces);
+  // create the workload
+  Workload* workload = new Workload(
+      "Workload", nullptr, metadataHandler, settings["workload"]);
+  gSim->setWorkload(workload);
 
   // check that all debug names were authentic
   Component::debugCheck();
@@ -93,7 +91,7 @@ s32 main(s32 _argc, char** _argv) {
 
   // cleanup the elements created here
   delete network;
-  delete application;
+  delete workload;
   delete metadataHandler;
 
   // cleanup the global simulator components

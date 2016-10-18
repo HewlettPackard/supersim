@@ -22,7 +22,7 @@
 
 class Component;
 class Network;
-class Application;
+class Workload;
 
 class Simulator {
  public:
@@ -52,25 +52,21 @@ class Simulator {
 
   void setNetwork(Network* _network);
   Network* getNetwork() const;
-  void setApplication(Application* _app);
-  Application* getApplication() const;
-
-  bool getMonitoring() const;
-  void startMonitoring();
-  void endMonitoring();
+  void setWorkload(Workload* _workload);
+  Workload* getWorkload() const;
 
   rnd::Random rnd;
 
  protected:
+  // this function must set time_, epsilon_, and quit_ on every call
+  virtual void runNextEvent() = 0;
+
   const bool printProgress_;
   const f64 printInterval_;
 
   u64 time_;
   u8 epsilon_;
   bool quit_;
-
-  // this function must set time_, epsilon_, and quit_ on every call
-  virtual void runNextEvent() = 0;
 
  private:
   const u64 channelCycleTime_;
@@ -80,9 +76,7 @@ class Simulator {
   bool running_;
 
   Network* net_;
-  Application* app_;
-
-  bool monitoring_;
+  Workload* workload_;
 };
 
 extern Simulator* gSim;

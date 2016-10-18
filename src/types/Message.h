@@ -33,12 +33,12 @@ class Message {
   Terminal* getOwner() const;
   void setOwner(Terminal* _owner);
 
-  u32 getId() const;
+  u32 id() const;
   void setId(u32 _id);
 
   u32 numPackets() const;
   u32 numFlits() const;
-  Packet* getPacket(u32 _index) const;
+  Packet* packet(u32 _index) const;
   void setPacket(u32 _index, Packet* _packet);
 
   void* getData() const;
@@ -46,6 +46,9 @@ class Message {
 
   u64 getTransaction() const;
   void setTransaction(u64 _trans);
+
+  u32 getTrafficClass() const;
+  void setTrafficClass(u32 _class);
 
   u32 getSourceId() const;
   void setSourceId(u32 _sourceId);
@@ -64,6 +67,7 @@ class Message {
   std::vector<Packet*> packets_;
   void* data_;
   u64 transaction_;
+  u32 trafficClass_;
 
   u32 sourceId_;
   u32 destinationId_;

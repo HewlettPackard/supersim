@@ -20,9 +20,10 @@
 #include <cassert>
 #include <cmath>
 
+#include <tuple>
+
 #include "interface/InterfaceFactory.h"
 #include "network/cube/util.h"
-#include "network/hyperx/InjectionAlgorithmFactory.h"
 #include "network/hyperx/RoutingAlgorithmFactory.h"
 #include "router/RouterFactory.h"
 #include "util/DimensionIterator.h"
@@ -61,10 +62,20 @@ Network::Network(const std::string& _name, const Component* _parent,
     routerRadix += ((dimensionWidths_.at(i) - 1) * dimensionWeights_.at(i));
   }
 
-  // create a routing algorithm factory to give to the routers
-  RoutingAlgorithmFactory* routingAlgorithmFactory =
-      new RoutingAlgorithmFactory(numVcs_, dimensionWidths_, dimensionWeights_,
-                                  concentration_, _settings["routing"]);
+  // parse the traffic classes description
+  std::vector<std::tuple<u32, u32> > trafficClassVcs;
+  std::vector<::RoutingAlgorithmFactory*> routingAlgorithmFactories;
+  for (u32 idx = 0; idx < _settings["traffic_classes"].size(); idx++) {
+    u32 numVcs = _settings["traffic_classes"][idx]["num_vcs"].asUInt();
+    u32 baseVc = routingAlgorithmFactories.size();
+    trafficClassVcs.push_back(std::make_tuple(baseVc, numVcs));
+    for (u32 vc = 0; vc < numVcs; vc++) {
+      routingAlgorithmFactories.push_back(
+          new RoutingAlgorithmFactory(
+              baseVc, numVcs, dimensionWidths_, dimensionWeights_,
+              concentration_, _settings["traffic_classes"][idx]["routing"]));
+    }
+  }
 
   // setup a router iterator for looping over the router dimensions
   DimensionIterator routerIterator(dimensionWidths_);
@@ -75,14 +86,21 @@ Network::Network(const std::string& _name, const Component* _parent,
   routers_.setSize(dimensionWidths_);
   while (routerIterator.next(&routerAddress)) {
     std::string routerName = "Router_" +
-      strop::vecString<u32>(routerAddress, '-');
+        strop::vecString<u32>(routerAddress, '-');
 
     // use the router factory to create a router
+    u32 routerId = translateRouterAddressToId(&routerAddress);
     routers_.at(routerAddress) = RouterFactory::createRouter(
-        routerName, this, routerRadix, numVcs_, routerAddress,
-        _metadataHandler, routingAlgorithmFactory, _settings["router"]);
+        routerName, this, routerId, routerAddress, routerRadix, numVcs_,
+        _metadataHandler, &routingAlgorithmFactories, _settings["router"]);
   }
-  delete routingAlgorithmFactory;
+
+  // we don't need the routing algorithm factories anymore
+  for (::RoutingAlgorithmFactory* raf : routingAlgorithmFactories) {
+    delete raf;
+  }
+  routingAlgorithmFactories.clear();
+
 
   // link routers via channels
   routerIterator.reset();
@@ -139,13 +157,8 @@ Network::Network(const std::string& _name, const Component* _parent,
   fullDimensionWidths.insert(fullDimensionWidths.begin() + 1,
                              dimensionWidths_.begin(), dimensionWidths_.end());
 
-  // create a injection algorithm factory
-  InjectionAlgorithmFactory* injectionAlgorithmFactory =
-      new InjectionAlgorithmFactory(numVcs_, _settings["routing"]);
-
   // create interfaces and link them with the routers
   interfaces_.setSize(fullDimensionWidths);
-  u32 interfaceId = 0;
   routerIterator.reset();
   while (routerIterator.next(&routerAddress)) {
     // get the router now, for later linking with terminals
@@ -164,11 +177,11 @@ Network::Network(const std::string& _name, const Component* _parent,
           strop::vecString<u32>(interfaceAddress, '-');
 
       // create the interface
+      u32 interfaceId = translateInterfaceAddressToId(&interfaceAddress);
       Interface* interface = InterfaceFactory::createInterface(
-          interfaceName, this, numVcs_, interfaceId, injectionAlgorithmFactory,
-          _settings["interface"]);
+          interfaceName, this, interfaceId, interfaceAddress, numVcs_,
+          trafficClassVcs, _settings["interface"]);
       interfaces_.at(interfaceAddress) = interface;
-      interfaceId++;
 
       // create I/O channels
       std::string inChannelName = "Channel_" +
@@ -186,13 +199,11 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // link with router
       router->setInputChannel(conc, inChannel);
-      interface->setOutputChannel(inChannel);
+      interface->setOutputChannel(0, inChannel);
       router->setOutputChannel(conc, outChannel);
-      interface->setInputChannel(outChannel);
+      interface->setInputChannel(0, outChannel);
     }
   }
-
-  delete injectionAlgorithmFactory;
 }
 
 Network::~Network() {
@@ -233,12 +244,12 @@ Interface* Network::getInterface(u32 _id) const {
   return interfaces_.at(_id);
 }
 
-void Network::translateTerminalIdToAddress(
+void Network::translateInterfaceIdToAddress(
     u32 _id, std::vector<u32>* _address) const {
   Cube::computeTerminalAddress(_id, dimensionWidths_, concentration_, _address);
 }
 
-u32 Network::translateTerminalAddressToId(
+u32 Network::translateInterfaceAddressToId(
     const std::vector<u32>* _address) const {
   return Cube::computeTerminalId(_address, dimensionWidths_, concentration_);
 }

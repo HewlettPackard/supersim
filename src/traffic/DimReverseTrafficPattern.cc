@@ -43,7 +43,7 @@ DimReverseTrafficPattern::DimReverseTrafficPattern(
 
   // get self as a vector address
   std::vector<u32> addr;
-  Cube::computeTerminalAddress(_self, widths, concentration, &addr);
+  Cube::computeTerminalAddress(self_, widths, concentration, &addr);
 
   for (u32 dim = 0; dim < dimensions/2; dim++) {
     u32 tmp = addr.at(dim + 1);

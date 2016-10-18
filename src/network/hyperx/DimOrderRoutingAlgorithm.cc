@@ -26,11 +26,12 @@ namespace HyperX {
 
 DimOrderRoutingAlgorithm::DimOrderRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u64 _latency, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
+    u64 _latency, u32 _baseVc, u32 _numVcs,
+    const std::vector<u32>& _dimensionWidths,
     const std::vector<u32>& _dimensionWeights, u32 _concentration)
-    : RoutingAlgorithm(_name, _parent, _router, _latency),
-      numVcs_(router_->numVcs()), dimensionWidths_(_dimensionWidths),
-      dimensionWeights_(_dimensionWeights), concentration_(_concentration) {}
+    : RoutingAlgorithm(_name, _parent, _router, _latency, _baseVc, _numVcs),
+      dimensionWidths_(_dimensionWidths), dimensionWeights_(_dimensionWeights),
+      concentration_(_concentration) {}
 
 DimOrderRoutingAlgorithm::~DimOrderRoutingAlgorithm() {}
 
@@ -39,10 +40,10 @@ void DimOrderRoutingAlgorithm::processRequest(
   std::unordered_set<u32> outputPorts;
 
   // ex: [x,y,z]
-  const std::vector<u32>& routerAddress = router_->getAddress();
+  const std::vector<u32>& routerAddress = router_->address();
   // ex: [c,x,y,z]
   const std::vector<u32>* destinationAddress =
-      _flit->getPacket()->getMessage()->getDestinationAddress();
+      _flit->packet()->message()->getDestinationAddress();
   assert(routerAddress.size() == (destinationAddress->size() - 1));
 
   // determine the next dimension to work on
@@ -85,7 +86,7 @@ void DimOrderRoutingAlgorithm::processRequest(
   for (auto it = outputPorts.cbegin(); it != outputPorts.cend(); ++it) {
     u32 outputPort = *it;
     // select all VCs in the output port
-    for (u32 vc = 0; vc < numVcs_; vc++) {
+    for (u32 vc = baseVc_; vc < baseVc_ + numVcs_; vc++) {
       _response->add(outputPort, vc);
     }
   }

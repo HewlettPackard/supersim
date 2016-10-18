@@ -49,10 +49,12 @@ InputQueue::InputQueue(
   rfe_.fsm = ePipelineFsm::kEmpty;
   rfe_.flit = nullptr;
   rfe_.route.clear();
+  rfe_.route.link(routingAlgorithm_);
 
   vca_.fsm = ePipelineFsm::kEmpty;
   vca_.flit = nullptr;
   vca_.route.clear();
+  vca_.route.link(routingAlgorithm_);
   vca_.allocatedVcIdx = U32_MAX;
   vca_.allocatedPort = U32_MAX;
   vca_.allocatedVc = U32_MAX;
@@ -285,7 +287,7 @@ void InputQueue::processPipeline() {
       u32 requestPort, requestVc;
       vca_.route.get(r, &requestPort, &requestVc);
       u32 vcIdx = router_->vcIndex(requestPort, requestVc);
-      u32 metadata = vca_.flit->getPacket()->getMetadata();
+      u32 metadata = vca_.flit->packet()->getMetadata();
       vcScheduler_->request(vcSchedulerIndex_, vcIdx, metadata);
     }
   }

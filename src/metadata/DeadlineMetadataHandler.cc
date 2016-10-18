@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "application/Application.h"
+#include "workload/Application.h"
 #include "event/Simulator.h"
 #include "types/Message.h"
 #include "types/Packet.h"
@@ -49,7 +49,7 @@ void DeadlineMetadataHandler::packetInjection(Application* _app,
       break;
     case Algorithm::kTransaction:
       metadata = _app->transactionCreationTime(
-          _packet->getMessage()->getTransaction());
+          _packet->message()->getTransaction());
       break;
     default:
       assert(false);

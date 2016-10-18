@@ -1,0 +1,176 @@
+{
+  "simulator": {
+    "channel_cycle_time": 3,
+    "core_cycle_time": 2,
+    "print_progress": true,
+    "print_interval": 1.0,  // seconds
+    "random_seed": 12345678
+  },
+  "network": {
+    "topology": "uno",
+    "concentration": 16,
+    "traffic_classes": [
+      {
+        "num_vcs": 2,
+        "routing": {
+          "algorithm": "direct",
+          "latency": 1,
+          "adaptive": true
+        }
+      },
+      {
+        "num_vcs": 2,
+        "routing": {
+          "algorithm": "direct",
+          "latency": 1,
+          "adaptive": true
+        }
+      }
+    ],
+    "external_channel": {
+      "latency": 2
+    },
+    "channel_log": {
+      "file": "/dev/null"  // "channels.csv"
+    },
+    "router": {
+      "architecture": "input_output_queued",
+      "congestion_status": {
+        "algorithm": "buffer_occupancy",
+        "latency": 1,
+        "granularity": 0
+      },
+      "input_queue_depth": 8,
+      "vca_swa_wait": false,
+      "output_queue_depth": 20,
+      "crossbar": {
+        "latency": 1  // cycles
+      },
+      "vc_scheduler": {
+        "allocator": {
+          "type": "rc_separable",
+          "slip_latch": true,
+          "iterations": 1,
+          "resource_arbiter": {
+            "type": "comparing",
+            "greater": false
+          },
+          "client_arbiter": {
+            "type": "lslp"
+          }
+        }
+      },
+      "crossbar_scheduler": {
+        "allocator": {
+          "type": "r_separable",
+          "slip_latch": true,
+          "resource_arbiter": {
+            "type": "comparing",
+            "greater": false
+          }
+        },
+        "full_packet": false,
+        "packet_lock": true,
+        "idle_unlock": true
+      },
+      "output_crossbar": {
+        "latency": 1  // cycles
+      },
+      "output_crossbar_scheduler": {
+        "allocator": {
+          "type": "r_separable",
+          "slip_latch": true,
+          "resource_arbiter": {
+            "type": "comparing",
+            "greater": false
+          }
+        },
+        "full_packet": false,
+        "packet_lock": true,
+        "idle_unlock": true
+      }
+    },
+    "interface": {
+      "type": "standard",
+      "adaptive": true,
+      "fixed_msg_vc": false,
+      "crossbar_scheduler": {
+        "allocator": {
+          "type": "r_separable",
+          "slip_latch": true,
+          "resource_arbiter": {
+            "type": "comparing",
+            "greater": false
+          }
+        },
+        "full_packet": false,
+        "packet_lock": true,
+        "idle_unlock": true
+      },
+      "init_credits": "$&(network.router.input_queue_depth)&$",
+      "crossbar": {
+        "latency": 1  // cycles
+      }
+    }
+  },
+  "metadata_handler": {
+    "type": "zero"
+  },
+  "workload": {
+    "message_log": {
+      "file": "/dev/null"  // "data.mpf.gz"
+    },
+    "applications": [
+      {
+        "type": "stress_test",
+        "max_injection_rate": 0.45,
+        "warmup_threshold": 0.90,
+        "kill_on_saturation": false,
+        "log_during_saturation": false,
+        "blast_terminal": {
+          "traffic_class": 0,
+          "num_messages": 0,
+          "min_message_size": 1,
+          "max_message_size": 64,
+          "max_packet_size": 16,
+          "warmup_interval": 200,  // delivered flits
+          "warmup_window": 15,
+          "warmup_attempts": 20,
+          "traffic_pattern": {
+            "type": "uniform_random",
+            "send_to_self": false
+          }
+        },
+        "rate_log": {
+          "file": "/dev/null"  // "rates.csv"
+        }
+      },
+      {
+        "type": "simple_mem",
+        "max_injection_rate": -1,  // infinite injection rate
+        "memory_slice": 4096,
+        "block_size": 64,  // bytes
+        "bytes_per_flit": 4,
+        "header_overhead": 16,  // bytes
+        "max_packet_size": 16,  // flits
+        "processor_terminal": {
+          "traffic_class": 0,
+          "latency": 3,
+          "memory_accesses": 700
+        },
+        "memory_terminal": {
+          "traffic_class": 1,
+          "latency": 5
+        },
+        "rate_log": {
+          "file": "/dev/null"  // "rates.csv"
+        }
+       }
+    ]
+  },
+  "debug": [
+    "Workload",
+    "Workload.Application_0",
+    "Workload.Application_1"
+  ]
+}

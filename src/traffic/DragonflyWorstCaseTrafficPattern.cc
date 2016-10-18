@@ -34,12 +34,12 @@ DragonflyWorstCaseTrafficPattern::DragonflyWorstCaseTrafficPattern(
   random_ = _settings["random"].asBool();
 
   // verify matching system size
-  assert((concentration_ * groupSize_ * groupCount_) == _numTerminals);
+  assert((concentration_ * groupSize_ * groupCount_) == numTerminals_);
 
   // precompute values needed for destination calculation
   u32 termsPerGroup = groupSize_ * concentration_;
-  selfGroup_ = self / termsPerGroup;
-  u32 localIndex = self % termsPerGroup;
+  selfGroup_ = self_ / termsPerGroup;
+  u32 localIndex = self_ % termsPerGroup;
   selfLocal_ = localIndex / concentration_;
   selfConc_ = localIndex % concentration_;
   destGroup_ = (selfGroup_ + (groupCount_ / 2)) % groupCount_;

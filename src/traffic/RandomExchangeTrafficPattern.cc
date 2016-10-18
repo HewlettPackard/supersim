@@ -23,9 +23,9 @@ RandomExchangeTrafficPattern::RandomExchangeTrafficPattern(
 RandomExchangeTrafficPattern::~RandomExchangeTrafficPattern() {}
 
 u32 RandomExchangeTrafficPattern::nextDestination() {
-  u32 dest = gSim->rnd.nextU64(0, numTerminals / 2 - 1);
-  if (self < numTerminals / 2) {
-    dest += numTerminals / 2;
+  u32 dest = gSim->rnd.nextU64(0, numTerminals_ / 2 - 1);
+  if (self_ < numTerminals_ / 2) {
+    dest += numTerminals_ / 2;
   }
   return dest;
 }

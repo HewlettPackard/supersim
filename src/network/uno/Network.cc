@@ -18,8 +18,9 @@
 #include <cassert>
 #include <cmath>
 
+#include <tuple>
+
 #include "interface/InterfaceFactory.h"
-#include "network/uno/InjectionAlgorithmFactory.h"
 #include "network/uno/RoutingAlgorithmFactory.h"
 #include "router/RouterFactory.h"
 
@@ -36,20 +37,31 @@ Network::Network(const std::string& _name, const Component* _parent,
   // router radix
   u32 routerRadix = concentration_;
 
-  // create a routing algorithm factory to give to the routers
-  RoutingAlgorithmFactory* routingAlgorithmFactory =
-      new RoutingAlgorithmFactory(numVcs_, concentration_,
-                                  _settings["routing"]);
+  // parse the traffic classes description
+  std::vector<std::tuple<u32, u32> > trafficClassVcs;
+  std::vector<::RoutingAlgorithmFactory*> routingAlgorithmFactories;
+  for (u32 idx = 0; idx < _settings["traffic_classes"].size(); idx++) {
+    u32 numVcs = _settings["traffic_classes"][idx]["num_vcs"].asUInt();
+    u32 baseVc = routingAlgorithmFactories.size();
+    trafficClassVcs.push_back(std::make_tuple(baseVc, numVcs));
+    for (u32 vc = 0; vc < numVcs; vc++) {
+      routingAlgorithmFactories.push_back(
+          new RoutingAlgorithmFactory(
+              baseVc, numVcs, concentration_,
+              _settings["traffic_classes"][idx]["routing"]));
+    }
+  }
 
   // create the router
   router_ = RouterFactory::createRouter(
-      "Router", this, routerRadix, numVcs_, std::vector<u32>(),
-      _metadataHandler, routingAlgorithmFactory, _settings["router"]);
-  delete routingAlgorithmFactory;
+      "Router", this, 0, std::vector<u32>(), routerRadix, numVcs_,
+      _metadataHandler, &routingAlgorithmFactories, _settings["router"]);
 
-  // create an injection algorithm factory to give to the interfaces
-  InjectionAlgorithmFactory* injectionAlgorithmFactory =
-      new InjectionAlgorithmFactory(numVcs_, _settings["routing"]);
+  // we don't need the routing algorithm factories anymore
+  for (::RoutingAlgorithmFactory* raf : routingAlgorithmFactories) {
+    delete raf;
+  }
+  routingAlgorithmFactories.clear();
 
   // create the interfaces and external channels
   interfaces_.resize(concentration_, nullptr);
@@ -57,8 +69,8 @@ Network::Network(const std::string& _name, const Component* _parent,
     // create the interface
     std::string interfaceName = "Interface_" + std::to_string(id);
     Interface* interface = InterfaceFactory::createInterface(
-        interfaceName, this, numVcs_, id, injectionAlgorithmFactory,
-        _settings["interface"]);
+        interfaceName, this, id, {id}, numVcs_,
+        trafficClassVcs, _settings["interface"]);
     interfaces_.at(id) = interface;
 
     // create the channels
@@ -74,11 +86,9 @@ Network::Network(const std::string& _name, const Component* _parent,
     // link interfaces to router via channels
     router_->setInputChannel(id, inChannel);
     router_->setOutputChannel(id, outChannel);
-    interface->setInputChannel(outChannel);
-    interface->setOutputChannel(inChannel);
+    interface->setInputChannel(0, outChannel);
+    interface->setOutputChannel(0, inChannel);
   }
-
-  delete injectionAlgorithmFactory;
 }
 
 Network::~Network() {
@@ -111,13 +121,13 @@ Interface* Network::getInterface(u32 _id) const {
   return interfaces_.at(_id);
 }
 
-void Network::translateTerminalIdToAddress(
+void Network::translateInterfaceIdToAddress(
     u32 _id, std::vector<u32>* _address) const {
   _address->resize(1);
   _address->at(0) = _id;
 }
 
-u32 Network::translateTerminalAddressToId(
+u32 Network::translateInterfaceAddressToId(
     const std::vector<u32>* _address) const {
   return _address->at(0);
 }

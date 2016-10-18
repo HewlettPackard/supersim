@@ -8,45 +8,29 @@
   },
   "network": {
     "topology": "uno",
-    "num_vcs": 2,
     "concentration": 16,
+    "traffic_classes": [
+      {
+        "num_vcs": 4,
+        "routing": {
+          "algorithm": "direct",
+          "latency": 1,
+          "adaptive": false
+        }
+      }
+    ],
     "external_channel": {
-      "latency": 1  // cycles
+      "latency": 4  // cycles
     },
     "channel_log": {
       "file": "/dev/null"  // "channels.csv"
-    },
-    "routing": {
-      "algorithm": "direct",
-      "latency": 1
-    },
-    "interface": {
-      "type": "standard",
-      "fixed_msg_vc": false,
-      "crossbar_scheduler": {
-        "allocator": {
-          "type": "r_separable",
-          "slip_latch": true,
-          "resource_arbiter": {
-            "type": "comparing",
-            "greater": false
-          }
-        },
-        "full_packet": false,
-        "packet_lock": false,
-        "idle_unlock": false
-      },
-      "init_credits": "$&(network.router.input_queue_depth)&$",
-      "crossbar": {
-        "latency": 1  // cycles
-      }
     },
     "router": {
       "architecture": "input_queued",
       "congestion_status": {
         "algorithm": "buffer_occupancy",
         "latency": 1,
-        "granularity": 0
+        "granularity": 8
       },
       "input_queue_depth": 16,
       "vca_swa_wait": false,
@@ -81,37 +65,64 @@
         "packet_lock": false,
         "idle_unlock": false
       }
-    }
-  },
-  "application": {
-    "type": "stress_test",
-    "max_injection_rate": 0.5,
-    "relative_injection": "json/relativeinjection.csv.gz",
-    "warmup_threshold": 0.99,
-    "kill_on_saturation": false,
-    "log_during_saturation": false,
-    "blast_terminal": {
-      "num_messages": 3000,
-      "min_message_size": 1,
-      "max_message_size": 64,
-      "max_packet_size": 16,
-      "warmup_interval": 200,  // delivered flits
-      "warmup_window": 15,
-      "warmup_attempts": 20,
-      "traffic_pattern": {
-        "type": "matrix",
-        "file": "json/trafficmatrix.csv.gz"
+    },
+    "interface": {
+      "type": "standard",
+      "adaptive": false,
+      "fixed_msg_vc": false,
+      "crossbar_scheduler": {
+        "allocator": {
+          "type": "r_separable",
+          "slip_latch": true,
+          "resource_arbiter": {
+            "type": "comparing",
+            "greater": false
+          }
+        },
+        "full_packet": false,
+        "packet_lock": false,
+        "idle_unlock": false
+      },
+      "init_credits": "$&(network.router.input_queue_depth)&$",
+      "crossbar": {
+        "latency": 1  // cycles
       }
-    },
-    "message_log": {
-      "file": "/dev/null"  // "data.mpf.gz"
-    },
-    "rate_log": {
-      "file": "/dev/null"  // "rates.csv"
     }
   },
   "metadata_handler": {
     "type": "local_timestamp"
+  },
+  "workload": {
+    "message_log": {
+      "file": "/dev/null"  // "data.mpf.gz"
+    },
+    "applications": [
+      {
+        "type": "stress_test",
+        "max_injection_rate": 0.9,
+        "relative_injection": "json/relativeinjection.csv",
+        "warmup_threshold": 0.99,
+        "kill_on_saturation": false,
+        "log_during_saturation": false,
+        "blast_terminal": {
+          "traffic_class": 0,
+          "num_messages": 2000,
+          "min_message_size": 1,
+          "max_message_size": 64,
+          "max_packet_size": 16,
+          "warmup_interval": 200,  // delivered flits
+          "warmup_window": 15,
+          "warmup_attempts": 20,
+          "traffic_pattern": {
+            "type": "matrix",
+            "file": "json/trafficmatrix.csv.gz"
+          }
+        },
+        "rate_log": {
+          "file": "/dev/null"  // "rates.csv"
+        }
+      }
+    ]
   },
   "debug": []
 }

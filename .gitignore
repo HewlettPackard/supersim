@@ -30,11 +30,3 @@
 # Build and binary directories
 bld/
 bin/
-
-# Simulator outputs
-*.log
-*.log.gz
-*.mpf
-*.mpf.gz
-*.csv
-*.csv.gz

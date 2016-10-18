@@ -23,8 +23,8 @@ BitComplementTrafficPattern::BitComplementTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
     : TrafficPattern(_name, _parent, _numTerminals, _self) {
-  assert(bits::isPow2(numTerminals));
-  dest_ = ~self & (numTerminals - 1);
+  assert(bits::isPow2(numTerminals_));
+  dest_ = ~self_ & (numTerminals_ - 1);
 }
 
 BitComplementTrafficPattern::~BitComplementTrafficPattern() {}

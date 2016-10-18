@@ -20,13 +20,14 @@
 #include "interface/standard/Interface.h"
 
 Interface* InterfaceFactory::createInterface(
-    const std::string& _name, const Component* _parent, u32 _numVcs, u32 _id,
-    InjectionAlgorithmFactory* _injectionAlgorithmFactory,
+    const std::string& _name, const Component* _parent, u32 _id,
+    const std::vector<u32>& _address, u32 _numVcs,
+    const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
     Json::Value _settings) {
   std::string type = _settings["type"].asString();
   if (type == "standard") {
     return new Standard::Interface(
-        _name, _parent, _numVcs, _id, _injectionAlgorithmFactory, _settings);
+        _name, _parent, _id, _address, _numVcs, _trafficClassVcs, _settings);
   } else {
     fprintf(stderr, "unknown interface type: %s\n", type.c_str());
     assert(false);

@@ -21,7 +21,8 @@
 #include <chrono>
 
 #include "network/Network.h"
-#include "application/Application.h"
+#include "workload/Application.h"
+#include "workload/Workload.h"
 
 Simulator::Simulator(Json::Value _settings)
     : printProgress_(_settings["print_progress"].asBool()),
@@ -29,8 +30,7 @@ Simulator::Simulator(Json::Value _settings)
       time_(0), epsilon_(0), quit_(false),
       channelCycleTime_(_settings["channel_cycle_time"].asUInt64()),
       coreCycleTime_(_settings["core_cycle_time"].asUInt64()),
-      initial_(true), running_(false), net_(nullptr), app_(nullptr),
-      monitoring_(false) {
+      initial_(true), running_(false), net_(nullptr), workload_(nullptr) {
   assert(!_settings["print_progress"].isNull());
   assert(!_settings["print_interval"].isNull());
   assert(!_settings["channel_cycle_time"].isNull());
@@ -106,10 +106,14 @@ void Simulator::simulate() {
         lastSimTime = time_;
 
         if (printProgress_) {
+          // use a common buffer and snprintf
+          char buf[256];  // much larger than needed
+          u32 cnt = 0;
+
+          // compute the human readable time
           f64 totalRealTime =
               std::chrono::duration_cast<std::chrono::duration<f64> >
               (realTime - startTime).count();
-
           u64 milliseconds = static_cast<u32>(totalRealTime * 1000);
           const u64 dayFactor = 24 * 60 * 60 * 1000;
           u64 days = milliseconds / dayFactor;
@@ -124,19 +128,32 @@ void Simulator::simulate() {
           u64 seconds = milliseconds / secondFactor;
           milliseconds %= secondFactor;
 
-          f64 percentComplete = app_->percentComplete();
+          // print the time
+          cnt = snprintf(buf + cnt, 256 - cnt, "%lu:%02lu:%02lu:%02lu [",
+                         days, hours, minutes, seconds);
+
+          // print the applications' progress
+          u32 numApps = workload_->numApplications();
+          for (u32 appId = 0; appId < numApps; appId++) {
+            Application* app = workload_->application(appId);
+            u64 perc = (u64)(app->percentComplete() * 100);
+            if (appId < numApps - 1) {
+              cnt += snprintf(buf + cnt, 256 - cnt, "%lu%%,", perc);
+            } else {
+              cnt += snprintf(buf + cnt, 256 - cnt, "%lu%%] ", perc);
+            }
+          }
+
+          // print the simulation performance
           f64 eventsPerSecond = intervalEvents / elapsedRealTime;
           f64 unitsPerSecond = elapsedSimTime /
               static_cast<f64>(elapsedRealTime);
+          snprintf(buf + cnt, 256 - cnt, "%lu events : %lu units : "
+                   "%.2f events/sec : %.2f units/sec\n", totalEvents, time_,
+                   eventsPerSecond, unitsPerSecond);
 
-          printf("%lu:%02lu:%02lu:%02lu [%lu%%] "
-                 "%lu events : %lu units : %.2f events/sec : %.2f units/sec\n",
-                 days, hours, minutes, seconds,
-                 (u64)(percentComplete * 100),
-                 totalEvents,
-                 time_,
-                 eventsPerSecond,
-                 unitsPerSecond);
+          // now print the entire buffer to stdout
+          printf("%s", buf);
         }
 
         lastRealTime = realTime;
@@ -195,33 +212,14 @@ Network* Simulator::getNetwork() const {
   return net_;
 }
 
-void Simulator::setApplication(Application* _app) {
-  app_ = _app;
+void Simulator::setWorkload(Workload* _workload) {
+  workload_ = _workload;
 }
 
-Application* Simulator::getApplication() const {
-  return app_;
+Workload* Simulator::getWorkload() const {
+  return workload_;
 }
 
-bool Simulator::getMonitoring() const {
-  return monitoring_;
-}
-
-void Simulator::startMonitoring() {
-  assert(running_);
-  assert(monitoring_ == false);
-  monitoring_ = true;
-  app_->startMonitoring();
-  net_->startMonitoring();
-}
-
-void Simulator::endMonitoring() {
-  assert(running_);
-  assert(monitoring_ == true);
-  monitoring_ = false;
-  app_->endMonitoring();
-  net_->endMonitoring();
-}
 
 /* globals */
 Simulator* gSim;

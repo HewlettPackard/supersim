@@ -43,14 +43,14 @@ ScanTrafficPattern::ScanTrafficPattern(
   if ((_settings["initial"].isString()) &&
       (_settings["initial"].asString() == "random")) {
     do {
-      next_ = gSim->rnd.nextU64(0, numTerminals - 1);
-    } while (!sendToSelf_ && next_ == self);
+      next_ = gSim->rnd.nextU64(0, numTerminals_ - 1);
+    } while (!sendToSelf_ && next_ == self_);
   } else if ((_settings["initial"].isUInt()) &&
-             (_settings["initial"].asUInt() < numTerminals)) {
+             (_settings["initial"].asUInt() < numTerminals_)) {
     next_ = _settings["initial"].asUInt();
-    if (next_ == self && !sendToSelf_) {
+    if (next_ == self_ && !sendToSelf_) {
       advance();
-      assert(next_ != self);  // is this even possible?
+      assert(next_ != self_);  // is this even possible?
     }
   } else {
     fprintf(stderr, "invalid initial spec\n");
@@ -64,14 +64,14 @@ u32 ScanTrafficPattern::nextDestination() {
   u32 dest = next_;
   do {
     advance();
-  } while (!sendToSelf_ && next_ == self);
+  } while (!sendToSelf_ && next_ == self_);
   return dest;
 }
 
 void ScanTrafficPattern::advance() {
   if (ascend_) {
-    next_ = (next_ + 1) % numTerminals;
+    next_ = (next_ + 1) % numTerminals_;
   } else {
-    next_ = (next_ == 0) ? numTerminals - 1 : next_ - 1;
+    next_ = (next_ == 0) ? numTerminals_ - 1 : next_ - 1;
   }
 }
