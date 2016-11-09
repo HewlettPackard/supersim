@@ -53,6 +53,7 @@ def delete(loc, url, commit):
 
 def main(args):
   repos = [('libprim', 'github.com', 'nicmcd/libprim', None),
+           ('libex', 'github.com', 'nicmcd/libex', None),
            ('librnd', 'github.com', 'nicmcd/librnd', None),
            ('libmut', 'github.com', 'nicmcd/libmut', None),
            ('libbits', 'github.com', 'nicmcd/libbits', None),
@@ -62,7 +63,7 @@ def main(args):
            ('libgrid', 'github.com', 'nicmcd/libgrid', None),
            ('libcolhash', 'github.com', 'nicmcd/libcolhash', None),
            ('libfio', 'github.com', 'nicmcd/libfio', None),
-           ('supersim', 'github.com', 'hewlettpackardlabs/supersim', None),
+           ('supersim', 'github.com', 'hewlettpackard/supersim', None),
            ('sslatency', 'github.com', 'nicmcd/sslatency', None),
            ('hyperxsearch', 'github.com', 'nicmcd/hyperxsearch', None)]
 
