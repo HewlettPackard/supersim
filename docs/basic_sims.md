@@ -92,14 +92,10 @@ transaction latency data using the `-m` and `-t` flags, respectively.
 
 ## Plotting the resuls
 Let's plot the packet latency results using the [SSPlot][] plotting package.
-This package has 3 executables:
+This package has many executables. The only one we'll use for this example is:
 
-1. sslqp - Latency quad plot focused on latency distribution
-2. ssllp - Standard load vs. latency plot
-3. sslrp - Injection rate vs. delivered rate plot
-4. sslcp - Load vs. latency comparison across multiple sweeps
+sslqp - Latency quad plot focused on latency distribution
 
-We only ran one simulation so the only tool we can use at this point is sslqp.
 Run it and view the plot with the following commands:
 Note: I'm using `eog` image viewer. Any image viewer will do.
 

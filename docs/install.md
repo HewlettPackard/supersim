@@ -92,9 +92,9 @@ This is what your development environment now looks like:
 
 ``` sh
 ls ~/ssdev
-  hyperxsearch  libbits     libgrid  libprim      libstrop    ssplot
-  installcc     libcolhash  libjson  librnd       percentile  supersim
-  installpy     libfio      libmut   libsettings  sslatency   taskrun
+  hyperxsearch  libbits     libfio   libmut   libsettings  sslatency  taskrun
+  installcc     libcolhash  libgrid  libprim  libstrop     ssplot
+  installpy     libex       libjson  librnd   percentile   supersim
 ```
 
 ## Reinstalling/rebuilding after modification
