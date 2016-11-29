@@ -15,6 +15,8 @@
  */
 #include "workload/simplemem/Application.h"
 
+#include <bits/bits.h>
+
 #include <cassert>
 
 #include <vector>
@@ -23,9 +25,6 @@
 #include "workload/simplemem/ProcessorTerminal.h"
 #include "event/Simulator.h"
 #include "network/Network.h"
-
-#define ISPOW2INT(X) (((X) != 0) && !((X) & ((X) - 1)))  /*glibc trick*/
-#define ISPOW2(X) (ISPOW2INT(X) == 0 ? false : true)
 
 namespace SimpleMem {
 
@@ -39,7 +38,7 @@ Application::Application(const std::string& _name, const Component* _parent,
   memorySlice_ = _settings["memory_slice"].asUInt();
   totalMemory_ = memorySlice_ * (numTerminals() / 2);
   blockSize_ = _settings["block_size"].asUInt();
-  assert(ISPOW2(blockSize_));
+  assert(bits::isPow2(blockSize_));
   assert((memorySlice_ % blockSize_) == 0);
 
   bytesPerFlit_ = _settings["bytes_per_flit"].asUInt();

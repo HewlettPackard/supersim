@@ -111,7 +111,9 @@ void Terminal::messageExitedNetwork(Message* _message) {
   deliveredMonitor_->monitorMessage(_message);
 
   // remove this message from the outstanding list and count it
-  assert(outstandingMessages_.erase(_message) == 1);
+  u64 res = outstandingMessages_.erase(_message);
+  (void)res;  // unused
+  assert(res == 1);
   messagesReceived_++;
 }
 
@@ -149,7 +151,9 @@ u32 Terminal::sendMessage(Message* _message, u32 _destinationId) {
   Terminal* dest = application()->getTerminal(_destinationId);
   _message->setDestinationAddress(&dest->address_);
   messageReceiver_->receiveMessage(_message);
-  assert(outstandingMessages_.insert(_message).second);
+  bool res = outstandingMessages_.insert(_message).second;
+  (void)res;  // unused
+  assert(res);
   return msgId;
 }
 

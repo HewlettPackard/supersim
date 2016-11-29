@@ -36,12 +36,16 @@ Component::Component(const std::string& _name, const Component* _parent)
   }
   if (toBeDebugged_.count(fullName()) == 1) {
     setDebug(true);
-    assert(toBeDebugged_.erase(fullName()) == 1);
+    u64 res = toBeDebugged_.erase(fullName());
+    (void)res;  // unused
+    assert(res == 1);
   }
 }
 
 Component::~Component() {
-  assert(Component::components_.erase(fullName()) == 1);
+  u64 res = Component::components_.erase(fullName());
+  (void)res;  // unused
+  assert(res == 1);
 }
 
 void Component::setName(const std::string& _name) {
@@ -117,7 +121,9 @@ u64 Component::numComponents() {
 }
 
 void Component::addDebugName(std::string _fullname) {
-  assert(toBeDebugged_.insert(_fullname).second);
+  bool res = toBeDebugged_.insert(_fullname).second;
+  (void)res;  // unused
+  assert(res);
 }
 
 void Component::debugCheck() {

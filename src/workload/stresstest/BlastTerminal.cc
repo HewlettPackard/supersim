@@ -198,7 +198,9 @@ void BlastTerminal::messageExitedNetwork(Message* _message) {
   // log message if tagged
   u32 mId = _message->id();
   if (messagesToLog_.count(mId) == 1) {
-    assert(messagesToLog_.erase(mId) == 1);
+    u64 res = messagesToLog_.erase(mId);
+    (void)res;  // unused
+    assert(res == 1);
 
     // log the message/transaction
     app->workload()->messageLog()->logMessage(_message);
@@ -330,7 +332,9 @@ void BlastTerminal::sendNextMessage() {
 
   // determine if this message/transaction should be logged
   if (fsm_ == BlastTerminal::Fsm::LOGGING) {
-    messagesToLog_.insert(msgId);
+    bool res = messagesToLog_.insert(msgId).second;
+    (void)res;  // unused
+    assert(res);
     app->workload()->messageLog()->startTransaction(trans);
   }
 }
