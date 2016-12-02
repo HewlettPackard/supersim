@@ -24,12 +24,12 @@ def clone(loc, url, commit):
     if commit:
       doit('cd {0} && git checkout {1}'.format(loc, commit))
   else:
+    doit('git pull origin')
     print('INFO: {0} is already cloned'.format(loc))
 
-
-def build(loc, url, commit):
+def build(loc, url, commit, opts):
   if os.path.isdir(loc):
-    doit('cd {0} && make -j {1}'.format(loc, os.cpu_count()))
+    doit('cd {0} && make -j {1} {2}'.format(loc, os.cpu_count(), opts))
   else:
     print('ERROR: {0} isn\'t cloned'.format(loc))
     exit(-1)
@@ -92,7 +92,7 @@ def main(args):
       elif command == 'clone':
         clone(loc, url, commit)
       elif command == 'build':
-        build(loc, url, commit)
+        build(loc, url, commit, args.opt)
       elif command == 'check':
         check(loc, url, commit)
       elif command == 'clean':
@@ -113,5 +113,6 @@ if __name__ == '__main__':
                   help='command to be run')
   ap.add_argument('-m', '--mode', choices=['git', 'https'], default='https',
                   help='use https urls (default) or git urls')
+  ap.add_argument('--opt', help='Options for make command', default='')
   args = ap.parse_args()
   main(args)
