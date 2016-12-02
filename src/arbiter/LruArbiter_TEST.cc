@@ -21,18 +21,58 @@
 #include <vector>
 
 #include "arbiter/Arbiter.h"
-#include "arbiter/LslpArbiter.h"
+#include "arbiter/LruArbiter.h"
 
 #include "arbiter/Arbiter_TEST.h"
 #include "test/TestSetup_TEST.h"
 
-TEST(LslpArbiter, full) {
+TEST(LruArbiter, full) {
   TestSetup testSetup(1, 1, 123);
 
   for (u32 size = 1; size < 100; size++) {
     bool* request = new bool[size];
     u64* metadata = new u64[size];
     bool* grant = new bool[size];
+
+    Arbiter* arb = new LruArbiter("Arb", nullptr, size, Json::Value());
+    assert(arb->size() == size);
+
+    // link the structures
+    for (u32 idx = 0; idx < size; idx++) {
+      arb->setRequest(idx, &request[idx]);
+      arb->setMetadata(idx, &metadata[idx]);
+      arb->setGrant(idx, &grant[idx]);
+    }
+
+    // start the process will all requesting
+    for (u32 idx = 0; idx < size; idx++) {
+      request[idx] = true;
+      metadata[idx] = 0;
+    }
+
+    // these data structures hold the unit tests version of LRU
+    std::list<u32> lru;
+    std::set<u32> unique;
+
+    // first arbitrations to over come random initialization
+    for (u32 idx = 0; idx < size; idx++) {
+      memset(grant, false, size);
+      arb->arbitrate();
+      ASSERT_EQ(hotCount(grant, size), 1u);
+      u32 winner = winnerId(grant, size);
+      arb->latch();
+
+      // update the expected LRU structure
+      lru.push_back(winner);
+
+      // make sure everyone gets serviced once
+      bool res = unique.insert(winner).second;
+      ASSERT_TRUE(res);
+    }
+    ASSERT_EQ(lru.size(), size);
+    ASSERT_EQ(unique.size(), size);
+
+    // now make a random request vector for testing
     do {
       for (u32 idx = 0; idx < size; idx++) {
         request[idx] = gSim->rnd.nextBool();
@@ -40,41 +80,40 @@ TEST(LslpArbiter, full) {
       }
     } while (hotCount(request, size) <= size/2);
 
-    Arbiter* arb = new LslpArbiter("Arb", nullptr, size, Json::Value());
-    assert(arb->size() == size);
-    for (u32 idx = 0; idx < size; idx++) {
-      arb->setRequest(idx, &request[idx]);
-      arb->setMetadata(idx, &metadata[idx]);
-      arb->setGrant(idx, &grant[idx]);
-    }
-
-    // first arbitration to over come random initialization
-    memset(grant, false, size);
-    arb->arbitrate();
-    ASSERT_EQ(hotCount(grant, size), 1u);
-    u32 pwinner = winnerId(grant, size);
-    arb->latch();
-
     // do more arbitrations
     const u32 ARBS = 100;
     for (u32 a = 0; a < ARBS; a++) {
       memset(grant, false, size);
       arb->arbitrate();
 
+      // verify one-hot and get winner
       ASSERT_EQ(hotCount(grant, size), 1u);
-      u32 awinner = winnerId(grant, size);
-      u32 ewinner = (pwinner + 1) % size;
-      while (request[ewinner] == false) {
-        ewinner = (ewinner + 1) % size;
+      u32 winner = winnerId(grant, size);
+
+      // compute expected winner
+      u32 ewinner = U32_MAX;
+      std::list<u32>::iterator ewinnerIt;
+      for (auto it = lru.begin(); it != lru.end(); ++it) {
+        u32 idx = *it;
+        if (request[idx]) {
+          ewinner = idx;
+          ewinnerIt = it;
+          break;
+        }
       }
-      // printf("p=%u a=%u e=%u\n", pwinner, awinner, ewinner);
-      ASSERT_EQ(awinner, ewinner);
-      ASSERT_TRUE(request[awinner]);
+      assert(ewinner != U32_MAX);
+
+      // verify correct operation
+      ASSERT_EQ(winner, ewinner);
+      ASSERT_TRUE(request[winner]);
 
       // only latch the priority sometimes
       if (gSim->rnd.nextBool()) {
         arb->latch();
-        pwinner = awinner;
+
+        // rotate the LRU structure
+        lru.erase(ewinnerIt);
+        lru.push_back(ewinner);
       }
     }
 
@@ -94,7 +133,7 @@ TEST(LslpArbiter, full) {
   }
 }
 
-TEST(LslpArbiter, dist) {
+TEST(LruArbiter, dist) {
   for (u8 quads = 1; quads <= 4; quads *= 2) {
     for (u32 size = 32; size <= 64; size += 8) {
       TestSetup testSetup(1, 1, 123);
@@ -112,7 +151,7 @@ TEST(LslpArbiter, dist) {
       }
 
       Json::Value arbSettings;
-      Arbiter* arb = new LslpArbiter("Arb", nullptr, size, arbSettings);
+      Arbiter* arb = new LruArbiter("Arb", nullptr, size, arbSettings);
       assert(arb->size() == size);
       for (u32 idx = 0; idx < size; idx++) {
         arb->setRequest(idx, &request[idx]);

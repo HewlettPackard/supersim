@@ -54,10 +54,10 @@
           "slip_latch": true,
           "iterations": 1,
           "resource_arbiter": {
-            "type": "lslp"
+            "type": "lru"
           },
           "client_arbiter": {
-            "type": "lslp"
+            "type": "lru"
           }
         }
       },
@@ -66,7 +66,7 @@
           "type": "r_separable",
           "slip_latch": true,
           "resource_arbiter": {
-            "type": "lslp"
+            "type": "lru"
           }
         },
         "full_packet": false,
@@ -83,7 +83,7 @@
           "type": "r_separable",
           "slip_latch": true,
           "resource_arbiter": {
-            "type": "lslp"
+            "type": "lru"
           }
         },
         "full_packet": false,

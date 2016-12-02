@@ -18,6 +18,7 @@
 #include <cassert>
 
 #include "arbiter/ComparingArbiter.h"
+#include "arbiter/LruArbiter.h"
 #include "arbiter/LslpArbiter.h"
 #include "arbiter/RandomArbiter.h"
 #include "arbiter/RandomPriorityArbiter.h"
@@ -29,6 +30,8 @@ Arbiter* ArbiterFactory::createArbiter(
 
   if (type == "lslp") {
     return new LslpArbiter(_name, _parent, _size, _settings);
+  } else if (type == "lru") {
+    return new LruArbiter(_name, _parent, _size, _settings);
   } else if (type == "comparing") {
     return new ComparingArbiter(_name, _parent, _size, _settings);
   } else if (type == "random") {
