@@ -23,6 +23,10 @@
 #include "event/Simulator.h"
 #include "network/Network.h"
 
+
+#define FORCE_WARMED   (0x123)
+#define MAX_SATURATION (0x456)
+
 namespace StressTest {
 
 Application::Application(
@@ -42,7 +46,7 @@ Application::Application(
     assert(!_settings["max_saturation_cycles"].isNull());
   }
   assert(!_settings["warmup_threshold"].isNull());
-  assert(warmupThreshold_ > 0);
+  assert(warmupThreshold_ >= 0.0);
   assert(warmupThreshold_ <= 1.0);
 
   // all terminals are the same
@@ -69,6 +73,11 @@ Application::Application(
   saturatedTerminals_ = 0;
   completedTerminals_ = 0;
   doneTerminals_ = 0;
+
+  // force warmed if threshold is 0.0
+  if (warmupThreshold_ == 0.0) {
+      addEvent(0, 0, nullptr, FORCE_WARMED);
+  }
 }
 
 Application::~Application() {}
@@ -119,7 +128,9 @@ void Application::kill() {
 
 void Application::terminalWarmed(u32 _id) {
   assert(fsm_ == Application::Fsm::WARMING);
-  warmedTerminals_++;
+  if (_id != U32_MAX) {
+    warmedTerminals_++;
+  }
   // dbgprintf("Terminal %u is warmed (%u total)", _id, warmedTerminals_);
   assert(warmedTerminals_ <= activeTerminals_);
   f64 percentWarmed = warmedTerminals_ / static_cast<f64>(activeTerminals_);
@@ -165,7 +176,7 @@ void Application::terminalSaturated(u32 _id) {
       u64 timeout = gSim->futureCycle(Simulator::Clock::CHANNEL,
                                       maxSaturationCycles_);
       dbgprintf("setting timeout from %lu to %lu", gSim->time(), timeout);
-      addEvent(timeout, 0, nullptr, 0);
+      addEvent(timeout, 0, nullptr, MAX_SATURATION);
     } else {
       // drain all the packets from the network
       dbgprintf("Saturation threshold %f reached",
@@ -206,10 +217,21 @@ void Application::terminalDone(u32 _id) {
 
 
 void Application::processEvent(void* _event, s32 _type) {
-  if (fsm_ == Application::Fsm::LOGGING) {
-    dbgprintf("Max saturation time reached");
-    fsm_ = Application::Fsm::BLABBING;
-    workload_->applicationComplete(id_);
+  switch (_type) {
+    case FORCE_WARMED: {
+      terminalWarmed(U32_MAX);
+      break;
+    }
+    case MAX_SATURATION: {
+      if (fsm_ == Application::Fsm::LOGGING) {
+        dbgprintf("Max saturation time reached");
+        fsm_ = Application::Fsm::BLABBING;
+        workload_->applicationComplete(id_);
+      }
+      break;
+    }
+    default:
+      assert(false);
   }
 }
 
