@@ -73,7 +73,7 @@ CrossbarScheduler::CrossbarScheduler(
 
   // create arrays for handling port locks
   anyRequests_.resize(crossbarPorts_, false);
-  portLocks_.resize(crossbarPorts_, false);
+  portLocks_.resize(crossbarPorts_, U32_MAX);
 
   // create the allocator
   allocator_ = AllocatorFactory::createAllocator(
@@ -239,16 +239,24 @@ void CrossbarScheduler::processEvent(void* _event, s32 _type) {
       }
     }
 
-    // handle the locking algorithm
     if (packetLock_) {
-      // perform the port locking mechanism
+      // perform the lock request filtering algorithm
       for (u32 p = 0; p < crossbarPorts_; p++) {
         // the lock has to be active and there must be at least one request
         if (portLocks_[p] != U32_MAX && anyRequests_[p]) {
-          // determine if the owner is requesting
+          // retrieve the lock owner's info
           u32 owner = portLocks_[p];
           u32 ownerIndex = index(owner, p);
-          if (requests_[ownerIndex]) {
+
+          // determine if idle unlock is applicable
+          if (idleUnlock_ && !requests_[ownerIndex]) {
+            // the owner isn't requesting and idle unlock is enabled
+            //  disable the port lock
+            portLocks_[p] = U32_MAX;
+          }
+
+          // determine if the requests need to be deactivated
+          if (portLocks_[p] != U32_MAX) {
             // deactivate other requests
             for (u32 c = 0; c < numClients_; c++) {
               if (c != owner) {
@@ -256,23 +264,14 @@ void CrossbarScheduler::processEvent(void* _event, s32 _type) {
                 requests_[otherIndex] = false;
               }
             }
-
-            // deactivate the port lock if the request is for a tail flit
-            if (clientRequestFlits_[owner]->isTail()) {
-              portLocks_[p] = U32_MAX;
-            }
-          } else if (idleUnlock_) {
-            // the owner isn't requesting and idle unlock is enabled, disable
-            //  the port lock
-            portLocks_[p] = U32_MAX;
           }
         }
       }
+    }
 
-      // clear the any request vector
-      for (u32 p = 0; p < crossbarPorts_; p++) {
-        anyRequests_[p] = false;
-      }
+    // clear the any request vector
+    for (u32 p = 0; p < crossbarPorts_; p++) {
+      anyRequests_[p] = false;
     }
 
     // clear the grants (must do before allocate() call)
@@ -281,13 +280,14 @@ void CrossbarScheduler::processEvent(void* _event, s32 _type) {
     // run the allocator
     allocator_->allocate();
 
-    // deliver responses, reset requests
+    // deliver responses, reset requests, if required lock ports
     for (u32 c = 0; c < numClients_; c++) {
       if (clientRequestPorts_[c] != U32_MAX) {
         u32 port = clientRequestPorts_[c];
         clientRequestPorts_[c] = U32_MAX;
         u32 vc = clientRequestVcs_[c];
         clientRequestVcs_[c] = U32_MAX;
+        const Flit* flit = clientRequestFlits_[c];
         clientRequestFlits_[c] = nullptr;
         u64 idx = index(c, port);
 
@@ -295,6 +295,12 @@ void CrossbarScheduler::processEvent(void* _event, s32 _type) {
         if (grants_[idx]) {
           granted = port;
           assert(credits_[vc] > 0);
+
+          // if needed, lock the port
+          if (packetLock_) {
+            // handle port locking
+            portLocks_[port] = flit->isTail() ? U32_MAX : c;
+          }
         }
         requests_[idx] = false;
 
