@@ -120,6 +120,7 @@
           "min_message_size": 1,
           "max_message_size": 64,
           "max_packet_size": 16,
+          "fake_responses": false,
           "warmup_interval": 200,  // delivered flits
           "warmup_window": 15,
           "warmup_attempts": 50,

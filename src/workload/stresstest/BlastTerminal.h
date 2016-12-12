@@ -73,6 +73,7 @@ class BlastTerminal : public Terminal {
   u32 minMessageSize_;  // flits
   u32 maxMessageSize_;  // flits
   u32 maxPacketSize_;  // flits
+  bool fakeResponses_;  // sends 1 flit msgs 50% of time
 
   // warmup/saturation detector
   u32 warmupInterval_;  // messages received

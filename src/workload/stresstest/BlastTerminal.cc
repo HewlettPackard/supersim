@@ -53,6 +53,8 @@ BlastTerminal::BlastTerminal(const std::string& _name, const Component* _parent,
   minMessageSize_ = _settings["min_message_size"].asUInt();
   maxMessageSize_ = _settings["max_message_size"].asUInt();
   maxPacketSize_  = _settings["max_packet_size"].asUInt();
+  assert(_settings.isMember("fake_responses"));
+  fakeResponses_ = _settings["fake_responses"].asBool();
   assert(minMessageSize_ > 0);
   assert(maxMessageSize_ >= minMessageSize_);
   assert(maxPacketSize_ > 0);
@@ -295,8 +297,15 @@ void BlastTerminal::sendNextMessage() {
   u32 destination = trafficPattern_->nextDestination();
   assert(destination < app->numTerminals());
 
-  // pick a random message length
-  u32 messageLength = gSim->rnd.nextU64(minMessageSize_, maxMessageSize_);
+  // pick a message length
+  u32 messageLength;
+  if (fakeResponses_ && gSim->rnd.nextBool()) {
+    messageLength = 1;
+  } else {
+    messageLength = gSim->rnd.nextU64(minMessageSize_, maxMessageSize_);
+  }
+
+  // determine the number of packets
   u32 numPackets = messageLength / maxPacketSize_;
   if ((messageLength % maxPacketSize_) > 0) {
     numPackets++;

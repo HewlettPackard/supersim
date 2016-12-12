@@ -57,6 +57,7 @@ class PulseTerminal : public Terminal {
   u32 minMessageSize_;  // flits
   u32 maxMessageSize_;  // flits
   u32 maxPacketSize_;  // flits
+  bool fakeResponses_;  // sends 1 flit msgs 50% of time
 
   // start time delay
   u64 delay_;
