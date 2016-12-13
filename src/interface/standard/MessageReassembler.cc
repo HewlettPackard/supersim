@@ -18,6 +18,8 @@
 #include <cassert>
 #include <cstdio>
 
+#include "workload/util.h"
+
 namespace Standard {
 
 MessageReassembler::MessageReassembler(const std::string& _name,
@@ -31,19 +33,21 @@ Message* MessageReassembler::receivePacket(Packet* _packet) {
   Message* message = _packet->message();
   u32 sourceId = message->getSourceId();
   u32 messageId = message->id();
-  u64 mid = ((u64)sourceId) << 32 | ((u64)messageId);
+  u32 appId1 = appId(message->getTransaction());
+  u64 umid = transactionId(appId1, sourceId, messageId);
+  // u64 mid = ((u64)sourceId) << 32 | ((u64)messageId);
 
   // if non-existent, add a new table entry
-  bool midExists = messages_.count(mid) == 1;
-  if (!midExists) {
-    messages_[mid] = MessageData();
-    messages_[mid].message = message;
-    messages_[mid].packetsReceived.resize(message->numPackets(), false);
-    messages_[mid].receivedCount = 0;
+  bool umidExists = messages_.count(umid) == 1;
+  if (!umidExists) {
+    messages_[umid] = MessageData();
+    messages_[umid].message = message;
+    messages_[umid].packetsReceived.resize(message->numPackets(), false);
+    messages_[umid].receivedCount = 0;
   }
 
   // retrieve the message data
-  MessageData& messageData = messages_.at(mid);
+  MessageData& messageData = messages_.at(umid);
   assert(messageData.message == message);
 
   // mark the packet as received
@@ -54,7 +58,7 @@ Message* MessageReassembler::receivePacket(Packet* _packet) {
   // check if the full message has been received
   if (messageData.receivedCount == message->numPackets()) {
     // remove the message from the map
-    s32 erased = messages_.erase(mid);
+    s32 erased = messages_.erase(umid);
     (void)erased;  // unused
     assert(erased == 1);
     return message;
