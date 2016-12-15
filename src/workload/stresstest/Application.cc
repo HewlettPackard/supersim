@@ -197,7 +197,8 @@ void Application::terminalComplete(u32 _id) {
   // dbgprintf("Terminal %u is done logging (%u total)",
   //           _id, completedTerminals_);
   assert(completedTerminals_ <= activeTerminals_);
-  if (completedTerminals_ == activeTerminals_) {
+  if ((completedTerminals_ == activeTerminals_) &&
+      (fsm_ == Application::Fsm::LOGGING)) {
     dbgprintf("All terminals are done logging");
     fsm_ = Application::Fsm::BLABBING;
     workload_->applicationComplete(id_);
