@@ -26,16 +26,6 @@ def clone(loc, url, commit):
   else:
     print('INFO: {0} is already cloned'.format(loc))
 
-def pull(loc, url, commit):
-  if not os.path.isdir(loc):
-    print('INFO: {0} does not exist.  Cloning!'.format(loc))
-    doit('git clone {0} {1}'.format(url, loc))
-    if commit:
-      doit('cd {0} && git checkout {1}'.format(loc, commit))
-  else:
-    doit('cd {0} &&  git pull'.format(loc))
-
-
 def build(loc, url, commit, opts):
   if os.path.isdir(loc):
     doit('cd {0} && make -j {1} {2}'.format(loc, os.cpu_count(), opts))
@@ -100,8 +90,6 @@ def main(args):
         print('{0} url={1} commit={2}'.format(loc, url, commit))
       elif command == 'clone':
         clone(loc, url, commit)
-      elif command == 'pull':
-        pull(loc, url, commit)
       elif command == 'build':
         build(loc, url, commit, args.opt)
       elif command == 'check':
@@ -124,6 +112,6 @@ if __name__ == '__main__':
                   help='command to be run')
   ap.add_argument('-m', '--mode', choices=['git', 'https'], default='https',
                   help='use https urls (default) or git urls')
-  ap.add_argument('--opt', help='Options for make command')
+  ap.add_argument('--opt', help='Options for make command', default='')
   args = ap.parse_args()
   main(args)
