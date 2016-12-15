@@ -107,7 +107,7 @@ def main(args):
 if __name__ == '__main__':
   ap = argparse.ArgumentParser()
   ap.add_argument('command', nargs='+',
-                  choices=['list', 'clone', 'pull', 'build', 'check', 'clean',
+                  choices=['list', 'clone', 'build', 'check', 'clean',
                            'delete'],
                   help='command to be run')
   ap.add_argument('-m', '--mode', choices=['git', 'https'], default='https',
