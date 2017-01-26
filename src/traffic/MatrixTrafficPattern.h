@@ -33,7 +33,7 @@ class MatrixTrafficPattern : public TrafficPattern {
   u32 nextDestination() override;
 
  private:
-  std::vector<f64> dist_;
+  std::vector<f64> cumulativeDistribution_;
 };
 
 #endif  // TRAFFIC_MATRIXTRAFFICPATTERN_H_

@@ -16,6 +16,7 @@
 #include "traffic/MatrixTrafficPattern.h"
 
 #include <fio/InFile.h>
+#include <mut/mut.h>
 #include <strop/strop.h>
 
 #include <cassert>
@@ -25,10 +26,10 @@ MatrixTrafficPattern::MatrixTrafficPattern(
     u32 _self, Json::Value _settings)
     : TrafficPattern(_name, _parent, _numTerminals, _self) {
 
-  // make space to hold a distribution
-  dist_.resize(numTerminals_, F64_POS_INF);
+  // make space to hold a probability distribution
+  std::vector<f64> probabilityDistribution(numTerminals_, F64_POS_INF);
 
-  // parse the distribution from the settings file
+  // parse the probability distribution from the settings file
   assert(_settings.isMember("file") && _settings["file"].isString());
   fio::InFile inf(_settings["file"].asString());
   std::string line;
@@ -43,7 +44,7 @@ MatrixTrafficPattern::MatrixTrafficPattern(
           std::vector<std::string> strs = strop::split(line, ',');
           assert(strs.size() == numTerminals_);
           for (u32 idx = 0; idx < strs.size(); idx++) {
-            dist_.at(idx) = std::stod(strs.at(idx));
+            probabilityDistribution.at(idx) = std::stod(strs.at(idx));
           }
         }
         lineNum++;
@@ -52,41 +53,14 @@ MatrixTrafficPattern::MatrixTrafficPattern(
   }
   assert(lineNum == numTerminals_);
 
-  // verify the current distribution sums to 1.0
-  // reformat distribution for a binary search
-  f64 sum = 0.0;
-  for (f64& f : dist_) {
-    f64 t = f;
-    f = sum;
-    sum += t;
-  }
-  // if (fabs(1.0 - sum) >= 0.000001) {
-  //   printf("lineNum=%u tol=%f\n", lineNum, fabs(1.0 - sum));
-  // }
-  assert(abs(1.0 - sum) < 0.000001);
+  // create the cumulative distribution
+  mut::generateCumulativeDistribution(
+      probabilityDistribution, &cumulativeDistribution_);
 }
 
 MatrixTrafficPattern::~MatrixTrafficPattern() {}
 
 u32 MatrixTrafficPattern::nextDestination() {
   f64 rnd = gSim->rnd.nextF64();
-
-  u32 bot = 0;
-  u32 top = numTerminals_;
-
-  while (true) {
-    assert(top > bot);
-    u32 span = top - bot;
-    u32 mid = (span / 2) + bot;
-    if (span == 1) {
-      // done! return the index
-      return mid;
-    } else if (dist_[mid] < rnd) {
-      // raise the bottom
-      bot = mid;
-    } else {
-      // lower the top
-      top = mid;
-    }
-  }
+  return mut::searchCumulativeDistribution(cumulativeDistribution_, rnd);
 }
