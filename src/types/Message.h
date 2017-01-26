@@ -52,6 +52,7 @@ class Message {
 
   u32 getSourceId() const;
   void setSourceId(u32 _sourceId);
+
   u32 getDestinationId() const;
   void setDestinationId(u32 _destinationId);
 

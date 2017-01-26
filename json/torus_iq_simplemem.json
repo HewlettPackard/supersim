@@ -19,7 +19,7 @@
         }
       },
       {
-        "num_vcs": 2,
+        "num_vcs": 3,
         "routing": {
           "algorithm": "dimension_order",
           "latency": 1

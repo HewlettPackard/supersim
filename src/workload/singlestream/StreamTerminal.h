@@ -23,7 +23,7 @@
 #include <vector>
 
 #include "event/Component.h"
-#include "traffic/TrafficPattern.h"
+#include "traffic/MessageSizeDistribution.h"
 #include "workload/Terminal.h"
 
 class Application;
@@ -49,11 +49,11 @@ class StreamTerminal : public Terminal {
  private:
   void sendNextMessage();
 
+  MessageSizeDistribution* messageSizeDistribution_;
+
   u32 trafficClass_;
 
   u32 numMessages_;
-  u32 minMessageSize_;  // flits
-  u32 maxMessageSize_;  // flits
   u32 maxPacketSize_;  // flits
   u32 recvdMessages_;
   bool destReady_;

@@ -113,8 +113,6 @@
         "blast_terminal": {
           "traffic_class": 0,
           "num_messages": 300,
-          "min_message_size": 1,
-          "max_message_size": 64,
           "max_packet_size": 16,
           "fake_responses": false,
           "warmup_interval": 200,  // delivered flits
@@ -123,6 +121,11 @@
           "traffic_pattern": {
             "type": "uniform_random",
             "send_to_self": false
+          },
+          "message_size_distribution": {
+            "type": "random",
+            "min_message_size": 1,
+            "max_message_size": 64
           }
         },
         "rate_log": {
@@ -135,13 +138,16 @@
         "pulse_terminal": {
           "traffic_class": 1,
           "num_messages": 50,
-          "min_message_size": 16,
-          "max_message_size": 16,
           "max_packet_size": 16,
           "fake_responses": false,
           "delay": 50000,
           "traffic_pattern": {
             "type": "bit_complement"
+          },
+          "message_size_distribution": {
+            "type": "random",
+            "min_message_size": 16,
+            "max_message_size": 16
           }
         },
         "rate_log": {

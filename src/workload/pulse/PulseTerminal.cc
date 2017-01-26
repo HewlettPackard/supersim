@@ -27,6 +27,7 @@
 #include "stats/MessageLog.h"
 #include "types/Flit.h"
 #include "types/Packet.h"
+#include "traffic/MessageSizeDistributionFactory.h"
 #include "traffic/TrafficPatternFactory.h"
 
 namespace Pulse {
@@ -41,6 +42,11 @@ PulseTerminal::PulseTerminal(const std::string& _name, const Component* _parent,
       "TrafficPattern", this, application()->numTerminals(), id_,
       _settings["traffic_pattern"]);
 
+    // create a message size distribution
+  messageSizeDistribution_ = MessageSizeDistributionFactory::
+      createMessageSizeDistribution("MessageSizeDistribution", this,
+                                    _settings["message_size_distribution"]);
+
   // traffic class of injection
   assert(_settings.isMember("traffic_class"));
   trafficClass_ = _settings["traffic_class"].asUInt();
@@ -50,13 +56,9 @@ PulseTerminal::PulseTerminal(const std::string& _name, const Component* _parent,
   numMessages_ = _settings["num_messages"].asUInt();
 
   // message and packet sizes
-  minMessageSize_ = _settings["min_message_size"].asUInt();
-  maxMessageSize_ = _settings["max_message_size"].asUInt();
   maxPacketSize_  = _settings["max_packet_size"].asUInt();
   assert(_settings.isMember("fake_responses"));
   fakeResponses_ = _settings["fake_responses"].asBool();
-  assert(minMessageSize_ > 0);
-  assert(maxMessageSize_ >= minMessageSize_);
   assert(maxPacketSize_ > 0);
 
   // start time delay
@@ -70,6 +72,7 @@ PulseTerminal::PulseTerminal(const std::string& _name, const Component* _parent,
 
 PulseTerminal::~PulseTerminal() {
   delete trafficPattern_;
+  delete messageSizeDistribution_;
 }
 
 void PulseTerminal::processEvent(void* _event, s32 _type) {
@@ -144,7 +147,8 @@ void PulseTerminal::start() {
     // choose a random number of cycles in the future to start
     // make an event to start the PulseTerminal in the future
     if (application()->maxInjectionRate(id_) > 0.0) {
-      u64 cycles = application()->cyclesToSend(id_, maxMessageSize_);
+      u32 maxMsg = messageSizeDistribution_->maxMessageSize();
+      u64 cycles = application()->cyclesToSend(id_, maxMsg);
       cycles = gSim->rnd.nextU64(delay_, delay_ + cycles * 3);
       u64 time = gSim->futureCycle(Simulator::Clock::CHANNEL, 1) +
           ((cycles - 1) * gSim->cycleTime(Simulator::Clock::CHANNEL));
@@ -171,7 +175,7 @@ void PulseTerminal::sendNextMessage() {
   if (fakeResponses_ && gSim->rnd.nextBool()) {
     messageLength = 1;
   } else {
-    messageLength = gSim->rnd.nextU64(minMessageSize_, maxMessageSize_);
+    messageLength = messageSizeDistribution_->nextMessageSize();
   }
 
   // determine the number of packets

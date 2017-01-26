@@ -23,6 +23,7 @@
 #include "workload/singlestream/Application.h"
 #include "network/Network.h"
 #include "stats/MessageLog.h"
+#include "traffic/MessageSizeDistributionFactory.h"
 #include "types/Flit.h"
 #include "types/Packet.h"
 
@@ -33,6 +34,11 @@ StreamTerminal::StreamTerminal(
     const std::vector<u32>& _address, ::Application* _app,
     Json::Value _settings)
     : Terminal(_name, _parent, _id, _address, _app), lastSendTime_(0) {
+  // create a message size distribution
+  messageSizeDistribution_ = MessageSizeDistributionFactory::
+      createMessageSizeDistribution("MessageSizeDistribution", this,
+                                    _settings["message_size_distribution"]);
+
   // traffic class of injection
   assert(_settings.isMember("traffic_class"));
   trafficClass_ = _settings["traffic_class"].asUInt();
@@ -46,14 +52,13 @@ StreamTerminal::StreamTerminal(
     // this application requires an injection rate for the source
     assert(app->maxInjectionRate(_id) > 0.0);
 
-    // message and packet sizes
-    minMessageSize_ = _settings["min_message_size"].asUInt();
-    maxMessageSize_ = _settings["max_message_size"].asUInt();
+    // max packet size
     maxPacketSize_  = _settings["max_packet_size"].asUInt();
 
     // choose a random number of cycles in the future to start
     // make an event to start the Terminal in the future
-    u64 cycles = application()->cyclesToSend(_id, maxMessageSize_);
+    u32 maxMsg = messageSizeDistribution_->maxMessageSize();
+    u64 cycles = application()->cyclesToSend(_id, maxMsg);
     cycles = gSim->rnd.nextU64(1, 1 + cycles * 3);
     u64 time = gSim->futureCycle(Simulator::Clock::CHANNEL, 1) +
         ((cycles - 1) * gSim->cycleTime(Simulator::Clock::CHANNEL));
@@ -68,7 +73,9 @@ StreamTerminal::StreamTerminal(
   sending_ = true;
 }
 
-StreamTerminal::~StreamTerminal() {}
+StreamTerminal::~StreamTerminal() {
+  delete messageSizeDistribution_;
+}
 
 void StreamTerminal::processEvent(void* _event, s32 _type) {
   sendNextMessage();
@@ -159,7 +166,7 @@ void StreamTerminal::sendNextMessage() {
   u32 destination = app->getDestination();
 
   // pick a random message length
-  u32 messageLength = gSim->rnd.nextU64(minMessageSize_, maxMessageSize_);
+  u32 messageLength = messageSizeDistribution_->nextMessageSize();
   u32 numPackets = messageLength / maxPacketSize_;
   if ((messageLength % maxPacketSize_) > 0) {
     numPackets++;

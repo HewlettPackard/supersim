@@ -109,8 +109,6 @@
         "blast_terminal": {
           "traffic_class": 0,
           "num_messages": 500,
-          "min_message_size": 4,
-          "max_message_size": 32,
           "max_packet_size": 10000,
           "fake_responses": true,
           "warmup_interval": 200,  // delivered flits
@@ -119,6 +117,11 @@
           "traffic_pattern": {
             "type": "uniform_random",
             "send_to_self": true
+          },
+          "message_size_distribution": {
+            "type": "random",
+            "min_message_size": 4,
+            "max_message_size": 32
           }
         },
         "rate_log": {

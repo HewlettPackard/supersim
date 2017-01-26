@@ -132,9 +132,11 @@
         "stream_terminal": {
           "traffic_class": 1,
           "num_messages": 0,
-          "min_message_size": 1,
-          "max_message_size": 1,
-          "max_packet_size": 1
+          "max_packet_size": 1,
+          "message_size_distribution": {
+            "type": "single",
+            "message_size": 1
+          }
         },
         "rate_log": {
           "file": "/dev/null"  // "rates.csv"

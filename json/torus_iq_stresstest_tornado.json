@@ -110,8 +110,6 @@
         "blast_terminal": {
           "traffic_class": 0,
           "num_messages": 200,
-          "min_message_size": 1,
-          "max_message_size": 64,
           "max_packet_size": 16,
           "fake_responses": true,
           "warmup_interval": 200,  // delivered flits
@@ -121,6 +119,11 @@
             "type": "tornado",
             "dimensions": [4, 3, 2],
             "concentration": 2
+          },
+          "message_size_distribution": {
+            "type": "random",
+            "min_message_size": 1,
+            "max_message_size": 16
           }
         },
         "rate_log": {

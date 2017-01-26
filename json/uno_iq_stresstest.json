@@ -107,8 +107,6 @@
         "blast_terminal": {
           "traffic_class": 0,
           "num_messages": 2000,
-          "min_message_size": 1,
-          "max_message_size": 64,
           "max_packet_size": 16,
           "fake_responses": false,
           "warmup_interval": 200,  // delivered flits
@@ -117,6 +115,11 @@
           "traffic_pattern": {
             "type": "matrix",
             "file": "json/trafficmatrix.csv.gz"
+          },
+          "message_size_distribution": {
+            "type": "random",
+            "min_message_size": 1,
+            "max_message_size": 64
           }
         },
         "rate_log": {

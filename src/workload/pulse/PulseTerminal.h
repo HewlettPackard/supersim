@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "event/Component.h"
+#include "traffic/MessageSizeDistribution.h"
 #include "traffic/TrafficPattern.h"
 #include "workload/Terminal.h"
 
@@ -49,13 +50,12 @@ class PulseTerminal : public Terminal {
   void sendNextMessage();
 
   TrafficPattern* trafficPattern_;
+  MessageSizeDistribution* messageSizeDistribution_;
 
   u32 trafficClass_;
 
   // messages
   u32 numMessages_;
-  u32 minMessageSize_;  // flits
-  u32 maxMessageSize_;  // flits
   u32 maxPacketSize_;  // flits
   bool fakeResponses_;  // sends 1 flit msgs 50% of time
 

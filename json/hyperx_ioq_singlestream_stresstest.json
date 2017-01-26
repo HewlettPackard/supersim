@@ -123,9 +123,11 @@
         "stream_terminal": {
           "traffic_class": 0,
           "num_messages": 0,
-          "min_message_size": 3000,
-          "max_message_size": 3000,
-          "max_packet_size": 3000
+          "max_packet_size": 3000,
+          "message_size_distribution": {
+            "type": "single",
+            "message_size": 3000
+          }
         },
         "rate_log": {
           "file": "/dev/null"  // "rates.csv"
@@ -142,8 +144,6 @@
         "blast_terminal": {
           "traffic_class": 0,
           "num_messages": 400,
-          "min_message_size": 1,
-          "max_message_size": 64,
           "max_packet_size": 16,
           "fake_responses": false,
           "warmup_interval": 200,  // delivered flits
@@ -152,6 +152,11 @@
           "traffic_pattern": {
             "type": "uniform_random",
             "send_to_self": false
+          },
+          "message_size_distribution": {
+            "type": "random",
+            "min_message_size": 1,
+            "max_message_size": 64
           }
         },
         "rate_log": {
