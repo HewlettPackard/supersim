@@ -23,8 +23,13 @@ SingleMessageSizeDistribution::SingleMessageSizeDistribution(
     const std::string& _name, const Component* _parent,
     Json::Value _settings)
     : MessageSizeDistribution(_name, _parent),
-      messageSize_(_settings["message_size"].asUInt()) {
+      messageSize_(_settings["message_size"].asUInt()),
+      doDependent_(_settings.isMember("dependent_message_size")),
+      depMessageSize_(_settings["dependent_message_size"].asUInt()) {
   assert(messageSize_ > 0);
+  if (doDependent_) {
+    assert(depMessageSize_ > 0);
+  }
 }
 
 SingleMessageSizeDistribution::~SingleMessageSizeDistribution() {}
@@ -42,5 +47,9 @@ u32 SingleMessageSizeDistribution::nextMessageSize() {
 }
 
 u32 SingleMessageSizeDistribution::nextMessageSize(const Message* _msg) {
-  return nextMessageSize();
+  if (doDependent_) {
+    return depMessageSize_;
+  } else {
+    return nextMessageSize();
+  }
 }

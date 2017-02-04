@@ -109,7 +109,6 @@
     "applications": [
       {
         "type": "simple_mem",
-        "max_injection_rate": -1,  // infinite injection rate
         "memory_slice": 4096,
         "block_size": 64,  // bytes
         "bytes_per_flit": 4,

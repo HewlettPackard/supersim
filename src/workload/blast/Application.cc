@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "workload/stresstest/Application.h"
+#include "workload/blast/Application.h"
 
 #include <cassert>
 
 #include <vector>
 
-#include "workload/stresstest/BlastTerminal.h"
+#include "workload/blast/BlastTerminal.h"
 #include "event/Simulator.h"
 #include "network/Network.h"
 
 
-#define FORCE_WARMED   (0x123)
-#define MAX_SATURATION (0x456)
+#define kForceWarmed   (0x123)
+#define kMaxSaturation (0x456)
 
-namespace StressTest {
+namespace Blast {
 
 Application::Application(
     const std::string& _name, const Component* _parent, u32 _id,
@@ -60,7 +60,7 @@ Application::Application(
     setTerminal(t, terminal);
 
     // remove terminals with no injection
-    if (maxInjectionRate(t) == 0.0) {
+    if (terminal->requestInjectionRate() == 0.0) {
       activeTerminals_--;
     }
   }
@@ -76,7 +76,7 @@ Application::Application(
 
   // force warmed if threshold is 0.0
   if (warmupThreshold_ == 0.0) {
-      addEvent(0, 0, nullptr, FORCE_WARMED);
+    addEvent(0, 0, nullptr, kForceWarmed);
   }
 }
 
@@ -131,7 +131,7 @@ void Application::terminalWarmed(u32 _id) {
   if (_id != U32_MAX) {
     warmedTerminals_++;
   }
-  // dbgprintf("Terminal %u is warmed (%u total)", _id, warmedTerminals_);
+  dbgprintf("Terminal %u is warmed (%u total)", _id, warmedTerminals_);
   assert(warmedTerminals_ <= activeTerminals_);
   f64 percentWarmed = warmedTerminals_ / static_cast<f64>(activeTerminals_);
   if (percentWarmed >= warmupThreshold_) {
@@ -149,7 +149,7 @@ void Application::terminalWarmed(u32 _id) {
 void Application::terminalSaturated(u32 _id) {
   assert(fsm_ == Application::Fsm::WARMING);
   saturatedTerminals_++;
-  // dbgprintf("Terminal %u is saturated (%u total)", _id, saturatedTerminals_);
+  dbgprintf("Terminal %u is saturated (%u total)", _id, saturatedTerminals_);
   assert(saturatedTerminals_ <= activeTerminals_);
   f64 percentSaturated = saturatedTerminals_ /
       static_cast<f64>(activeTerminals_);
@@ -176,7 +176,7 @@ void Application::terminalSaturated(u32 _id) {
       u64 timeout = gSim->futureCycle(Simulator::Clock::CHANNEL,
                                       maxSaturationCycles_);
       dbgprintf("setting timeout from %lu to %lu", gSim->time(), timeout);
-      addEvent(timeout, 0, nullptr, MAX_SATURATION);
+      addEvent(timeout, 0, nullptr, kMaxSaturation);
     } else {
       // drain all the packets from the network
       dbgprintf("Saturation threshold %f reached",
@@ -194,8 +194,8 @@ void Application::terminalSaturated(u32 _id) {
 
 void Application::terminalComplete(u32 _id) {
   completedTerminals_++;
-  // dbgprintf("Terminal %u is done logging (%u total)",
-  //           _id, completedTerminals_);
+  dbgprintf("Terminal %u is done logging (%u total)",
+            _id, completedTerminals_);
   assert(completedTerminals_ <= activeTerminals_);
   if ((completedTerminals_ == activeTerminals_) &&
       (fsm_ == Application::Fsm::LOGGING)) {
@@ -207,7 +207,7 @@ void Application::terminalComplete(u32 _id) {
 
 void Application::terminalDone(u32 _id) {
   doneTerminals_++;
-  // dbgprintf("Terminal %u is done sending (%u total)", _id, doneTerminals_);
+  dbgprintf("Terminal %u is done sending (%u total)", _id, doneTerminals_);
   assert(doneTerminals_ <= activeTerminals_);
   if (doneTerminals_ == activeTerminals_) {
     dbgprintf("All terminals are done sending");
@@ -219,11 +219,11 @@ void Application::terminalDone(u32 _id) {
 
 void Application::processEvent(void* _event, s32 _type) {
   switch (_type) {
-    case FORCE_WARMED: {
+    case kForceWarmed: {
       terminalWarmed(U32_MAX);
       break;
     }
-    case MAX_SATURATION: {
+    case kMaxSaturation: {
       if (fsm_ == Application::Fsm::LOGGING) {
         dbgprintf("Max saturation time reached");
         fsm_ = Application::Fsm::BLABBING;
@@ -236,4 +236,4 @@ void Application::processEvent(void* _event, s32 _type) {
   }
 }
 
-}  // namespace StressTest
+}  // namespace Blast

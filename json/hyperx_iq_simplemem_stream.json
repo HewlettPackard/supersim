@@ -8,12 +8,19 @@
   },
   "network": {
     "topology": "hyperx",
-    "dimension_widths": [4],
-    "dimension_weights": [3],
+    "dimension_widths": [3, 4, 5],
+    "dimension_weights": [2, 2, 1],
     "concentration": 3,
     "traffic_classes": [
       {
-        "num_vcs": 8,
+        "num_vcs": 3,
+        "routing": {
+          "algorithm": "dimension_order",
+          "latency": 1
+        }
+      },
+      {
+        "num_vcs": 3,
         "routing": {
           "algorithm": "dimension_order",
           "latency": 1
@@ -21,24 +28,24 @@
       }
     ],
     "internal_channel": {
-      "latency": 5  // cycles
+      "latency": 1  // cycles
     },
     "external_channel": {
-      "latency": 5  // cycles
+      "latency": 1  // cycles
     },
     "channel_log": {
       "file": "/dev/null"  // "channels.csv"
     },
     "router": {
-      "architecture": "input_output_queued",
+      "architecture": "input_queued",
       "congestion_status": {
         "algorithm": "buffer_occupancy",
         "latency": 1,
         "granularity": 0
       },
-      "input_queue_depth": 12,
+      "input_queue_depth": 16,
       "vca_swa_wait": true,
-      "output_queue_depth": 2,
+      "output_queue_depth": 128,
       "crossbar": {
         "latency": 1  // cycles
       },
@@ -46,10 +53,9 @@
         "allocator": {
           "type": "rc_separable",
           "slip_latch": true,
-          "iterations": 1,
+          "iterations": 3,
           "resource_arbiter": {
-            "type": "comparing",
-            "greater": false
+            "type": "lslp"
           },
           "client_arbiter": {
             "type": "lslp"
@@ -61,24 +67,7 @@
           "type": "r_separable",
           "slip_latch": true,
           "resource_arbiter": {
-            "type": "comparing",
-            "greater": false
-          }
-        },
-        "full_packet": false,
-        "packet_lock": true,
-        "idle_unlock": true
-      },
-      "output_crossbar": {
-        "latency": 1  // cycles
-      },
-      "output_crossbar_scheduler": {
-        "allocator": {
-          "type": "r_separable",
-          "slip_latch": true,
-          "resource_arbiter": {
-            "type": "comparing",
-            "greater": false
+            "type": "lslp"
           }
         },
         "full_packet": false,
@@ -95,15 +84,14 @@
           "type": "r_separable",
           "slip_latch": true,
           "resource_arbiter": {
-            "type": "comparing",
-            "greater": false
+            "type": "lslp"
           }
         },
         "full_packet": false,
         "packet_lock": true,
         "idle_unlock": true
       },
-      "init_credits": 12,
+      "init_credits": "$&(network.router.input_queue_depth)&$",
       "crossbar": {
         "latency": 1  // cycles
       }
@@ -118,56 +106,44 @@
     },
     "applications": [
       {
-        "type": "single_stream",
-        "max_injection_rate": 0.85,
-        "stream_terminal": {
-          "traffic_class": 0,
-          "num_messages": 0,
-          "max_packet_size": 3000,
-          "message_size_distribution": {
-            "type": "single",
-            "message_size": 3000
-          }
+        "type": "simple_mem",
+        "memory_slice": 4096,
+        "block_size": 64,  // bytes
+        "bytes_per_flit": 4,
+        "header_overhead": 16,  // bytes
+        "max_packet_size": 16,  // flits
+        "processor_terminal": {
+          "traffic_class": 1,
+          "latency": 10,
+          "memory_accesses": 20
         },
-        "rate_log": {
-          "file": "/dev/null"  // "rates.csv"
-        },
-        "source_terminal": 0,  // < 0 is random
-        "destination_terminal": 11  // < 0 is random
-      },
-      {
-        "type": "stress_test",
-        "max_injection_rate": 0.15,
-        "warmup_threshold": 0.90,
-        "kill_on_saturation": false,
-        "log_during_saturation": false,
-        "blast_terminal": {
+        "memory_terminal": {
           "traffic_class": 0,
-          "num_messages": 400,
-          "max_packet_size": 16,
-          "fake_responses": false,
-          "warmup_interval": 200,  // delivered flits
-          "warmup_window": 15,
-          "warmup_attempts": 20,
-          "traffic_pattern": {
-            "type": "uniform_random",
-            "send_to_self": false
-          },
-          "message_size_distribution": {
-            "type": "random",
-            "min_message_size": 1,
-            "max_message_size": 64
-          }
+          "latency": 15
         },
         "rate_log": {
           "file": "/dev/null"  // "rates.csv"
         }
+      },
+      {
+        "type": "stream",
+        "stream_terminal": {
+          "injection_rate": 1.0,
+          "traffic_class": 1,
+          "num_messages": 0,
+          "max_packet_size": 1,
+          "message_size_distribution": {
+            "type": "single",
+            "message_size": 1
+          }
+        },
+        "rate_log": {
+          "file": "/dev/null"  // "rates.csv"
+        },
+        "source_terminal": -1,  // < 0 is random
+        "destination_terminal": -1  // < 0 is random
       }
     ]
   },
-  "debug": [
-    "Workload",
-    "Workload.Application_0",
-    "Workload.Application_1"
-  ]
+  "debug": []
 }

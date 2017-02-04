@@ -28,8 +28,7 @@ class RateLog {
   explicit RateLog(Json::Value _settings);
   ~RateLog();
   void logRates(u32 _terminalId, const std::string& _terminalName,
-                f64 _supplyRate, f64 _injectionRate, f64 _deliveredRate,
-                f64 _ejectionRate);
+                f64 _injectionRate, f64 _deliveredRate, f64 _ejectionRate);
 
  private:
   fio::OutFile outFile_;

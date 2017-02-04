@@ -52,10 +52,17 @@ void MemoryTerminal::processEvent(void* _event, s32 _type) {
   sendMemoryResponse();
 }
 
-void MemoryTerminal::receiveMessage(Message* _message) {
-  // any override of this function must call the base class's function
-  ::Terminal::receiveMessage(_message);
+void MemoryTerminal::startMemoryAccess() {
+  addEvent(gSim->futureCycle(Simulator::Clock::CHANNEL, latency_),
+           0, nullptr, 0);
+  fsm_ = eState::kAccessing;
+}
 
+void MemoryTerminal::handleDeliveredMessage(Message* _message) {
+  // I don't need to care about this
+}
+
+void MemoryTerminal::handleReceivedMessage(Message* _message) {
   dbgprintf("received message");
 
   // log the message
@@ -84,22 +91,6 @@ void MemoryTerminal::receiveMessage(Message* _message) {
   if (fsm_ == eState::kWaiting) {
     startMemoryAccess();
   }
-}
-
-void MemoryTerminal::messageEnteredInterface(Message* _message) {
-  // any override of this function must call the base class's function
-  ::Terminal::messageEnteredInterface(_message);
-}
-
-void MemoryTerminal::messageExitedNetwork(Message* _message) {
-  // any override of this function must call the base class's function
-  ::Terminal::messageExitedNetwork(_message);
-}
-
-void MemoryTerminal::startMemoryAccess() {
-  addEvent(gSim->futureCycle(Simulator::Clock::CHANNEL, latency_),
-           0, nullptr, 0);
-  fsm_ = eState::kAccessing;
 }
 
 void MemoryTerminal::sendMemoryResponse() {

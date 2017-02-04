@@ -18,7 +18,10 @@
 #include <gtest/gtest.h>
 #include <prim/prim.h>
 
-TEST(Application, transactionId) {
+#include "event/Simulator.h"
+#include "test/TestSetup_TEST.h"
+
+TEST(WorkloadUtil, transactionId) {
   u32 appId, termId, msgId;
 
   appId = 0;
@@ -57,7 +60,7 @@ TEST(Application, transactionId) {
   ASSERT_EQ(0x8080000080000000lu, transactionId(appId, termId, msgId));
 }
 
-TEST(Application, appId) {
+TEST(WorkloadUtil, appId) {
   u64 transId;
 
   transId = 0x0100000000000000lu;
@@ -77,4 +80,36 @@ TEST(Application, appId) {
 
   transId = 0x8800000000000000lu;
   ASSERT_EQ(136u, appId(transId));
+}
+
+TEST(WorkloadUtil, cyclesToSend_multiple) {
+  TestSetup ts(123, 123, 123);
+
+  const u32 kRounds = 1000000;
+  for (u32 r = 0; r < kRounds; r++) {
+    ASSERT_EQ(cyclesToSend(1.0000, 16), 16u);
+    ASSERT_EQ(cyclesToSend(0.5000, 16), 32u);
+    ASSERT_EQ(cyclesToSend(0.2500, 16), 64u);
+    ASSERT_EQ(cyclesToSend(0.1250, 16), 128u);
+    ASSERT_EQ(cyclesToSend(0.0625, 16), 256u);
+  }
+}
+
+TEST(WorkloadUtil, cyclesToSend_probabilistic) {
+  TestSetup ts(123, 123, 123);
+
+  const u32 kTests = 500;
+  const u32 kRounds = 1000000;
+
+  for (u32 t = 0; t < kTests; t++) {
+    f64 rate = std::max(0.001, gSim->rnd.nextF64());
+    u32 flits = gSim->rnd.nextU64(1, 50);
+    f64 sum = 0;
+    for (u32 r = 0; r < kRounds; r++) {
+      sum += (f64)cyclesToSend(rate, flits);
+    }
+    f64 act = sum / kRounds;
+    f64 exp = (f64)flits * (1 / rate);
+    ASSERT_NEAR(act, exp, 0.002);
+  }
 }

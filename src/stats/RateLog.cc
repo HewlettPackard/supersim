@@ -21,7 +21,7 @@ RateLog::RateLog(Json::Value _settings)
     : outFile_(_settings["file"].asString()) {
   assert(!_settings["file"].isNull());
 
-  outFile_.write("id,name,supply,injection,delivered,ejection\n");
+  outFile_.write("id,name,injection,delivered,ejection\n");
   ss_.precision(6);
   ss_.setf(std::ios::fixed, std::ios::floatfield);
 }
@@ -29,10 +29,10 @@ RateLog::RateLog(Json::Value _settings)
 RateLog::~RateLog() {}
 
 void RateLog::logRates(u32 _terminalId, const std::string& _terminalName,
-                       f64 _supplyRate, f64 _injectionRate, f64 _deliveredRate,
+                       f64 _injectionRate, f64 _deliveredRate,
                        f64 _ejectionRate) {
-  ss_ << _terminalId << ',' << _terminalName << ',' << _supplyRate << ',' <<
-      _injectionRate << ',' << _deliveredRate << ',' << _ejectionRate << '\n';
+  ss_ << _terminalId << ',' << _terminalName << ',' << _injectionRate << ','
+      << _deliveredRate << ',' << _ejectionRate << '\n';
   outFile_.write(ss_.str());
   ss_.str("");
   ss_.clear();

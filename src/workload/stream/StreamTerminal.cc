@@ -13,27 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "workload/singlestream/StreamTerminal.h"
+#include "workload/stream/StreamTerminal.h"
 
 #include <cassert>
 #include <cmath>
 
 #include <algorithm>
 
-#include "workload/singlestream/Application.h"
 #include "network/Network.h"
 #include "stats/MessageLog.h"
 #include "traffic/MessageSizeDistributionFactory.h"
 #include "types/Flit.h"
 #include "types/Packet.h"
+#include "workload/stream/Application.h"
+#include "workload/util.h"
 
-namespace SingleStream {
+namespace Stream {
 
 StreamTerminal::StreamTerminal(
     const std::string& _name, const Component* _parent, u32 _id,
     const std::vector<u32>& _address, ::Application* _app,
     Json::Value _settings)
-    : Terminal(_name, _parent, _id, _address, _app), lastSendTime_(0) {
+    : Terminal(_name, _parent, _id, _address, _app) {
   // create a message size distribution
   messageSizeDistribution_ = MessageSizeDistributionFactory::
       createMessageSizeDistribution("MessageSizeDistribution", this,
@@ -49,16 +50,19 @@ StreamTerminal::StreamTerminal(
   // apply the routines only if this terminal is targeted
   Application* app = reinterpret_cast<Application*>(application());
   if (_id == app->getSource()) {
-    // this application requires an injection rate for the source
-    assert(app->maxInjectionRate(_id) > 0.0);
+    // get the injection rate
+    assert(_settings.isMember("injection_rate") &&
+           _settings["injection_rate"].isDouble());
+    injectionRate_ = _settings["injection_rate"].asDouble();
+    assert(injectionRate_ >= 0.0 && injectionRate_ <= 1.0);
 
     // max packet size
-    maxPacketSize_  = _settings["max_packet_size"].asUInt();
+    maxPacketSize_ = _settings["max_packet_size"].asUInt();
 
     // choose a random number of cycles in the future to start
     // make an event to start the Terminal in the future
     u32 maxMsg = messageSizeDistribution_->maxMessageSize();
-    u64 cycles = application()->cyclesToSend(_id, maxMsg);
+    u64 cycles = cyclesToSend(injectionRate_, maxMsg);
     cycles = gSim->rnd.nextU64(1, 1 + cycles * 3);
     u64 time = gSim->futureCycle(Simulator::Clock::CHANNEL, 1) +
         ((cycles - 1) * gSim->cycleTime(Simulator::Clock::CHANNEL));
@@ -78,13 +82,37 @@ StreamTerminal::~StreamTerminal() {
 }
 
 void StreamTerminal::processEvent(void* _event, s32 _type) {
-  sendNextMessage();
+  if (sending_) {
+    sendNextMessage();
+  }
 }
 
-void StreamTerminal::receiveMessage(Message* _message) {
-  // any override of this function must call the base class's function
-  ::Terminal::receiveMessage(_message);
+f64 StreamTerminal::percentComplete() const {
+  if (!counting_) {
+    return 0.0;
+  } else if (numMessages_ == 0) {
+    return 1.0;
+  } else {
+    u32 count = std::min(numMessages_, recvdMessages_);
+    return (f64)count / (f64)numMessages_;
+  }
+}
 
+void StreamTerminal::start() {
+  counting_ = true;
+}
+
+void StreamTerminal::stop() {
+  sending_ = false;
+}
+
+void StreamTerminal::handleDeliveredMessage(Message* _message) {
+  // log the message
+  Application* app = reinterpret_cast<Application*>(application());
+  app->workload()->messageLog()->logMessage(_message);
+}
+
+void StreamTerminal::handleReceivedMessage(Message* _message) {
   dbgprintf("received message %u", _message->id());
 
   // end the transaction
@@ -113,53 +141,8 @@ void StreamTerminal::receiveMessage(Message* _message) {
   delete _message;  // don't need this anymore
 }
 
-void StreamTerminal::messageEnteredInterface(Message* _message) {
-  // any override of this function must call the base class's function
-  ::Terminal::messageEnteredInterface(_message);
-
-  // determine if more messages should be created and sent
-  if (sending_) {
-    u64 now = gSim->time();
-    assert(lastSendTime_ <= now);
-    if (now == lastSendTime_) {
-      addEvent(gSim->futureCycle(Simulator::Clock::CHANNEL, 1), 0, nullptr, 0);
-    } else {
-      sendNextMessage();
-    }
-  }
-}
-
-void StreamTerminal::messageExitedNetwork(Message* _message) {
-  // any override of this function must call the base class's function
-  ::Terminal::messageExitedNetwork(_message);
-
-  // log the message
-  Application* app = reinterpret_cast<Application*>(application());
-  app->workload()->messageLog()->logMessage(_message);
-}
-
-f64 StreamTerminal::percentComplete() const {
-  if (!counting_) {
-    return 0.0;
-  } else if (numMessages_ == 0) {
-    return 1.0;
-  } else {
-    u32 count = std::min(numMessages_, recvdMessages_);
-    return (f64)count / (f64)numMessages_;
-  }
-}
-
-void StreamTerminal::start() {
-  counting_ = true;
-}
-
-void StreamTerminal::stop() {
-  sending_ = false;
-}
-
 void StreamTerminal::sendNextMessage() {
   u64 now = gSim->time();
-  lastSendTime_ = now;
 
   // pick a destination
   Application* app = reinterpret_cast<Application*>(application());
@@ -200,6 +183,15 @@ void StreamTerminal::sendNextMessage() {
 
   // send the message
   sendMessage(message, destination);
+
+  // compute when to send next time
+  u64 cycles = cyclesToSend(injectionRate_, messageLength);
+  u64 time = gSim->futureCycle(Simulator::Clock::CHANNEL, cycles);
+  if (time == now) {
+    sendNextMessage();
+  } else {
+    addEvent(time, 0, nullptr, 0);
+  }
 }
 
-}  // namespace SingleStream
+}  // namespace Stream

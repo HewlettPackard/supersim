@@ -25,7 +25,6 @@
 #include "event/Component.h"
 #include "stats/RateLog.h"
 
-class Messenger;
 class MetadataHandler;
 class Terminal;
 class Workload;
@@ -47,9 +46,6 @@ class Application : public Component {
   u64 transactionCreationTime(u64 _trans) const;
   void endTransaction(u64 _trans);
 
-  f64 maxInjectionRate(u32 _id) const;
-  u64 cyclesToSend(u32 _id, u32 _numFlits) const;
-
   void startMonitoring();
   void endMonitoring();
 
@@ -69,8 +65,6 @@ class Application : public Component {
 
  private:
   std::vector<Terminal*> terminals_;
-  std::vector<Messenger*> messengers_;
-  std::vector<f64> maxInjectionRates_;
   RateLog* rateLog_;
   MetadataHandler* metadataHandler_;
   std::unordered_map<u64, u64> transactions_;

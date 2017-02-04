@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef WORKLOAD_SINGLESTREAM_STREAMTERMINAL_H_
-#define WORKLOAD_SINGLESTREAM_STREAMTERMINAL_H_
+#ifndef WORKLOAD_STREAM_STREAMTERMINAL_H_
+#define WORKLOAD_STREAM_STREAMTERMINAL_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -28,7 +28,7 @@
 
 class Application;
 
-namespace SingleStream {
+namespace Stream {
 
 class Application;
 
@@ -39,12 +39,13 @@ class StreamTerminal : public Terminal {
                  Json::Value _settings);
   ~StreamTerminal();
   void processEvent(void* _event, s32 _type) override;
-  void receiveMessage(Message* _message) override;
-  void messageEnteredInterface(Message* _message) override;
-  void messageExitedNetwork(Message* _message) override;
   f64 percentComplete() const;
   void start();
   void stop();
+
+ protected:
+  void handleDeliveredMessage(Message* _message) override;
+  void handleReceivedMessage(Message* _message) override;
 
  private:
   void sendNextMessage();
@@ -53,6 +54,7 @@ class StreamTerminal : public Terminal {
 
   u32 trafficClass_;
 
+  f64 injectionRate_;
   u32 numMessages_;
   u32 maxPacketSize_;  // flits
   u32 recvdMessages_;
@@ -62,11 +64,8 @@ class StreamTerminal : public Terminal {
   // track state
   bool counting_;
   bool sending_;
-
-  // message generator
-  u64 lastSendTime_;
 };
 
-}  // namespace SingleStream
+}  // namespace Stream
 
-#endif  // WORKLOAD_SINGLESTREAM_STREAMTERMINAL_H_
+#endif  // WORKLOAD_STREAM_STREAMTERMINAL_H_

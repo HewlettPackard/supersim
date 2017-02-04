@@ -36,12 +36,13 @@ class ProcessorTerminal : public Terminal {
                     ::Application* _app, Json::Value _settings);
   ~ProcessorTerminal();
   void processEvent(void* _event, s32 _type) override;
-  void receiveMessage(Message* _message) override;
-  void messageEnteredInterface(Message* _message) override;
-  void messageExitedNetwork(Message* _message) override;
   f64 percentComplete() const;
   void start();
   void stop();
+
+ protected:
+  void handleDeliveredMessage(Message* _message) override;
+  void handleReceivedMessage(Message* _message) override;
 
  private:
   enum class eState {kProcessing, kWaitingForReadResp, kWaitingForWriteResp,

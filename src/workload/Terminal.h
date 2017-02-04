@@ -42,32 +42,23 @@ class Terminal : public Component, public MessageReceiver {
   void endRateMonitors();
   void logRates(RateLog* _rateLog);
   u32 messagesSent() const;
+  u32 messagesDelivered() const;
   u32 messagesReceived() const;
   u32 transactionsCreated() const;
   void setMessageReceiver(MessageReceiver* _receiver);
 
   /*
-   * This function is called by the network when a message is being given
-   * to this terminal.
-   * NOTE: THIS MUST BE EXPLICITLY CALLED BY SUBCLASSES
-   */
-  void receiveMessage(Message* _message) override;
-
-  /*
-   * This informs this terminal that the message has entered
-   * the network interface. This allows the owner to generate messages
-   * back-to-back without being concerned about message queuing.
-   * NOTE: THIS MUST BE EXPLICITLY CALLED BY SUBCLASSES
-   */
-  virtual void messageEnteredInterface(Message* _message);
-
-  /*
    * This informs this terminal that the message has exited the network and
-   * that this terminal doesn't need to worry about memory deallocation.
-   * Overriding implementation must call this!
-   * NOTE: THIS MUST BE EXPLICITLY CALLED BY SUBCLASSES
+   * that this terminal doesn't need to worry about memory deallocation. This
+   * function will call "handleDeliveredMessage()".
    */
-  virtual void messageExitedNetwork(Message* _message);
+  void messageDelivered(Message* _message);
+
+  /*
+   * This function is called by the network when a message is being given
+   * to this terminal. This function will call "handleReceivedMessage()".
+   */
+  void receiveMessage(Message* _message) final;
 
   /*
    * This returns the number of messages, packet, and flits that have been send
@@ -101,6 +92,19 @@ class Terminal : public Component, public MessageReceiver {
    */
   void endTransaction(u64 _trans);
 
+  /*
+   * This is called when a message is delivered to its destination sourced from
+   *  this terminal.
+   */
+  virtual void handleDeliveredMessage(Message* _message) = 0;
+
+  /*
+   * This is called when a message is received from the network to this
+   *  terminal.
+   * NOTE: This function is responsible for deleting the message.
+   */
+  virtual void handleReceivedMessage(Message* _message) = 0;
+
   // members for subclasses
   const u32 id_;
   const std::vector<u32> address_;
@@ -109,12 +113,12 @@ class Terminal : public Component, public MessageReceiver {
   Application* app_;
   MessageReceiver* messageReceiver_;
 
-  RateMonitor* supplyMonitor_;
   RateMonitor* injectionMonitor_;
   RateMonitor* deliveredMonitor_;
   RateMonitor* ejectionMonitor_;
 
   u32 messagesSent_;
+  u32 messagesDelivered_;
   u32 messagesReceived_;
   u32 transactionsCreated_;
   std::unordered_set<Message*> outstandingMessages_;

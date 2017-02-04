@@ -44,6 +44,9 @@ class RandomMessageSizeDistribution : public MessageSizeDistribution {
  private:
   const u32 minMessageSize_;
   const u32 maxMessageSize_;
+  const bool doDependent_;
+  const u32 depMinMessageSize_;
+  const u32 depMaxMessageSize_;
 };
 
 #endif  // TRAFFIC_RANDOMMESSAGESIZEDISTRIBUTION_H_

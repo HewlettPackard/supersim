@@ -191,13 +191,16 @@ void Interface::sendFlit(u32 _port, Flit* _flit) {
   assert(_port == 0);
   assert(outputChannel_->getNextFlit() == nullptr);
   outputChannel_->setNextFlit(_flit);
+
+  // check source is correct
+  u32 src = _flit->packet()->message()->getSourceId();
+  (void)src;  // unused
+  assert(src == id_);
 }
 
 void Interface::receiveFlit(u32 _port, Flit* _flit) {
   assert(_port == 0);
   assert(_flit != nullptr);
-
-  dbgprintf("received flit from network");
 
   // send a credit back
   sendCredit(_port, _flit->getVc());
@@ -239,7 +242,7 @@ void Interface::receiveCredit(u32 _port, Credit* _credit) {
   assert(_port == 0);
   while (_credit->more()) {
     u32 vc = _credit->getNum();
-    dbgprintf("port = %u, vc = %u", _port, vc);
+    // dbgprintf("port = %u, vc = %u", _port, vc);
     crossbarScheduler_->incrementCreditCount(vc);
   }
   delete _credit;

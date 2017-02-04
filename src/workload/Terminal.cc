@@ -24,9 +24,9 @@
 Terminal::Terminal(const std::string& _name, const Component* _parent, u32 _id,
                    const std::vector<u32>& _address, Application* _app)
     : Component(_name, _parent), id_(_id), address_(_address), app_(_app),
-      messagesSent_(0), messagesReceived_(0), transactionsCreated_(0) {
+      messagesSent_(0), messagesDelivered_(0), messagesReceived_(0),
+      transactionsCreated_(0) {
   // create the rate monitors
-  supplyMonitor_ = new RateMonitor("SupplyMonitor", this);
   injectionMonitor_ = new RateMonitor("InjectionMonitor", this);
   deliveredMonitor_ = new RateMonitor("DeliveredMonitor", this);
   ejectionMonitor_ = new RateMonitor("EjectionMonitor", this);
@@ -37,7 +37,6 @@ Terminal::~Terminal() {
        ++it) {
     delete *it;
   }
-  delete supplyMonitor_;
   delete injectionMonitor_;
   delete deliveredMonitor_;
   delete ejectionMonitor_;
@@ -56,14 +55,12 @@ Application* Terminal::application() const {
 }
 
 void Terminal::startRateMonitors() {
-  supplyMonitor_->start();
   injectionMonitor_->start();
   deliveredMonitor_->start();
   ejectionMonitor_->start();
 }
 
 void Terminal::endRateMonitors() {
-  supplyMonitor_->end();
   injectionMonitor_->end();
   deliveredMonitor_->end();
   ejectionMonitor_->end();
@@ -71,7 +68,6 @@ void Terminal::endRateMonitors() {
 
 void Terminal::logRates(RateLog* _rateLog) {
   _rateLog->logRates(id_, name(),
-                     supplyMonitor_->rate(),
                      injectionMonitor_->rate(),
                      deliveredMonitor_->rate(),
                      ejectionMonitor_->rate());
@@ -79,6 +75,10 @@ void Terminal::logRates(RateLog* _rateLog) {
 
 u32 Terminal::messagesSent() const {
   return messagesSent_;
+}
+
+u32 Terminal::messagesDelivered() const {
+  return messagesDelivered_;
 }
 
 u32 Terminal::messagesReceived() const {
@@ -93,28 +93,37 @@ void Terminal::setMessageReceiver(MessageReceiver* _receiver) {
   messageReceiver_ = _receiver;
 }
 
+void Terminal::messageDelivered(Message* _message) {
+  // log this occurrence
+  deliveredMonitor_->monitorMessage(_message);
+
+  // remove this message from the outstanding list
+  u64 res = outstandingMessages_.erase(_message);
+  (void)res;  // unused
+  assert(res == 1);
+
+  // count the message delivered
+  messagesDelivered_++;
+
+  // allow subclasses to act upon message delivery
+  handleDeliveredMessage(_message);
+}
+
 void Terminal::receiveMessage(Message* _message) {
   // log this occurrence
   ejectionMonitor_->monitorMessage(_message);
 
+  // count the message received
+  messagesReceived_++;
+
+  // notify the owner of delivery
+  _message->getOwner()->messageDelivered(_message);
+
   // change the owner of the message to this terminal
   _message->setOwner(this);
-}
 
-void Terminal::messageEnteredInterface(Message* _message) {
-  // log this occurrence
-  injectionMonitor_->monitorMessage(_message);
-}
-
-void Terminal::messageExitedNetwork(Message* _message) {
-  // log this occurrence
-  deliveredMonitor_->monitorMessage(_message);
-
-  // remove this message from the outstanding list and count it
-  u64 res = outstandingMessages_.erase(_message);
-  (void)res;  // unused
-  assert(res == 1);
-  messagesReceived_++;
+  // allow subclasses to act upon message reception
+  handleReceivedMessage(_message);
 }
 
 void Terminal::enrouteCount(u32* _messages, u32* _packets, u32* _flits) const {
@@ -131,7 +140,7 @@ void Terminal::enrouteCount(u32* _messages, u32* _packets, u32* _flits) const {
 
 u32 Terminal::sendMessage(Message* _message, u32 _destinationId) {
   // log this occurrence
-  supplyMonitor_->monitorMessage(_message);
+  injectionMonitor_->monitorMessage(_message);
 
   // set each packet's metadata
   u32 numPackets = _message->numPackets();
@@ -140,7 +149,7 @@ u32 Terminal::sendMessage(Message* _message, u32 _destinationId) {
     app_->metadataHandler()->packetInjection(app_, packet);
   }
 
-  // handle the message as a whole
+  // set up the message for transmission
   u32 msgId = messagesSent_;
   messagesSent_++;
   _message->setOwner(this);
@@ -150,10 +159,16 @@ u32 Terminal::sendMessage(Message* _message, u32 _destinationId) {
   _message->setDestinationId(_destinationId);
   Terminal* dest = application()->getTerminal(_destinationId);
   _message->setDestinationAddress(&dest->address_);
-  messageReceiver_->receiveMessage(_message);
+
+  // track the message as an outstanding message
   bool res = outstandingMessages_.insert(_message).second;
   (void)res;  // unused
   assert(res);
+
+  // pass the message to the next stage
+  messageReceiver_->receiveMessage(_message);
+
+  // return the msgId incase the application logic needs it
   return msgId;
 }
 

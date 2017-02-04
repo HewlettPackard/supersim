@@ -42,3 +42,29 @@ TEST(SingleMessageSizeDistribution, simple) {
 
   delete msd;
 }
+
+TEST(SingleMessageSizeDistribution, dependent) {
+  TestSetup ts(123, 123, 123);
+
+  const u32 SIZE = 3;
+
+  Json::Value settings;
+  settings["type"] = "single";
+  settings["message_size"] = SIZE;
+  settings["dependent_message_size"] = SIZE+1;
+
+  MessageSizeDistribution* msd =
+      MessageSizeDistributionFactory::createMessageSizeDistribution(
+          "msd", nullptr, settings);
+
+  const u32 ROUNDS = 5000000;
+  for (u32 round = 0; round < ROUNDS; round++) {
+    u32 size;
+    size = msd->nextMessageSize();
+    ASSERT_EQ(size, SIZE);
+    size = msd->nextMessageSize(nullptr);
+    ASSERT_EQ(size, SIZE+1);
+  }
+
+  delete msd;
+}

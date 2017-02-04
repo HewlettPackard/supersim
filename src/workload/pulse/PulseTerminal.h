@@ -40,34 +40,47 @@ class PulseTerminal : public Terminal {
                 ::Application* _app, Json::Value _settings);
   ~PulseTerminal();
   void processEvent(void* _event, s32 _type) override;
-  void receiveMessage(Message* _message) override;
-  void messageEnteredInterface(Message* _message) override;
-  void messageExitedNetwork(Message* _message) override;
   f64 percentComplete() const;
+  f64 requestInjectionRate() const;
   void start();
 
- private:
-  void sendNextMessage();
+ protected:
+  void handleDeliveredMessage(Message* _message) override;
+  void handleReceivedMessage(Message* _message) override;
 
+ private:
+  void completeTracking(Message* _message);
+  void completeLoggable(Message* _message);
+  void sendNextRequest();
+  void sendNextResponse(Message* _request);
+
+  // traffic generation
+  f64 requestInjectionRate_;
+  u32 numTransactions_;
+  u32 maxPacketSize_;  // flits
   TrafficPattern* trafficPattern_;
   MessageSizeDistribution* messageSizeDistribution_;
 
-  u32 trafficClass_;
+  // state machine
+  bool sendStalled_;
 
-  // messages
-  u32 numMessages_;
-  u32 maxPacketSize_;  // flits
-  bool fakeResponses_;  // sends 1 flit msgs 50% of time
+  // requests
+  u32 requestTrafficClass_;
+
+  // responses
+  bool enableResponses_;
+  u32 maxOutstandingTransactions_;  // 0=inf, >0=limit
+  std::unordered_set<u64> outstandingTransactions_;
+  u32 responseTrafficClass_;
+  u64 requestProcessingLatency_;  // cycles
 
   // start time delay
   u64 delay_;
 
-  // message generator
-  u64 lastSendTime_;
-
-  // counter
-  u32 loggableEnteredCount_;
-  u32 loggableExitedCount_;
+  // logging and message generation
+  std::unordered_set<u32> transactionsToLog_;
+  u32 requestsSent_;
+  u32 loggableCompleteCount_;
 };
 
 }  // namespace Pulse

@@ -52,10 +52,33 @@ void ProcessorTerminal::processEvent(void* _event, s32 _type) {
   startNextMemoryAccess();
 }
 
-void ProcessorTerminal::receiveMessage(Message* _message) {
-  // any override of this function must call the base class's function
-  ::Terminal::receiveMessage(_message);
+f64 ProcessorTerminal::percentComplete() const {
+  f64 pc = 1.0 - ((f64)remainingAccesses_ / (f64)numMemoryAccesses_);
+  dbgprintf("Percent complete: %f", pc);
+  return pc;
+}
 
+void ProcessorTerminal::start() {
+  continueProcessing();
+}
+
+void ProcessorTerminal::continueProcessing() {
+  if (remainingAccesses_ > 0) {
+    dbgprintf("starting processing");
+    addEvent(gSim->futureCycle(Simulator::Clock::CHANNEL, latency_),
+             0, nullptr, 0);
+    fsm_ = eState::kProcessing;
+  } else {
+    Application* app = reinterpret_cast<Application*>(application());
+    app->processorComplete(id_);
+  }
+}
+
+void ProcessorTerminal::handleDeliveredMessage(Message* _message) {
+  // I don't need to care about this
+}
+
+void ProcessorTerminal::handleReceivedMessage(Message* _message) {
   dbgprintf("received message");
 
   // log the message
@@ -83,38 +106,6 @@ void ProcessorTerminal::receiveMessage(Message* _message) {
   remainingAccesses_--;
   dbgprintf("remaining accesses = %u", remainingAccesses_);
   continueProcessing();
-}
-
-void ProcessorTerminal::messageEnteredInterface(Message* _message) {
-  // any override of this function must call the base class's function
-  ::Terminal::messageEnteredInterface(_message);
-}
-
-void ProcessorTerminal::messageExitedNetwork(Message* _message) {
-  // any override of this function must call the base class's function
-  ::Terminal::messageExitedNetwork(_message);
-}
-
-f64 ProcessorTerminal::percentComplete() const {
-  f64 pc = 1.0 - ((f64)remainingAccesses_ / (f64)numMemoryAccesses_);
-  dbgprintf("Percent complete: %f", pc);
-  return pc;
-}
-
-void ProcessorTerminal::start() {
-  continueProcessing();
-}
-
-void ProcessorTerminal::continueProcessing() {
-  if (remainingAccesses_ > 0) {
-    dbgprintf("starting processing");
-    addEvent(gSim->futureCycle(Simulator::Clock::CHANNEL, latency_),
-             0, nullptr, 0);
-    fsm_ = eState::kProcessing;
-  } else {
-    Application* app = reinterpret_cast<Application*>(application());
-    app->processorComplete(id_);
-  }
 }
 
 void ProcessorTerminal::startNextMemoryAccess() {

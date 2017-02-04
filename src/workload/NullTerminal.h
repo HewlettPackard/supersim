@@ -29,9 +29,10 @@ class NullTerminal : public Terminal {
   NullTerminal(const std::string& _name, const Component* _parent, u32 _id,
                const std::vector<u32>& _address, Application* _app);
   virtual ~NullTerminal();
-  void receiveMessage(Message* _message) override;
-  void messageEnteredInterface(Message* _message) override;
-  void messageExitedNetwork(Message* _message) override;
+
+ protected:
+  void handleDeliveredMessage(Message* _message) override;
+  void handleReceivedMessage(Message* _message) override;
 };
 
 #endif  // WORKLOAD_NULLTERMINAL_H_

@@ -22,7 +22,9 @@
 ProbabilityMessageSizeDistribution::ProbabilityMessageSizeDistribution(
       const std::string& _name, const Component* _parent,
       Json::Value _settings)
-    :MessageSizeDistribution(_name, _parent) {
+    :MessageSizeDistribution(_name, _parent),
+     doDependent_(_settings.isMember("dependent_message_sizes") &&
+                  _settings.isMember("dependent_size_probabilities")) {
   // verify input settings
   assert(_settings.isMember("message_sizes") &&
          _settings["message_sizes"].isArray());
@@ -31,6 +33,18 @@ ProbabilityMessageSizeDistribution::ProbabilityMessageSizeDistribution(
   assert(_settings["message_sizes"].size() > 0);
   assert(_settings["message_sizes"].size() ==
          _settings["size_probabilities"].size());
+  if (!doDependent_) {
+    assert(!_settings.isMember("dependent_message_sizes"));
+    assert(!_settings.isMember("dependent_size_probabilities"));
+  } else {
+    assert(_settings.isMember("dependent_message_sizes") &&
+           _settings["dependent_message_sizes"].isArray());
+    assert(_settings.isMember("dependent_size_probabilities") &&
+           _settings["dependent_size_probabilities"].isArray());
+    assert(_settings["dependent_message_sizes"].size() > 0);
+    assert(_settings["dependent_message_sizes"].size() ==
+           _settings["dependent_size_probabilities"].size());
+  }
 
   // create a probability array and message size array
   u32 size = _settings["message_sizes"].size();
@@ -49,6 +63,26 @@ ProbabilityMessageSizeDistribution::ProbabilityMessageSizeDistribution(
   // create a cumulative distribution from the probability distribution
   mut::generateCumulativeDistribution(probabilityDistribution,
                                       &cumulativeDistribution_);
+
+  if (doDependent_) {
+    // create a probability array and message size array
+    u32 depSize = _settings["dependent_message_sizes"].size();
+    depMessageSizes_.resize(depSize);
+    std::vector<f64> depProbabilityDistribution(depSize);
+
+    // parse the message size array and the size probabilities array
+    for (u32 idx = 0; idx < depSize; idx++) {
+      u32 depMessageSize = _settings["dependent_message_sizes"][idx].asUInt();
+      assert(depMessageSize > 0);
+      depMessageSizes_.at(idx) = depMessageSize;
+      depProbabilityDistribution.at(idx) =
+          _settings["dependent_size_probabilities"][idx].asDouble();
+    }
+
+    // create a cumulative distribution from the probability distribution
+    mut::generateCumulativeDistribution(depProbabilityDistribution,
+                                        &depCumulativeDistribution_);
+  }
 }
 
 ProbabilityMessageSizeDistribution::~ProbabilityMessageSizeDistribution() {}
@@ -68,5 +102,12 @@ u32 ProbabilityMessageSizeDistribution::nextMessageSize() {
 }
 
 u32 ProbabilityMessageSizeDistribution::nextMessageSize(const Message* _msg) {
-  return nextMessageSize();
+  if (doDependent_) {
+    f64 rnd = gSim->rnd.nextF64();
+    u32 idx = mut::searchCumulativeDistribution(
+        depCumulativeDistribution_, rnd);
+    return depMessageSizes_.at(idx);
+  } else {
+    return nextMessageSize();
+  }
 }

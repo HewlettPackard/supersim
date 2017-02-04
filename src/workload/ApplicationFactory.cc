@@ -18,28 +18,28 @@
 #include <cassert>
 
 #include "workload/Application.h"
+#include "workload/blast/Application.h"
 #include "workload/pulse/Application.h"
-#include "workload/stresstest/Application.h"
 #include "workload/simplemem/Application.h"
-#include "workload/singlestream/Application.h"
+#include "workload/stream/Application.h"
 
 Application* ApplicationFactory::createApplication(
     const std::string& _name, const Component* _parent, u32 _id,
     Workload* _workload, MetadataHandler* _metadataHandler,
     Json::Value _settings) {
   std::string type = _settings["type"].asString();
-  if (type == "stress_test") {
-    return new StressTest::Application(_name, _parent, _id, _workload,
-                                       _metadataHandler, _settings);
+  if (type == "blast") {
+    return new Blast::Application(_name, _parent, _id, _workload,
+                                  _metadataHandler, _settings);
   } else if (type == "pulse") {
     return new Pulse::Application(_name, _parent, _id, _workload,
                                   _metadataHandler, _settings);
   } else if (type == "simple_mem") {
     return new SimpleMem::Application(_name, _parent, _id, _workload,
                                       _metadataHandler, _settings);
-  } else if (type == "single_stream") {
-    return new SingleStream::Application(_name, _parent, _id, _workload,
-                                         _metadataHandler, _settings);
+  } else if (type == "stream") {
+    return new Stream::Application(_name, _parent, _id, _workload,
+                                   _metadataHandler, _settings);
   } else {
     fprintf(stderr, "unknown application type: %s\n", type.c_str());
     assert(false);

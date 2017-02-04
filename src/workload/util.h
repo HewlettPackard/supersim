@@ -18,7 +18,21 @@
 
 #include <prim/prim.h>
 
+/*
+ * This generates a 64-bit transaction ID.
+ */
 u64 transactionId(u32 _appId, u32 _termId, u32 _msgId);
+
+/*
+ * This extracts the 8-bit application ID from the transaction ID.
+ */
 u32 appId(u64 _transId);
+
+/*
+ * This computes how many cycles it would take to send a packet with the
+ *  specified number of flits. Probabilistic injection is used when the number
+ *  of cycles isn't a deterministic value.
+ */
+u64 cyclesToSend(f64 _injectionRate, u32 _numFlits);
 
 #endif  // WORKLOAD_UTIL_H_

@@ -45,6 +45,9 @@ class ProbabilityMessageSizeDistribution : public MessageSizeDistribution {
  private:
   std::vector<u32> messageSizes_;
   std::vector<f64> cumulativeDistribution_;
+  const bool doDependent_;
+  std::vector<u32> depMessageSizes_;
+  std::vector<f64> depCumulativeDistribution_;
 };
 
 #endif  // TRAFFIC_PROBABILITYMESSAGESIZEDISTRIBUTION_H_

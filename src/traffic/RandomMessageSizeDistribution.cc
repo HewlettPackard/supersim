@@ -24,10 +24,22 @@ RandomMessageSizeDistribution::RandomMessageSizeDistribution(
     Json::Value _settings)
     : MessageSizeDistribution(_name, _parent),
       minMessageSize_(_settings["min_message_size"].asUInt()),
-      maxMessageSize_(_settings["max_message_size"].asUInt()) {
+      maxMessageSize_(_settings["max_message_size"].asUInt()),
+      doDependent_(_settings.isMember("dependent_min_message_size") &&
+                   _settings.isMember("dependent_max_message_size")),
+      depMinMessageSize_(_settings["dependent_min_message_size"].asUInt()),
+      depMaxMessageSize_(_settings["dependent_max_message_size"].asUInt()) {
   assert(minMessageSize_ > 0);
   assert(maxMessageSize_ > 0);
   assert(maxMessageSize_ >= minMessageSize_);
+  if (doDependent_) {
+      assert(depMinMessageSize_ > 0);
+      assert(depMaxMessageSize_ > 0);
+      assert(depMaxMessageSize_ >= depMinMessageSize_);
+  } else {
+    assert(_settings["dependent_min_message_size"].isNull());
+    assert(_settings["dependent_max_message_size"].isNull());
+  }
 }
 
 RandomMessageSizeDistribution::~RandomMessageSizeDistribution() {}
@@ -45,5 +57,9 @@ u32 RandomMessageSizeDistribution::nextMessageSize() {
 }
 
 u32 RandomMessageSizeDistribution::nextMessageSize(const Message* _msg) {
-  return nextMessageSize();
+  if (doDependent_) {
+    return gSim->rnd.nextU64(depMinMessageSize_, depMaxMessageSize_);
+  } else {
+    return nextMessageSize();
+  }
 }

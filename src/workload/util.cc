@@ -15,10 +15,34 @@
  */
 #include "workload/util.h"
 
+#include <cassert>
+
+#include "event/Simulator.h"
+
 u64 transactionId(u32 _appId, u32 _termId, u32 _msgId) {
   return ((u64)_appId << 56) | ((u64)_termId << 32) | ((u64)_msgId);
 }
 
 u32 appId(u64 _transId) {
   return (u32)(_transId >> 56);
+}
+
+u64 cyclesToSend(f64 _injectionRate, u32 _numFlits) {
+  if (std::isinf(_injectionRate)) {
+    return 0;  // infinite injection rate
+  }
+  assert(_injectionRate > 0.0);
+  f64 cycles = _numFlits / _injectionRate;
+
+  // if the number of cycles is not even, probablistic cycles must be computed
+  f64 fraction = modf(cycles, &cycles);
+  if (fraction != 0.0) {
+    assert(fraction > 0.0);
+    assert(fraction < 1.0);
+    f64 rnd = gSim->rnd.nextF64();
+    if (fraction > rnd) {
+      cycles += 1.0;
+    }
+  }
+  return (u64)cycles;
 }

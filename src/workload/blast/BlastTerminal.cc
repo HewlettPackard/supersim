@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "workload/pulse/PulseTerminal.h"
+#include "workload/blast/BlastTerminal.h"
 
+#include <fio/InFile.h>
 #include <mut/mut.h>
+#include <strop/strop.h>
 
 #include <cassert>
 #include <cmath>
@@ -28,7 +30,7 @@
 #include "types/Packet.h"
 #include "traffic/MessageSizeDistributionFactory.h"
 #include "traffic/TrafficPatternFactory.h"
-#include "workload/pulse/Application.h"
+#include "workload/blast/Application.h"
 #include "workload/util.h"
 
 // these are event types
@@ -39,9 +41,9 @@
 void* const kRequestMsg = reinterpret_cast<void* const>(kRequestEvt);
 void* const kResponseMsg = reinterpret_cast<void* const>(kResponseEvt);
 
-namespace Pulse {
+namespace Blast {
 
-PulseTerminal::PulseTerminal(const std::string& _name, const Component* _parent,
+BlastTerminal::BlastTerminal(const std::string& _name, const Component* _parent,
                              u32 _id, const std::vector<u32>& _address,
                              ::Application* _app, Json::Value _settings)
     : ::Terminal(_name, _parent, _id, _address, _app) {
@@ -50,6 +52,35 @@ PulseTerminal::PulseTerminal(const std::string& _name, const Component* _parent,
          _settings["request_injection_rate"].isDouble());
   requestInjectionRate_ = _settings["request_injection_rate"].asDouble();
   assert(requestInjectionRate_ >= 0.0 && requestInjectionRate_ <= 1.0);
+
+  // if relative injection is specified, modify the injection accordingly
+  if (_settings.isMember("relative_injection")) {
+    // if a file is given, it is a csv of injection rates
+    fio::InFile inf(_settings["relative_injection"].asString());
+    std::string line;
+    u32 lineNum = 0;
+    fio::InFile::Status sts = fio::InFile::Status::OK;
+    bool foundMe = false;
+    for (lineNum = 0; sts == fio::InFile::Status::OK;) {
+      sts = inf.getLine(&line);
+      assert(sts != fio::InFile::Status::ERROR);
+      if (sts == fio::InFile::Status::OK) {
+        if (line.size() > 0) {
+          std::vector<std::string> strs = strop::split(line, ',');
+          assert(strs.size() == 1);
+          f64 ri = std::stod(strs.at(0));
+          assert(ri >= 0.0);
+          if (lineNum == id_) {
+            requestInjectionRate_ *= ri;
+            foundMe = true;
+            break;
+          }
+          lineNum++;
+        }
+      }
+    }
+    assert(foundMe);
+  }
 
   // transaction quantity limitation
   assert(_settings.isMember("num_transactions"));
@@ -97,16 +128,38 @@ PulseTerminal::PulseTerminal(const std::string& _name, const Component* _parent,
   assert(!enableResponses_ || _settings.isMember("response_traffic_class"));
   responseTrafficClass_ = _settings["response_traffic_class"].asUInt();
 
-  // start time delay
-  assert(_settings.isMember("delay"));
-  delay_ = _settings["delay"].asUInt();
+  // warmup/saturation detector
+  fsm_ = BlastTerminal::Fsm::WARMING;
+  warmupInterval_ = _settings["warmup_interval"].asUInt();
+  assert(warmupInterval_ > 0);
+  warmupFlitsReceived_ = 0;
+  warmupWindow_ = _settings["warmup_window"].asUInt();
+  assert(warmupWindow_ >= 5);
+  maxWarmupAttempts_ = _settings["warmup_attempts"].asUInt();
+  assert(maxWarmupAttempts_ > 0);
+  warmupAttempts_ = 0;
+  enrouteSamplePos_ = 0;
+  fastFailSample_ = U32_MAX;
+
+  // choose a random number of cycles in the future to start
+  // make an event to start the BlastTerminal in the future
+  if (requestInjectionRate_ > 0.0) {
+    u32 maxMsg = messageSizeDistribution_->maxMessageSize();
+    u64 cycles = cyclesToSend(requestInjectionRate_, maxMsg);
+    cycles = gSim->rnd.nextU64(1, 1 + cycles * 3);
+    u64 time = gSim->futureCycle(Simulator::Clock::CHANNEL, 1) +
+        ((cycles - 1) * gSim->cycleTime(Simulator::Clock::CHANNEL));
+    dbgprintf("start time is %lu", time);
+    addEvent(time, 0, nullptr, kRequestEvt);
+  } else {
+    dbgprintf("not running");
+  }
 
   // initialize the counters
-  requestsSent_ = 0;
   loggableCompleteCount_ = 0;
 }
 
-PulseTerminal::~PulseTerminal() {
+BlastTerminal::~BlastTerminal() {
   assert(sendStalled_ == false);
   assert(outstandingTransactions_.size() == 0);
 
@@ -114,11 +167,13 @@ PulseTerminal::~PulseTerminal() {
   delete messageSizeDistribution_;
 }
 
-void PulseTerminal::processEvent(void* _event, s32 _type) {
+void BlastTerminal::processEvent(void* _event, s32 _type) {
   switch (_type) {
     case kRequestEvt:
       assert(_event == nullptr);
-      sendNextRequest();
+      if (fsm_ != BlastTerminal::Fsm::DRAINING) {
+        sendNextRequest();
+      }
       break;
 
     case kResponseEvt:
@@ -131,43 +186,56 @@ void PulseTerminal::processEvent(void* _event, s32 _type) {
   }
 }
 
-f64 PulseTerminal::percentComplete() const {
-  if (numTransactions_ == 0) {
-    return 1.0;
+f64 BlastTerminal::percentComplete() const {
+  if (fsm_ >= BlastTerminal::Fsm::LOGGING) {
+    if (numTransactions_ == 0) {
+      return 1.0;
+    } else {
+      u32 count = std::min(loggableCompleteCount_, numTransactions_);
+      return (f64)count / (f64)numTransactions_;
+    }
   } else {
-    u32 count = std::min(loggableCompleteCount_, numTransactions_);
-    return (f64)count / (f64)numTransactions_;
+    return 0.0;
   }
 }
 
-f64 PulseTerminal::requestInjectionRate() const {
+f64 BlastTerminal::requestInjectionRate() const {
   return requestInjectionRate_;
 }
 
-void PulseTerminal::start() {
-  Application* app = reinterpret_cast<Application*>(application());
+void BlastTerminal::stopWarming() {
+  fsm_ = BlastTerminal::Fsm::WARM_BLABBING;
+}
 
+void BlastTerminal::startLogging() {
+  // clear the samples in case it hasn't already happened
+  enrouteSampleTimes_.clear();
+  enrouteSampleValues_.clear();
+
+  fsm_ = BlastTerminal::Fsm::LOGGING;
   if (numTransactions_ == 0) {
-    dbgprintf("complete");
-    app->terminalComplete(id_);
-  } else {
-    // choose a random number of cycles in the future to start
-    // make an event to start the PulseTerminal in the future
-    if (requestInjectionRate_ > 0.0) {
-      u32 maxMsg = messageSizeDistribution_->maxMessageSize();
-      u64 cycles = cyclesToSend(requestInjectionRate_, maxMsg);
-      cycles = gSim->rnd.nextU64(delay_, delay_ + cycles * 3);
-      u64 time = gSim->futureCycle(Simulator::Clock::CHANNEL, 1) +
-          ((cycles - 1) * gSim->cycleTime(Simulator::Clock::CHANNEL));
-      dbgprintf("start time is %lu", time);
-      addEvent(time, 0, nullptr, kRequestEvt);
-    } else {
-      dbgprintf("not running");
-    }
+    complete();
   }
 }
 
-void PulseTerminal::handleDeliveredMessage(Message* _message) {
+void BlastTerminal::stopLogging() {
+  fsm_ = BlastTerminal::Fsm::LOG_BLABBING;
+  if (numTransactions_ == 0 ||
+      transactionsToLog_.size() == 0) {
+    done();
+  }
+}
+
+void BlastTerminal::stopSending() {
+  fsm_ = BlastTerminal::Fsm::DRAINING;
+}
+
+void BlastTerminal::handleDeliveredMessage(Message* _message) {
+  // process for each warmup window
+  if (fsm_ == BlastTerminal::Fsm::WARMING) {
+    warmDetector(_message);
+  }
+
   // handle request only transaction tracking
   void* msgType = _message->getData();
   u64 transId = _message->getTransaction();
@@ -190,7 +258,7 @@ void PulseTerminal::handleDeliveredMessage(Message* _message) {
   }
 }
 
-void PulseTerminal::handleReceivedMessage(Message* _message) {
+void BlastTerminal::handleReceivedMessage(Message* _message) {
   Application* app = reinterpret_cast<Application*>(application());
   void* msgType = _message->getData();
   u64 transId = _message->getTransaction();
@@ -229,8 +297,10 @@ void PulseTerminal::handleReceivedMessage(Message* _message) {
     // if responses are enabled and requests have been stalled due to limited
     //  tracker entries, signal a send operation to resume
     sendStalled_ = false;
-    u64 reqTime = gSim->futureCycle(Simulator::Clock::CHANNEL, 1);
-    addEvent(reqTime, 0, nullptr, kRequestEvt);
+    if (fsm_ != BlastTerminal::Fsm::DRAINING) {
+      u64 reqTime = gSim->futureCycle(Simulator::Clock::CHANNEL, 1);
+      addEvent(reqTime, 0, nullptr, kRequestEvt);
+    }
   }
 
   // delete the message if no longer needed
@@ -240,7 +310,91 @@ void PulseTerminal::handleReceivedMessage(Message* _message) {
   }
 }
 
-void PulseTerminal::completeTracking(Message* _message) {
+void BlastTerminal::warmDetector(Message* _message) {
+  // count flits received
+  warmupFlitsReceived_ += _message->numFlits();
+  if (warmupFlitsReceived_ >= warmupInterval_) {
+    warmupFlitsReceived_ %= warmupInterval_;
+
+    u32 msgs;
+    u32 pkts;
+    u32 flits;
+    enrouteCount(&msgs, &pkts, &flits);
+    dbgprintf("enroute: msgs=%u pkts=%u flits=%u", msgs, pkts, flits);
+
+    // push this sample into the cyclic buffers
+    if (enrouteSampleTimes_.size() < warmupWindow_) {
+      enrouteSampleTimes_.push_back(gSim->cycle(Simulator::Clock::CHANNEL));
+      enrouteSampleValues_.push_back(flits);
+    } else {
+      enrouteSampleTimes_.at(enrouteSamplePos_) = gSim->time();
+      enrouteSampleValues_.at(enrouteSamplePos_) = flits;
+      enrouteSamplePos_ = (enrouteSamplePos_ + 1) % warmupWindow_;
+    }
+
+    bool warmed = false;
+    bool saturated = false;
+
+    // run the fast fail logic for early saturation detection
+    if (enrouteSampleTimes_.size() == warmupWindow_) {
+      if (fastFailSample_ == U32_MAX) {
+        fastFailSample_ = *std::max_element(enrouteSampleValues_.begin(),
+                                            enrouteSampleValues_.end());
+        dbgprintf("fast fail sample = %u", fastFailSample_);
+      } else if (flits > (fastFailSample_ * 3)) {
+        dbgprintf("fast fail detected");
+        saturated = true;
+      }
+    }
+
+    // after enough samples were taken, try to figure out network status using
+    //  a sliding window linear regression
+    if (enrouteSampleTimes_.size() == warmupWindow_) {
+      warmupAttempts_++;
+      dbgprintf("warmup attempt %u of %u",
+                warmupAttempts_, maxWarmupAttempts_);
+      f64 growthRate = mut::slope<u64>(enrouteSampleTimes_,
+                                       enrouteSampleValues_);
+      dbgprintf("growthRate: %e", growthRate);
+      if (growthRate <= 0.0) {
+        warmed = true;
+      } else if (warmupAttempts_ == maxWarmupAttempts_) {
+        saturated = true;
+      }
+    }
+
+    // react to warmed or saturated
+    if (warmed || saturated) {
+      warm(saturated);
+    }
+  }
+}
+
+void BlastTerminal::warm(bool _saturated) {
+  fsm_ = BlastTerminal::Fsm::WARM_BLABBING;
+  Application* app = reinterpret_cast<Application*>(application());
+  if (_saturated) {
+    dbgprintf("saturated");
+    app->terminalSaturated(id_);
+  } else {
+    dbgprintf("warmed");
+    app->terminalWarmed(id_);
+  }
+  enrouteSampleTimes_.clear();
+  enrouteSampleValues_.clear();
+}
+
+void BlastTerminal::complete() {
+  Application* app = reinterpret_cast<Application*>(application());
+  app->terminalComplete(id_);
+}
+
+void BlastTerminal::done() {
+  Application* app = reinterpret_cast<Application*>(application());
+  app->terminalDone(id_);
+}
+
+void BlastTerminal::completeTracking(Message* _message) {
   // remove this transaction from the tracker
   u32 res = outstandingTransactions_.erase(_message->getTransaction());
   (void)res;  // unused
@@ -250,7 +404,7 @@ void PulseTerminal::completeTracking(Message* _message) {
   endTransaction(_message->getTransaction());
 }
 
-void PulseTerminal::completeLoggable(Message* _message) {
+void BlastTerminal::completeLoggable(Message* _message) {
   // clear the logging entry
   u64 res = transactionsToLog_.erase(_message->getTransaction());
   (void)res;  // unused
@@ -262,14 +416,19 @@ void PulseTerminal::completeLoggable(Message* _message) {
   loggableCompleteCount_++;
 
   // detect when logging complete
-  //  this also completes the terminal
   if (loggableCompleteCount_ == numTransactions_) {
-    dbgprintf("complete");
-    app->terminalComplete(id_);
+    complete();
+  }
+
+  // detect when logging is empty
+  if (fsm_ == BlastTerminal::Fsm::LOG_BLABBING) {
+    if (transactionsToLog_.size() == 0) {
+      done();
+    }
   }
 }
 
-void PulseTerminal::sendNextRequest() {
+void BlastTerminal::sendNextRequest() {
   Application* app = reinterpret_cast<Application*>(application());
 
   // determine if another request can be generated
@@ -277,6 +436,7 @@ void PulseTerminal::sendNextRequest() {
       (maxOutstandingTransactions_ == 0) ||
       (outstandingTransactions_.size() < maxOutstandingTransactions_)) {
     assert(!sendStalled_);
+    assert(fsm_ != BlastTerminal::Fsm::DRAINING);
 
     // generate a new request
     u32 destination = trafficPattern_->nextDestination();
@@ -291,11 +451,13 @@ void PulseTerminal::sendNextRequest() {
     (void)res;  // unused
     assert(res);
 
-    // register the transaction for logging
-    bool res2 = transactionsToLog_.insert(transaction).second;
-    (void)res2;  // unused
-    assert(res2);
-    app->workload()->messageLog()->startTransaction(transaction);
+    // if in logging phase, register the transaction for logging
+    if (fsm_ == BlastTerminal::Fsm::LOGGING) {
+      bool res2 = transactionsToLog_.insert(transaction).second;
+      (void)res2;  // unused
+      assert(res2);
+      app->workload()->messageLog()->startTransaction(transaction);
+    }
 
     // determine the number of packets
     u32 numPackets = messageSize / maxPacketSize_;
@@ -333,24 +495,23 @@ void PulseTerminal::sendNextRequest() {
     (void)msgId;  // unused
 
     // determine when to send the next request
-    requestsSent_++;
-    if (requestsSent_ < numTransactions_) {
-      u64 cycles = cyclesToSend(requestInjectionRate_, messageSize);
-      u64 time = gSim->futureCycle(Simulator::Clock::CHANNEL, cycles);
-      if (time == gSim->time()) {
-        sendNextRequest();
-      } else {
-        addEvent(time, 0, nullptr, kRequestEvt);
-      }
+    u64 cycles = cyclesToSend(requestInjectionRate_, messageSize);
+    u64 time = gSim->futureCycle(Simulator::Clock::CHANNEL, cycles);
+    if (time == gSim->time()) {
+      sendNextRequest();
+    } else {
+      addEvent(time, 0, nullptr, kRequestEvt);
     }
   } else {
+    assert(fsm_ != BlastTerminal::Fsm::DRAINING);
+
     // can't generate a new request because the tracker is full
     // dbgprintf("tracker is full, new requests are stalled");
     sendStalled_ = true;
   }
 }
 
-void PulseTerminal::sendNextResponse(Message* _request) {
+void BlastTerminal::sendNextResponse(Message* _request) {
   assert(enableResponses_);
 
   // process the request received to make a response
@@ -400,4 +561,4 @@ void PulseTerminal::sendNextResponse(Message* _request) {
   (void)msgId;  // unused
 }
 
-}  // namespace Pulse
+}  // namespace Blast

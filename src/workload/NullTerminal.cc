@@ -24,14 +24,10 @@ NullTerminal::NullTerminal(const std::string& _name, const Component* _parent,
 
 NullTerminal::~NullTerminal() {}
 
-void NullTerminal::receiveMessage(Message* _message) {
+void NullTerminal::handleDeliveredMessage(Message* _message) {
   assert(false);
 }
 
-void NullTerminal::messageEnteredInterface(Message* _message) {
-  assert(false);
-}
-
-void NullTerminal::messageExitedNetwork(Message* _message) {
+void NullTerminal::handleReceivedMessage(Message* _message) {
   assert(false);
 }

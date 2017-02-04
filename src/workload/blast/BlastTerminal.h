@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef WORKLOAD_STRESSTEST_BLASTTERMINAL_H_
-#define WORKLOAD_STRESSTEST_BLASTTERMINAL_H_
+#ifndef WORKLOAD_BLAST_BLASTTERMINAL_H_
+#define WORKLOAD_BLAST_BLASTTERMINAL_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
 
+#include <queue>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "event/Component.h"
@@ -29,7 +31,7 @@
 
 class Application;
 
-namespace StressTest {
+namespace Blast {
 
 class Application;
 
@@ -40,14 +42,16 @@ class BlastTerminal : public Terminal {
                 ::Application* _app, Json::Value _settings);
   ~BlastTerminal();
   void processEvent(void* _event, s32 _type) override;
-  void receiveMessage(Message* _message) override;
-  void messageEnteredInterface(Message* _message) override;
-  void messageExitedNetwork(Message* _message) override;
   f64 percentComplete() const;
+  f64 requestInjectionRate() const;
   void stopWarming();
   void startLogging();
   void stopLogging();
   void stopSending();
+
+ protected:
+  void handleDeliveredMessage(Message* _message) override;
+  void handleReceivedMessage(Message* _message) override;
 
  private:
   // WARMING = sending and monitoring outstanding flits to determine if warm/sat
@@ -57,23 +61,35 @@ class BlastTerminal : public Terminal {
   enum class Fsm : u8 {WARMING = 0, WARM_BLABBING = 1, LOGGING = 2,
       LOG_BLABBING = 3 , DRAINING = 4};
 
+  void warmDetector(Message* _message);
   void warm(bool _saturated);
   void complete();
   void done();
-  void sendNextMessage();
-
-  TrafficPattern* trafficPattern_;
-  MessageSizeDistribution* messageSizeDistribution_;
-
-  u32 trafficClass_;
+  void completeTracking(Message* _message);
+  void completeLoggable(Message* _message);
+  void sendNextRequest();
+  void sendNextResponse(Message* _request);
 
   // state machine
   Fsm fsm_;
+  bool sendStalled_;
 
-  // messages
-  u32 numMessages_;
+  // traffic generation
+  f64 requestInjectionRate_;
+  u32 numTransactions_;
   u32 maxPacketSize_;  // flits
-  bool fakeResponses_;  // sends 1 flit msgs 50% of time
+  TrafficPattern* trafficPattern_;
+  MessageSizeDistribution* messageSizeDistribution_;
+
+  // requests
+  u32 requestTrafficClass_;
+
+  // responses
+  bool enableResponses_;
+  u32 maxOutstandingTransactions_;  // 0=inf, >0=limit
+  std::unordered_set<u64> outstandingTransactions_;
+  u32 responseTrafficClass_;
+  u64 requestProcessingLatency_;  // cycles
 
   // warmup/saturation detector
   u32 warmupInterval_;  // messages received
@@ -86,15 +102,11 @@ class BlastTerminal : public Terminal {
   u32 enrouteSamplePos_;
   u32 fastFailSample_;
 
-  // message generator
-  u64 lastSendTime_;
-
   // logging and message generation
-  std::unordered_set<u32> messagesToLog_;
-  u32 loggableEnteredCount_;
-  u32 loggableExitedCount_;
+  std::unordered_set<u32> transactionsToLog_;
+  u32 loggableCompleteCount_;
 };
 
-}  // namespace StressTest
+}  // namespace Blast
 
-#endif  // WORKLOAD_STRESSTEST_BLASTTERMINAL_H_
+#endif  // WORKLOAD_BLAST_BLASTTERMINAL_H_

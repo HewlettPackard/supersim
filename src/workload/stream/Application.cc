@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "workload/singlestream/Application.h"
+#include "workload/stream/Application.h"
 
 #include <cassert>
 
 #include <vector>
 
-#include "workload/singlestream/StreamTerminal.h"
+#include "workload/NullTerminal.h"
+#include "workload/stream/StreamTerminal.h"
 #include "event/Simulator.h"
 #include "network/Network.h"
 
-namespace SingleStream {
+namespace Stream {
 
 Application::Application(
     const std::string& _name, const Component* _parent, u32 _id,
@@ -59,8 +60,13 @@ Application::Application(
     std::string tname = "Terminal_" + std::to_string(t);
     std::vector<u32> address;
     gSim->getNetwork()->translateInterfaceIdToAddress(t, &address);
-    StreamTerminal* terminal = new StreamTerminal(
-        tname, this, t, address, this, _settings["stream_terminal"]);
+    Terminal* terminal;
+    if (t == sourceTerminal_ || t == destinationTerminal_) {
+      terminal = new StreamTerminal(tname, this, t, address, this,
+                                    _settings["stream_terminal"]);
+    } else {
+      terminal = new NullTerminal(tname, this, t, address, this);
+    }
     setTerminal(t, terminal);
   }
 }
@@ -112,4 +118,4 @@ void Application::destinationComplete(u32 _id) {
   workload_->applicationComplete(id_);
 }
 
-}  // namespace SingleStream
+}  // namespace Stream

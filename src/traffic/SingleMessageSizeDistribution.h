@@ -43,6 +43,8 @@ class SingleMessageSizeDistribution : public MessageSizeDistribution {
 
  private:
   const u32 messageSize_;
+  const bool doDependent_;
+  const u32 depMessageSize_;
 };
 
 #endif  // TRAFFIC_SINGLEMESSAGESIZEDISTRIBUTION_H_

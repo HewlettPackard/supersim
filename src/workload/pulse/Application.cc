@@ -42,7 +42,7 @@ Application::Application(
     setTerminal(t, terminal);
 
     // remove terminals with no injection
-    if (maxInjectionRate(t) == 0.0) {
+    if (terminal->requestInjectionRate() == 0.0) {
       activeTerminals_--;
     }
   }
