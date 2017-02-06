@@ -39,6 +39,10 @@ class PhantomBufferOccupancy : public CongestionStatus {
   f64 computeStatus(u32 _port, u32 _vc) const override;
 
  private:
+  enum class Mode {kVc, kPort};
+  static Mode parseMode(const std::string& _mode);
+
+  const Mode mode_;
   const f64 valueCoeff_;
   const f64 lengthCoeff_;
   std::vector<u32> maximums_;

@@ -53,6 +53,7 @@ TEST(PhantomBufferOccupancy, statusCheck) {
         statusSettings["granularity"] = granularity;
         statusSettings["value_coeff"] = valueCoeff;
         statusSettings["length_coeff"] = lengthCoeff;
+        statusSettings["mode"] = "vc";
         PhantomBufferOccupancy status("CongestionStatus", &router, &router,
                                       statusSettings);
         status.setDebug(debug);

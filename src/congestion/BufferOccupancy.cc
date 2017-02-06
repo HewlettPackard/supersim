@@ -21,7 +21,8 @@
 BufferOccupancy::BufferOccupancy(
     const std::string& _name, const Component* _parent, PortedDevice* _device,
     Json::Value _settings)
-    : CongestionStatus(_name, _parent, _device, _settings) {
+    : CongestionStatus(_name, _parent, _device, _settings),
+      mode_(parseMode(_settings["mode"].asString())) {
   u32 totalVcs = numPorts_ * numVcs_;
   maximums_.resize(totalVcs, 0);
   counts_.resize(totalVcs, 0);
@@ -51,7 +52,41 @@ void BufferOccupancy::performDecrementCredit(u32 _port, u32 _vc) {
 }
 
 f64 BufferOccupancy::computeStatus(u32 _port, u32 _vc) const {
-  u32 vcIdx = device_->vcIndex(_port, _vc);
-  return ((f64)maximums_.at(vcIdx) - (f64)counts_.at(vcIdx)) /
-      (f64)maximums_.at(vcIdx);
+  switch (mode_) {
+    case BufferOccupancy::Mode::kVc: {
+      // return this VC's status
+      u32 vcIdx = device_->vcIndex(_port, _vc);
+      return ((f64)maximums_.at(vcIdx) - (f64)counts_.at(vcIdx)) /
+          (f64)maximums_.at(vcIdx);
+      break;
+    }
+
+    case BufferOccupancy::Mode::kPort: {
+      // return the average status of all VCs in this port
+      u32 curSum = 0;
+      u32 maxSum = 0;
+      bool D = _port == 2 && _vc == 1;
+      for (u32 vc = 0; vc < numVcs_; vc++) {
+        u32 vcIdx = device_->vcIndex(_port, vc);
+        curSum += maximums_.at(vcIdx) - counts_.at(vcIdx);
+        maxSum += maximums_.at(vcIdx);
+      }
+      return (f64)curSum / (f64)maxSum;
+      break;
+    }
+
+    default:
+      assert(false);
+      break;
+  }
+}
+
+BufferOccupancy::Mode BufferOccupancy::parseMode(const std::string& _mode) {
+  if (_mode == "vc") {
+    return BufferOccupancy::Mode::kVc;
+  } else if (_mode == "port") {
+    return  BufferOccupancy::Mode::kPort;
+  } else {
+    assert(false);
+  }
 }

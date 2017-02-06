@@ -41,7 +41,8 @@
       "congestion_status": {
         "algorithm": "buffer_occupancy",
         "latency": 1,
-        "granularity": 0
+        "granularity": 0,
+        "mode": "port"
       },
       "input_queue_depth": 16,
       "vca_swa_wait": true,

@@ -229,7 +229,7 @@ void StatusCheck::setEvent(u64 _time, u8 _epsilon, u32 _port, u32 _vc,
 void StatusCheck::processEvent(void* _event, s32 _type) {
   Event* evt = reinterpret_cast<Event*>(_event);
   f64 sts = congestionStatus_->status(evt->port, evt->vc);
-  ASSERT_DOUBLE_EQ(sts, evt->exp);
+  ASSERT_NEAR(sts, evt->exp, 0.002);
   delete evt;
 }
 

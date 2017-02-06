@@ -26,6 +26,7 @@ PhantomBufferOccupancy::PhantomBufferOccupancy(
     const std::string& _name, const Component* _parent, PortedDevice* _device,
     Json::Value _settings)
     : CongestionStatus(_name, _parent, _device, _settings),
+      mode_(parseMode(_settings["mode"].asString())),
       valueCoeff_(_settings["value_coeff"].asDouble()),
       lengthCoeff_(_settings["length_coeff"].asDouble()) {
   assert(!_settings["value_coeff"].isNull());
@@ -60,20 +61,17 @@ void PhantomBufferOccupancy::performInitCredits(
 
 void PhantomBufferOccupancy::performIncrementCredit(u32 _port, u32 _vc) {
   u32 vcIdx = device_->vcIndex(_port, _vc);
-  dbgprintf("incr %u from %u", vcIdx, counts_.at(vcIdx));
   assert(counts_.at(vcIdx) < maximums_.at(vcIdx));
   counts_.at(vcIdx)++;
 }
 
 void PhantomBufferOccupancy::performDecrementCredit(u32 _port, u32 _vc) {
   u32 vcIdx = device_->vcIndex(_port, _vc);
-  dbgprintf("decr %u from %u", vcIdx, counts_.at(vcIdx));
   assert(counts_.at(vcIdx) > 0);
   counts_.at(vcIdx)--;
 
   // push credit into phantom congestion detection window
   // set an event to decrement the phantom congestion window
-  dbgprintf("+window %u from %u", vcIdx, windows_.at(vcIdx));
   windows_.at(vcIdx)++;
   Channel* ch = device_->getOutputChannel(_port);
   u32 windowLength = (u32)(ch->latency() * lengthCoeff_);
@@ -82,12 +80,44 @@ void PhantomBufferOccupancy::performDecrementCredit(u32 _port, u32 _vc) {
 }
 
 f64 PhantomBufferOccupancy::computeStatus(u32 _port, u32 _vc) const {
-  u32 vcIdx = device_->vcIndex(_port, _vc);
-  dbgprintf("q=%u w=%u m=%u vm=%f", counts_.at(vcIdx), windows_.at(vcIdx),
-            maximums_.at(vcIdx), valueCoeff_);
-  f64 status = (((f64)maximums_.at(vcIdx) - (f64)counts_.at(vcIdx) -
-                 (f64)windows_.at(vcIdx) * valueCoeff_) /
-                (f64)maximums_.at(vcIdx));
-  dbgprintf("sts=%f", status);
-  return std::min(1.0, std::max(0.0, status));
+  switch (mode_) {
+    case PhantomBufferOccupancy::Mode::kVc: {
+      // return this VC's status
+      u32 vcIdx = device_->vcIndex(_port, _vc);
+      f64 status = (((f64)maximums_.at(vcIdx) - (f64)counts_.at(vcIdx) -
+                     (f64)windows_.at(vcIdx) * valueCoeff_) /
+                    (f64)maximums_.at(vcIdx));
+      return std::min(1.0, std::max(0.0, status));
+      break;
+    }
+
+    case PhantomBufferOccupancy::Mode::kPort: {
+      // return the average status of all VCs in this port
+      u32 curSum = 0;
+      u32 maxSum = 0;
+      for (u32 vc = 0; vc < numVcs_; vc++) {
+        u32 vcIdx = device_->vcIndex(_port, vc);
+        curSum += ((f64)maximums_.at(vcIdx) - (f64)counts_.at(vcIdx) -
+                   (f64)windows_.at(vcIdx) * valueCoeff_);
+        maxSum += (f64)maximums_.at(vcIdx);
+      }
+      return std::min(1.0, std::max(0.0, (f64)curSum / (f64)maxSum));
+      break;
+    }
+
+    default:
+      assert(false);
+      break;
+  }
+}
+
+PhantomBufferOccupancy::Mode PhantomBufferOccupancy::parseMode(
+    const std::string& _mode) {
+  if (_mode == "vc") {
+    return PhantomBufferOccupancy::Mode::kVc;
+  } else if (_mode == "port") {
+    return  PhantomBufferOccupancy::Mode::kPort;
+  } else {
+    assert(false);
+  }
 }

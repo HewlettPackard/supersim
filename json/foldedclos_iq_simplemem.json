@@ -38,7 +38,8 @@
         "latency": 1,
         "granularity": 0,
         "value_coeff": 1.23,
-        "length_coeff": 2.5
+        "length_coeff": 2.5,
+        "mode": "vc"
       },
       "input_queue_depth": 16,
       "vca_swa_wait": false,
