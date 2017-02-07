@@ -65,7 +65,6 @@ f64 BufferOccupancy::computeStatus(u32 _port, u32 _vc) const {
       // return the average status of all VCs in this port
       u32 curSum = 0;
       u32 maxSum = 0;
-      bool D = _port == 2 && _vc == 1;
       for (u32 vc = 0; vc < numVcs_; vc++) {
         u32 vcIdx = device_->vcIndex(_port, vc);
         curSum += maximums_.at(vcIdx) - counts_.at(vcIdx);

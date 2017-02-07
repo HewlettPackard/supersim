@@ -139,7 +139,6 @@ TEST(BufferOccupancy, statusCheck_PortMode) {
       // check credits
       u32 curSum = 0;
       u32 maxSum = 0;
-      bool D = port == 2 && vc == 1;
       for (u32 vc2 = 0; vc2 < numVcs; vc2++) {
         u32 max = port * 10 + vc2 + 2;
         curSum += 2;
