@@ -19,6 +19,7 @@
 
 #include "traffic/ProbabilityMessageSizeDistribution.h"
 #include "traffic/RandomMessageSizeDistribution.h"
+#include "traffic/ReadWriteMessageSizeDistribution.h"
 #include "traffic/SingleMessageSizeDistribution.h"
 
 MessageSizeDistribution*
@@ -34,6 +35,9 @@ MessageSizeDistributionFactory::createMessageSizeDistribution(
         _name, _parent, _settings);
   } else if (type == "probability") {
     return new ProbabilityMessageSizeDistribution(
+        _name, _parent, _settings);
+  } else if (type == "read_write") {
+    return new ReadWriteMessageSizeDistribution(
         _name, _parent, _settings);
   } else {
     fprintf(stderr, "unknown message size distribution: %s\n", type.c_str());
