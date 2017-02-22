@@ -20,6 +20,7 @@
 #include <string>
 #include <sstream>
 
+#include "event/Simulator.h"
 #include "types/Packet.h"
 #include "types/Flit.h"
 
@@ -59,12 +60,12 @@ void MessageLog::logMessage(const Message* _message) {
 
 void MessageLog::startTransaction(u64 _trans) {
   std::stringstream ss;
-  ss << "+T" << ',' << _trans << '\n';
+  ss << "+T" << ',' << _trans << ',' << gSim->time() << '\n';
   outFile_.write(ss.str());
 }
 
 void MessageLog::endTransaction(u64 _trans) {
   std::stringstream ss;
-  ss << "-T" << ',' << _trans << '\n';
+  ss << "-T" << ',' << _trans << ',' << gSim->time() << '\n';
   outFile_.write(ss.str());
 }

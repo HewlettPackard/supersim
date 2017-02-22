@@ -133,7 +133,7 @@
           "request_injection_rate": 0.45,
           // responses
           "enable_responses": true,
-          "request_processing_latency": 20,
+          "request_processing_latency": 200,
           "max_outstanding_transactions": 1,
           "response_traffic_class": 1,
           // warmup
@@ -165,7 +165,7 @@
         "header_overhead": 16,  // bytes
         "max_packet_size": 16,  // flits
         "processor_terminal": {
-          "traffic_class": 1,
+          "traffic_class": 0,
           "latency": 3,
           "memory_accesses": 700
         },
