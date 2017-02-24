@@ -1,0 +1,164 @@
+{
+  "simulator": {
+    "channel_cycle_time": 1,
+    "core_cycle_time": 1,
+    "print_progress": true,
+    "print_interval": 1.0,  // seconds
+    "random_seed": 12345678
+  },
+  "network": {
+    "topology": "torus",
+    "dimensions": [3, 3, 3],
+    "concentration": 2,
+    "traffic_classes": [
+      {
+        "num_vcs": 2,
+        "routing": {
+          "algorithm": "dimension_order",
+          "latency": 1
+        }
+      }
+    ],
+    "internal_channel": {
+      "latency": 1  // cycles
+    },
+    "external_channel": {
+      "latency": 1  // cycles
+    },
+    "channel_log": {
+      "file": "/dev/null"  // "channels.csv"
+    },
+    "router": {
+      "architecture": "input_queued",
+      "congestion_status": {
+        "algorithm": "buffer_occupancy",
+        "latency": 1,
+        "granularity": 0,
+        "mode": "vc"
+      },
+      "input_queue_depth": 16,
+      "vca_swa_wait": false,
+      "output_queue_depth": 16,
+      "crossbar": {
+        "latency": 1  // cycles
+      },
+      "vc_scheduler": {
+        "allocator": {
+          "type": "rc_separable",
+          "slip_latch": true,
+          "iterations": 1,
+          "resource_arbiter": {
+            "type": "lru"
+          },
+          "client_arbiter": {
+            "type": "lru"
+          }
+        }
+      },
+      "crossbar_scheduler": {
+        "allocator": {
+          "type": "r_separable",
+          "slip_latch": true,
+          "resource_arbiter": {
+            "type": "lru"
+          }
+        },
+        "full_packet": false,
+        "packet_lock": false,
+        "idle_unlock": false
+      }
+    },
+    "interface": {
+      "type": "standard",
+      "adaptive": false,
+      "fixed_msg_vc": false,
+      "crossbar_scheduler": {
+        "allocator": {
+          "type": "r_separable",
+          "slip_latch": true,
+          "resource_arbiter": {
+            "type": "lru"
+          }
+        },
+        "full_packet": false,
+        "packet_lock": false,
+        "idle_unlock": false
+      },
+      "init_credits": "$&(network.router.input_queue_depth)&$",
+      "crossbar": {
+        "latency": 1  // cycles
+      }
+    }
+  },
+  "metadata_handler": {
+    "type": "zero"
+  },
+  "workload": {
+    "message_log": {
+      "file": "/dev/null"  // "data.mpf.gz"
+    },
+    "applications": [
+      {
+        "type": "blast",
+        "warmup_threshold": 0.99,
+        "kill_on_saturation": false,
+        "log_during_saturation": false,
+        "blast_terminal": {
+          // requests
+          "request_traffic_class": 0,
+          "request_injection_rate": 0.5,
+          "relative_injection": "json/7_of_54_inj.csv",
+          // responses
+          "enable_responses": false,
+          // warmup
+          "warmup_interval": 200,  // delivered flits
+          "warmup_window": 15,
+          "warmup_attempts": 20,
+          // traffic generation
+          "num_transactions": 1000,
+          "max_packet_size": 16,
+          "traffic_pattern": {
+            "type": "uniform_random",
+            "send_to_self": true
+          },
+          "message_size_distribution": {
+            "type": "single",
+            "message_size": 4
+          }
+        },
+        "rate_log": {
+          "file": "/dev/null"  // "rates.csv"
+        }
+      },
+      {
+        "type": "pulse",
+        "pulse_terminal": {
+          // requests
+          "request_traffic_class": 0,
+          "request_injection_rate": 0.50,
+          "relative_injection": "json/4_of_54_inj.csv",
+          // responses
+          "enable_responses": false,
+          // traffic generation
+          "delay": 1000,
+          "num_transactions": 200,
+          "max_packet_size": 16,
+          "traffic_pattern": {
+            "type": "uniform_random",
+            "send_to_self": true
+          },
+          "message_size_distribution": {
+            "type": "single",
+            "message_size": 16
+          }
+        },
+        "rate_log": {
+          "file": "/dev/null"  // "rates.csv"
+        }
+      }
+    ]
+  },
+  "debug": [
+    "Workload"
+  ]
+}

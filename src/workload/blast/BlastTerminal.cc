@@ -213,15 +213,15 @@ void BlastTerminal::startLogging() {
   enrouteSampleValues_.clear();
 
   fsm_ = BlastTerminal::Fsm::LOGGING;
-  if (numTransactions_ == 0) {
+  if (requestInjectionRate_ > 0.0 && numTransactions_ == 0) {
     complete();
   }
 }
 
 void BlastTerminal::stopLogging() {
   fsm_ = BlastTerminal::Fsm::LOG_BLABBING;
-  if (numTransactions_ == 0 ||
-      transactionsToLog_.size() == 0) {
+  if ((requestInjectionRate_ > 0.0) &&
+      (numTransactions_ == 0 || transactionsToLog_.size() == 0)) {
     done();
   }
 }
