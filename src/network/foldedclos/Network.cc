@@ -84,12 +84,12 @@ Network::Network(const std::string& _name, const Component* _parent,
         // create channels
         std::string upChannelName = "UpChannel_" + std::to_string(r) +
             ":" + std::to_string(c) + ":" + std::to_string(p);
-        Channel* up = new Channel(upChannelName, this,
+        Channel* up = new Channel(upChannelName, this, numVcs_,
                                   _settings["internal_channel"]);
         internalChannels_.push_back(up);
         std::string downChannelName = "DownChannel_" + std::to_string(r) +
             ":" + std::to_string(c) + ":" + std::to_string(p);
-        Channel* down = new Channel(downChannelName, this,
+        Channel* down = new Channel(downChannelName, this, numVcs_,
                                     _settings["internal_channel"]);
         internalChannels_.push_back(down);
 
@@ -150,12 +150,12 @@ Network::Network(const std::string& _name, const Component* _parent,
       // create channels
       std::string inChannelName = "InChannel_" + std::to_string(r) +
           ":" + std::to_string(c) + ":" + std::to_string(p);
-      Channel* inChannel = new Channel(inChannelName, this,
+      Channel* inChannel = new Channel(inChannelName, this, numVcs_,
                                        _settings["external_channel"]);
       externalChannels_.push_back(inChannel);
       std::string outChannelName = "OutChannel_" + std::to_string(r) +
           ":" + std::to_string(c) + ":" + std::to_string(p);
-      Channel* outChannel = new Channel(outChannelName, this,
+      Channel* outChannel = new Channel(outChannelName, this, numVcs_,
                                         _settings["external_channel"]);
       externalChannels_.push_back(outChannel);
 

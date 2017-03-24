@@ -28,10 +28,13 @@
 #define CRDT 0xEF
 
 Channel::Channel(const std::string& _name, const Component* _parent,
-                 Json::Value _settings)
-    : Component(_name, _parent), latency_(_settings["latency"].asUInt()) {
+                 u32 _numVcs, Json::Value _settings)
+    : Component(_name, _parent),
+      latency_(_settings["latency"].asUInt()),
+      numVcs_(_numVcs) {
   assert(!_settings["latency"].isNull());
   assert(latency_ > 0);
+  assert(numVcs_ > 0);
 
   nextFlitTime_ = U64_MAX;
   nextFlit_ = nullptr;
@@ -40,6 +43,7 @@ Channel::Channel(const std::string& _name, const Component* _parent,
 
   monitoring_ = false;
   monitorTime_ = U64_MAX;
+  monitorCounts_.resize(_numVcs + 1);
 }
 
 Channel::~Channel() {}
@@ -63,7 +67,9 @@ void Channel::startMonitoring() {
   assert(monitorTime_ == U64_MAX);
   monitoring_ = true;
   monitorTime_ = gSim->time();  // start time
-  monitorCount_ = 0;
+  for (auto& mc : monitorCounts_) {
+    mc = 0;
+  }
 }
 
 void Channel::endMonitoring() {
@@ -73,10 +79,17 @@ void Channel::endMonitoring() {
   monitorTime_ = gSim->time() - monitorTime_;  // delta time
 }
 
-f64 Channel::utilization() const {
+f64 Channel::utilization(u32 _vc) const {
   assert(monitoring_ == false);
   assert(monitorTime_ != U64_MAX);
-  return (f64)monitorCount_ / ((f64)monitorTime_ / gSim->cycleTime(
+  u64 count;
+  if (_vc == U32_MAX) {
+    count = monitorCounts_.at(numVcs_);
+  } else {
+    assert(_vc < numVcs_);
+    count = monitorCounts_.at(_vc);
+  }
+  return (f64)count / ((f64)monitorTime_ / gSim->cycleTime(
       Simulator::Clock::CHANNEL));
 }
 
@@ -130,8 +143,10 @@ u64 Channel::setNextFlit(Flit* _flit) {
   addEvent(nextTime, 1, _flit, FLIT);
 
   // increment the count when monitoring
+  assert(_flit->getVc() < numVcs_);
   if (monitoring_) {
-    monitorCount_++;
+    monitorCounts_.at(_flit->getVc())++;
+    monitorCounts_.at(numVcs_)++;
   }
 
   // return the injection time

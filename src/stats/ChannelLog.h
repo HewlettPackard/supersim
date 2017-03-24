@@ -26,11 +26,12 @@
 
 class ChannelLog {
  public:
-  explicit ChannelLog(Json::Value _settings);
+  explicit ChannelLog(u32 _numVcs, Json::Value _settings);
   ~ChannelLog();
   void logChannel(const Channel* _channel);
 
  private:
+  const u32 numVcs_;
   fio::OutFile outFile_;
   std::stringstream ss_;
 };

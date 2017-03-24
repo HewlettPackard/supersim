@@ -75,11 +75,11 @@ Network::Network(const std::string& _name, const Component* _parent,
 
     // create the channels
     std::string inChannelName = "InChannel_" + std::to_string(id);
-    Channel* inChannel = new Channel(inChannelName, this,
+    Channel* inChannel = new Channel(inChannelName, this, numVcs_,
                                      _settings["external_channel"]);
     externalChannels_.push_back(inChannel);
     std::string outChannelName = "OutChannel_" + std::to_string(id);
-    Channel* outChannel = new Channel(outChannelName, this,
+    Channel* outChannel = new Channel(outChannelName, this, numVcs_,
                                       _settings["external_channel"]);
     externalChannels_.push_back(outChannel);
 

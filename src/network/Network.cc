@@ -38,7 +38,7 @@ Network::Network(const std::string& _name, const Component* _parent,
   assert(numVcs_ > 0);
 
   // create a channel log object
-  channelLog_ = new ChannelLog(_settings["channel_log"]);
+  channelLog_ = new ChannelLog(numVcs_, _settings["channel_log"]);
 }
 
 Network::~Network() {

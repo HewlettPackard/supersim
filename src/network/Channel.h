@@ -20,6 +20,7 @@
 #include <prim/prim.h>
 
 #include <string>
+#include <vector>
 
 #include "event/Component.h"
 
@@ -31,14 +32,14 @@ class CreditReceiver;
 class Channel : public Component {
  public:
   Channel(const std::string& _name, const Component* _parent,
-          Json::Value _settings);
+          u32 _numVcs, Json::Value _settings);
   ~Channel();
   u32 latency() const;
   void setSource(CreditReceiver* _source, u32 _port);
   void setSink(FlitReceiver* _sink, u32 _port);
   void startMonitoring();
   void endMonitoring();
-  f64 utilization() const;
+  f64 utilization(u32 _vc) const;  // U32_MAX for total
   void processEvent(void* _event, s32 _type) override;
 
   /*
@@ -73,6 +74,7 @@ class Channel : public Component {
 
  private:
   const u32 latency_;
+  const u32 numVcs_;
 
   u64 nextFlitTime_;
   Flit* nextFlit_;
@@ -80,7 +82,7 @@ class Channel : public Component {
   Credit* nextCredit_;
   bool monitoring_;
   u64 monitorTime_;
-  u64 monitorCount_;
+  std::vector<u64> monitorCounts_;
 
   CreditReceiver* source_;  // sends flits, receives credits
   u32 sourcePort_;

@@ -45,7 +45,7 @@ TEST(PhantomBufferOccupancy, statusCheck) {
 
         Json::Value channelSettings;
         channelSettings["latency"] = channelLatency;
-        Channel channel("Channel", nullptr, channelSettings);
+        Channel channel("Channel", nullptr, 8, channelSettings);
         router.setOutputChannel(0, &channel);
 
         Json::Value statusSettings;

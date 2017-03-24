@@ -114,7 +114,7 @@ Network::Network(const std::string& _name, const Component* _parent,
           strop::vecString<u32>(routerAddress, '-') +
           "-to-" +
           strop::vecString<u32>(destinationAddress, '-');
-      Channel* channel = new Channel(channelName, this,
+      Channel* channel = new Channel(channelName, this, numVcs_,
                                      _settings["internal_channel"]);
       internalChannels_.push_back(channel);
 
@@ -137,7 +137,8 @@ Network::Network(const std::string& _name, const Component* _parent,
           strop::vecString<u32>(routerAddress, '-') +
           "-to-" +
           strop::vecString<u32>(destinationAddress, '-');
-      channel = new Channel(channelName, this, _settings["internal_channel"]);
+      channel = new Channel(channelName, this, numVcs_,
+                            _settings["internal_channel"]);
       internalChannels_.push_back(channel);
 
       // link the routers from source to destination
@@ -192,9 +193,9 @@ Network::Network(const std::string& _name, const Component* _parent,
       std::string outChannelName = "Channel_" +
           strop::vecString<u32>(routerAddress, '-') + "-to-" +
           strop::vecString<u32>(interfaceAddress, '-');
-      Channel* inChannel = new Channel(inChannelName, this,
+      Channel* inChannel = new Channel(inChannelName, this, numVcs_,
                                        _settings["external_channel"]);
-      Channel* outChannel = new Channel(outChannelName, this,
+      Channel* outChannel = new Channel(outChannelName, this, numVcs_,
                                         _settings["external_channel"]);
       externalChannels_.push_back(inChannel);
       externalChannels_.push_back(outChannel);

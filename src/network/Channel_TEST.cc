@@ -119,6 +119,8 @@ void Source::expect(u64 _time) {
 
 void Source::processEvent(void* _event, s32 _type) {
   Flit* flit = new Flit(0, false, false, nullptr);
+  u32 vc = gSim->rnd.nextU64(0, 7);
+  flit->setVc(vc);
   assert(channel_->getNextFlit() == nullptr);
   channel_->setNextFlit(flit);
   dbgprintf("source injecting at %lu", gSim->time());
@@ -226,7 +228,7 @@ TEST(Channel, full) {
 
     Json::Value settings;
     settings["latency"] = latency;
-    Channel c("TestChannel", nullptr, settings);
+    Channel c("TestChannel", nullptr, 8, settings);
 
     Source source(&c);
     Sink sink(&c);
@@ -243,7 +245,7 @@ TEST(Channel, full) {
 
     gSim->simulate();
 
-    f64 actUtil = c.utilization();
+    f64 actUtil = c.utilization(U32_MAX);
     f64 expUtil = static_cast<f64>(flits) / clocks;
     f64 absDelta = std::abs(actUtil - expUtil);
     ASSERT_LE(absDelta, 0.0001);

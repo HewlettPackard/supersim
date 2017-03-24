@@ -95,7 +95,7 @@ Network::Network(const std::string& _name, const Component* _parent,
         std::string chname = "Channel_" +
             strop::vecString<u32>(sourceRouter->address(), '-') + "-to-" +
             strop::vecString<u32>(destinationRouter->address(), '-');
-        Channel* channel = new Channel(chname, this,
+        Channel* channel = new Channel(chname, this, numVcs_,
                                        _settings["internal_channel"]);
         internalChannels_.push_back(channel);
 
@@ -138,11 +138,11 @@ Network::Network(const std::string& _name, const Component* _parent,
 
     // create the channels
     std::string inChannelName = "InChannel_" + std::to_string(id);
-    Channel* inChannel = new Channel(inChannelName, this,
+    Channel* inChannel = new Channel(inChannelName, this, numVcs_,
                                      _settings["external_channel"]);
     externalChannels_.push_back(inChannel);
     std::string outChannelName = "OutChannel_" + std::to_string(id);
-    Channel* outChannel = new Channel(outChannelName, this,
+    Channel* outChannel = new Channel(outChannelName, this, numVcs_,
                                       _settings["external_channel"]);
     externalChannels_.push_back(outChannel);
 

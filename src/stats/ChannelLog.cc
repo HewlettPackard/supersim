@@ -17,19 +17,38 @@
 
 #include <cassert>
 
-ChannelLog::ChannelLog(Json::Value _settings)
-    : outFile_(_settings["file"].asString()) {
+ChannelLog::ChannelLog(u32 _numVcs, Json::Value _settings)
+    : numVcs_(_numVcs), outFile_(_settings["file"].asString()) {
   assert(!_settings["file"].isNull());
 
-  outFile_.write("name,utilization\n");
+  // set up the stream
   ss_.precision(6);
   ss_.setf(std::ios::fixed, std::ios::floatfield);
+
+  // write the header
+  ss_ << "name,";
+  for (u32 vc = 0; vc < numVcs_; vc++) {
+    ss_ << vc << ',';
+  }
+  ss_ << "total" << std::endl;
+
+  // write to the outfile and reset the stream
+  outFile_.write(ss_.str());
+  ss_.str("");
+  ss_.clear();
 }
 
 ChannelLog::~ChannelLog() {}
 
 void ChannelLog::logChannel(const Channel* _channel) {
-  ss_ << _channel->fullName() << ',' << _channel->utilization() << std::endl;
+  // log the channel utilization to the stream
+  ss_ << _channel->fullName() << ',';
+  for (u32 vc = 0; vc < numVcs_; vc++) {
+    ss_ << _channel->utilization(vc) << ',';
+  }
+  ss_ << _channel->utilization(U32_MAX) << std::endl;
+
+  // write to the outfile and reset the stream
   outFile_.write(ss_.str());
   ss_.str("");
   ss_.clear();
