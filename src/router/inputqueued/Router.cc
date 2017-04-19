@@ -193,3 +193,6 @@ f64 Router::congestionStatus(u32 _port, u32 _vc) const {
 }
 
 }  // namespace InputQueued
+
+FACTORY_REGISTER("input_queued", Router, InputQueued::Router,
+    ROUTER_FACTORY_ARGS);

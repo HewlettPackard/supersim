@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "router/RouterFactory.h"
 
 #include <cassert>
 
-#include "router/inputoutputqueued/Router.h"
-#include "router/inputqueued/Router.h"
+#include "router/RouterFactory.h"
+#include "router/Router.h"
+#include "factory/AbstractFactory.h"
+
+
 
 Router* RouterFactory::createRouter(
     const std::string& _name, const Component* _parent, u32 _id,
@@ -29,16 +31,18 @@ Router* RouterFactory::createRouter(
     Json::Value _settings) {
   std::string architecture = _settings["architecture"].asString();
 
-  if (architecture == "input_queued") {
-    return new InputQueued::Router(
+  Router *retval = AbstractFactory<Router,
+      const std::string& , const Component*, u32,
+      const std::vector<u32>&, u32, u32,
+      MetadataHandler*,
+      std::vector<RoutingAlgorithmFactory*>*,
+      Json::Value
+      >::Create(architecture.c_str(),
         _name, _parent, _id, _address, _numPorts, _numVcs, _metadataHandler,
         _routingAlgorithmFactories, _settings);
-  } else if (architecture == "input_output_queued") {
-    return new InputOutputQueued::Router(
-        _name, _parent, _id, _address, _numPorts, _numVcs, _metadataHandler,
-        _routingAlgorithmFactories, _settings);
-  } else {
+  if (!retval) {
     fprintf(stderr, "unknown router architecture: %s\n", architecture.c_str());
     assert(false);
   }
+  return retval;
 }

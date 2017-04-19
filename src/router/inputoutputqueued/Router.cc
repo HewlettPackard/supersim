@@ -23,6 +23,7 @@
 #include "router/inputoutputqueued/Ejector.h"
 #include "router/inputoutputqueued/InputQueue.h"
 #include "router/inputoutputqueued/OutputQueue.h"
+#include "factory/AbstractFactory.h"
 
 namespace InputOutputQueued {
 
@@ -248,3 +249,6 @@ f64 Router::congestionStatus(u32 _port, u32 _vc) const {
 }
 
 }  // namespace InputOutputQueued
+
+FACTORY_REGISTER("input_output_queued", Router, InputOutputQueued::Router,
+      ROUTER_FACTORY_ARGS);
