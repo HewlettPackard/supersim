@@ -30,6 +30,12 @@
 #include "types/CreditSender.h"
 #include "types/FlitReceiver.h"
 #include "types/FlitSender.h"
+#include "factory/AbstractFactory.h"
+
+#define ROUTER_FACTORY_ARGS const std::string&, \
+      const Component*, u32, const std::vector<u32>&, u32, u32, \
+      MetadataHandler*, \
+      std::vector<RoutingAlgorithmFactory*>*, Json::Value
 
 class Router : public Component, public PortedDevice, public FlitSender,
                public FlitReceiver, public CreditSender, public CreditReceiver {
