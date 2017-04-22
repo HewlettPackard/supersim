@@ -18,7 +18,7 @@
 #include <cassert>
 #include <cstring>
 
-#include "allocator/AllocatorFactory.h"
+#include "allocator/Allocator.h"
 
 VcScheduler::Client::Client() {}
 
@@ -48,7 +48,7 @@ VcScheduler::VcScheduler(const std::string& _name, const Component* _parent,
   grants_ = new bool[totalVcs_ * numClients_];
 
   // create the allocator
-  allocator_ = AllocatorFactory::createAllocator(
+  allocator_ = Allocator::create(
       "Allocator", this, numClients_, totalVcs_, _settings["allocator"]);
 
   // map inputs and outputs to allocator

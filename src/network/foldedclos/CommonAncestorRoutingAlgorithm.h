@@ -22,7 +22,7 @@
 #include <string>
 
 #include "event/Component.h"
-#include "network/RoutingAlgorithm.h"
+#include "network/foldedclos/RoutingAlgorithm.h"
 #include "router/Router.h"
 
 namespace FoldedClos {
@@ -31,7 +31,7 @@ class CommonAncestorRoutingAlgorithm : public RoutingAlgorithm {
  public:
   CommonAncestorRoutingAlgorithm(
       const std::string& _name, const Component* _parent, Router* _router,
-      u64 _latency, u32 _baseVc, u32 _numVcs, u32 _numPorts, u32 _numLevels,
+      u32 _baseVc, u32 _numVcs, u32 _numPorts, u32 _numLevels,
       u32 _inputPort, Json::Value _settings);
   ~CommonAncestorRoutingAlgorithm();
 
@@ -42,10 +42,6 @@ class CommonAncestorRoutingAlgorithm : public RoutingAlgorithm {
  private:
   enum class Mode : uint8_t { ALL, PORT, VC };
   Mode parseMode(const std::string& _mode) const;
-
-  const u32 numPorts_;
-  const u32 numLevels_;
-  const u32 inputPort_;
 
   const bool leastCommonAncestor_;
   const Mode mode_;

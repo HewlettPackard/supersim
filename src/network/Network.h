@@ -20,20 +20,34 @@
 #include <prim/prim.h>
 
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "event/Component.h"
 #include "interface/Interface.h"
 #include "metadata/MetadataHandler.h"
 #include "network/Channel.h"
+#include "network/RoutingAlgorithm.h"
 #include "router/Router.h"
 #include "stats/ChannelLog.h"
+
+#define NETWORK_ARGS const std::string&, const Component*, MetadataHandler*, \
+    Json::Value
 
 class Network : public Component {
  public:
   Network(const std::string& _name, const Component* _parent,
           MetadataHandler* _metadataHandler, Json::Value _settings);
   virtual ~Network();
+
+  // this is a network factory
+  static Network* create(NETWORK_ARGS);
+
+  // this is a routing algorithm factory definition
+  virtual RoutingAlgorithm* createRoutingAlgorithm(
+      u32 _vc, u32 _port, const std::string& _name, const Component* _parent,
+      Router* _router) = 0;
+
   virtual u32 numRouters() const = 0;
   virtual u32 numInterfaces() const = 0;
   virtual Router* getRouter(u32 _id) const = 0;
@@ -53,9 +67,24 @@ class Network : public Component {
   void endMonitoring();
 
  protected:
+  // this is used by network implementations to create routing algorithms
+  struct RoutingAlgorithmInfo {
+    u32 baseVc;
+    u32 numVcs;
+    Json::Value settings;
+  };
+
   virtual void collectChannels(std::vector<Channel*>* _channels) = 0;
 
+  // this loads the routing algorithm info vector
+  void loadTrafficClassInfo(Json::Value _settings);
+
+  // this clears the routingAlgorithmInfo_ vector
+  void clearTrafficClassInfo();
+
   u32 numVcs_;
+  std::vector<std::tuple<u32, u32> > trafficClassVcs_;
+  std::vector<RoutingAlgorithmInfo> routingAlgorithmInfo_;
 
  private:
   ChannelLog* channelLog_;

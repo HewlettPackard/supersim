@@ -29,12 +29,19 @@ class MetadataHandler;
 class Terminal;
 class Workload;
 
+#define APPLICATION_ARGS const std::string&, const Component*, u32, Workload*, \
+    MetadataHandler*, Json::Value
+
 class Application : public Component {
  public:
   Application(const std::string& _name, const Component* _parent, u32 _id,
               Workload* _workload, MetadataHandler* _metadataHandler,
               Json::Value _settings);
   virtual ~Application();
+
+  // this is an application factory
+  static Application* create(APPLICATION_ARGS);
+
   u32 numTerminals() const;
   u32 id() const;
   Workload* workload() const;

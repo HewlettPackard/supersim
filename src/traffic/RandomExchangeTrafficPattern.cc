@@ -15,10 +15,12 @@
  */
 #include "traffic/RandomExchangeTrafficPattern.h"
 
+#include <factory/Factory.h>
+
 RandomExchangeTrafficPattern::RandomExchangeTrafficPattern(
     const std::string& _name, const Component* _parent, u32 _numTerminals,
     u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {}
+    : TrafficPattern(_name, _parent, _numTerminals, _self, _settings) {}
 
 RandomExchangeTrafficPattern::~RandomExchangeTrafficPattern() {}
 
@@ -29,3 +31,6 @@ u32 RandomExchangeTrafficPattern::nextDestination() {
   }
   return dest;
 }
+
+registerWithFactory("random_exchange", TrafficPattern,
+                    RandomExchangeTrafficPattern, TRAFFICPATTERN_ARGS);

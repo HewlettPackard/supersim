@@ -24,8 +24,9 @@
 
 #include "event/Component.h"
 #include "interface/Interface.h"
-#include "network/Network.h"
 #include "network/Channel.h"
+#include "network/Network.h"
+#include "network/butterfly/RoutingAlgorithm.h"
 #include "router/Router.h"
 
 namespace Butterfly {
@@ -35,6 +36,11 @@ class Network : public ::Network {
   Network(const std::string& _name, const Component* _parent,
           MetadataHandler* _metadataHandler, Json::Value _settings);
   ~Network();
+
+  // this is the routing algorithm factory for this network
+  ::RoutingAlgorithm* createRoutingAlgorithm(
+       u32 _vc, u32 _port, const std::string& _name, const Component* _parent,
+       Router* _router) override;
 
   // Network
   u32 numRouters() const override;
@@ -57,6 +63,7 @@ class Network : public ::Network {
   u32 routerRadix_;
   u32 numStages_;
   u32 stageWidth_;
+  u32 tmpStage_;
 
   std::vector<Router*> routers_;
 

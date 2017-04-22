@@ -15,6 +15,7 @@
  */
 #include "network/hyperx/Network.h"
 
+#include <factory/Factory.h>
 #include <strop/strop.h>
 
 #include <cassert>
@@ -22,10 +23,8 @@
 
 #include <tuple>
 
-#include "interface/InterfaceFactory.h"
 #include "network/cube/util.h"
-#include "network/hyperx/RoutingAlgorithmFactory.h"
-#include "router/RouterFactory.h"
+#include "network/hyperx/RoutingAlgorithm.h"
 #include "util/DimensionIterator.h"
 
 namespace HyperX {
@@ -63,19 +62,7 @@ Network::Network(const std::string& _name, const Component* _parent,
   }
 
   // parse the traffic classes description
-  std::vector<std::tuple<u32, u32> > trafficClassVcs;
-  std::vector<::RoutingAlgorithmFactory*> routingAlgorithmFactories;
-  for (u32 idx = 0; idx < _settings["traffic_classes"].size(); idx++) {
-    u32 numVcs = _settings["traffic_classes"][idx]["num_vcs"].asUInt();
-    u32 baseVc = routingAlgorithmFactories.size();
-    trafficClassVcs.push_back(std::make_tuple(baseVc, numVcs));
-    for (u32 vc = 0; vc < numVcs; vc++) {
-      routingAlgorithmFactories.push_back(
-          new RoutingAlgorithmFactory(
-              baseVc, numVcs, dimensionWidths_, dimensionWeights_,
-              concentration_, _settings["traffic_classes"][idx]["routing"]));
-    }
-  }
+  loadTrafficClassInfo(_settings["traffic_classes"]);
 
   // setup a router iterator for looping over the router dimensions
   DimensionIterator routerIterator(dimensionWidths_);
@@ -90,17 +77,10 @@ Network::Network(const std::string& _name, const Component* _parent,
 
     // use the router factory to create a router
     u32 routerId = translateRouterAddressToId(&routerAddress);
-    routers_.at(routerAddress) = RouterFactory::createRouter(
-        routerName, this, routerId, routerAddress, routerRadix, numVcs_,
-        _metadataHandler, &routingAlgorithmFactories, _settings["router"]);
+    routers_.at(routerAddress) = Router::create(
+        routerName, this, this, routerId, routerAddress, routerRadix, numVcs_,
+        _metadataHandler, _settings["router"]);
   }
-
-  // we don't need the routing algorithm factories anymore
-  for (::RoutingAlgorithmFactory* raf : routingAlgorithmFactories) {
-    delete raf;
-  }
-  routingAlgorithmFactories.clear();
-
 
   // link routers via channels
   routerIterator.reset();
@@ -178,9 +158,9 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // create the interface
       u32 interfaceId = translateInterfaceAddressToId(&interfaceAddress);
-      Interface* interface = InterfaceFactory::createInterface(
+      Interface* interface = Interface::create(
           interfaceName, this, interfaceId, interfaceAddress, numVcs_,
-          trafficClassVcs, _settings["interface"]);
+          trafficClassVcs_, _settings["interface"]);
       interfaces_.at(interfaceAddress) = interface;
 
       // create I/O channels
@@ -204,6 +184,9 @@ Network::Network(const std::string& _name, const Component* _parent,
       interface->setInputChannel(0, outChannel);
     }
   }
+
+  // clear the traffic class info
+  clearTrafficClassInfo();
 }
 
 Network::~Network() {
@@ -226,6 +209,18 @@ Network::~Network() {
        it != externalChannels_.end(); ++it) {
     delete *it;
   }
+}
+
+::RoutingAlgorithm* Network::createRoutingAlgorithm(
+     u32 _vc, u32 _port, const std::string& _name, const Component* _parent,
+     Router* _router) {
+  // get the info
+  const Network::RoutingAlgorithmInfo& info = routingAlgorithmInfo_.at(_vc);
+
+  // call the routing algorithm factory
+  return RoutingAlgorithm::create(
+      _name, _parent, _router, info.baseVc, info.numVcs, dimensionWidths_,
+      dimensionWeights_, concentration_, _port, info.settings);
 }
 
 u32 Network::numRouters() const {
@@ -276,3 +271,6 @@ void Network::collectChannels(std::vector<Channel*>* _channels) {
 }
 
 }  // namespace HyperX
+
+registerWithFactory("hyperx", ::Network,
+                    HyperX::Network, NETWORK_ARGS);

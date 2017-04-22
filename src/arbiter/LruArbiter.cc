@@ -15,11 +15,13 @@
  */
 #include "arbiter/LruArbiter.h"
 
+#include <factory/Factory.h>
+
 #include <vector>
 
 LruArbiter::LruArbiter(const std::string& _name, const Component* _parent,
                        u32 _size, Json::Value _settings)
-    : Arbiter(_name, _parent, _size) {
+    : Arbiter(_name, _parent, _size, _settings) {
   // create a random ordered priority list
   std::vector<u32> clients(size_);
   for (u32 idx = 0; idx < size_; idx++) {
@@ -55,3 +57,6 @@ u32 LruArbiter::arbitrate() {
   }
   return winner;
 }
+
+registerWithFactory("lru", Arbiter,
+                    LruArbiter, ARBITER_ARGS);

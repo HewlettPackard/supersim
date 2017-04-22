@@ -15,10 +15,13 @@
  */
 #include "metadata/ZeroMetadataHandler.h"
 
+#include <factory/Factory.h>
+
 #include "event/Simulator.h"
 #include "types/Packet.h"
 
-ZeroMetadataHandler::ZeroMetadataHandler(Json::Value _settings) {}
+ZeroMetadataHandler::ZeroMetadataHandler(Json::Value _settings)
+    : MetadataHandler(_settings) {}
 
 ZeroMetadataHandler::~ZeroMetadataHandler() {}
 
@@ -29,3 +32,6 @@ void ZeroMetadataHandler::packetInjection(Application* _app, Packet* _packet) {
 void ZeroMetadataHandler::packetArrival(Packet* _packet) {
   // this isn't used in this handler
 }
+
+registerWithFactory("zero", MetadataHandler,
+                    ZeroMetadataHandler, METADATAHANDLER_ARGS);

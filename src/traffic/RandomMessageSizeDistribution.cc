@@ -15,6 +15,8 @@
  */
 #include "traffic/RandomMessageSizeDistribution.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 #include "event/Simulator.h"
@@ -22,7 +24,7 @@
 RandomMessageSizeDistribution::RandomMessageSizeDistribution(
     const std::string& _name, const Component* _parent,
     Json::Value _settings)
-    : MessageSizeDistribution(_name, _parent),
+    : MessageSizeDistribution(_name, _parent, _settings),
       minMessageSize_(_settings["min_message_size"].asUInt()),
       maxMessageSize_(_settings["max_message_size"].asUInt()),
       doDependent_(_settings.isMember("dependent_min_message_size") &&
@@ -63,3 +65,7 @@ u32 RandomMessageSizeDistribution::nextMessageSize(const Message* _msg) {
     return nextMessageSize();
   }
 }
+
+registerWithFactory("random", MessageSizeDistribution,
+                    RandomMessageSizeDistribution,
+                    MESSAGESIZEDISTRIBUTION_ARGS);

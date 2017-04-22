@@ -15,16 +15,39 @@
  */
 #include "router/Router.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
-Router::Router(const std::string& _name, const Component* _parent, u32 _id,
-               const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
-               MetadataHandler* _metadataHandler, Json::Value _settings)
+Router::Router(
+    const std::string& _name, const Component* _parent, Network* _network,
+    u32 _id, const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
+    MetadataHandler* _metadataHandler, Json::Value _settings)
     : Component(_name, _parent),
       PortedDevice(_id, _address, _numPorts, _numVcs),
-      metadataHandler_(_metadataHandler) {}
+      network_(_network), metadataHandler_(_metadataHandler) {}
 
 Router::~Router() {}
+
+Router* Router::create(
+    const std::string& _name, const Component* _parent, Network* _network,
+    u32 _id, const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
+    MetadataHandler* _metadataHandler, Json::Value _settings) {
+  // retrieve the architecture
+  const std::string& architecture = _settings["architecture"].asString();
+
+  // attempt to build the router
+  Router* router = factory::Factory<Router, ROUTER_ARGS>::create(
+      architecture, _name, _parent, _network, _id, _address, _numPorts, _numVcs,
+      _metadataHandler, _settings);
+
+  // check that the factory had this architecture
+  if (router == nullptr) {
+    fprintf(stderr, "unknown router architecture: %s\n", architecture.c_str());
+    assert(false);
+  }
+  return router;
+}
 
 void Router::packetArrival(Packet* _packet) const {
   metadataHandler_->packetArrival(_packet);

@@ -16,6 +16,7 @@
 #ifndef TRAFFIC_MESSAGESIZEDISTRIBUTION_H_
 #define TRAFFIC_MESSAGESIZEDISTRIBUTION_H_
 
+#include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>
@@ -23,10 +24,17 @@
 #include "event/Component.h"
 #include "types/Message.h"
 
+#define MESSAGESIZEDISTRIBUTION_ARGS const std::string&, const Component*, \
+    Json::Value
+
 class MessageSizeDistribution : public Component {
  public:
-  MessageSizeDistribution(const std::string& _name, const Component* _parent);
+  MessageSizeDistribution(const std::string& _name, const Component* _parent,
+                          Json::Value _settings);
   virtual ~MessageSizeDistribution();
+
+  // this is the message size distribution factory
+  static MessageSizeDistribution* create(MESSAGESIZEDISTRIBUTION_ARGS);
 
   // bounds must be defined
   virtual u32 minMessageSize() const = 0;

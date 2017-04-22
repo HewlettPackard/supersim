@@ -15,6 +15,8 @@
  */
 #include "traffic/UniformRandomQuadrantTrafficPattern.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 #include <vector>
@@ -25,7 +27,7 @@ UniformRandomQuadrantTrafficPattern::
 UniformRandomQuadrantTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {
+    : TrafficPattern(_name, _parent, _numTerminals, _self, _settings) {
   // parse the settings
   assert(_settings.isMember("dimensions") &&
          _settings["dimensions"].isArray());
@@ -76,3 +78,6 @@ UniformRandomQuadrantTrafficPattern::
 u32 UniformRandomQuadrantTrafficPattern::nextDestination() {
   return dstVect_.at(gSim->rnd.nextU64(0, dstVect_.size() - 1));
 }
+
+registerWithFactory("uniform_random_quadrant", TrafficPattern,
+                    UniformRandomQuadrantTrafficPattern, TRAFFICPATTERN_ARGS);

@@ -16,13 +16,14 @@
 #include "traffic/BitReverseTrafficPattern.h"
 
 #include <bits/bits.h>
+#include <factory/Factory.h>
 
 #include <cassert>
 
 BitReverseTrafficPattern::BitReverseTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {
+    : TrafficPattern(_name, _parent, _numTerminals, _self, _settings) {
   assert(bits::isPow2(numTerminals_));
   dest_ = bits::reverse<u32>(self_, bits::ceilLog2(numTerminals_));
 }
@@ -32,3 +33,6 @@ BitReverseTrafficPattern::~BitReverseTrafficPattern() {}
 u32 BitReverseTrafficPattern::nextDestination() {
   return dest_;
 }
+
+registerWithFactory("BitReverse", TrafficPattern,
+                    BitReverseTrafficPattern, TRAFFICPATTERN_ARGS);

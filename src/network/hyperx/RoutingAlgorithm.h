@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_HYPERX_ROUTINGALGORITHMFACTORY_H_
-#define NETWORK_HYPERX_ROUTINGALGORITHMFACTORY_H_
+#ifndef NETWORK_HYPERX_ROUTINGALGORITHM_H_
+#define NETWORK_HYPERX_ROUTINGALGORITHM_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -23,30 +23,35 @@
 #include <vector>
 
 #include "event/Component.h"
-#include "network/RoutingAlgorithmFactory.h"
+#include "network/RoutingAlgorithm.h"
+#include "router/Router.h"
+
+#define HYPERX_ROUTINGALGORITHM_ARGS const std::string&, const Component*, \
+    Router*, u32, u32, const std::vector<u32>&, const std::vector<u32>&, \
+    u32, u32, Json::Value
 
 namespace HyperX {
 
-class RoutingAlgorithmFactory : public ::RoutingAlgorithmFactory {
+class RoutingAlgorithm : public ::RoutingAlgorithm {
  public:
-  RoutingAlgorithmFactory(
-      u32 _baseVc, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
+  RoutingAlgorithm(
+      const std::string& _name, const Component* _parent,
+      Router* _router, u32 _baseVc, u32 _numVcs,
+      const std::vector<u32>& _dimensionWidths,
       const std::vector<u32>& _dimensionWeights, u32 _concentration,
-      Json::Value _settings);
-  ~RoutingAlgorithmFactory();
-  RoutingAlgorithm* createRoutingAlgorithm(
-      const std::string& _name, const Component* _parent, Router* _router,
-      u32 _inputPort) override;
+      u32 _inputPort, Json::Value _settings);
+  virtual ~RoutingAlgorithm();
 
- private:
-  const u32 baseVc_;
-  const u32 numVcs_;
+  // this is a routing algorithm factory for the hyperx topology
+  static RoutingAlgorithm* create(HYPERX_ROUTINGALGORITHM_ARGS);
+
+ protected:
   const std::vector<u32> dimensionWidths_;
   const std::vector<u32> dimensionWeights_;
   const u32 concentration_;
-  const Json::Value settings_;
+  const u32 inputPort_;
 };
 
 }  // namespace HyperX
 
-#endif  // NETWORK_HYPERX_ROUTINGALGORITHMFACTORY_H_
+#endif  // NETWORK_HYPERX_ROUTINGALGORITHM_H_

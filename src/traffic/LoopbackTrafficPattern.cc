@@ -15,15 +15,20 @@
  */
 #include "traffic/LoopbackTrafficPattern.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 LoopbackTrafficPattern::LoopbackTrafficPattern(
     const std::string& _name, const Component* _parent, u32 _numTerminals,
     u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {}
+    : TrafficPattern(_name, _parent, _numTerminals, _self, _settings) {}
 
 LoopbackTrafficPattern::~LoopbackTrafficPattern() {}
 
 u32 LoopbackTrafficPattern::nextDestination() {
   return self_;
 }
+
+registerWithFactory("loopback", TrafficPattern,
+                    LoopbackTrafficPattern, TRAFFICPATTERN_ARGS);

@@ -15,8 +15,29 @@
  */
 #include "traffic/MessageSizeDistribution.h"
 
-MessageSizeDistribution::MessageSizeDistribution(const std::string& _name,
-                                                 const Component* _parent)
+#include <factory/Factory.h>
+
+MessageSizeDistribution::MessageSizeDistribution(
+    const std::string& _name, const Component* _parent, Json::Value _settings)
     : Component(_name, _parent) {}
 
 MessageSizeDistribution::~MessageSizeDistribution() {}
+
+MessageSizeDistribution* MessageSizeDistribution::create(
+    const std::string& _name, const Component* _parent, Json::Value _settings) {
+  // retrieve the type
+  const std::string& type = _settings["type"].asString();
+
+  // attempt to build the message size distribution
+  MessageSizeDistribution* msg = factory::Factory<
+    MessageSizeDistribution, MESSAGESIZEDISTRIBUTION_ARGS>::create(
+        type, _name, _parent, _settings);
+
+  // check that the factory had this type
+  if (msg == nullptr) {
+    fprintf(stderr, "unknown message size distribution type: %s\n",
+            type.c_str());
+    assert(false);
+  }
+  return msg;
+}

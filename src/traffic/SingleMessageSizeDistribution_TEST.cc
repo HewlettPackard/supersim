@@ -19,7 +19,7 @@
 #include <json/json.h>
 
 #include "test/TestSetup_TEST.h"
-#include "traffic/MessageSizeDistributionFactory.h"
+#include "traffic/MessageSizeDistribution.h"
 
 TEST(SingleMessageSizeDistribution, simple) {
   TestSetup ts(123, 123, 123);
@@ -30,9 +30,8 @@ TEST(SingleMessageSizeDistribution, simple) {
   settings["type"] = "single";
   settings["message_size"] = SIZE;
 
-  MessageSizeDistribution* msd =
-      MessageSizeDistributionFactory::createMessageSizeDistribution(
-          "msd", nullptr, settings);
+  MessageSizeDistribution* msd = MessageSizeDistribution::create(
+      "msd", nullptr, settings);
 
   const u32 ROUNDS = 10000000;
   for (u32 round = 0; round < ROUNDS; round++) {
@@ -53,9 +52,8 @@ TEST(SingleMessageSizeDistribution, dependent) {
   settings["message_size"] = SIZE;
   settings["dependent_message_size"] = SIZE+1;
 
-  MessageSizeDistribution* msd =
-      MessageSizeDistributionFactory::createMessageSizeDistribution(
-          "msd", nullptr, settings);
+  MessageSizeDistribution* msd = MessageSizeDistribution::create(
+      "msd", nullptr, settings);
 
   const u32 ROUNDS = 5000000;
   for (u32 round = 0; round < ROUNDS; round++) {

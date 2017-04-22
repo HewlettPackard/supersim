@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "traffic/BisectionStressTrafficPattern.h"
+#include "traffic/DimBisectionStressTrafficPattern.h"
+
+#include <factory/Factory.h>
 
 #include <cassert>
 
@@ -21,10 +23,10 @@
 
 #include "network/cube/util.h"
 
-BisectionStressTrafficPattern::BisectionStressTrafficPattern(
+DimBisectionStressTrafficPattern::DimBisectionStressTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {
+    : TrafficPattern(_name, _parent, _numTerminals, _self, _settings) {
   // parse the settings
   assert(_settings.isMember("dimensions") &&
          _settings["dimensions"].isArray());
@@ -61,7 +63,7 @@ BisectionStressTrafficPattern::BisectionStressTrafficPattern(
     }
     nodeGroup = paritySum % 2;
   } else {
-    fprintf(stderr, "Unknown bisection stress mode\n");
+    fprintf(stderr, "Unknown dim bisection stress mode\n");
     assert(false);
   }
 
@@ -82,8 +84,11 @@ BisectionStressTrafficPattern::BisectionStressTrafficPattern(
   dest_ = Cube::computeTerminalId(&addr, widths, concentration);
 }
 
-BisectionStressTrafficPattern:: ~BisectionStressTrafficPattern() {}
+DimBisectionStressTrafficPattern::~DimBisectionStressTrafficPattern() {}
 
-u32 BisectionStressTrafficPattern::nextDestination() {
+u32 DimBisectionStressTrafficPattern::nextDestination() {
   return dest_;
 }
+
+registerWithFactory("dim_bisection_stress", TrafficPattern,
+                    DimBisectionStressTrafficPattern, TRAFFICPATTERN_ARGS);

@@ -19,7 +19,7 @@
 #include <json/json.h>
 
 #include "test/TestSetup_TEST.h"
-#include "traffic/MessageSizeDistributionFactory.h"
+#include "traffic/MessageSizeDistribution.h"
 
 TEST(ProbabilityMessageSizeDistribution, simple) {
   TestSetup ts(123, 123, 123);
@@ -39,9 +39,8 @@ TEST(ProbabilityMessageSizeDistribution, simple) {
     }
   }
 
-  MessageSizeDistribution* msd =
-      MessageSizeDistributionFactory::createMessageSizeDistribution(
-          "msd", nullptr, settings);
+  MessageSizeDistribution* msd = MessageSizeDistribution::create(
+      "msd", nullptr, settings);
 
   std::unordered_map<u32, u32> counts;
   const u32 ROUNDS = 10000000;
@@ -80,9 +79,8 @@ TEST(ProbabilityMessageSizeDistribution, simple_over1) {
     }
   }
 
-  MessageSizeDistribution* msd =
-      MessageSizeDistributionFactory::createMessageSizeDistribution(
-          "msd", nullptr, settings);
+  MessageSizeDistribution* msd = MessageSizeDistribution::create(
+      "msd", nullptr, settings);
 
   std::unordered_map<u32, u32> counts;
   const u32 ROUNDS = 10000000;
@@ -133,9 +131,8 @@ TEST(ProbabilityMessageSizeDistribution, dependent) {
     }
   }
 
-  MessageSizeDistribution* msd =
-      MessageSizeDistributionFactory::createMessageSizeDistribution(
-          "msd", nullptr, settings);
+  MessageSizeDistribution* msd = MessageSizeDistribution::create(
+      "msd", nullptr, settings);
 
   std::unordered_map<u32, u32> counts;
   const u32 ROUNDS = 10000000;

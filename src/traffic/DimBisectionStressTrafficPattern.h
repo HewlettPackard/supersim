@@ -13,26 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_ROUTINGALGORITHMFACTORY_H_
-#define NETWORK_ROUTINGALGORITHMFACTORY_H_
+#ifndef TRAFFIC_DIMBISECTIONSTRESSTRAFFICPATTERN_H_
+#define TRAFFIC_DIMBISECTIONSTRESSTRAFFICPATTERN_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>
 
-class Component;
-class Interface;
-class Router;
-class RoutingAlgorithm;
+#include "traffic/TrafficPattern.h"
 
-class RoutingAlgorithmFactory {
+class DimBisectionStressTrafficPattern : public TrafficPattern {
  public:
-  RoutingAlgorithmFactory();
-  virtual ~RoutingAlgorithmFactory();
-  virtual RoutingAlgorithm* createRoutingAlgorithm(
-      const std::string& _name, const Component* _parent, Router* _router,
-      u32 _inputPort) = 0;
+  DimBisectionStressTrafficPattern(
+      const std::string& _name, const Component* _parent, u32 _numTerminals,
+      u32 _self, Json::Value _settings);
+  ~DimBisectionStressTrafficPattern();
+
+  u32 nextDestination() override;
+
+ private:
+  u32 dest_;
 };
 
-#endif  // NETWORK_ROUTINGALGORITHMFACTORY_H_
+#endif  // TRAFFIC_DIMBISECTIONSTRESSTRAFFICPATTERN_H_

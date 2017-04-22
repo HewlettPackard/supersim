@@ -16,13 +16,14 @@
 #include "traffic/ProbabilityMessageSizeDistribution.h"
 
 #include <mut/mut.h>
+#include <factory/Factory.h>
 
 #include <algorithm>
 
 ProbabilityMessageSizeDistribution::ProbabilityMessageSizeDistribution(
       const std::string& _name, const Component* _parent,
       Json::Value _settings)
-    :MessageSizeDistribution(_name, _parent),
+    : MessageSizeDistribution(_name, _parent, _settings),
      doDependent_(_settings.isMember("dependent_message_sizes") &&
                   _settings.isMember("dependent_size_probabilities")) {
   // verify input settings
@@ -111,3 +112,7 @@ u32 ProbabilityMessageSizeDistribution::nextMessageSize(const Message* _msg) {
     return nextMessageSize();
   }
 }
+
+registerWithFactory("probability", MessageSizeDistribution,
+                    ProbabilityMessageSizeDistribution,
+                    MESSAGESIZEDISTRIBUTION_ARGS);

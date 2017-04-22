@@ -39,7 +39,7 @@ TEST(PhantomBufferOccupancy, statusCheck) {
 
         Json::Value routerSettings;
         CongestionTestRouter router(
-            "Router", nullptr, 0, {}, numPorts, numVcs, nullptr,
+            "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, nullptr,
             routerSettings);
         router.setDebug(debug);
 

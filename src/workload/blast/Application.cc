@@ -15,6 +15,8 @@
  */
 #include "workload/blast/Application.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 #include <vector>
@@ -237,3 +239,6 @@ void Application::processEvent(void* _event, s32 _type) {
 }
 
 }  // namespace Blast
+
+registerWithFactory("blast", ::Application, Blast::Application,
+                    APPLICATION_ARGS);

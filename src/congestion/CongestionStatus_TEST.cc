@@ -26,11 +26,12 @@
 /*********************** CongestionTestRouter class ***************************/
 
 CongestionTestRouter::CongestionTestRouter(
-    const std::string& _name, const Component* _parent, u32 _id,
-    const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
+    const std::string& _name, const Component* _parent, Network* _network,
+    u32 _id, const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
     MetadataHandler* _metadataHandler, Json::Value _settings)
-    : Router(_name, _parent, _id, _address, _numPorts, _numVcs,
-             _metadataHandler, _settings), congestionStatus_(nullptr) {
+    : Router(_name, _parent, _network, _id, _address, _numPorts, _numVcs,
+             _metadataHandler, _settings),
+      congestionStatus_(nullptr) {
   outputChannels_.resize(numPorts_);
 }
 
@@ -257,7 +258,8 @@ TEST(CongestionStatus, latencyAndGranularity) {
 
       Json::Value routerSettings;
       CongestionTestRouter router(
-          "Router", nullptr, 0, {}, numPorts, numVcs, nullptr, routerSettings);
+          "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, nullptr,
+          routerSettings);
       router.setDebug(debug);
 
       Json::Value statusSettings;

@@ -15,6 +15,8 @@
  */
 #include "workload/Application.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 #include <cmath>
 
@@ -52,6 +54,25 @@ Application::~Application() {
     delete terminals_.at(idx);
   }
   delete rateLog_;
+}
+
+Application* Application::create(
+    const std::string& _name, const Component* _parent, u32 _id,
+    Workload* _workload, MetadataHandler* _metadataHandler,
+    Json::Value _settings) {
+  // retrieve the application type
+  const std::string& type = _settings["type"].asString();
+
+  // attempt to create the application
+  Application* app = factory::Factory<Application, APPLICATION_ARGS>::create(
+      type, _name, _parent, _id, _workload, _metadataHandler, _settings);
+
+  // check that the factory has this type of application
+  if (app == nullptr) {
+    fprintf(stderr, "unknown application type: %s\n", type.c_str());
+    assert(false);
+  }
+  return app;
 }
 
 u32 Application::numTerminals() const {

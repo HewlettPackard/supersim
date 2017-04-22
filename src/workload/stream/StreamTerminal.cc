@@ -22,7 +22,7 @@
 
 #include "network/Network.h"
 #include "stats/MessageLog.h"
-#include "traffic/MessageSizeDistributionFactory.h"
+#include "traffic/MessageSizeDistribution.h"
 #include "types/Flit.h"
 #include "types/Packet.h"
 #include "workload/stream/Application.h"
@@ -36,9 +36,8 @@ StreamTerminal::StreamTerminal(
     Json::Value _settings)
     : Terminal(_name, _parent, _id, _address, _app) {
   // create a message size distribution
-  messageSizeDistribution_ = MessageSizeDistributionFactory::
-      createMessageSizeDistribution("MessageSizeDistribution", this,
-                                    _settings["message_size_distribution"]);
+  messageSizeDistribution_ = MessageSizeDistribution::create(
+      "MessageSizeDistribution", this, _settings["message_size_distribution"]);
 
   // traffic class of injection
   assert(_settings.isMember("traffic_class"));

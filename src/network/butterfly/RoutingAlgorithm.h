@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_BUTTERFLY_DESTINATIONTAGROUTINGALGORITHM_H_
-#define NETWORK_BUTTERFLY_DESTINATIONTAGROUTINGALGORITHM_H_
+#ifndef NETWORK_BUTTERFLY_ROUTINGALGORITHM_H_
+#define NETWORK_BUTTERFLY_ROUTINGALGORITHM_H_
 
+#include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>
@@ -25,21 +26,23 @@
 #include "network/RoutingAlgorithm.h"
 #include "router/Router.h"
 
+#define BUTTERFLY_ROUTINGALGORITHM_ARGS const std::string&, const Component*, \
+    Router*, u32, u32, u32, u32, u32, Json::Value
+
 namespace Butterfly {
 
-class DestinationTagRoutingAlgorithm : public RoutingAlgorithm {
+class RoutingAlgorithm : public ::RoutingAlgorithm {
  public:
-  DestinationTagRoutingAlgorithm(
-      const std::string& _name, const Component* _parent, Router* _router,
-      u64 _latency, u32 _baseVc, u32 _numVcs, u32 _numPorts, u32 _numStages,
-      u32 _stage);
-  ~DestinationTagRoutingAlgorithm();
+  RoutingAlgorithm(
+      const std::string& _name, const Component* _parent,
+      Router* _router, u32 _baseVc, u32 _numVcs, u32 _numPorts,
+      u32 _numStages, u32 _stage, Json::Value _settings);
+  virtual ~RoutingAlgorithm();
+
+  // this is a routing algorithm factory for the butterfly topology
+  static RoutingAlgorithm* create(BUTTERFLY_ROUTINGALGORITHM_ARGS);
 
  protected:
-  void processRequest(
-      Flit* _flit, RoutingAlgorithm::Response* _response) override;
-
- private:
   const u32 numPorts_;
   const u32 numStages_;
   const u32 stage_;
@@ -47,4 +50,4 @@ class DestinationTagRoutingAlgorithm : public RoutingAlgorithm {
 
 }  // namespace Butterfly
 
-#endif  // NETWORK_BUTTERFLY_DESTINATIONTAGROUTINGALGORITHM_H_
+#endif  // NETWORK_BUTTERFLY_ROUTINGALGORITHM_H_

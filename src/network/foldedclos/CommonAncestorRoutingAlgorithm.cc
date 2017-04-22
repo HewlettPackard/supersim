@@ -15,6 +15,8 @@
  */
 #include "network/foldedclos/CommonAncestorRoutingAlgorithm.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 #include <tuple>
@@ -27,10 +29,10 @@ namespace FoldedClos {
 
 CommonAncestorRoutingAlgorithm::CommonAncestorRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u64 _latency, u32 _baseVc, u32 _numVcs, u32 _numPorts, u32 _numLevels,
+    u32 _baseVc, u32 _numVcs, u32 _numPorts, u32 _numLevels,
     u32 _inputPort, Json::Value _settings)
-    : RoutingAlgorithm(_name, _parent, _router, _latency, _baseVc, _numVcs),
-      numPorts_(_numPorts), numLevels_(_numLevels), inputPort_(_inputPort),
+    : RoutingAlgorithm(_name, _parent, _router, _baseVc, _numVcs, _numPorts,
+                       _numLevels, _inputPort, _settings),
       leastCommonAncestor_(_settings["least_common_ancestor"].asBool()),
       mode_(parseMode(_settings["mode"].asString())),
       adaptive_(_settings["adaptive"].asBool()) {
@@ -230,3 +232,7 @@ CommonAncestorRoutingAlgorithm::Mode CommonAncestorRoutingAlgorithm::parseMode(
 }
 
 }  // namespace FoldedClos
+
+registerWithFactory("common_ancestor", FoldedClos::RoutingAlgorithm,
+                    FoldedClos::CommonAncestorRoutingAlgorithm,
+                    FOLDEDCLOS_ROUTINGALGORITHM_ARGS);

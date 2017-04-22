@@ -15,6 +15,7 @@
  */
 #include "traffic/MatrixTrafficPattern.h"
 
+#include <factory/Factory.h>
 #include <fio/InFile.h>
 #include <mut/mut.h>
 #include <strop/strop.h>
@@ -24,7 +25,7 @@
 MatrixTrafficPattern::MatrixTrafficPattern(
     const std::string& _name, const Component* _parent, u32 _numTerminals,
     u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {
+    : TrafficPattern(_name, _parent, _numTerminals, _self, _settings) {
 
   // make space to hold a probability distribution
   std::vector<f64> probabilityDistribution(numTerminals_, F64_POS_INF);
@@ -64,3 +65,6 @@ u32 MatrixTrafficPattern::nextDestination() {
   f64 rnd = gSim->rnd.nextF64();
   return mut::searchCumulativeDistribution(cumulativeDistribution_, rnd);
 }
+
+registerWithFactory("matrix", TrafficPattern,
+                    MatrixTrafficPattern, TRAFFICPATTERN_ARGS);

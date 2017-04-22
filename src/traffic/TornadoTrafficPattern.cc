@@ -15,6 +15,8 @@
  */
 #include "traffic/TornadoTrafficPattern.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 #include <vector>
@@ -24,7 +26,7 @@
 TornadoTrafficPattern::TornadoTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {
+    : TrafficPattern(_name, _parent, _numTerminals, _self, _settings) {
   // parse the settings
   assert(_settings.isMember("dimensions") &&
          _settings["dimensions"].isArray());
@@ -69,3 +71,6 @@ TornadoTrafficPattern::~TornadoTrafficPattern() {}
 u32 TornadoTrafficPattern::nextDestination() {
   return dest_;
 }
+
+registerWithFactory("tornado", TrafficPattern,
+                    TornadoTrafficPattern, TRAFFICPATTERN_ARGS);

@@ -15,12 +15,14 @@
  */
 #include "traffic/ScanTrafficPattern.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 ScanTrafficPattern::ScanTrafficPattern(
     const std::string& _name, const Component* _parent, u32 _numTerminals,
     u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {
+    : TrafficPattern(_name, _parent, _numTerminals, _self, _settings) {
   assert(_settings.isMember("send_to_self"));
   sendToSelf_ = _settings["send_to_self"].asBool();
 
@@ -75,3 +77,6 @@ void ScanTrafficPattern::advance() {
     next_ = (next_ == 0) ? numTerminals_ - 1 : next_ - 1;
   }
 }
+
+registerWithFactory("scan", TrafficPattern,
+                    ScanTrafficPattern, TRAFFICPATTERN_ARGS);

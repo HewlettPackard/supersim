@@ -15,10 +15,12 @@
  */
 #include "arbiter/RandomArbiter.h"
 
+#include <factory/Factory.h>
+
 RandomArbiter::RandomArbiter(
     const std::string& _name, const Component* _parent, u32 _size,
     Json::Value _settings)
-    : Arbiter(_name, _parent, _size) {
+    : Arbiter(_name, _parent, _size, _settings) {
   temp_.reserve(size_);
 }
 
@@ -39,3 +41,6 @@ u32 RandomArbiter::arbitrate() {
   temp_.clear();
   return winner;
 }
+
+registerWithFactory("random", Arbiter,
+                    RandomArbiter, ARBITER_ARGS);

@@ -19,7 +19,7 @@
 #include <json/json.h>
 
 #include "test/TestSetup_TEST.h"
-#include "traffic/MessageSizeDistributionFactory.h"
+#include "traffic/MessageSizeDistribution.h"
 
 TEST(RandomMessageSizeDistribution, simple) {
   TestSetup ts(123, 123, 123);
@@ -32,9 +32,8 @@ TEST(RandomMessageSizeDistribution, simple) {
   settings["min_message_size"] = MIN;
   settings["max_message_size"] = MAX;
 
-  MessageSizeDistribution* msd =
-      MessageSizeDistributionFactory::createMessageSizeDistribution(
-          "msd", nullptr, settings);
+  MessageSizeDistribution* msd = MessageSizeDistribution::create(
+      "msd", nullptr, settings);
 
   std::vector<u32> counts(MAX - MIN + 1, 0);
   const u32 ROUNDS = 10000000;
@@ -69,9 +68,8 @@ TEST(RandomMessageSizeDistribution, dependent) {
   settings["dependent_min_message_size"] = MIN;
   settings["dependent_max_message_size"] = MAX;
 
-  MessageSizeDistribution* msd =
-      MessageSizeDistributionFactory::createMessageSizeDistribution(
-          "msd", nullptr, settings);
+  MessageSizeDistribution* msd = MessageSizeDistribution::create(
+      "msd", nullptr, settings);
 
   std::vector<u32> counts(MAX - MIN + 1, 0);
   const u32 ROUNDS = 10000000;

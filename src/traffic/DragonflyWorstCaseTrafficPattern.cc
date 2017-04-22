@@ -15,12 +15,14 @@
  */
 #include "traffic/DragonflyWorstCaseTrafficPattern.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 DragonflyWorstCaseTrafficPattern::DragonflyWorstCaseTrafficPattern(
     const std::string& _name, const Component* _parent, u32 _numTerminals,
     u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {
+    : TrafficPattern(_name, _parent, _numTerminals, _self, _settings) {
   // verify settings exist
   assert(_settings.isMember("group_count"));
   assert(_settings.isMember("group_size"));
@@ -65,3 +67,6 @@ u32 DragonflyWorstCaseTrafficPattern::nextDestination() {
           (destLocal * concentration_) +
           (destConc));
 }
+
+registerWithFactory("dragonfly_worstcase", TrafficPattern,
+                    DragonflyWorstCaseTrafficPattern, TRAFFICPATTERN_ARGS);

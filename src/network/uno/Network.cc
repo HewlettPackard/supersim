@@ -15,14 +15,14 @@
  */
 #include "network/uno/Network.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 #include <cmath>
 
 #include <tuple>
 
-#include "interface/InterfaceFactory.h"
-#include "network/uno/RoutingAlgorithmFactory.h"
-#include "router/RouterFactory.h"
+#include "network/uno/RoutingAlgorithm.h"
 
 namespace Uno {
 
@@ -38,39 +38,21 @@ Network::Network(const std::string& _name, const Component* _parent,
   u32 routerRadix = concentration_;
 
   // parse the traffic classes description
-  std::vector<std::tuple<u32, u32> > trafficClassVcs;
-  std::vector<::RoutingAlgorithmFactory*> routingAlgorithmFactories;
-  for (u32 idx = 0; idx < _settings["traffic_classes"].size(); idx++) {
-    u32 numVcs = _settings["traffic_classes"][idx]["num_vcs"].asUInt();
-    u32 baseVc = routingAlgorithmFactories.size();
-    trafficClassVcs.push_back(std::make_tuple(baseVc, numVcs));
-    for (u32 vc = 0; vc < numVcs; vc++) {
-      routingAlgorithmFactories.push_back(
-          new RoutingAlgorithmFactory(
-              baseVc, numVcs, concentration_,
-              _settings["traffic_classes"][idx]["routing"]));
-    }
-  }
+  loadTrafficClassInfo(_settings["traffic_classes"]);
 
   // create the router
-  router_ = RouterFactory::createRouter(
-      "Router", this, 0, std::vector<u32>(), routerRadix, numVcs_,
-      _metadataHandler, &routingAlgorithmFactories, _settings["router"]);
-
-  // we don't need the routing algorithm factories anymore
-  for (::RoutingAlgorithmFactory* raf : routingAlgorithmFactories) {
-    delete raf;
-  }
-  routingAlgorithmFactories.clear();
+  router_ = Router::create(
+      "Router", this, this, 0, std::vector<u32>(), routerRadix, numVcs_,
+      _metadataHandler, _settings["router"]);
 
   // create the interfaces and external channels
   interfaces_.resize(concentration_, nullptr);
   for (u32 id = 0; id < concentration_; id++) {
     // create the interface
     std::string interfaceName = "Interface_" + std::to_string(id);
-    Interface* interface = InterfaceFactory::createInterface(
+    Interface* interface = Interface::create(
         interfaceName, this, id, {id}, numVcs_,
-        trafficClassVcs, _settings["interface"]);
+        trafficClassVcs_, _settings["interface"]);
     interfaces_.at(id) = interface;
 
     // create the channels
@@ -89,6 +71,9 @@ Network::Network(const std::string& _name, const Component* _parent,
     interface->setInputChannel(0, outChannel);
     interface->setOutputChannel(0, inChannel);
   }
+
+  // clear the traffic class info
+  clearTrafficClassInfo();
 }
 
 Network::~Network() {
@@ -102,6 +87,17 @@ Network::~Network() {
     Channel* channel = *it;
     delete channel;
   }
+}
+
+::RoutingAlgorithm* Network::createRoutingAlgorithm(
+     u32 _vc, u32 _port, const std::string& _name, const Component* _parent,
+     Router* _router) {
+  // get the info
+  const Network::RoutingAlgorithmInfo& info = routingAlgorithmInfo_.at(_vc);
+
+  // call the routing algorithm factory
+  return RoutingAlgorithm::create(_name, _parent, _router, info.baseVc,
+                                  info.numVcs, concentration_, info.settings);
 }
 
 u32 Network::numRouters() const {
@@ -152,3 +148,6 @@ void Network::collectChannels(std::vector<Channel*>* _channels) {
 }
 
 }  // namespace Uno
+
+registerWithFactory("uno", ::Network,
+                    Uno::Network, NETWORK_ARGS);

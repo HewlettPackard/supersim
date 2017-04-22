@@ -15,6 +15,8 @@
  */
 #include "traffic/DimTransposeTrafficPattern.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 #include <vector>
@@ -24,7 +26,7 @@
 DimTransposeTrafficPattern::DimTransposeTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {
+    : TrafficPattern(_name, _parent, _numTerminals, _self, _settings) {
   // parse the settings
   assert(_settings.isMember("dimensions") &&
          _settings["dimensions"].isArray());
@@ -83,3 +85,6 @@ DimTransposeTrafficPattern::~DimTransposeTrafficPattern() {}
 u32 DimTransposeTrafficPattern::nextDestination() {
   return dest_;
 }
+
+registerWithFactory("dim_transpose", TrafficPattern,
+                    DimTransposeTrafficPattern, TRAFFICPATTERN_ARGS);

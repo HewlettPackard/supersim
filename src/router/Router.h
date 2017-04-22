@@ -25,19 +25,26 @@
 #include "architecture/PortedDevice.h"
 #include "event/Component.h"
 #include "metadata/MetadataHandler.h"
-#include "network/Channel.h"
 #include "types/CreditReceiver.h"
 #include "types/CreditSender.h"
 #include "types/FlitReceiver.h"
 #include "types/FlitSender.h"
 
+class Network;
+
+#define ROUTER_ARGS const std::string&, const Component*, Network*, u32, \
+    const std::vector<u32>&, u32, u32, MetadataHandler*, Json::Value
+
 class Router : public Component, public PortedDevice, public FlitSender,
                public FlitReceiver, public CreditSender, public CreditReceiver {
  public:
-  Router(const std::string& _name, const Component* _parent, u32 _id,
-         const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
+  Router(const std::string& _name, const Component* _parent, Network* _network,
+         u32 _id, const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
          MetadataHandler* _metadataHandler, Json::Value _settings);
   virtual ~Router();
+
+  // this is a router factory
+  static Router* create(ROUTER_ARGS);
 
   // this must be called by all subclasses when a packet's head flit arrives
   //  on an input port.
@@ -46,6 +53,7 @@ class Router : public Component, public PortedDevice, public FlitSender,
   virtual f64 congestionStatus(u32 _port, u32 _vc) const = 0;
 
  protected:
+  Network* network_;
   MetadataHandler* metadataHandler_;
 };
 

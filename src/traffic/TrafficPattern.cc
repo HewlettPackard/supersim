@@ -15,14 +15,34 @@
  */
 #include "traffic/TrafficPattern.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 TrafficPattern::TrafficPattern(
     const std::string& _name, const Component* _parent,
-    u32 _numTerminals, u32 _self)
+    u32 _numTerminals, u32 _self, Json::Value _settings)
     : Component(_name, _parent), numTerminals_(_numTerminals), self_(_self) {
   assert(numTerminals_ > 0);
   assert(self_ < numTerminals_);
 }
 
 TrafficPattern::~TrafficPattern() {}
+
+TrafficPattern* TrafficPattern::create(
+    const std::string& _name, const Component* _parent, u32 _numTerminals,
+    u32 _self, Json::Value _settings) {
+  // retrieve type
+  const std::string& type = _settings["type"].asString();
+
+  // try to construct a traffic pattern
+  TrafficPattern* tp = factory::Factory<TrafficPattern, TRAFFICPATTERN_ARGS>
+      ::create(type, _name, _parent, _numTerminals, _self, _settings);
+
+  // check that the factory had an entry for that type
+  if (tp == nullptr) {
+    fprintf(stderr, "unknown traffic pattern: %s\n", type.c_str());
+    assert(false);
+  }
+  return tp;
+}

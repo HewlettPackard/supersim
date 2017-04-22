@@ -16,17 +16,24 @@
 #ifndef TRAFFIC_TRAFFICPATTERN_H_
 #define TRAFFIC_TRAFFICPATTERN_H_
 
+#include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>
 
 #include "event/Component.h"
 
+#define TRAFFICPATTERN_ARGS const std::string&, const Component*, u32, u32, \
+    Json::Value
+
 class TrafficPattern : public Component {
  public:
   TrafficPattern(const std::string& _name, const Component* _parent,
-                 u32 _numTerminals, u32 _self);
+                 u32 _numTerminals, u32 _self, Json::Value _settings);
   virtual ~TrafficPattern();
+
+  static TrafficPattern* create(TRAFFICPATTERN_ARGS);
+
   virtual u32 nextDestination() = 0;
 
  protected:

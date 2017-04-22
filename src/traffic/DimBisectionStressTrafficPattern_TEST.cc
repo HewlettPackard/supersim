@@ -20,14 +20,14 @@
 
 #include <cassert>
 
-#include "traffic/BisectionStressTrafficPattern.h"
+#include "traffic/DimBisectionStressTrafficPattern.h"
 #include "test/TestSetup_TEST.h"
 
-TEST(BisectionStressTrafficPattern, parity) {
+TEST(DimBisectionStressTrafficPattern, parity) {
   TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
-  BisectionStressTrafficPattern* tp;
+  DimBisectionStressTrafficPattern* tp;
   std::map<u32, u32> pairs_DC, pairs_HB;
 
   settings["dimensions"][0] = Json::Value(4);
@@ -76,7 +76,7 @@ TEST(BisectionStressTrafficPattern, parity) {
   for (const auto& p : pairs_DC) {
     src = p.first;
     dst = p.second;
-    tp = new BisectionStressTrafficPattern(
+    tp = new DimBisectionStressTrafficPattern(
         "TP", nullptr, numTerminals, src, settings);
     for (u32 idx = 0; idx < 100; ++idx) {
       u32 next = tp->nextDestination();
@@ -88,7 +88,7 @@ TEST(BisectionStressTrafficPattern, parity) {
   for (const auto& p : pairs_HB) {
     src = p.first;
     dst = p.second;
-    tp = new BisectionStressTrafficPattern(
+    tp = new DimBisectionStressTrafficPattern(
         "TP", nullptr, numTerminals, src, settings);
     for (u32 idx = 0; idx < 100; ++idx) {
       u32 next = tp->nextDestination();
@@ -99,11 +99,11 @@ TEST(BisectionStressTrafficPattern, parity) {
   }
 }
 
-TEST(BisectionStressTrafficPattern, half) {
+TEST(DimBisectionStressTrafficPattern, half) {
   TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
-  BisectionStressTrafficPattern* tp;
+  DimBisectionStressTrafficPattern* tp;
   std::map<u32, u32> pairs;
 
   settings["dimensions"][0] = Json::Value(4);
@@ -136,7 +136,7 @@ TEST(BisectionStressTrafficPattern, half) {
     for (const auto& p : pairs) {
       src = p.first * 2 + conc;
       dst = p.second * 2 + conc;
-      tp = new BisectionStressTrafficPattern(
+      tp = new DimBisectionStressTrafficPattern(
           "TP", nullptr, numTerminals, src, settings);
       for (u32 idx = 0; idx < 100; ++idx) {
         u32 next = tp->nextDestination();
@@ -148,11 +148,11 @@ TEST(BisectionStressTrafficPattern, half) {
   }
 }
 
-TEST(BisectionStressTrafficPattern, quadrant) {
+TEST(DimBisectionStressTrafficPattern, quadrant) {
   TestSetup test(1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
-  BisectionStressTrafficPattern* tp;
+  DimBisectionStressTrafficPattern* tp;
   std::map<u32, u32> pairs;
 
   settings["dimensions"][0] = Json::Value(4);
@@ -185,7 +185,7 @@ TEST(BisectionStressTrafficPattern, quadrant) {
     for (const auto& p : pairs) {
       src = p.first * 2 + conc;
       dst = p.second * 2 + conc;
-      tp = new BisectionStressTrafficPattern(
+      tp = new DimBisectionStressTrafficPattern(
           "TP", nullptr, numTerminals, src, settings);
       for (u32 idx = 0; idx < 100; ++idx) {
         u32 next = tp->nextDestination();

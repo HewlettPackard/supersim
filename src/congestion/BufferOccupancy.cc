@@ -15,6 +15,8 @@
  */
 #include "congestion/BufferOccupancy.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 #include <cmath>
 
@@ -89,3 +91,6 @@ BufferOccupancy::Mode BufferOccupancy::parseMode(const std::string& _mode) {
     assert(false);
   }
 }
+
+registerWithFactory("buffer_occupancy", CongestionStatus,
+                    BufferOccupancy, CONGESTIONSTATUS_ARGS);

@@ -15,6 +15,8 @@
  */
 #include "interface/Interface.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 Interface::Interface(
@@ -26,6 +28,27 @@ Interface::Interface(
       trafficClassVcs_(_trafficClassVcs), messageReceiver_(nullptr) {}
 
 Interface::~Interface() {}
+
+Interface* Interface::create(
+    const std::string& _name, const Component* _parent, u32 _id,
+    const std::vector<u32>& _address, u32 _numVcs,
+    const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
+    Json::Value _settings) {
+  // retrieve the type
+  const std::string& type = _settings["type"].asString();
+
+  // attempt to build the interface
+  Interface* interface = factory::Factory<Interface, INTERFACE_ARGS>::create(
+      type, _name, _parent, _id, _address, _numVcs, _trafficClassVcs,
+      _settings);
+
+  // check that the factory had this type
+  if (interface == nullptr) {
+    fprintf(stderr, "unknown interface type: %s\n", type.c_str());
+    assert(false);
+  }
+  return interface;
+}
 
 void Interface::setMessageReceiver(MessageReceiver* _receiver) {
   assert(messageReceiver_ == nullptr);

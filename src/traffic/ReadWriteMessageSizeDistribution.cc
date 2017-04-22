@@ -15,6 +15,8 @@
  */
 #include "traffic/ReadWriteMessageSizeDistribution.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 #include <algorithm>
@@ -24,7 +26,7 @@
 ReadWriteMessageSizeDistribution::ReadWriteMessageSizeDistribution(
     const std::string& _name, const Component* _parent,
     Json::Value _settings)
-    : MessageSizeDistribution(_name, _parent),
+    : MessageSizeDistribution(_name, _parent, _settings),
       readRequestSize_(_settings["read_request_size"].asUInt()),
       readResponseSize_(_settings["read_response_size"].asUInt()),
       writeRequestSize_(_settings["write_request_size"].asUInt()),
@@ -80,3 +82,7 @@ u32 ReadWriteMessageSizeDistribution::nextMessageSize(const Message* _msg) {
     assert(false);
   }
 }
+
+registerWithFactory("read_write", MessageSizeDistribution,
+                    ReadWriteMessageSizeDistribution,
+                    MESSAGESIZEDISTRIBUTION_ARGS);

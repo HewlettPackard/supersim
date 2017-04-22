@@ -16,13 +16,20 @@
 #ifndef METADATA_METADATAHANDLER_H_
 #define METADATA_METADATAHANDLER_H_
 
+#include <json/json.h>
+
 class Application;
 class Packet;
 
+#define METADATAHANDLER_ARGS Json::Value
+
 class MetadataHandler {
  public:
-  MetadataHandler();
+  explicit MetadataHandler(Json::Value _settings);
   virtual ~MetadataHandler();
+
+  // this is the metadata handler factory
+  static MetadataHandler* create(METADATAHANDLER_ARGS);
 
   virtual void packetInjection(Application* _app, Packet* _packet) = 0;
   virtual void packetArrival(Packet* _packet) = 0;

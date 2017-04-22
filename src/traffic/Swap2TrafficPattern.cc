@@ -15,6 +15,8 @@
  */
 #include "traffic/Swap2TrafficPattern.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 #include <vector>
@@ -24,7 +26,7 @@
 Swap2TrafficPattern::Swap2TrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {
+    : TrafficPattern(_name, _parent, _numTerminals, _self, _settings) {
   // parse the settings
   assert(_settings.isMember("dimensions") &&
          _settings["dimensions"].isArray());
@@ -93,3 +95,6 @@ Swap2TrafficPattern::~Swap2TrafficPattern() {}
 u32 Swap2TrafficPattern::nextDestination() {
   return dest_;
 }
+
+registerWithFactory("swap2", TrafficPattern,
+                    Swap2TrafficPattern, TRAFFICPATTERN_ARGS);

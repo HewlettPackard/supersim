@@ -19,7 +19,7 @@
 #include <json/json.h>
 
 #include "test/TestSetup_TEST.h"
-#include "traffic/MessageSizeDistributionFactory.h"
+#include "traffic/MessageSizeDistribution.h"
 #include "types/Message.h"
 #include "types/Packet.h"
 
@@ -42,9 +42,8 @@ TEST(ReadWriteMessageSizeDistribution, simple) {
   settings["write_response_size"] = WS;
   settings["read_probability"] = RP;
 
-  MessageSizeDistribution* msd =
-      MessageSizeDistributionFactory::createMessageSizeDistribution(
-          "msd", nullptr, settings);
+  MessageSizeDistribution* msd = MessageSizeDistribution::create(
+      "msd", nullptr, settings);
 
   std::unordered_map<u32, u32> sizes;
   const u32 ROUNDS = 10000000;

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef ALLOCATOR_ALLOCATORFACTORY_H_
-#define ALLOCATOR_ALLOCATORFACTORY_H_
+#ifndef NETWORK_BUTTERFLY_DESTTAGROUTINGALGORITHM_H_
+#define NETWORK_BUTTERFLY_DESTTAGROUTINGALGORITHM_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -22,13 +22,25 @@
 #include <string>
 #include <vector>
 
-#include "allocator/Allocator.h"
+#include "event/Component.h"
+#include "network/butterfly/RoutingAlgorithm.h"
+#include "router/Router.h"
 
-class AllocatorFactory {
+namespace Butterfly {
+
+class DestTagRoutingAlgorithm : public RoutingAlgorithm {
  public:
-  static Allocator* createAllocator(
-      const std::string& _name, const Component* _parent,
-      u32 _numClients, u32 _numResources, Json::Value _settings);
+  DestTagRoutingAlgorithm(
+      const std::string& _name, const Component* _parent, Router* _router,
+      u32 _baseVc, u32 _numVcs, u32 _numPorts, u32 _numStages,
+      u32 _stage, Json::Value _settings);
+  ~DestTagRoutingAlgorithm();
+
+ protected:
+  void processRequest(
+      Flit* _flit, RoutingAlgorithm::Response* _response) override;
 };
 
-#endif  // ALLOCATOR_ALLOCATORFACTORY_H_
+}  // namespace Butterfly
+
+#endif  // NETWORK_BUTTERFLY_DESTTAGROUTINGALGORITHM_H_

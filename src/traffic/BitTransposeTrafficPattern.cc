@@ -16,13 +16,14 @@
 #include "traffic/BitTransposeTrafficPattern.h"
 
 #include <bits/bits.h>
+#include <factory/Factory.h>
 
 #include <cassert>
 
 BitTransposeTrafficPattern::BitTransposeTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {
+    : TrafficPattern(_name, _parent, _numTerminals, _self, _settings) {
   assert(bits::isPow2(numTerminals_));
 
   u32 bitsNum = bits::ceilLog2(numTerminals_);
@@ -39,3 +40,6 @@ BitTransposeTrafficPattern::~BitTransposeTrafficPattern() {}
 u32 BitTransposeTrafficPattern::nextDestination() {
   return dest_;
 }
+
+registerWithFactory("bit_transpose", TrafficPattern,
+                    BitTransposeTrafficPattern, TRAFFICPATTERN_ARGS);

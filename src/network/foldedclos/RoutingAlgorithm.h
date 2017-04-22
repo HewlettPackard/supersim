@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_FOLDEDCLOS_ROUTINGALGORITHMFACTORY_H_
-#define NETWORK_FOLDEDCLOS_ROUTINGALGORITHMFACTORY_H_
+#ifndef NETWORK_FOLDEDCLOS_ROUTINGALGORITHM_H_
+#define NETWORK_FOLDEDCLOS_ROUTINGALGORITHM_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -22,27 +22,31 @@
 #include <string>
 
 #include "event/Component.h"
-#include "network/RoutingAlgorithmFactory.h"
+#include "network/RoutingAlgorithm.h"
+#include "router/Router.h"
+
+#define FOLDEDCLOS_ROUTINGALGORITHM_ARGS const std::string&, const Component*, \
+    Router*, u32, u32, u32, u32, u32, Json::Value
 
 namespace FoldedClos {
 
-class RoutingAlgorithmFactory : public ::RoutingAlgorithmFactory {
+class RoutingAlgorithm : public ::RoutingAlgorithm {
  public:
-  RoutingAlgorithmFactory(u32 _baseVc, u32 _numVcs, u32 _numPorts,
-                          u32 _numLevels, Json::Value _settings);
-  ~RoutingAlgorithmFactory();
-  RoutingAlgorithm* createRoutingAlgorithm(
-      const std::string& _name, const Component* _parent, Router* _router,
-      u32 _inputPort) override;
+  RoutingAlgorithm(
+      const std::string& _name, const Component* _parent,
+      Router* _router, u32 _baseVc, u32 _numVcs, u32 _numPorts,
+      u32 _numLevels, u32 _inputPort, Json::Value _settings);
+  virtual ~RoutingAlgorithm();
 
- private:
-  const u32 baseVc_;
-  const u32 numVcs_;
+  // this is a routing algorithm factory for the folded clos topology
+  static RoutingAlgorithm* create(FOLDEDCLOS_ROUTINGALGORITHM_ARGS);
+
+ protected:
   const u32 numPorts_;
   const u32 numLevels_;
-  const Json::Value settings_;
+  const u32 inputPort_;
 };
 
 }  // namespace FoldedClos
 
-#endif  // NETWORK_FOLDEDCLOS_ROUTINGALGORITHMFACTORY_H_
+#endif  // NETWORK_FOLDEDCLOS_ROUTINGALGORITHM_H_

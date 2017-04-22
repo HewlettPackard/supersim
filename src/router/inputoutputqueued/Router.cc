@@ -15,11 +15,13 @@
  */
 #include "router/inputoutputqueued/Router.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 #include <cmath>
 
-#include "network/RoutingAlgorithmFactory.h"
-#include "congestion/CongestionStatusFactory.h"
+#include "congestion/CongestionStatus.h"
+#include "network/Network.h"
 #include "router/inputoutputqueued/Ejector.h"
 #include "router/inputoutputqueued/InputQueue.h"
 #include "router/inputoutputqueued/OutputQueue.h"
@@ -27,12 +29,10 @@
 namespace InputOutputQueued {
 
 Router::Router(
-    const std::string& _name, const Component* _parent, u32 _id,
-    const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
-    MetadataHandler* _metadataHandler,
-    std::vector<RoutingAlgorithmFactory*>* _routingAlgorithmFactories,
-    Json::Value _settings)
-    : ::Router(_name, _parent, _id, _address, _numPorts, _numVcs,
+    const std::string& _name, const Component* _parent, Network* _network,
+    u32 _id, const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
+    MetadataHandler* _metadataHandler, Json::Value _settings)
+    : ::Router(_name, _parent, _network, _id, _address, _numPorts, _numVcs,
                _metadataHandler, _settings) {
   // determine the size of credits
   creditSize_ = numVcs_ * (u32)std::ceil(
@@ -49,7 +49,7 @@ Router::Router(
   assert(outputQueueDepth > 0);
 
   // create a congestion status device
-  congestionStatus_ = CongestionStatusFactory::createCongestionStatus(
+  congestionStatus_ = CongestionStatus::create(
       "CongestionStatus", this, this, _settings["congestion_status"]);
 
   // create crossbar and schedulers
@@ -84,8 +84,8 @@ Router::Router(
 
       // routing algorithm
       std::string rfname = "RoutingAlgorithm" + nameSuffix;
-      RoutingAlgorithm* rf = _routingAlgorithmFactories->at(vc)->
-          createRoutingAlgorithm(rfname, this, this, port);
+      RoutingAlgorithm* rf = network_->createRoutingAlgorithm(
+          vc, port, rfname, this, this);
       routingAlgorithms_.at(vcIdx) = rf;
 
       // compute the client index (same for VC alloc, SW alloc, and Xbar)
@@ -248,3 +248,6 @@ f64 Router::congestionStatus(u32 _port, u32 _vc) const {
 }
 
 }  // namespace InputOutputQueued
+
+registerWithFactory("input_output_queued", ::Router,
+                    InputOutputQueued::Router, ROUTER_ARGS);

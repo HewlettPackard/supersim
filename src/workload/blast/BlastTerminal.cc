@@ -28,8 +28,7 @@
 #include "stats/MessageLog.h"
 #include "types/Flit.h"
 #include "types/Packet.h"
-#include "traffic/MessageSizeDistributionFactory.h"
-#include "traffic/TrafficPatternFactory.h"
+#include "traffic/MessageSizeDistribution.h"
 #include "workload/blast/Application.h"
 #include "workload/util.h"
 
@@ -91,14 +90,13 @@ BlastTerminal::BlastTerminal(const std::string& _name, const Component* _parent,
   assert(maxPacketSize_ > 0);
 
   // create a traffic pattern
-  trafficPattern_ = TrafficPatternFactory::createTrafficPattern(
+  trafficPattern_ = TrafficPattern::create(
       "TrafficPattern", this, application()->numTerminals(), id_,
       _settings["traffic_pattern"]);
 
   // create a message size distribution
-  messageSizeDistribution_ = MessageSizeDistributionFactory::
-      createMessageSizeDistribution("MessageSizeDistribution", this,
-                                    _settings["message_size_distribution"]);
+  messageSizeDistribution_ = MessageSizeDistribution::create(
+      "MessageSizeDistribution", this, _settings["message_size_distribution"]);
 
   // traffic class of injection of requests
   assert(_settings.isMember("request_traffic_class"));

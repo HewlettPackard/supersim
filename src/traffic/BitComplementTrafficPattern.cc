@@ -16,13 +16,14 @@
 #include "traffic/BitComplementTrafficPattern.h"
 
 #include <bits/bits.h>
+#include <factory/Factory.h>
 
 #include <cassert>
 
 BitComplementTrafficPattern::BitComplementTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {
+    : TrafficPattern(_name, _parent, _numTerminals, _self, _settings) {
   assert(bits::isPow2(numTerminals_));
   dest_ = ~self_ & (numTerminals_ - 1);
 }
@@ -32,3 +33,6 @@ BitComplementTrafficPattern::~BitComplementTrafficPattern() {}
 u32 BitComplementTrafficPattern::nextDestination() {
   return dest_;
 }
+
+registerWithFactory("bit_complement", TrafficPattern,
+                    BitComplementTrafficPattern, TRAFFICPATTERN_ARGS);

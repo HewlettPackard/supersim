@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "network/butterfly/DestinationTagRoutingAlgorithm.h"
+#include "network/butterfly/DestTagRoutingAlgorithm.h"
+
+#include <factory/Factory.h>
 
 #include <cassert>
 
@@ -22,16 +24,16 @@
 
 namespace Butterfly {
 
-DestinationTagRoutingAlgorithm::DestinationTagRoutingAlgorithm(
+DestTagRoutingAlgorithm::DestTagRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u64 _latency, u32 _baseVc, u32 _numVcs, u32 _numPorts, u32 _numStages,
-    u32 _stage)
-    : RoutingAlgorithm(_name, _parent, _router, _latency, _baseVc, _numVcs),
-      numPorts_(_numPorts), numStages_(_numStages), stage_(_stage) {}
+    u32 _baseVc, u32 _numVcs, u32 _numPorts, u32 _numStages, u32 _stage,
+    Json::Value _settings)
+    : RoutingAlgorithm(_name, _parent, _router, _baseVc, _numVcs, _numPorts,
+                       _numStages, _stage, _settings) {}
 
-DestinationTagRoutingAlgorithm::~DestinationTagRoutingAlgorithm() {}
+DestTagRoutingAlgorithm::~DestTagRoutingAlgorithm() {}
 
-void DestinationTagRoutingAlgorithm::processRequest(
+void DestTagRoutingAlgorithm::processRequest(
     Flit* _flit, RoutingAlgorithm::Response* _response) {
   const std::vector<u32>* destinationAddress =
       _flit->packet()->message()->getDestinationAddress();
@@ -47,3 +49,7 @@ void DestinationTagRoutingAlgorithm::processRequest(
 }
 
 }  // namespace Butterfly
+
+registerWithFactory("dest_tag", Butterfly::RoutingAlgorithm,
+                    Butterfly::DestTagRoutingAlgorithm,
+                    BUTTERFLY_ROUTINGALGORITHM_ARGS);

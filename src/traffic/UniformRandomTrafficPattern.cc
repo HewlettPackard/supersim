@@ -15,12 +15,14 @@
  */
 #include "traffic/UniformRandomTrafficPattern.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 UniformRandomTrafficPattern::UniformRandomTrafficPattern(
     const std::string& _name, const Component* _parent, u32 _numTerminals,
     u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {
+    : TrafficPattern(_name, _parent, _numTerminals, _self, _settings) {
   assert(_settings.isMember("send_to_self"));
   sendToSelf_ = _settings["send_to_self"].asBool();
 }
@@ -34,3 +36,6 @@ u32 UniformRandomTrafficPattern::nextDestination() {
   } while (!sendToSelf_ && dest == self_);
   return dest;
 }
+
+registerWithFactory("uniform_random", TrafficPattern,
+                    UniformRandomTrafficPattern, TRAFFICPATTERN_ARGS);

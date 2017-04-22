@@ -15,6 +15,8 @@
  */
 #include "traffic/SingleMessageSizeDistribution.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 #include "event/Simulator.h"
@@ -22,7 +24,7 @@
 SingleMessageSizeDistribution::SingleMessageSizeDistribution(
     const std::string& _name, const Component* _parent,
     Json::Value _settings)
-    : MessageSizeDistribution(_name, _parent),
+    : MessageSizeDistribution(_name, _parent, _settings),
       messageSize_(_settings["message_size"].asUInt()),
       doDependent_(_settings.isMember("dependent_message_size")),
       depMessageSize_(_settings["dependent_message_size"].asUInt()) {
@@ -53,3 +55,7 @@ u32 SingleMessageSizeDistribution::nextMessageSize(const Message* _msg) {
     return nextMessageSize();
   }
 }
+
+registerWithFactory("single", MessageSizeDistribution,
+                    SingleMessageSizeDistribution,
+                    MESSAGESIZEDISTRIBUTION_ARGS);

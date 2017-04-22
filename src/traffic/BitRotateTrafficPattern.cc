@@ -16,13 +16,14 @@
 #include "traffic/BitRotateTrafficPattern.h"
 
 #include <bits/bits.h>
+#include <factory/Factory.h>
 
 #include <cassert>
 
 BitRotateTrafficPattern::BitRotateTrafficPattern(
     const std::string& _name, const Component* _parent,
     u32 _numTerminals, u32 _self, Json::Value _settings)
-    : TrafficPattern(_name, _parent, _numTerminals, _self) {
+    : TrafficPattern(_name, _parent, _numTerminals, _self, _settings) {
   assert(bits::isPow2(numTerminals_));
   assert(_settings.isMember("direction"));
   assert(_settings["direction"].isString());
@@ -42,3 +43,6 @@ BitRotateTrafficPattern::~BitRotateTrafficPattern() {}
 u32 BitRotateTrafficPattern::nextDestination() {
   return dest_;
 }
+
+registerWithFactory("bit_rotate", TrafficPattern,
+                    BitRotateTrafficPattern, TRAFFICPATTERN_ARGS);

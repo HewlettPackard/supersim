@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_TORUS_ROUTINGALGORITHMFACTORY_H_
-#define NETWORK_TORUS_ROUTINGALGORITHMFACTORY_H_
+#ifndef NETWORK_TORUS_ROUTINGALGORITHM_H_
+#define NETWORK_TORUS_ROUTINGALGORITHM_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -23,29 +23,33 @@
 #include <vector>
 
 #include "event/Component.h"
-#include "network/RoutingAlgorithmFactory.h"
+#include "network/RoutingAlgorithm.h"
 #include "router/Router.h"
+
+#define TORUS_ROUTINGALGORITHM_ARGS const std::string&, const Component*, \
+    Router*, u32, u32, const std::vector<u32>&, u32, u32, Json::Value
 
 namespace Torus {
 
-class RoutingAlgorithmFactory : public ::RoutingAlgorithmFactory {
+class RoutingAlgorithm : public ::RoutingAlgorithm {
  public:
-  RoutingAlgorithmFactory(
-      u32 _baseVc, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
-      u32 _concentration, Json::Value _settings);
-  ~RoutingAlgorithmFactory();
-  RoutingAlgorithm* createRoutingAlgorithm(
-      const std::string& _name, const Component* _parent, Router* _router,
-      u32 _inputPort) override;
+  RoutingAlgorithm(
+      const std::string& _name, const Component* _parent,
+      Router* _router, u32 _baseVc, u32 _numVcs,
+      const std::vector<u32>& _dimensionWidths, u32 _concentration,
+      u32 _inputPort, Json::Value _settings);
+  virtual ~RoutingAlgorithm();
 
- private:
-  const u32 baseVc_;
-  const u32 numVcs_;
+  // this is a routing algorithm factory for the torus topology
+  static RoutingAlgorithm* create(TORUS_ROUTINGALGORITHM_ARGS);
+
+ protected:
   const std::vector<u32> dimensionWidths_;
   const u32 concentration_;
-  const Json::Value settings_;
+  const u32 inputPort_;
+  const u32 inputPortDim_;
 };
 
 }  // namespace Torus
 
-#endif  // NETWORK_TORUS_ROUTINGALGORITHMFACTORY_H_
+#endif  // NETWORK_TORUS_ROUTINGALGORITHM_H_
