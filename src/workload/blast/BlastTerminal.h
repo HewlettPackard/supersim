@@ -25,8 +25,8 @@
 #include <vector>
 
 #include "event/Component.h"
-#include "traffic/MessageSizeDistribution.h"
-#include "traffic/TrafficPattern.h"
+#include "traffic/continuous/ContinuousTrafficPattern.h"
+#include "traffic/size/MessageSizeDistribution.h"
 #include "workload/Terminal.h"
 
 class Application;
@@ -78,7 +78,7 @@ class BlastTerminal : public Terminal {
   f64 requestInjectionRate_;
   u32 numTransactions_;
   u32 maxPacketSize_;  // flits
-  TrafficPattern* trafficPattern_;
+  ContinuousTrafficPattern* trafficPattern_;
   MessageSizeDistribution* messageSizeDistribution_;
 
   // requests

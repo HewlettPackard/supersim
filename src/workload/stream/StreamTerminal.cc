@@ -22,7 +22,6 @@
 
 #include "network/Network.h"
 #include "stats/MessageLog.h"
-#include "traffic/MessageSizeDistribution.h"
 #include "types/Flit.h"
 #include "types/Packet.h"
 #include "workload/stream/Application.h"

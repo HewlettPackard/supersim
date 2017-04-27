@@ -26,7 +26,6 @@
 #include "stats/MessageLog.h"
 #include "types/Flit.h"
 #include "types/Packet.h"
-#include "traffic/MessageSizeDistribution.h"
 #include "workload/pulse/Application.h"
 #include "workload/util.h"
 
@@ -59,7 +58,7 @@ PulseTerminal::PulseTerminal(const std::string& _name, const Component* _parent,
   assert(maxPacketSize_ > 0);
 
   // create a traffic pattern
-  trafficPattern_ = TrafficPattern::create(
+  trafficPattern_ = ContinuousTrafficPattern::create(
       "TrafficPattern", this, application()->numTerminals(), id_,
       _settings["traffic_pattern"]);
 

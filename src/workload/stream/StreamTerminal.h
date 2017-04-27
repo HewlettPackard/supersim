@@ -23,7 +23,7 @@
 #include <vector>
 
 #include "event/Component.h"
-#include "traffic/MessageSizeDistribution.h"
+#include "traffic/size/MessageSizeDistribution.h"
 #include "workload/Terminal.h"
 
 class Application;
