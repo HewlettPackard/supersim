@@ -33,9 +33,9 @@
 #define kRequestEvt (0xFA)
 #define kResponseEvt (0x82)
 
-// this app overrides the data* in the message to carry the type as follows:
-void* const kRequestMsg = reinterpret_cast<void* const>(kRequestEvt);
-void* const kResponseMsg = reinterpret_cast<void* const>(kResponseEvt);
+// this app defines the following message OpCodes
+static const u32 kRequestMsg = kRequestEvt;
+static const u32 kResponseMsg = kResponseEvt;
 
 namespace Pulse {
 
@@ -166,7 +166,7 @@ void PulseTerminal::start() {
 
 void PulseTerminal::handleDeliveredMessage(Message* _message) {
   // handle request only transaction tracking
-  void* msgType = _message->getData();
+  u32 msgType = _message->getOpCode();
   u64 transId = _message->getTransaction();
   if (msgType == kRequestMsg) {
     if (!enableResponses_) {
@@ -189,7 +189,7 @@ void PulseTerminal::handleDeliveredMessage(Message* _message) {
 
 void PulseTerminal::handleReceivedMessage(Message* _message) {
   Application* app = reinterpret_cast<Application*>(application());
-  void* msgType = _message->getData();
+  u32 msgType = _message->getOpCode();
   u64 transId = _message->getTransaction();
 
   // handle request/response transaction tracking
@@ -280,7 +280,7 @@ void PulseTerminal::sendNextRequest() {
     u32 messageSize = messageSizeDistribution_->nextMessageSize();
     u32 trafficClass = requestTrafficClass_;
     u64 transaction = createTransaction();
-    void* msgType = kRequestMsg;
+    u32 msgType = kRequestMsg;
 
     // start tracking the transaction
     // dbgprintf("insert trans = %lu", transaction);
@@ -304,7 +304,7 @@ void PulseTerminal::sendNextRequest() {
     Message* message = new Message(numPackets, nullptr);
     message->setTrafficClass(trafficClass);
     message->setTransaction(transaction);
-    message->setData(msgType);
+    message->setOpCode(msgType);
 
     // create the packets
     u32 flitsLeft = messageSize;
@@ -356,7 +356,7 @@ void PulseTerminal::sendNextResponse(Message* _request) {
   u32 trafficClass = responseTrafficClass_;
   u64 transaction = _request->getTransaction();
   // dbgprintf("turning around trans = %lu", transaction);
-  void* msgType = kResponseMsg;
+  u32 msgType = kResponseMsg;
 
   // delete the request
   delete _request;
@@ -371,7 +371,7 @@ void PulseTerminal::sendNextResponse(Message* _request) {
   Message* message = new Message(numPackets, nullptr);
   message->setTrafficClass(trafficClass);
   message->setTransaction(transaction);
-  message->setData(msgType);
+  message->setOpCode(msgType);
 
   // create the packets
   u32 flitsLeft = messageSize;
