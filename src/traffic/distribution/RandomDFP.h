@@ -30,6 +30,8 @@ class RandomDFP : public DistributionTrafficPattern {
       const std::string& _name, const Component* _parent, u32 _numTerminals,
       u32 _self, Json::Value _settings);
   ~RandomDFP();
+
+  u32 size() const override;
   u32 nextDestination() override;
   bool complete() const override;
   void reset() override;

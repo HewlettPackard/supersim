@@ -32,6 +32,14 @@ RandomDFP::RandomDFP(
 
 RandomDFP::~RandomDFP() {}
 
+u32 RandomDFP::size() const {
+  if (sendToSelf_) {
+    return numTerminals_;
+  } else {
+    return numTerminals_ - 1;
+  }
+}
+
 u32 RandomDFP::nextDestination() {
   assert(!destinations_.empty());
   u32 dest = destinations_.back();
@@ -53,5 +61,5 @@ void RandomDFP::reset() {
   gSim->rnd.shuffle(&destinations_);
 }
 
-registerWithFactory("uniform_random", DistributionTrafficPattern,
+registerWithFactory("random", DistributionTrafficPattern,
                     RandomDFP, DISTRIBUTIONTRAFFICPATTERN_ARGS);

@@ -36,6 +36,7 @@ class DistributionTrafficPattern : public Component {
   // this is the factory for distribution traffic patterns
   static DistributionTrafficPattern* create(DISTRIBUTIONTRAFFICPATTERN_ARGS);
 
+  virtual u32 size() const = 0;
   virtual u32 nextDestination() = 0;
   virtual bool complete() const = 0;
   virtual void reset() = 0;
