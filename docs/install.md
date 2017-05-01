@@ -91,10 +91,25 @@ You can run the unit tests for these projects with the following command:
 This is what your development environment now looks like:
 
 ``` sh
-ls ~/ssdev
-  hyperxsearch  libbits     libfio   libmut   libsettings  sslatency  taskrun
-  installcc     libcolhash  libgrid  libprim  libstrop     ssplot
-  installpy     libex       libjson  librnd   percentile   supersim
+ls -1 ~/ssdev
+  hyperxsearch
+  libbits
+  libcolhash
+  libex
+  libfactory
+  libfio
+  libgrid
+  libjson
+  libmut
+  libprim
+  librnd
+  libsettings
+  libstrop
+  percentile
+  sslatency
+  ssplot
+  supersim
+  taskrun
 ```
 
 ## Reinstalling/rebuilding after modification

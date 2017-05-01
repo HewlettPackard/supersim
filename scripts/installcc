@@ -63,6 +63,7 @@ def main(args):
            ('libgrid', 'github.com', 'nicmcd/libgrid', None),
            ('libcolhash', 'github.com', 'nicmcd/libcolhash', None),
            ('libfio', 'github.com', 'nicmcd/libfio', None),
+           ('libfactory', 'github.com', 'nicmcd/libfactory', None),
            ('supersim', 'github.com', 'hewlettpackard/supersim', None),
            ('sslatency', 'github.com', 'nicmcd/sslatency', None),
            ('hyperxsearch', 'github.com', 'nicmcd/hyperxsearch', None)]
