@@ -59,6 +59,10 @@ AllToAllTerminal::AllToAllTerminal(
   // iteration quantity limitation
   assert(_settings.isMember("num_iterations"));
   numIterations_ = _settings["num_iterations"].asUInt();
+  assert(_settings.isMember("perform_barriers") &&
+         _settings["perform_barriers"].isBool());
+  performBarriers_ = _settings["perform_barriers"].asBool();
+  inBarrier_ = false;
 
   // max packet size
   maxPacketSize_  = _settings["max_packet_size"].asUInt();
@@ -185,6 +189,23 @@ void AllToAllTerminal::start() {
   }
 }
 
+void AllToAllTerminal::exitBarrier() {
+  assert(performBarriers_);
+  assert(!sendWaitingForRecv_);
+
+  // make sure we are in a barrier
+  assert(inBarrier_);
+  assert(recvIteration_ == sendIteration_);
+
+  // start sending again
+  dbgprintf("unwaiting");
+  inBarrier_ = false;
+  if (sendIteration_ != numIterations_) {
+    u64 reqTime = gSim->futureCycle(Simulator::Clock::CHANNEL, 1);
+    addEvent(reqTime, 0, nullptr, kRequestEvt);
+  }
+}
+
 void AllToAllTerminal::handleDeliveredMessage(Message* _message) {
   // handle request only transaction tracking
   u32 msgType = _message->getOpCode();
@@ -241,6 +262,7 @@ void AllToAllTerminal::handleReceivedMessage(Message* _message) {
     assert(res);
 
     // try to clean up iterations in order
+    bool advRecvIter = false;
     while (true) {
       // retrieve the set we care about (may not exist)
       std::unordered_set<u32>& iterationReceivedSet2 =
@@ -255,15 +277,22 @@ void AllToAllTerminal::handleReceivedMessage(Message* _message) {
 
         // advance to the next iteration
         recvIteration_++;
+        advRecvIter = true;
       } else {
         // to clean up in order, break here
         break;
       }
     }
 
+    // perform barrier entrance
+    if (advRecvIter && performBarriers_) {
+      app->terminalAtBarrier(id());
+    }
+
     // handle the case where the send operation is stalled by the recv operation
     if (sendWaitingForRecv_ && (recvIteration_ >= sendIteration_)) {
       dbgprintf("unwaiting");
+      assert(!performBarriers_);
 
       // disable the waiting flag
       sendWaitingForRecv_ = false;
@@ -360,9 +389,11 @@ void AllToAllTerminal::sendNextRequest() {
   Application* app = reinterpret_cast<Application*>(application());
 
   // determine if another request can be generated
+  assert(!inBarrier_);
   if (sendIteration_ > recvIteration_) {
     // the send operation has completed before the recv operation
-    dbgprintf("unwaiting");
+    dbgprintf("waiting");
+    assert(!performBarriers_);
     assert(!sendStalled_);
     sendWaitingForRecv_ = true;
   } else if ((enableResponses_) &&
@@ -389,6 +420,10 @@ void AllToAllTerminal::sendNextRequest() {
 
     // handle this iteration's distribution
     if (trafficPattern_->complete()) {
+      // if barriers used, wait for barrier to start next send iteration
+      if (performBarriers_) {
+        inBarrier_ = true;
+      }
       sendIteration_++;
       trafficPattern_->reset();
     }
@@ -446,7 +481,7 @@ void AllToAllTerminal::sendNextRequest() {
     (void)msgId;  // unused
 
     // determine when to send the next request
-    if (sendIteration_ < numIterations_) {
+    if (!inBarrier_ && sendIteration_ < numIterations_) {
       u64 cycles = cyclesToSend(requestInjectionRate_, messageSize);
       u64 time = gSim->futureCycle(Simulator::Clock::CHANNEL, cycles);
       if (time == gSim->time()) {

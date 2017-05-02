@@ -113,16 +113,17 @@
         "type": "alltoall",
         "alltoall_terminal": {
           // requests
-          "request_traffic_class": 1,
+          "request_traffic_class": 0,
           "request_injection_rate": 0.35,
           // responses
           "enable_responses": true,
           "request_processing_latency": 1000,
           "max_outstanding_transactions": 0,
-          "response_traffic_class": 0,
+          "response_traffic_class": 1,
           // traffic generation
           "delay": 1,
           "num_iterations": 40,
+          "perform_barriers": true,
           "max_packet_size": 16,
           "traffic_pattern": {
             "type": "random",

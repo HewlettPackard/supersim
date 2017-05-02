@@ -84,8 +84,24 @@ void Application::stop() {
 
 void Application::kill() {}
 
+void Application::terminalAtBarrier(u32 _id) {
+  atBarrierTerminals_++;
+  assert(atBarrierTerminals_ <= activeTerminals_);
+  if (atBarrierTerminals_ == activeTerminals_) {
+    for (u32 idx = 0; idx < numTerminals(); idx++) {
+      AllToAllTerminal* t = reinterpret_cast<AllToAllTerminal*>(
+          getTerminal(idx));
+      if (t->requestInjectionRate() > 0.0) {
+        t->exitBarrier();
+      }
+    }
+    atBarrierTerminals_ = 0;
+  }
+}
+
 void Application::terminalComplete(u32 _id) {
   completedTerminals_++;
+  printf("id=%u c=%u a=%u\n", _id, completedTerminals_, activeTerminals_);
   assert(completedTerminals_ <= activeTerminals_);
   if (completedTerminals_ == activeTerminals_) {
     dbgprintf("all terminals are done");

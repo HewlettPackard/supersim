@@ -42,6 +42,7 @@ class AllToAllTerminal : public Terminal {
   f64 percentComplete() const;
   f64 requestInjectionRate() const;
   void start();
+  void exitBarrier();
 
  protected:
   void handleDeliveredMessage(Message* _message) override;
@@ -87,6 +88,8 @@ class AllToAllTerminal : public Terminal {
   u32 recvIteration_;
   std::unordered_map<u32, std::unordered_set<u32> > iterationReceived_;
   bool sendWaitingForRecv_;
+  bool performBarriers_;
+  bool inBarrier_;
 };
 
 }  // namespace AllToAll

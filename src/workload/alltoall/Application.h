@@ -39,6 +39,7 @@ class Application : public ::Application {
   void stop() override;
   void kill() override;
 
+  void terminalAtBarrier(u32 _id);
   void terminalComplete(u32 _id);
 
   void processEvent(void* _event, s32 _type) override;
@@ -47,6 +48,7 @@ class Application : public ::Application {
   u32 activeTerminals_;
   u32 completedTerminals_;
   u32 doneTerminals_;
+  u32 atBarrierTerminals_;
   bool allDone_;
 };
 
