@@ -16,6 +16,7 @@
 #include "workload/simplemem/Application.h"
 
 #include <bits/bits.h>
+#include <factory/Factory.h>
 
 #include <cassert>
 
@@ -144,3 +145,6 @@ void Application::processEvent(void* _event, s32 _type) {
 }
 
 }  // namespace SimpleMem
+
+registerWithFactory("simple_mem", ::Application, SimpleMem::Application,
+                    APPLICATION_ARGS);

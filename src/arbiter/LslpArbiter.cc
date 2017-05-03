@@ -15,9 +15,11 @@
  */
 #include "arbiter/LslpArbiter.h"
 
+#include <factory/Factory.h>
+
 LslpArbiter::LslpArbiter(const std::string& _name, const Component* _parent,
                          u32 _size, Json::Value _settings)
-    : Arbiter(_name, _parent, _size) {
+    : Arbiter(_name, _parent, _size, _settings) {
   nextPriority_ = gSim->rnd.nextU64(0, size_ - 1);
   latch();
 }
@@ -41,3 +43,6 @@ u32 LslpArbiter::arbitrate() {
   }
   return winner;
 }
+
+registerWithFactory("lslp", Arbiter,
+                    LslpArbiter, ARBITER_ARGS);

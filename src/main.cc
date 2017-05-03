@@ -28,9 +28,7 @@
 #include "event/Simulator.h"
 #include "event/VectorQueue.h"
 #include "metadata/MetadataHandler.h"
-#include "metadata/MetadataHandlerFactory.h"
 #include "network/Network.h"
-#include "network/NetworkFactory.h"
 
 s32 main(s32 _argc, char** _argv) {
   // turn off buffered output on stdout and stderr
@@ -52,11 +50,11 @@ s32 main(s32 _argc, char** _argv) {
   gSim = new VectorQueue(settings["simulator"]);
 
   // create a metadata handler
-  MetadataHandler* metadataHandler = MetadataHandlerFactory::createHandler(
+  MetadataHandler* metadataHandler = MetadataHandler::create(
       settings["metadata_handler"]);
 
   // create a network
-  Network* network = NetworkFactory::createNetwork(
+  Network* network = Network::create(
       "Network", nullptr, metadataHandler, settings["network"]);
   gSim->setNetwork(network);
   u32 numInterfaces = network->numInterfaces();

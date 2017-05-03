@@ -15,7 +15,11 @@
  */
 #include "network/uno/DirectRoutingAlgorithm.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
+
+#include <vector>
 
 #include "types/Packet.h"
 #include "types/Message.h"
@@ -24,10 +28,9 @@ namespace Uno {
 
 DirectRoutingAlgorithm::DirectRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u64 _latency, u32 _baseVc, u32 _numVcs, u32 _concentration,
-    Json::Value _settings)
-    : RoutingAlgorithm(_name, _parent, _router, _latency, _baseVc, _numVcs),
-      concentration_(_concentration),
+    u32 _baseVc, u32 _numVcs, u32 _concentration, Json::Value _settings)
+    : RoutingAlgorithm(_name, _parent, _router, _baseVc, _numVcs,
+                       _concentration, _settings),
       adaptive_(_settings["adaptive"].asBool()) {
   assert(!_settings["adaptive"].isNull());
 }
@@ -68,3 +71,6 @@ void DirectRoutingAlgorithm::processRequest(
 }
 
 }  // namespace Uno
+
+registerWithFactory("direct", Uno::RoutingAlgorithm,
+                    Uno::DirectRoutingAlgorithm, UNO_ROUTINGALGORITHM_ARGS);

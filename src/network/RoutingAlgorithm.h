@@ -17,6 +17,7 @@
 #define NETWORK_ROUTINGALGORITHM_H_
 
 #include <prim/prim.h>
+#include <json/json.h>
 
 #include <string>
 #include <utility>
@@ -26,6 +27,9 @@
 #include "types/Flit.h"
 
 class Router;
+
+#define ROUTINGALGORITHM_ARGS const std::string&, const Component*, Router*, \
+    u32, u32, Json::Value
 
 class RoutingAlgorithm : public Component {
  public:
@@ -66,7 +70,8 @@ class RoutingAlgorithm : public Component {
    *  must override the processRequest() function.
    */
   RoutingAlgorithm(const std::string& _name, const Component* _parent,
-                   Router* _router, u32 _latency, u32 _baseVc, u32 _numVcs);
+                   Router* _router, u32 _baseVc, u32 _numVcs,
+                   Json::Value _settings);
   virtual ~RoutingAlgorithm();
   u32 latency() const;
   u32 baseVc() const;

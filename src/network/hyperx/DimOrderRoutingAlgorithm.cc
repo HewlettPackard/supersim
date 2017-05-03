@@ -15,6 +15,8 @@
  */
 #include "network/hyperx/DimOrderRoutingAlgorithm.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 #include <unordered_set>
@@ -26,12 +28,12 @@ namespace HyperX {
 
 DimOrderRoutingAlgorithm::DimOrderRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u64 _latency, u32 _baseVc, u32 _numVcs,
-    const std::vector<u32>& _dimensionWidths,
-    const std::vector<u32>& _dimensionWeights, u32 _concentration)
-    : RoutingAlgorithm(_name, _parent, _router, _latency, _baseVc, _numVcs),
-      dimensionWidths_(_dimensionWidths), dimensionWeights_(_dimensionWeights),
-      concentration_(_concentration) {}
+    u32 _baseVc, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
+    const std::vector<u32>& _dimensionWeights, u32 _concentration,
+    u32 _inputPort, Json::Value _settings)
+    : RoutingAlgorithm(_name, _parent, _router, _baseVc, _numVcs,
+                       _dimensionWidths, _dimensionWeights, _concentration,
+                       _inputPort, _settings) {}
 
 DimOrderRoutingAlgorithm::~DimOrderRoutingAlgorithm() {}
 
@@ -93,3 +95,7 @@ void DimOrderRoutingAlgorithm::processRequest(
 }
 
 }  // namespace HyperX
+
+registerWithFactory("dimension_order", HyperX::RoutingAlgorithm,
+                    HyperX::DimOrderRoutingAlgorithm,
+                    HYPERX_ROUTINGALGORITHM_ARGS);

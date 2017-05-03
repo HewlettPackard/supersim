@@ -15,6 +15,8 @@
  */
 #include "congestion/CongestionStatus.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 #include <cmath>
 
@@ -32,6 +34,26 @@ CongestionStatus::CongestionStatus(
 }
 
 CongestionStatus::~CongestionStatus() {}
+
+CongestionStatus* CongestionStatus::create(
+    const std::string& _name, const Component* _parent, PortedDevice* _device,
+    Json::Value _settings) {
+  // retrieve the algorithm
+  const std::string& algorithm = _settings["algorithm"].asString();
+
+  // attempt to build the congestion status
+  CongestionStatus* cs = factory::Factory<
+    CongestionStatus, CONGESTIONSTATUS_ARGS>::create(
+        algorithm, _name, _parent, _device, _settings);
+
+  // check that the algorithm exists within the factory
+  if (cs == nullptr) {
+    fprintf(stderr, "unknown congestion status algorithm: %s\n",
+            algorithm.c_str());
+    assert(false);
+  }
+  return cs;
+}
 
 void CongestionStatus::initCredits(u32 _vcIdx, u32 _credits) {
   u32 port, vc;

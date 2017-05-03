@@ -15,6 +15,8 @@
  */
 #include "metadata/DeadlineMetadataHandler.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 #include <string>
@@ -24,7 +26,8 @@
 #include "types/Message.h"
 #include "types/Packet.h"
 
-DeadlineMetadataHandler::DeadlineMetadataHandler(Json::Value _settings) {
+DeadlineMetadataHandler::DeadlineMetadataHandler(Json::Value _settings)
+    : MetadataHandler(_settings) {
   assert(_settings.isMember("delay"));
   delay_ = _settings["delay"].asUInt64();
   std::string alg = _settings["algorithm"].asString();
@@ -61,3 +64,6 @@ void DeadlineMetadataHandler::packetInjection(Application* _app,
 void DeadlineMetadataHandler::packetArrival(Packet* _packet) {
   // this isn't used in this handler
 }
+
+registerWithFactory("deadline", MetadataHandler,
+                    DeadlineMetadataHandler, METADATAHANDLER_ARGS);

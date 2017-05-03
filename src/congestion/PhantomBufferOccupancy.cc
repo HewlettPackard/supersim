@@ -15,6 +15,8 @@
  */
 #include "congestion/PhantomBufferOccupancy.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 #include <cmath>
 
@@ -121,3 +123,6 @@ PhantomBufferOccupancy::Mode PhantomBufferOccupancy::parseMode(
     assert(false);
   }
 }
+
+registerWithFactory("phantom_buffer_occupancy", CongestionStatus,
+                    PhantomBufferOccupancy, CONGESTIONSTATUS_ARGS);

@@ -15,10 +15,12 @@
  */
 #include "arbiter/ComparingArbiter.h"
 
+#include <factory/Factory.h>
+
 ComparingArbiter::ComparingArbiter(
     const std::string& _name, const Component* _parent,
     u32 _size, Json::Value _settings)
-    : Arbiter(_name, _parent, _size) {
+    : Arbiter(_name, _parent, _size, _settings) {
   greater_ = _settings["greater"].asBool();
   temp_.reserve(size_);
 }
@@ -62,3 +64,6 @@ u32 ComparingArbiter::arbitrate() {
   temp_.clear();
   return winner;
 }
+
+registerWithFactory("comparing", Arbiter,
+                    ComparingArbiter, ARBITER_ARGS);

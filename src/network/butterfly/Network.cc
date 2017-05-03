@@ -15,6 +15,7 @@
  */
 #include "network/butterfly/Network.h"
 
+#include <factory/Factory.h>
 #include <strop/strop.h>
 
 #include <cassert>
@@ -22,10 +23,7 @@
 
 #include <tuple>
 
-#include "interface/InterfaceFactory.h"
-#include "network/butterfly/RoutingAlgorithmFactory.h"
 #include "network/butterfly/util.h"
-#include "router/RouterFactory.h"
 
 namespace Butterfly {
 
@@ -39,38 +37,23 @@ Network::Network(const std::string& _name, const Component* _parent,
   assert(numStages_ >= 1);
   stageWidth_ = (u32)pow(routerRadix_, numStages_ - 1);
 
+  // parse the traffic classes description
+  loadTrafficClassInfo(_settings["traffic_classes"]);
+
   // create the routers
   routers_.resize(stageWidth_ * numStages_, nullptr);
   for (u32 stage = 0; stage < numStages_; stage++) {
+    tmpStage_ = stage;
     for (u32 column = 0; column < stageWidth_; column++) {
       // create the router name
       std::string rname = "Router_" + std::to_string(stage) + "-" +
           std::to_string(column);
 
-      // parse the traffic classes description
-      std::vector<::RoutingAlgorithmFactory*> routingAlgorithmFactories;
-      for (u32 idx = 0; idx < _settings["traffic_classes"].size(); idx++) {
-        u32 numVcs = _settings["traffic_classes"][idx]["num_vcs"].asUInt();
-        u32 baseVc = routingAlgorithmFactories.size();
-        for (u32 vc = 0; vc < numVcs; vc++) {
-          routingAlgorithmFactories.push_back(
-              new RoutingAlgorithmFactory(
-                  baseVc, numVcs, routerRadix_, numStages_, stage,
-                  _settings["traffic_classes"][idx]["routing"]));
-        }
-      }
-
       // create the router
       u32 routerId = stage * stageWidth_ + column;
-      routers_.at(routerId) = RouterFactory::createRouter(
-          rname, this, routerId, {stage, column}, routerRadix_, numVcs_,
-          _metadataHandler, &routingAlgorithmFactories, _settings["router"]);
-
-      // we don't need the routing algorithm factories anymore
-      for (::RoutingAlgorithmFactory* raf : routingAlgorithmFactories) {
-        delete raf;
-      }
-      routingAlgorithmFactories.clear();
+      routers_.at(routerId) = Router::create(
+          rname, this, this, routerId, {stage, column}, routerRadix_, numVcs_,
+          _metadataHandler, _settings["router"]);
     }
   }
 
@@ -106,15 +89,6 @@ Network::Network(const std::string& _name, const Component* _parent,
     }
   }
 
-  // parse the traffic classes description
-  std::vector<std::tuple<u32, u32> > trafficClassVcs;
-  for (u32 baseVc = 0, idx = 0; idx < _settings["traffic_classes"].size();
-       idx++) {
-    u32 numVcs = _settings["traffic_classes"][idx]["num_vcs"].asUInt();
-    trafficClassVcs.push_back(std::make_tuple(baseVc, numVcs));
-    baseVc += numVcs;
-  }
-
   // create the interfaces and external channels
   u32 ifaces = routerRadix_ * stageWidth_;
   interfaces_.resize(ifaces, nullptr);
@@ -123,8 +97,8 @@ Network::Network(const std::string& _name, const Component* _parent,
     std::string interfaceName = "Interface_" + std::to_string(id);
     std::vector<u32> interfaceAddress;
     translateInterfaceIdToAddress(id, &interfaceAddress);
-    Interface* interface = InterfaceFactory::createInterface(
-        interfaceName, this, id, interfaceAddress, numVcs_, trafficClassVcs,
+    Interface* interface = Interface::create(
+        interfaceName, this, id, interfaceAddress, numVcs_, trafficClassVcs_,
         _settings["interface"]);
     interfaces_.at(id) = interface;
 
@@ -152,6 +126,9 @@ Network::Network(const std::string& _name, const Component* _parent,
     interface->setInputChannel(0, outChannel);
     outputRouter->setOutputChannel(routerPort, outChannel);
   }
+
+  // clear the traffic class info
+  clearTrafficClassInfo();
 }
 
 Network::~Network() {
@@ -173,6 +150,18 @@ Network::~Network() {
     Channel* channel = *it;
     delete channel;
   }
+}
+
+::RoutingAlgorithm* Network::createRoutingAlgorithm(
+     u32 _vc, u32 _port, const std::string& _name, const Component* _parent,
+     Router* _router) {
+  // get the info
+  const Network::RoutingAlgorithmInfo& info = routingAlgorithmInfo_.at(_vc);
+
+  // call the routing algorithm factory
+  return RoutingAlgorithm::create(
+      _name, _parent, _router, info.baseVc, info.numVcs, routerRadix_,
+      numStages_, tmpStage_, info.settings);
 }
 
 u32 Network::numRouters() const {
@@ -229,3 +218,6 @@ void Network::collectChannels(std::vector<Channel*>* _channels) {
 }
 
 }  // namespace Butterfly
+
+registerWithFactory("butterfly", ::Network,
+                    Butterfly::Network, NETWORK_ARGS);

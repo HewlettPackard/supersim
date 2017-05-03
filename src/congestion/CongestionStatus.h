@@ -26,11 +26,17 @@
 #include "architecture/PortedDevice.h"
 #include "event/Component.h"
 
+#define CONGESTIONSTATUS_ARGS const std::string&, const Component*, \
+    PortedDevice*, Json::Value
+
 class CongestionStatus : public Component, public CreditWatcher {
  public:
   CongestionStatus(const std::string& _name, const Component* _parent,
                    PortedDevice* _device, Json::Value _settings);
   virtual ~CongestionStatus();
+
+  // this is a congestion status factory
+  static CongestionStatus* create(CONGESTIONSTATUS_ARGS);
 
   // CreditWatcher interface
   void initCredits(u32 _vcIdx, u32 _credits) override;  // called per source

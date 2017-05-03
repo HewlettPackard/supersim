@@ -15,6 +15,28 @@
  */
 #include "metadata/MetadataHandler.h"
 
-MetadataHandler::MetadataHandler() {}
+#include <factory/Factory.h>
+
+#include <cassert>
+
+#include <string>
+
+MetadataHandler::MetadataHandler(Json::Value _settings) {}
 
 MetadataHandler::~MetadataHandler() {}
+
+MetadataHandler* MetadataHandler::create(Json::Value _settings) {
+  // retrieve the type
+  const std::string& type = _settings["type"].asString();
+
+  // attempt to create the metadata handler
+  MetadataHandler* mh = factory::Factory<MetadataHandler, METADATAHANDLER_ARGS>
+      ::create(type, _settings);
+
+  // check that the factory had this type
+  if (mh == nullptr) {
+    fprintf(stderr, "unknown metadata handler type: %s\n", type.c_str());
+    assert(false);
+  }
+  return mh;
+}

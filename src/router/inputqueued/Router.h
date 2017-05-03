@@ -29,10 +29,11 @@
 #include "event/Component.h"
 #include "network/Channel.h"
 #include "network/RoutingAlgorithm.h"
-#include "network/RoutingAlgorithmFactory.h"
 #include "router/Router.h"
 #include "types/Credit.h"
 #include "types/Flit.h"
+
+class Network;
 
 namespace InputQueued {
 
@@ -41,11 +42,9 @@ class OutputQueue;
 
 class Router : public ::Router {
  public:
-  Router(const std::string& _name, const Component* _parent, u32 _id,
-         const std::vector<u32>& _address,  u32 _numPorts, u32 _numVcs,
-         MetadataHandler* _metadataHandler,
-         std::vector<RoutingAlgorithmFactory*>* _routingAlgorithmFactories,
-         Json::Value _settings);
+  Router(const std::string& _name, const Component* _parent, Network* _network,
+         u32 _id, const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
+         MetadataHandler* _metadataHandler, Json::Value _settings);
   ~Router();
 
   // Network

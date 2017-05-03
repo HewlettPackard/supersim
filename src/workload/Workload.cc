@@ -19,7 +19,6 @@
 
 #include "network/Network.h"
 #include "workload/Application.h"
-#include "workload/ApplicationFactory.h"
 
 Workload::Workload(const std::string& _name, const Component* _parent,
                    MetadataHandler* _metadataHandler, Json::Value _settings)
@@ -47,7 +46,7 @@ Workload::Workload(const std::string& _name, const Component* _parent,
   // create the applications
   applications_.resize(numApps, nullptr);
   for (u32 app = 0; app < numApps; app++) {
-    applications_.at(app) = ApplicationFactory::createApplication(
+    applications_.at(app) = Application::create(
         "Application_" +  std::to_string(app), this, app, this,
         _metadataHandler, _settings["applications"][app]);
   }

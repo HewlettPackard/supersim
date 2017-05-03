@@ -21,7 +21,6 @@
 #include <string>
 
 #include "allocator/Allocator.h"
-#include "allocator/AllocatorFactory.h"
 
 #include "test/TestSetup_TEST.h"
 
@@ -54,7 +53,7 @@ void AllocatorTest(Json::Value _settings, AllocatorVerifier _verifier,
       bool* grant = new bool[C * R];
 
       // create the allocator
-      Allocator* alloc = AllocatorFactory::createAllocator(
+      Allocator* alloc = Allocator::create(
           "Alloc", nullptr, C, R, _settings);
 
       // map I/O to the allocator
@@ -156,7 +155,7 @@ void AllocatorLoadBalanceTest(Json::Value _settings) {
   u32* clientGrantCounts = new u32[C];
 
   // create the allocator
-  Allocator* alloc = AllocatorFactory::createAllocator(
+  Allocator* alloc = Allocator::create(
       "Alloc", nullptr, C, R, _settings);
 
   // map I/O to the allocator

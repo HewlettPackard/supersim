@@ -15,6 +15,8 @@
  */
 #include "interface/standard/Interface.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 #include "workload/Application.h"
@@ -277,3 +279,6 @@ void Interface::injectMessage(Message* _message) {
 }
 
 }  // namespace Standard
+
+registerWithFactory("standard", ::Interface,
+                    Standard::Interface, INTERFACE_ARGS);

@@ -14,14 +14,14 @@
       {
         "num_vcs": 1,
         "routing": {
-          "algorithm": "destination_tag",
+          "algorithm": "dest_tag",
           "latency": 1
         }
       },
       {
         "num_vcs": 1,
         "routing": {
-          "algorithm": "destination_tag",
+          "algorithm": "dest_tag",
           "latency": 1
         }
       }

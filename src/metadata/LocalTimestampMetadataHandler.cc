@@ -15,17 +15,19 @@
  */
 #include "metadata/LocalTimestampMetadataHandler.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 #include <string>
 
 #include "workload/Application.h"
 #include "event/Simulator.h"
-#include "types/Message.h"
 #include "types/Packet.h"
 
 LocalTimestampMetadataHandler::LocalTimestampMetadataHandler(
-    Json::Value _settings) {}
+    Json::Value _settings)
+    : MetadataHandler(_settings) {}
 
 LocalTimestampMetadataHandler::~LocalTimestampMetadataHandler() {}
 
@@ -37,3 +39,6 @@ void LocalTimestampMetadataHandler::packetInjection(Application* _app,
 void LocalTimestampMetadataHandler::packetArrival(Packet* _packet) {
   _packet->setMetadata(gSim->time());
 }
+
+registerWithFactory("local_timestamp", MetadataHandler,
+                    LocalTimestampMetadataHandler, METADATAHANDLER_ARGS);

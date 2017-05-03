@@ -15,10 +15,13 @@
  */
 #include "arbiter/Arbiter.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 Arbiter::Arbiter(
-    const std::string& _name, const Component* _parent, u32 _size)
+    const std::string& _name, const Component* _parent, u32 _size,
+    Json::Value _settings)
     : Component(_name, _parent), size_(_size) {
   assert(size_ > 0);
   requests_.resize(size_, nullptr);
@@ -27,6 +30,24 @@ Arbiter::Arbiter(
 }
 
 Arbiter::~Arbiter() {}
+
+Arbiter* Arbiter::create(
+    const std::string& _name, const Component* _parent, u32 _size,
+    Json::Value _settings) {
+  // retrieve the arbiter type
+  const std::string& type = _settings["type"].asString();
+
+  // attempt to create the arbiter
+  Arbiter* arb = factory::Factory<Arbiter, ARBITER_ARGS>::create(
+      type, _name, _parent, _size, _settings);
+
+  // check that the factory had this type of arbiter
+  if (arb == nullptr) {
+    fprintf(stderr, "unknown Arbiter type: %s\n", type.c_str());
+    assert(false);
+  }
+  return arb;
+}
 
 u32 Arbiter::size() const {
   return size_;

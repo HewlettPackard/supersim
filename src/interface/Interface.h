@@ -36,6 +36,10 @@
 class PacketReassembler;
 class MessageReassembler;
 
+#define INTERFACE_ARGS const std::string&, const Component*, u32, \
+    const std::vector<u32>&, u32, const std::vector<std::tuple<u32, u32> >&, \
+    Json::Value
+
 class Interface : public Component, public PortedDevice, public FlitSender,
                   public FlitReceiver, public CreditSender,
                   public CreditReceiver, public MessageReceiver {
@@ -45,6 +49,9 @@ class Interface : public Component, public PortedDevice, public FlitSender,
             const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
             Json::Value _settings);
   virtual ~Interface();
+
+  // this is an interface factory
+  static Interface* create(INTERFACE_ARGS);
 
   void setMessageReceiver(MessageReceiver* _receiver);
   MessageReceiver* messageReceiver() const;

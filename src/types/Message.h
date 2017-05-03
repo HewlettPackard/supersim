@@ -50,6 +50,9 @@ class Message {
   u32 getTrafficClass() const;
   void setTrafficClass(u32 _class);
 
+  u32 getOpCode() const;
+  void setOpCode(u32 _opCode);
+
   u32 getSourceId() const;
   void setSourceId(u32 _sourceId);
 
@@ -69,6 +72,7 @@ class Message {
   void* data_;
   u64 transaction_;
   u32 trafficClass_;
+  u32 opCode_;
 
   u32 sourceId_;
   u32 destinationId_;

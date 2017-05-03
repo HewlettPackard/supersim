@@ -15,14 +15,16 @@
  */
 #include "allocator/RcSeparableAllocator.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
-#include "arbiter/ArbiterFactory.h"
+#include "arbiter/Arbiter.h"
 
 RcSeparableAllocator::RcSeparableAllocator(
     const std::string& _name, const Component* _parent,
     u32 _numClients, u32 _numResources, Json::Value _settings)
-    : Allocator(_name, _parent, _numClients, _numResources) {
+    : Allocator(_name, _parent, _numClients, _numResources, _settings) {
   // pointer arrays
   requests_ = new bool*[numClients_ * numResources_];
   metadatas_ = new u64*[numClients_ * numResources_];
@@ -36,14 +38,14 @@ RcSeparableAllocator::RcSeparableAllocator(
   // instantiate the resource arbiters
   for (u32 r = 0; r < numResources_; r++) {
     std::string name = "ArbiterR" + std::to_string(r);
-    resourceArbiters_[r] = ArbiterFactory::createArbiter(
+    resourceArbiters_[r] = Arbiter::create(
         name, this, numClients_, _settings["resource_arbiter"]);
   }
 
   // instantiate the client arbiters
   for (u32 c = 0; c < numClients_; c++) {
     std::string name = "ArbiterC" + std::to_string(c);
-    clientArbiters_[c] = ArbiterFactory::createArbiter(
+    clientArbiters_[c] = Arbiter::create(
         name, this, numResources_, _settings["client_arbiter"]);
   }
 
@@ -145,3 +147,6 @@ void RcSeparableAllocator::allocate() {
 u64 RcSeparableAllocator::index(u64 _client, u64 _resource) const {
   return (numClients_ * _resource) + _client;
 }
+
+registerWithFactory("rc_separable", Allocator, RcSeparableAllocator,
+                    ALLOCATOR_ARGS);

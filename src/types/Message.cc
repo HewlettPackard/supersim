@@ -94,6 +94,14 @@ void Message::setTrafficClass(u32 _class) {
   trafficClass_ = _class;
 }
 
+u32 Message::getOpCode() const {
+  return opCode_;
+}
+
+void Message::setOpCode(u32 _opCode) {
+  opCode_ = _opCode;
+}
+
 u32 Message::getSourceId() const {
   return sourceId_;
 }

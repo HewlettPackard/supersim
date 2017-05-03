@@ -15,6 +15,7 @@
  */
 #include "network/foldedclos/Network.h"
 
+#include <factory/Factory.h>
 #include <strop/strop.h>
 
 #include <cassert>
@@ -22,10 +23,8 @@
 
 #include <tuple>
 
-#include "interface/InterfaceFactory.h"
-#include "network/foldedclos/RoutingAlgorithmFactory.h"
+#include "network/foldedclos/RoutingAlgorithm.h"
 #include "network/foldedclos/util.h"
-#include "router/RouterFactory.h"
 
 namespace FoldedClos {
 
@@ -33,13 +32,16 @@ Network::Network(const std::string& _name, const Component* _parent,
                  MetadataHandler* _metadataHandler, Json::Value _settings)
     : ::Network(_name, _parent, _metadataHandler, _settings) {
   // network structure and router radix
-  u32 routerRadix = _settings["radix"].asUInt();
-  assert(routerRadix >= 2);
-  assert(routerRadix % 2 == 0);
-  halfRadix_   = routerRadix / 2;
+  routerRadix_ = _settings["radix"].asUInt();
+  assert(routerRadix_ >= 2);
+  assert(routerRadix_ % 2 == 0);
+  halfRadix_   = routerRadix_ / 2;
   numLevels_   = _settings["levels"].asUInt();
   assert(numLevels_ >= 1);
   rowRouters_  = (u32)pow(halfRadix_, numLevels_-1);
+
+  // parse the traffic classes description
+  loadTrafficClassInfo(_settings["traffic_classes"]);
 
   // create all routers
   routers_.resize(numLevels_ * rowRouters_, nullptr);
@@ -51,29 +53,10 @@ Network::Network(const std::string& _name, const Component* _parent,
       translateRouterIdToAddress(routerId, &routerAddress);
       std::string rname = "Router_" + strop::vecString<u32>(routerAddress, '-');
 
-      // parse the traffic classes description
-      std::vector<::RoutingAlgorithmFactory*> routingAlgorithmFactories;
-      for (u32 idx = 0; idx < _settings["traffic_classes"].size(); idx++) {
-        u32 numVcs = _settings["traffic_classes"][idx]["num_vcs"].asUInt();
-        u32 baseVc = routingAlgorithmFactories.size();
-        for (u32 vc = 0; vc < numVcs; vc++) {
-          routingAlgorithmFactories.push_back(
-              new RoutingAlgorithmFactory(
-                  baseVc, numVcs, routerRadix, numLevels_,
-                  _settings["traffic_classes"][idx]["routing"]));
-        }
-      }
-
       // make router
-      routers_.at(routerId) = RouterFactory::createRouter(
-          rname, this, routerId, routerAddress, routerRadix, numVcs_,
-          _metadataHandler, &routingAlgorithmFactories, _settings["router"]);
-
-      // we don't need the routing algorithm factories anymore
-      for (::RoutingAlgorithmFactory* raf : routingAlgorithmFactories) {
-        delete raf;
-      }
-      routingAlgorithmFactories.clear();
+      routers_.at(routerId) = Router::create(
+          rname, this, this, routerId, routerAddress, routerRadix_, numVcs_,
+          _metadataHandler, _settings["router"]);
     }
   }
 
@@ -132,15 +115,6 @@ Network::Network(const std::string& _name, const Component* _parent,
     }
   }
 
-  // parse the traffic classes description
-  std::vector<std::tuple<u32, u32> > trafficClassVcs;
-  for (u32 baseVc = 0, idx = 0; idx < _settings["traffic_classes"].size();
-       idx++) {
-    u32 numVcs = _settings["traffic_classes"][idx]["num_vcs"].asUInt();
-    trafficClassVcs.push_back(std::make_tuple(baseVc, numVcs));
-    baseVc += numVcs;
-  }
-
   // create interfaces, external channels, link together
   interfaces_.resize(rowRouters_ * halfRadix_, nullptr);
   for (u32 c = 0; c < rowRouters_; c++) {
@@ -173,9 +147,9 @@ Network::Network(const std::string& _name, const Component* _parent,
       // create interface
       std::string interfaceName = "Interface_" + std::to_string(c) + ":" +
           std::to_string(p);
-      Interface* interface = InterfaceFactory::createInterface(
+      Interface* interface = Interface::create(
           interfaceName, this, interfaceId, interfaceAddress, numVcs_,
-          trafficClassVcs, _settings["interface"]);
+          trafficClassVcs_, _settings["interface"]);
       interfaces_.at(interfaceId) = interface;
 
       // link to interface
@@ -183,6 +157,9 @@ Network::Network(const std::string& _name, const Component* _parent,
       interface->setOutputChannel(0, inChannel);
     }
   }
+
+  // clear the traffic class info
+  clearTrafficClassInfo();
 
   for (u32 id = 0; id < numInterfaces(); id++) {
     assert(getInterface(id) != nullptr);
@@ -214,6 +191,18 @@ Network::~Network() {
     Channel* c = *it;
     delete c;
   }
+}
+
+::RoutingAlgorithm* Network::createRoutingAlgorithm(
+       u32 _vc, u32 _port, const std::string& _name, const Component* _parent,
+       Router* _router) {
+  // get the info
+  const Network::RoutingAlgorithmInfo& info = routingAlgorithmInfo_.at(_vc);
+
+  // call the routing algorithm factory
+  return RoutingAlgorithm::create(
+      _name, _parent, _router, info.baseVc, info.numVcs, routerRadix_,
+      numLevels_, _port, info.settings);
 }
 
 u32 Network::numRouters() const {
@@ -270,3 +259,6 @@ void Network::collectChannels(std::vector<Channel*>* _channels) {
 }
 
 }  // namespace FoldedClos
+
+registerWithFactory("folded_clos", ::Network,
+                    FoldedClos::Network, NETWORK_ARGS);

@@ -18,7 +18,7 @@
 #include <cassert>
 #include <cstring>
 
-#include "allocator/AllocatorFactory.h"
+#include "allocator/Allocator.h"
 #include "types/Packet.h"
 
 static bool warningIssued = false;
@@ -76,7 +76,7 @@ CrossbarScheduler::CrossbarScheduler(
   portLocks_.resize(crossbarPorts_, U32_MAX);
 
   // create the allocator
-  allocator_ = AllocatorFactory::createAllocator(
+  allocator_ = Allocator::create(
       "Allocator", this, numClients_, crossbarPorts_, _settings["allocator"]);
 
   // map inputs and outputs to allocator

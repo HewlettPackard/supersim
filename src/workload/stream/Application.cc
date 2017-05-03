@@ -15,6 +15,8 @@
  */
 #include "workload/stream/Application.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
 #include <vector>
@@ -119,3 +121,6 @@ void Application::destinationComplete(u32 _id) {
 }
 
 }  // namespace Stream
+
+registerWithFactory("stream", ::Application, Stream::Application,
+                    APPLICATION_ARGS);

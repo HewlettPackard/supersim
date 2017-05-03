@@ -16,13 +16,14 @@
 #ifndef NETWORK_HYPERX_DIMORDERROUTINGALGORITHM_H_
 #define NETWORK_HYPERX_DIMORDERROUTINGALGORITHM_H_
 
+#include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>
 #include <vector>
 
 #include "event/Component.h"
-#include "network/RoutingAlgorithm.h"
+#include "network/hyperx/RoutingAlgorithm.h"
 #include "router/Router.h"
 
 namespace HyperX {
@@ -31,20 +32,14 @@ class DimOrderRoutingAlgorithm : public RoutingAlgorithm {
  public:
   DimOrderRoutingAlgorithm(
       const std::string& _name, const Component* _parent, Router* _router,
-      u64 _latency, u32 _baseVc, u32 _numVcs,
-      const std::vector<u32>& _dimensionWidths,
-      const std::vector<u32>& _dimensionWeights,
-      u32 _concentration);
+      u32 _baseVc, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
+      const std::vector<u32>& _dimensionWeights, u32 _concentration,
+      u32 _inputPort, Json::Value _settings);
   ~DimOrderRoutingAlgorithm();
 
  protected:
   void processRequest(
       Flit* _flit, RoutingAlgorithm::Response* _response) override;
-
- private:
-  const std::vector<u32> dimensionWidths_;
-  const std::vector<u32> dimensionWeights_;
-  const u32 concentration_;
 };
 
 }  // namespace HyperX

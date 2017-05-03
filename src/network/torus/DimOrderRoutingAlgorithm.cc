@@ -15,9 +15,10 @@
  */
 #include "network/torus/DimOrderRoutingAlgorithm.h"
 
+#include <factory/Factory.h>
+
 #include <cassert>
 
-#include "network/torus/util.h"
 #include "types/Message.h"
 #include "types/Packet.h"
 
@@ -25,14 +26,11 @@ namespace Torus {
 
 DimOrderRoutingAlgorithm::DimOrderRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u64 _latency, u32 _baseVc, u32 _numVcs,
-    const std::vector<u32>& _dimensionWidths, u32 _concentration,
-    u32 _inputPort)
-    : RoutingAlgorithm(_name, _parent, _router, _latency, _baseVc, _numVcs),
-      dimensionWidths_(_dimensionWidths), concentration_(_concentration),
-      inputPort_(_inputPort),
-      inputPortDim_(computeInputPortDim(dimensionWidths_, concentration_,
-                                        inputPort_)) {
+    u32 _baseVc, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
+    u32 _concentration, u32 _inputPort, Json::Value _settings)
+    : RoutingAlgorithm(_name, _parent, _router, _baseVc, _numVcs,
+                       _dimensionWidths, _concentration, _inputPort,
+                       _settings) {
   assert(numVcs_ >= 2);
 }
 
@@ -130,3 +128,7 @@ void DimOrderRoutingAlgorithm::processRequest(
 }
 
 }  // namespace Torus
+
+registerWithFactory("dimension_order", Torus::RoutingAlgorithm,
+                    Torus::DimOrderRoutingAlgorithm,
+                    TORUS_ROUTINGALGORITHM_ARGS);

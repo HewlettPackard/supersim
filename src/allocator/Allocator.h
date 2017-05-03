@@ -16,6 +16,7 @@
 #ifndef ALLOCATOR_ALLOCATOR_H_
 #define ALLOCATOR_ALLOCATOR_H_
 
+#include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>
@@ -24,11 +25,17 @@
 #include "arbiter/Arbiter.h"
 #include "event/Component.h"
 
+#define ALLOCATOR_ARGS const std::string&, const Component*, u32, u32, \
+    Json::Value
+
 class Allocator : public Component {
  public:
   Allocator(const std::string& _name, const Component* _parent,
-            u32 _numClients, u32 _numResources);
+            u32 _numClients, u32 _numResources, Json::Value _settings);
   virtual ~Allocator();
+
+  // this is the factory for allocators
+  static Allocator* create(ALLOCATOR_ARGS);
 
   // returns number of clients
   u32 numClients() const;

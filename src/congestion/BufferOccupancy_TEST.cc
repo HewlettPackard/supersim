@@ -32,8 +32,9 @@ TEST(BufferOccupancy, statusCheck_VcMode) {
   const u32 granularity = 0;
 
   Json::Value routerSettings;
-  CongestionTestRouter router("Router", nullptr, 0, {}, numPorts, numVcs,
-                              nullptr, routerSettings);
+  CongestionTestRouter router(
+      "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, nullptr,
+      routerSettings);
   router.setDebug(debug);
 
   Json::Value statusSettings;
@@ -94,8 +95,9 @@ TEST(BufferOccupancy, statusCheck_PortMode) {
   const u32 granularity = 0;
 
   Json::Value routerSettings;
-  CongestionTestRouter router("Router", nullptr, 0, {}, numPorts, numVcs,
-                              nullptr, routerSettings);
+  CongestionTestRouter router(
+      "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, nullptr,
+      routerSettings);
   router.setDebug(debug);
 
   Json::Value statusSettings;

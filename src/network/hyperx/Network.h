@@ -24,8 +24,9 @@
 
 #include "event/Component.h"
 #include "interface/Interface.h"
-#include "network/Network.h"
 #include "network/Channel.h"
+#include "network/Network.h"
+#include "network/hyperx/RoutingAlgorithm.h"
 #include "router/Router.h"
 #include "util/DimensionalArray.h"
 
@@ -36,6 +37,11 @@ class Network : public ::Network {
   Network(const std::string& _name, const Component* _parent,
           MetadataHandler* _metadataHandler, Json::Value _settings);
   ~Network();
+
+  // this is the routing algorithm factory for this network
+  ::RoutingAlgorithm* createRoutingAlgorithm(
+       u32 _vc, u32 _port, const std::string& _name, const Component* _parent,
+       Router* _router) override;
 
   // Network
   u32 numRouters() const override;
