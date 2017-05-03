@@ -25,7 +25,6 @@
 #include "router/inputoutputqueued/Ejector.h"
 #include "router/inputoutputqueued/InputQueue.h"
 #include "router/inputoutputqueued/OutputQueue.h"
-#include "factory/AbstractFactory.h"
 
 namespace InputOutputQueued {
 
