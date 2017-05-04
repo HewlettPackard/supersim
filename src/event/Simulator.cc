@@ -95,17 +95,17 @@ void Simulator::simulate() {
       totalEvents++;
       intervalEvents++;
 
-      u64 elapsedSimTime = time_ - lastSimTime;
-      std::chrono::steady_clock::time_point realTime =
-          std::chrono::steady_clock::now();
-      f64 elapsedRealTime =
-          std::chrono::duration_cast<std::chrono::duration<f64> >
-          (realTime - lastRealTime).count();
+      if (printProgress_ && ((totalEvents & 0xff) == 0)) {
+        u64 elapsedSimTime = time_ - lastSimTime;
+        std::chrono::steady_clock::time_point realTime =
+            std::chrono::steady_clock::now();
+        f64 elapsedRealTime =
+            std::chrono::duration_cast<std::chrono::duration<f64> >
+            (realTime - lastRealTime).count();
 
-      if (elapsedRealTime > printInterval_) {
-        lastSimTime = time_;
+        if (elapsedRealTime > printInterval_) {
+          lastSimTime = time_;
 
-        if (printProgress_) {
           // use a common buffer and snprintf
           char buf[256];  // much larger than needed
           u32 cnt = 0;
@@ -154,10 +154,10 @@ void Simulator::simulate() {
 
           // now print the entire buffer to stdout
           printf("%s", buf);
-        }
 
-        lastRealTime = realTime;
-        intervalEvents = 0;
+          lastRealTime = realTime;
+          intervalEvents = 0;
+        }
       }
     }
   }
