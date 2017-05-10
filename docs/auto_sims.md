@@ -102,7 +102,7 @@ TaskManager object.
 We'll use an example settings file from the SuperSim project.
 
 ``` sh
-cp ../supersim/json/foldedclos_iq_stresstest.json settings.json
+cp ../supersim/json/foldedclos_iq_blast.json settings.json
 ```
 
 Now we are ready to run the TaskRun script.

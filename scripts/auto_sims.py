@@ -41,13 +41,14 @@ for a in ['oblivious', 'adaptive']:
     sim_cmd = ('../supersim/bin/supersim '
                'settings.json '
                'network.traffic_classes[0].routing.adaptive=bool={0} '
-               'workload.applications[0].max_injection_rate=float={1} '
+               'workload.applications[0].blast_terminal.request_injection_rate=float={1} '
+               'workload.applications[0].blast_terminal.enable_responses=bool=false '
                'network.channel_log.file=string={2} '
                'workload.applications[0].rate_log.file=string={3} '
                'workload.message_log.file=string={4} '
                .format(
                  'true' if a == 'adaptive' else 'false',
-                 '0.000001' if l == '0.00' else l,
+                 '0.0001' if l == '0.00' else l,
                  'channels_' + id + '.csv',
                  'rates_' + id + '.csv',
                  'messages_' + id + '.mpf.gz'))
