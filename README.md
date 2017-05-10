@@ -1,10 +1,10 @@
 # SuperSim
 
 ## What is it?
-*SuperSim* is an event-driven cycle-accurate flit-level interconnection network simulator written in C++. SuperSim's highest priority is flexbility. As Professor [Christos Kozyrakis][christos] once said:
+*SuperSim* is an event-driven cycle-accurate flit-level interconnection network simulator written in C++. SuperSim's highest priority is flexibility. As Professor [Christos Kozyrakis][christos] once said:
 > If a simulator already does what you want it to do, you're most likely asking the wrong questions.
 
-SuperSim is designed to be a simulation framework, not a ready-to-go simulator for all scenarios. The core of SuperSim is a well structured abstract class hierarchy that generically represents the interaction between common network components. Specific implementations override the basic abstractions to create the desired functionality without reinventing the wheel for every new model.
+SuperSim is designed to be a simulation framework, not a ready-to-go simulator for all scenarios. The core of SuperSim is a well-structured abstract class hierarchy that generically represents the interaction between common network components. Specific implementations override the basic abstractions to create the desired functionality without reinventing the wheel for every new model.
 
 SuperSim is meant to produce very detailed and realistic simulations. While anything can in theory be simulated, the convention of SuperSim thus far is to model the real world on a cycle-by-cycle basis. This provides closer to real life simulation results and better verification for logical designs.
 
@@ -17,7 +17,7 @@ SuperSim has some key advantages in its design and development that make it part
 + SuperSim uses event-driven simulation which has the following major advantages:
   - Event-driven simulation is fast because it only models devices when things change. This is in contrast to cycle-driven simulation that models devices on every cycle regardless if something is going to change or not.
   - Event-driven simulation provides an automatic data structure to the component models. In many cases, the event system can be used to store data that will be needed later and the model doesn't have to store the data manually. This greatly simplifies model development.
-+ SuperSim is meticulously developed. It has a very well-defined coding and formatting standard (almost identical to the Google coding standard). There is no mish mash of different styles and formats.
++ SuperSim is meticulously developed. It has a very well-defined coding and formatting standard (almost identical to the Google coding standard). There is no mish-mash of different styles and formats.
 + SuperSim uses a proactive linear regression algorithm to determine when a network is saturated or warmed up. All other simulators simply run the simulator for a fixed time then begin logging. This produces untrustworthy results for networks that are close to the saturation point. SuperSim runs the simulator until it can be determined that the network is saturated or it is warmed up. It is never a guessing game in SuperSim whether you ran the simulation long enough to produce correct results.
 + SuperSim is supported by many tools that allow simulations to be run, parsed, analyzed, and plotted very efficiently.
   - [SSLatency][sslatency] is an optimized C++ program that parses the verbose file format output from SuperSim into latency numbers. SSLatency prepares files for analysis and plotting.
