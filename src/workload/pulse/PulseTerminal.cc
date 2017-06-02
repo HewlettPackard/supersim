@@ -14,7 +14,9 @@
  */
 #include "workload/pulse/PulseTerminal.h"
 
+#include <fio/InFile.h>
 #include <mut/mut.h>
+#include <strop/strop.h>
 
 #include <cassert>
 #include <cmath>
@@ -47,6 +49,35 @@ PulseTerminal::PulseTerminal(const std::string& _name, const Component* _parent,
          _settings["request_injection_rate"].isDouble());
   requestInjectionRate_ = _settings["request_injection_rate"].asDouble();
   assert(requestInjectionRate_ >= 0.0 && requestInjectionRate_ <= 1.0);
+
+  // if relative injection is specified, modify the injection accordingly
+  if (_settings.isMember("relative_injection")) {
+    // if a file is given, it is a csv of injection rates
+    fio::InFile inf(_settings["relative_injection"].asString());
+    std::string line;
+    u32 lineNum = 0;
+    fio::InFile::Status sts = fio::InFile::Status::OK;
+    bool foundMe = false;
+    for (lineNum = 0; sts == fio::InFile::Status::OK;) {
+      sts = inf.getLine(&line);
+      assert(sts != fio::InFile::Status::ERROR);
+      if (sts == fio::InFile::Status::OK) {
+        if (line.size() > 0) {
+          std::vector<std::string> strs = strop::split(line, ',');
+          assert(strs.size() == 1);
+          f64 ri = std::stod(strs.at(0));
+          assert(ri >= 0.0);
+          if (lineNum == id_) {
+            requestInjectionRate_ *= ri;
+            foundMe = true;
+            break;
+          }
+          lineNum++;
+        }
+      }
+    }
+    assert(foundMe);
+  }
 
   // transaction quantity limitation
   assert(_settings.isMember("num_transactions"));
