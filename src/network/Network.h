@@ -64,6 +64,7 @@ class Network : public Component {
 
   void startMonitoring();
   void endMonitoring();
+  bool monitoring() const;
 
  protected:
   // this is used by network implementations to create routing algorithms
@@ -88,6 +89,7 @@ class Network : public Component {
  private:
   ChannelLog* channelLog_;
   MetadataHandler* metadataHandler_;
+  bool monitoring_;
 };
 
 #endif  // NETWORK_NETWORK_H_
