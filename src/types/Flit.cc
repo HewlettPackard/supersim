@@ -48,6 +48,14 @@ void Flit::setVc(u32 _vc) {
   vc_ = _vc;
 }
 
+u32 Flit::getTrafficClass() const {
+  return packet_->getTrafficClass();
+}
+
+void Flit::setTrafficClass(u32 _trafficClass) {
+  packet_->setTrafficClass(_trafficClass);
+}
+
 void Flit::setSendTime(u64 _time) {
   assert(_time != U64_MAX);
   sendTime_ = _time;
