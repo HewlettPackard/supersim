@@ -38,6 +38,7 @@ class Workload : public Component {
   Application* application(u32 _index) const;
   MessageDistributor* messageDistributor(u32 _index) const;
   MessageLog* messageLog() const;
+  bool monitoring() const;
 
   // OPERATION: The Workload class signals the applications to keep them
   //  synchronized. After all applications report 'ready', the workload

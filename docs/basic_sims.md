@@ -26,7 +26,7 @@ example settings file from the SuperSim project. We'll modify the settings
 on the command line when we run the simulator.
 
 ``` sh
-cp ../supersim/json/foldedclos_iq_stresstest.json sample.json
+cp ../supersim/json/foldedclos_iq_blast.json sample.json
 ```
 
 ## Running the simulator
@@ -38,8 +38,8 @@ pattern to use in the simulation.
 ../supersim/bin/supersim sample.json \
   network.channel_log.file=string=channels.csv \
   workload.message_log.file=string=messages.mpf.gz \
-  workload.application[0].rate_log.file=string=rates.csv \
-  workload.application[0].blast_terminal.traffic_pattern.type=string=random_exchange
+  workload.applications[0].rate_log.file=string=rates.csv \
+  workload.applications[0].blast_terminal.traffic_pattern.type=string=random_exchange
 ```
 
 The first thing SuperSim does is prints the settings as it interprets them.

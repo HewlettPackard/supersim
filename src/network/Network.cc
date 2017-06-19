@@ -34,7 +34,8 @@ Network::Network(const std::string& _name, const Component* _parent,
                  MetadataHandler* _metadataHandler, Json::Value _settings)
     : Component(_name, _parent),
       numVcs_(computeNumVcs(_settings["traffic_classes"])),
-      metadataHandler_(_metadataHandler) {
+      metadataHandler_(_metadataHandler),
+      monitoring_(false) {
   // check settings
   assert(numVcs_ > 0);
 
@@ -73,6 +74,7 @@ MetadataHandler* Network::metadataHandler() const {
 }
 
 void Network::startMonitoring() {
+  monitoring_ = true;
   std::vector<Channel*> channels;
   collectChannels(&channels);
   for (auto it = channels.begin(); it != channels.end(); ++it) {
@@ -82,6 +84,7 @@ void Network::startMonitoring() {
 }
 
 void Network::endMonitoring() {
+  monitoring_ = false;
   std::vector<Channel*> channels;
   collectChannels(&channels);
   for (auto it = channels.begin(); it != channels.end(); ++it) {
@@ -89,6 +92,10 @@ void Network::endMonitoring() {
     c->endMonitoring();
     channelLog_->logChannel(c);
   }
+}
+
+bool Network::monitoring() const {
+  return monitoring_;
 }
 
 void Network::loadTrafficClassInfo(Json::Value _settings) {

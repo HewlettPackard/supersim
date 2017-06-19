@@ -24,7 +24,7 @@ These can be installed on a modern Debian based system with the following
 commands:
 
 ``` sh
-sudo apt-get install g++ git python3 python3-pip python3-dev libtclap-dev zlib1g-dev wget
+sudo apt-get install g++ git python3 python3-pip python3-dev python3-tk libtclap-dev zlib1g-dev wget
 pip3 install setuptools --user
 pip3 install numpy matplotlib psutil --user
 ```

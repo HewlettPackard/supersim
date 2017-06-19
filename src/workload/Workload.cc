@@ -80,6 +80,10 @@ MessageLog* Workload::messageLog() const {
   return messageLog_;
 }
 
+bool Workload::monitoring() const {
+  return monitoring_;
+}
+
 void Workload::applicationReady(u32 _index) {
   dbgprintf("App %u is ready", _index);
   readyCount_++;
