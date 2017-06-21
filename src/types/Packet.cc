@@ -54,10 +54,6 @@ u32 Packet::getTrafficClass() const {
   return message_->getTrafficClass();
 }
 
-void Packet::setTrafficClass(u32 _trafficClass) {
-  message_->setTrafficClass(_trafficClass);
-}
-
 Message* Packet::message() const {
   return message_;
 }

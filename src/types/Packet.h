@@ -36,7 +36,6 @@ class Packet {
   void setFlit(u32 _index, Flit* _flit);
 
   u32 getTrafficClass() const;
-  void setTrafficClass(u32 _trafficClass);
 
   Message* message() const;
 

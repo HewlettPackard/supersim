@@ -36,7 +36,6 @@ class Flit {
   u64 getSendTime() const;
   void setReceiveTime(u64 time);
   u64 getReceiveTime() const;
-  void setTrafficClass(u32 _trafficClass);
   u32 getTrafficClass() const;
 
  private:
