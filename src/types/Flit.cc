@@ -20,7 +20,7 @@
 
 Flit::Flit(u32 _id, bool _isHead, bool _isTail, Packet* _packet)
     : id_(_id), head_(_isHead), tail_(_isTail), packet_(_packet),
-      sendTime_(U64_MAX), receiveTime_(U64_MAX) {}
+      vc_(U32_MAX), sendTime_(U64_MAX), receiveTime_(U64_MAX) {}
 
 Flit::~Flit() {}
 
