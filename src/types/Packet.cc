@@ -50,6 +50,10 @@ void Packet::setFlit(u32 _index, Flit* _flit) {
   flits_.at(_index) = _flit;
 }
 
+u32 Packet::getTrafficClass() const {
+  return message_->getTrafficClass();
+}
+
 Message* Packet::message() const {
   return message_;
 }
