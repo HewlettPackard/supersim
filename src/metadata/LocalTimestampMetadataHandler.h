@@ -29,8 +29,10 @@ class LocalTimestampMetadataHandler : public MetadataHandler {
   explicit LocalTimestampMetadataHandler(Json::Value _settings);
   ~LocalTimestampMetadataHandler();
 
-  void packetInjection(Application* _app, Packet* _packet) override;
-  void packetArrival(Packet* _packet) override;
+  void packetInterfaceArrival(
+      const Interface* _iface, Packet* _packet) override;
+  void packetRouterArrival(
+      const Router* _router, u32 _port, Packet* _packet) override;
 };
 
 #endif  // METADATA_LOCALTIMESTAMPMETADATAHANDLER_H_

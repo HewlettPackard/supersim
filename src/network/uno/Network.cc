@@ -50,8 +50,8 @@ Network::Network(const std::string& _name, const Component* _parent,
     // create the interface
     std::string interfaceName = "Interface_" + std::to_string(id);
     Interface* interface = Interface::create(
-        interfaceName, this, id, {id}, numVcs_,
-        trafficClassVcs_, _settings["interface"]);
+        interfaceName, this, id, {id}, numVcs_, trafficClassVcs_,
+        _metadataHandler, _settings["interface"]);
     interfaces_.at(id) = interface;
 
     // create the channels

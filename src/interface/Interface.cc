@@ -22,9 +22,10 @@ Interface::Interface(
     const std::string& _name, const Component* _parent, u32 _id,
     const std::vector<u32>& _address, u32 _numVcs,
     const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
-    Json::Value _settings)
+    MetadataHandler* _metadataHandler, Json::Value _settings)
     : Component(_name, _parent), PortedDevice(_id, _address, 1, _numVcs),
-      trafficClassVcs_(_trafficClassVcs), messageReceiver_(nullptr) {}
+      trafficClassVcs_(_trafficClassVcs), messageReceiver_(nullptr),
+      metadataHandler_(_metadataHandler) {}
 
 Interface::~Interface() {}
 
@@ -32,14 +33,14 @@ Interface* Interface::create(
     const std::string& _name, const Component* _parent, u32 _id,
     const std::vector<u32>& _address, u32 _numVcs,
     const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
-    Json::Value _settings) {
+    MetadataHandler* _metadataHandler, Json::Value _settings) {
   // retrieve the type
   const std::string& type = _settings["type"].asString();
 
   // attempt to build the interface
   Interface* interface = factory::Factory<Interface, INTERFACE_ARGS>::create(
       type, _name, _parent, _id, _address, _numVcs, _trafficClassVcs,
-      _settings);
+      _metadataHandler, _settings);
 
   // check that the factory had this type
   if (interface == nullptr) {
@@ -56,4 +57,12 @@ void Interface::setMessageReceiver(MessageReceiver* _receiver) {
 
 MessageReceiver* Interface::messageReceiver() const {
   return messageReceiver_;
+}
+
+void Interface::packetArrival(Packet* _packet) const {
+  metadataHandler_->packetInterfaceArrival(this, _packet);
+}
+
+void Interface::packetDeparture(Packet* _packet) const {
+  metadataHandler_->packetInterfaceDeparture(this, _packet);
 }

@@ -30,12 +30,13 @@ LocalTimestampMetadataHandler::LocalTimestampMetadataHandler(
 
 LocalTimestampMetadataHandler::~LocalTimestampMetadataHandler() {}
 
-void LocalTimestampMetadataHandler::packetInjection(Application* _app,
-                                                    Packet* _packet) {
+void LocalTimestampMetadataHandler::packetInterfaceArrival(
+    const Interface* _iface, Packet* _packet) {
   _packet->setMetadata(gSim->time());
 }
 
-void LocalTimestampMetadataHandler::packetArrival(Packet* _packet) {
+void LocalTimestampMetadataHandler::packetRouterArrival(
+    const Router* _router, u32 _port, Packet* _packet) {
   _packet->setMetadata(gSim->time());
 }
 

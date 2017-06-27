@@ -159,7 +159,7 @@ Network::Network(const std::string& _name, const Component* _parent,
       u32 interfaceId = translateInterfaceAddressToId(&interfaceAddress);
       Interface* interface = Interface::create(
           interfaceName, this, interfaceId, interfaceAddress, numVcs_,
-          trafficClassVcs_, _settings["interface"]);
+          trafficClassVcs_, _metadataHandler, _settings["interface"]);
       interfaces_.at(interfaceAddress) = interface;
 
       // create I/O channels

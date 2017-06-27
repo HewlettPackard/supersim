@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef METADATA_DEADLINEMETADATAHANDLER_H_
-#define METADATA_DEADLINEMETADATAHANDLER_H_
+#ifndef METADATA_CREATIONTIMESTAMPMETADATAHANDLER_H_
+#define METADATA_CREATIONTIMESTAMPMETADATAHANDLER_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -24,13 +24,12 @@
 
 class Application;
 
-class DeadlineMetadataHandler : public MetadataHandler {
+class CreationTimestampMetadataHandler : public MetadataHandler {
  public:
-  explicit DeadlineMetadataHandler(Json::Value _settings);
-  ~DeadlineMetadataHandler();
+  explicit CreationTimestampMetadataHandler(Json::Value _settings);
+  ~CreationTimestampMetadataHandler();
 
-  void packetInjection(Application* _app, Packet* _packet) override;
-  void packetArrival(Packet* _packet) override;
+  void packetInjection(const Application* _app, Packet* _packet) override;
 
  private:
   enum class Algorithm {kMessage, kTransaction};
@@ -39,4 +38,4 @@ class DeadlineMetadataHandler : public MetadataHandler {
   Algorithm alg_;
 };
 
-#endif  // METADATA_DEADLINEMETADATAHANDLER_H_
+#endif  // METADATA_CREATIONTIMESTAMPMETADATAHANDLER_H_

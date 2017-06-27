@@ -39,3 +39,18 @@ MetadataHandler* MetadataHandler::create(Json::Value _settings) {
   }
   return mh;
 }
+
+void MetadataHandler::packetInjection(
+    const Application* _app, Packet* _packet) {}
+
+void MetadataHandler::packetInterfaceArrival(
+    const Interface* _iface, Packet* _packet) {}
+
+void MetadataHandler::packetInterfaceDeparture(
+    const Interface* _iface, Packet* _packet) {}
+
+void MetadataHandler::packetRouterArrival(
+    const Router* _router, u32 _port, Packet* _packet) {}
+
+void MetadataHandler::packetRouterDeparture(
+    const Router* _router, u32 _port, Packet* _packet) {}

@@ -24,6 +24,7 @@
 
 #include "architecture/PortedDevice.h"
 #include "event/Component.h"
+#include "metadata/MetadataHandler.h"
 #include "types/CreditReceiver.h"
 #include "types/CreditSender.h"
 #include "types/FlitReceiver.h"
@@ -37,7 +38,7 @@ class MessageReassembler;
 
 #define INTERFACE_ARGS const std::string&, const Component*, u32, \
     const std::vector<u32>&, u32, const std::vector<std::tuple<u32, u32> >&, \
-    Json::Value
+    MetadataHandler*, Json::Value
 
 class Interface : public Component, public PortedDevice, public FlitSender,
                   public FlitReceiver, public CreditSender,
@@ -46,6 +47,7 @@ class Interface : public Component, public PortedDevice, public FlitSender,
   Interface(const std::string& _name, const Component* _parent, u32 _id,
             const std::vector<u32>& _address, u32 _numVcs,
             const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
+            MetadataHandler* _metadataHandler,
             Json::Value _settings);
   virtual ~Interface();
 
@@ -55,6 +57,14 @@ class Interface : public Component, public PortedDevice, public FlitSender,
   void setMessageReceiver(MessageReceiver* _receiver);
   MessageReceiver* messageReceiver() const;
 
+  // this must be called by all subclasses when a packet's head flit arrives
+  //  on an input from a terminal.
+  void packetArrival(Packet* _packet) const;
+
+  // this must be called by all subclasses when a packet's head flit departs
+  //  on an output port.
+  void packetDeparture(Packet* _packet) const;
+
  protected:
   const std::vector<std::tuple<u32, u32> > trafficClassVcs_;
 
@@ -62,6 +72,7 @@ class Interface : public Component, public PortedDevice, public FlitSender,
   MessageReceiver* messageReceiver_;
   std::vector<PacketReassembler*> packetReassemblers_;
   MessageReassembler* messageReassembler_;
+  MetadataHandler* metadataHandler_;
 };
 
 #endif  // INTERFACE_INTERFACE_H_

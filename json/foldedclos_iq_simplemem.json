@@ -99,7 +99,7 @@
     }
   },
   "metadata_handler": {
-    "type": "deadline",
+    "type": "creation_timestamp",
     "delay": 10000,
     "algorithm": "transaction"
   },

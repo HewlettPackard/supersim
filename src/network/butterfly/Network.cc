@@ -98,7 +98,7 @@ Network::Network(const std::string& _name, const Component* _parent,
     translateInterfaceIdToAddress(id, &interfaceAddress);
     Interface* interface = Interface::create(
         interfaceName, this, id, interfaceAddress, numVcs_, trafficClassVcs_,
-        _settings["interface"]);
+        _metadataHandler, _settings["interface"]);
     interfaces_.at(id) = interface;
 
     // get references to the routers

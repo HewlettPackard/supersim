@@ -208,9 +208,9 @@ void Router::receiveFlit(u32 _port, Flit* _flit) {
   InputQueue* iq = inputQueues_.at(vcIndex(_port, vc));
   iq->receiveFlit(0, _flit);
 
-  // give to metadata handler for router packet arrival
+  // inform base class of arrival
   if (_flit->isHead()) {
-    packetArrival(_flit->packet());
+    packetArrival(_port, _flit->packet());
   }
 }
 
@@ -240,6 +240,11 @@ void Router::sendCredit(u32 _port, u32 _vc) {
 void Router::sendFlit(u32 _port, Flit* _flit) {
   assert(outputChannels_.at(_port)->getNextFlit() == nullptr);
   outputChannels_.at(_port)->setNextFlit(_flit);
+
+  // inform base class of departure
+  if (_flit->isHead()) {
+    packetDeparture(_port, _flit->packet());
+  }
 }
 
 f64 Router::congestionStatus(u32 _port, u32 _vc) const {
