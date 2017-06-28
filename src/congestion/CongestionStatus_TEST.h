@@ -28,6 +28,8 @@
 #include "network/Channel.h"
 #include "router/Router.h"
 
+// this is a test class for implementing an router API for congestion status
+//  tests
 class CongestionTestRouter : public Router {
  public:
   CongestionTestRouter(
@@ -49,43 +51,58 @@ class CongestionTestRouter : public Router {
   void sendCredit(u32 _port, u32 _vc) override;
   void sendFlit(u32 _port, Flit* _flit) override;
 
-  f64 congestionStatus(u32 _port, u32 _vc) const override;
+  f64 congestionStatus(u32 _inputPort, u32 _inputVc, u32 _outputPort,
+                       u32 _outputVc) const override;
 
  private:
   CongestionStatus* congestionStatus_;
   std::vector<Channel*> outputChannels_;
 };
 
+// this is a test class for altering the congestion status module under test
 class CreditHandler : public Component {
  public:
+  enum class Type {INCR, DECR};
+
   CreditHandler(const std::string& _name, const Component* _parent,
                 CongestionStatus* _congestionStatus, PortedDevice* _device);
   ~CreditHandler();
 
-  void setEvent(u32 _port, u32 _vc, u64 _time, u8 _epsilon, s32 _type);
+  void setEvent(u32 _port, u32 _vc, u64 _time, u8 _epsilon,
+                CreditHandler::Type _type);
   void processEvent(void* _event, s32 _type);
 
  private:
+  struct Event {
+    Type type;
+    u32 port;
+    u32 vc;
+  };
+
   CongestionStatus* congestionStatus_;
   PortedDevice* device_;
 };
 
+// this is a test class for verifying proper congestion status
 class StatusCheck : public Component {
  public:
   StatusCheck(const std::string& _name, const Component* _parent,
               CongestionStatus* _congestionStatus);
   ~StatusCheck();
 
-  struct Event {
-    u32 port;
-    u32 vc;
-    f64 exp;
-  };
-
-  void setEvent(u64 _time, u8 _epsilon, u32 _port, u32 _vc, f64 _expected);
+  void setEvent(u64 _time, u8 _epsilon, u32 _inputPort, u32 _inputVc,
+                u32 _outputPort, u32 _outputVc, f64 _expected);
   void processEvent(void* _event, s32 _type);
 
  private:
+  struct Event {
+    u32 inputPort;
+    u32 inputVc;
+    u32 outputPort;
+    u32 outputVc;
+    f64 exp;
+  };
+
   CongestionStatus* congestionStatus_;
 };
 

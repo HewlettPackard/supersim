@@ -29,19 +29,38 @@ class BufferOccupancy : public CongestionStatus {
                   PortedDevice* _device, Json::Value _settings);
   ~BufferOccupancy();
 
+  // CreditWatcher interface
+  void initCredits(u32 _vcIdx, u32 _credits) override;  // called per source
+  void incrementCredit(u32 _vcIdx) override;  // a credit came from downstream
+  void decrementCredit(u32 _vcIdx) override;  // a credit was consumed locally
+
+  // this creates INCR and DECR events to simulate a fixed latency between all
+  //  input and output ports (IOW, input port and VC are ignored in the calc).
+  void processEvent(void* _event, s32 _type);
+
  protected:
-  void performInitCredits(u32 _port, u32 _vc, u32 _credits) override;
-  void performIncrementCredit(u32 _port, u32 _vc) override;
-  void performDecrementCredit(u32 _port, u32 _vc) override;
-  f64 computeStatus(u32 _port, u32 _vc) const override;
+  // see CongestionStatus::computeStatus
+  f64 computeStatus(u32 _inputPort, u32 _inputVc, u32 _outputPort,
+                    u32 _outputVc) const override;
 
  private:
   enum class Mode {kVc, kPort};
   static Mode parseMode(const std::string& _mode);
+  void createEvent(u32 _vcIdx, s32 _type);
+  void performIncrementCredit(u32 _vcIdx);
+  void performDecrementCredit(u32 _vcIdx);
+  void performDecrementWindow(u32 _vcIdx);
 
+  const u32 latency_;
   const Mode mode_;
   std::vector<u32> maximums_;
   std::vector<u32> counts_;
+
+  // phantom congestion awareness
+  bool phantom_;
+  f64 valueCoeff_;
+  f64 lengthCoeff_;
+  std::vector<u32> windows_;
 };
 
 #endif  // CONGESTION_BUFFEROCCUPANCY_H_

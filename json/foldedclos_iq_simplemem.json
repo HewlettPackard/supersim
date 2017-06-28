@@ -34,12 +34,13 @@
     "router": {
       "architecture": "input_queued",
       "congestion_status": {
-        "algorithm": "phantom_buffer_occupancy",
+        "algorithm": "buffer_occupancy",
         "latency": 1,
         "granularity": 0,
+        "mode": "vc",
+        "phantom": true,
         "value_coeff": 1.23,
-        "length_coeff": 2.5,
-        "mode": "vc"
+        "length_coeff": 2.5
       },
       "input_queue_depth": 16,
       "vca_swa_wait": false,

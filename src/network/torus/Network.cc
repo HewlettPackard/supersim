@@ -214,15 +214,16 @@ Network::~Network() {
 }
 
 ::RoutingAlgorithm* Network::createRoutingAlgorithm(
-     u32 _vc, u32 _port, const std::string& _name, const Component* _parent,
-     Router* _router) {
+     u32 _inputPort, u32 _inputVc, const std::string& _name,
+     const Component* _parent, Router* _router) {
   // get the info
-  const Network::RoutingAlgorithmInfo& info = routingAlgorithmInfo_.at(_vc);
+  const Network::RoutingAlgorithmInfo& info =
+      routingAlgorithmInfo_.at(_inputVc);
 
   // call the routing algorithm factory
   return RoutingAlgorithm::create(
-      _name, _parent, _router, info.baseVc, info.numVcs, dimensionWidths_,
-      concentration_, _port, info.settings);
+      _name, _parent, _router, info.baseVc, info.numVcs, _inputPort, _inputVc,
+      dimensionWidths_, concentration_, info.settings);
 }
 
 u32 Network::numRouters() const {

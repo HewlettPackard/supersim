@@ -56,6 +56,7 @@ void RoutingAlgorithmTestRouter::sendFlit(u32 _port, Flit* _flit) {
   assert(false);
 }
 
-f64 RoutingAlgorithmTestRouter::congestionStatus(u32 _port, u32 _vc) const {
+f64 RoutingAlgorithmTestRouter::congestionStatus(
+    u32 _inputPort, u32 _inputVc, u32 _outputPort, u32 _outputVc) const {
   assert(false);
 }

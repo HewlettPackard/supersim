@@ -28,7 +28,7 @@
 class Router;
 
 #define ROUTINGALGORITHM_ARGS const std::string&, const Component*, Router*, \
-    u32, u32, Json::Value
+    u32, u32, u32, u32, Json::Value
 
 class RoutingAlgorithm : public Component {
  public:
@@ -67,14 +67,20 @@ class RoutingAlgorithm : public Component {
   /*
    * This defines the RoutingAlgorithm interface. Specific implementations
    *  must override the processRequest() function.
+   *
+   *  Note: inputPort and inputVc just state where this routing algorithm
+   *   attaches to. For either of these settings that don't make sense, use
+   *   U32_MAX to signify that.
    */
   RoutingAlgorithm(const std::string& _name, const Component* _parent,
-                   Router* _router, u32 _baseVc, u32 _numVcs,
-                   Json::Value _settings);
+                   Router* _router, u32 _baseVc, u32 _numVcs, u32 _inputPort,
+                   u32 _inputVc, Json::Value _settings);
   virtual ~RoutingAlgorithm();
   u32 latency() const;
   u32 baseVc() const;
   u32 numVcs() const;
+  u32 inputPort() const;
+  u32 inputVc() const;
   void request(Client* _client, Flit* _flit, Response* _response);
   virtual void vcScheduled(Flit* _flit, u32 _port, u32 _vc);
   void processEvent(void* _event, s32 _type) override;
@@ -85,6 +91,8 @@ class RoutingAlgorithm : public Component {
   Router* router_;
   const u32 baseVc_;
   const u32 numVcs_;
+  const u32 inputPort_;
+  const u32 inputVc_;
 
  private:
   class EventPackage {

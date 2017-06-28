@@ -27,9 +27,10 @@ namespace Uno {
 
 DirectRoutingAlgorithm::DirectRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u32 _baseVc, u32 _numVcs, u32 _concentration, Json::Value _settings)
-    : RoutingAlgorithm(_name, _parent, _router, _baseVc, _numVcs,
-                       _concentration, _settings),
+    u32 _baseVc, u32 _numVcs, u32 _inputPort, u32 _inputVc, u32 _concentration,
+    Json::Value _settings)
+    : RoutingAlgorithm(_name, _parent, _router, _baseVc, _numVcs, _inputPort,
+                       _inputVc, _concentration, _settings),
       adaptive_(_settings["adaptive"].asBool()) {
   assert(!_settings["adaptive"].isNull());
 }
@@ -54,7 +55,8 @@ void DirectRoutingAlgorithm::processRequest(
     std::vector<u32> minCongVcs;
     f64 minCong = F64_POS_INF;
     for (u32 vc = baseVc_; vc < baseVc_ + numVcs_; vc++) {
-      f64 cong = router_->congestionStatus(outputPort, vc);
+      f64 cong = router_->congestionStatus(inputPort_, inputVc_, outputPort,
+                                           vc);
       if (cong < minCong) {
         minCong = cong;
         minCongVcs.clear();

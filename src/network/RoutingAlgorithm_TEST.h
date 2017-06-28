@@ -43,7 +43,8 @@ class RoutingAlgorithmTestRouter : public Router {
   void sendCredit(u32 _port, u32 _vc) override;
   void sendFlit(u32 _port, Flit* _flit) override;
 
-  f64 congestionStatus(u32 _port, u32 _vc) const override;
+  f64 congestionStatus(u32 _inputPort, u32 _inputVc, u32 _outputPort,
+                       u32 _outputVc) const override;
 };
 
 #endif  // NETWORK_ROUTINGALGORITHM_TEST_H_

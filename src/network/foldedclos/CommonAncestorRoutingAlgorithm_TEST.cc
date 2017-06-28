@@ -44,7 +44,7 @@ TEST(FoldedClos_CommonAncestorRoutingAlgorithm, construct) {
           RoutingAlgorithmTestRouter tr("Router", 64, 16);
           FoldedClos::RoutingAlgorithm* ra =
               FoldedClos::RoutingAlgorithm::create(
-                  "RoutingAlgorithm", &tr, &tr, 1, 13, 64, 3, 9, settings);
+                  "RoutingAlgorithm", &tr, &tr, 1, 13, 14, 56, 64, 3, settings);
           delete ra;
         }
       }

@@ -28,9 +28,10 @@ namespace Uno {
 
 class DirectRoutingAlgorithm : public Uno::RoutingAlgorithm {
  public:
-  DirectRoutingAlgorithm(const std::string& _name, const Component* _parent,
-                         Router* _router, u32 _baseVc, u32 _numVcs,
-                         u32 _concentration, Json::Value _settings);
+  DirectRoutingAlgorithm(
+      const std::string& _name, const Component* _parent, Router* _router,
+      u32 _baseVc, u32 _numVcs, u32 _inputPort, u32 _inputVc,
+      u32 _concentration, Json::Value _settings);
   ~DirectRoutingAlgorithm();
 
  protected:

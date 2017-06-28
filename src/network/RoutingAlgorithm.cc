@@ -60,9 +60,11 @@ RoutingAlgorithm::Client::~Client() {}
 
 RoutingAlgorithm::RoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u32 _baseVc, u32 _numVcs, Json::Value _settings)
+    u32 _baseVc, u32 _numVcs, u32 _inputPort, u32 _inputVc,
+    Json::Value _settings)
     : Component(_name, _parent), router_(_router), baseVc_(_baseVc),
-      numVcs_(_numVcs), latency_(_settings["latency"].asUInt()) {
+      numVcs_(_numVcs), inputPort_(_inputPort), inputVc_(_inputVc),
+      latency_(_settings["latency"].asUInt()) {
   assert(router_ != nullptr);
   assert(latency_ > 0);
   assert(numVcs_ <= router_->numVcs());
@@ -81,6 +83,14 @@ u32 RoutingAlgorithm::baseVc() const {
 
 u32 RoutingAlgorithm::numVcs() const {
   return numVcs_;
+}
+
+u32 RoutingAlgorithm::inputPort() const {
+  return inputPort_;
+}
+
+u32 RoutingAlgorithm::inputVc() const {
+  return inputVc_;
 }
 
 void RoutingAlgorithm::request(Client* _client, Flit* _flit,

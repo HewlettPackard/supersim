@@ -28,10 +28,10 @@ namespace FoldedClos {
 
 CommonAncestorRoutingAlgorithm::CommonAncestorRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u32 _baseVc, u32 _numVcs, u32 _numPorts, u32 _numLevels,
-    u32 _inputPort, Json::Value _settings)
-    : RoutingAlgorithm(_name, _parent, _router, _baseVc, _numVcs, _numPorts,
-                       _numLevels, _inputPort, _settings),
+    u32 _baseVc, u32 _numVcs, u32 _inputPort, u32 _inputVc, u32 _numPorts,
+    u32 _numLevels, Json::Value _settings)
+    : RoutingAlgorithm(_name, _parent, _router, _baseVc, _numVcs, _inputPort,
+                       _inputVc, _numPorts, _numLevels, _settings),
       leastCommonAncestor_(_settings["least_common_ancestor"].asBool()),
       mode_(parseMode(_settings["mode"].asString())),
       adaptive_(_settings["adaptive"].asBool()) {
@@ -106,7 +106,8 @@ void CommonAncestorRoutingAlgorithm::processRequest(
             std::vector<u32> minCongVcs;
             f64 minCong = F64_POS_INF;
             for (u32 vc = baseVc_; vc < baseVc_ + numVcs_; vc++) {
-              f64 cong = router_->congestionStatus(port, vc);
+              f64 cong = router_->congestionStatus(
+                  inputPort_, inputVc_, port, vc);
               if (cong < minCong) {
                 minCong = cong;
                 minCongVcs.clear();
@@ -157,7 +158,8 @@ void CommonAncestorRoutingAlgorithm::processRequest(
               // average the port's congestion
               f64 cong = 0.0;
               for (u32 vc = baseVc_; vc < baseVc_ + numVcs_; vc++) {
-                cong += router_->congestionStatus(port, vc);
+                cong += router_->congestionStatus(
+                    inputPort_, inputVc_, port, vc);
               }
               cong /= numVcs_;
 
@@ -193,7 +195,8 @@ void CommonAncestorRoutingAlgorithm::processRequest(
             f64 minCong = F64_POS_INF;
             for (u32 port = numPorts_ / 2; port < numPorts_; port++) {
               for (u32 vc = baseVc_; vc < baseVc_ + numVcs_; vc++) {
-                f64 cong = router_->congestionStatus(port, vc);
+                f64 cong = router_->congestionStatus(
+                    inputPort_, inputVc_, port, vc);
                 if (cong < minCong) {
                   minCong = cong;
                   minCongVcs.clear();
