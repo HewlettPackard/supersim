@@ -18,9 +18,27 @@
 
 namespace Cube {
 
+u32 computeNumTerminals(const std::vector<u32>& _widths, u32 _concentration) {
+  u32 num = _concentration;
+  for (u32 width : _widths) {
+    num *= width;
+  }
+  return num;
+}
+
+u32 computeNumRouters(const std::vector<u32>& _widths) {
+  u32 num = 1;
+  for (u32 width : _widths) {
+    num *= width;
+  }
+  return num;
+}
+
 void translateInterfaceIdToAddress(
     u32 _id, const std::vector<u32>& _widths, u32 _concentration,
     std::vector<u32>* _address) {
+  assert(_id < computeNumTerminals(_widths, _concentration));
+
   u32 dimensions = _widths.size();
   _address->resize(dimensions + 1);
 
@@ -68,6 +86,8 @@ u32 translateInterfaceAddressToId(
 void translateRouterIdToAddress(
     const u32 _id, const std::vector<u32>& _widths,
     std::vector<u32>* _address) {
+  assert(_id < computeNumRouters(_widths));
+
   u32 dimensions = _widths.size();
   _address->resize(dimensions);
 

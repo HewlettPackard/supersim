@@ -14,17 +14,34 @@
     "concentration": 1,
     "protocol_classes": [
       {
-        "num_vcs": 3,
+        "num_vcs": 2,
         "routing": {
-          "algorithm": "dimension_order",
-          "latency": 1
+          "algorithm": "ugal",
+          "min_all_vc_sets" : false,
+          "bias_mode" : "regular",
+          "congestion_bias" : 0,
+          "decision_scheme" : "monolithic_weighted",
+          "hop_count_mode" : "normalized",
+          "independent_bias" : 0,
+          "intermediate_node" : "unaligned",
+          "latency" : 1,
+          "max_outputs" : 0,
+          "minimal" : "dimension_order",
+          "non_minimal" : "valiants",
+          "short_cut": true,
+          "output_algorithm" : "random",
+          "output_type" : "vc",
+          "threshold" : 0
         }
       },
       {
         "num_vcs": 2,
         "routing": {
           "algorithm": "dimension_order",
-          "latency": 1
+          "latency": 1,
+          "output_type": "vc",
+          "output_algorithm": "minimal",
+          "max_outputs": 0
         }
       }
     ],

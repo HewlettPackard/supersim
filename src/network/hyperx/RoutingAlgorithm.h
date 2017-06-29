@@ -34,11 +34,11 @@ namespace HyperX {
 class RoutingAlgorithm : public ::RoutingAlgorithm {
  public:
   RoutingAlgorithm(
-      const std::string& _name, const Component* _parent,
-      Router* _router, u32 _baseVc, u32 _numVcs, u32 _inputPort, u32 _inputVc,
+      const std::string& _name, const Component* _parent, Router* _router,
+      u32 _baseVc, u32 _numVcs, u32 _inputPort, u32 _inputVc,
       const std::vector<u32>& _dimensionWidths,
-      const std::vector<u32>& _dimensionWeights, u32 _concentration,
-      Json::Value _settings);
+      const std::vector<u32>& _dimensionWeights,
+      u32 _concentration, Json::Value _settings);
   virtual ~RoutingAlgorithm();
 
   // this is a routing algorithm factory for the hyperx topology

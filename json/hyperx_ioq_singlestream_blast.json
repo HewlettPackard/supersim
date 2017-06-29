@@ -16,7 +16,18 @@
       {
         "num_vcs": 8,
         "routing": {
-          "algorithm": "dimension_order",
+          "algorithm": "dal",
+          "adaptivity_type": "variable",
+          "max_deroutes": 1,
+          "multi_deroute": false,
+          "decision_scheme": "monolithic_weighted",
+          "hop_count_mode": "normalized",
+          "bias_mode": "regular",
+          "independent_bias": 0.0,
+          "congestion_bias": 0.0,
+          "output_type": "vc",
+          "max_outputs": 1,
+          "output_algorithm": "random",
           "latency": 1
         }
       }

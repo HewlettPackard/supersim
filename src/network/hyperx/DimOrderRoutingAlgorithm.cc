@@ -20,6 +20,7 @@
 
 #include <unordered_set>
 
+#include "network/hyperx/util.h"
 #include "types/Message.h"
 #include "types/Packet.h"
 
@@ -33,63 +34,69 @@ DimOrderRoutingAlgorithm::DimOrderRoutingAlgorithm(
     Json::Value _settings)
     : RoutingAlgorithm(_name, _parent, _router, _baseVc, _numVcs, _inputPort,
                        _inputVc, _dimensionWidths, _dimensionWeights,
-                       _concentration, _settings) {}
+                       _concentration, _settings) {
+  assert(_settings.isMember("output_type") &&
+         _settings["output_type"].isString());
+  assert(_settings.isMember("max_outputs") &&
+         _settings["max_outputs"].isUInt());
+
+  assert(_settings.isMember("output_algorithm") &&
+         _settings["output_algorithm"].isString());
+  if (_settings["output_algorithm"].asString() == "random") {
+    outputAlg_ = OutputAlg::Rand;
+  } else if (_settings["output_algorithm"].asString() == "minimal") {
+    outputAlg_ = OutputAlg::Min;
+  } else {
+    fprintf(stderr, "Unknown output algorithm:");
+    fprintf(stderr, " '%s'\n",
+            _settings["output_algorithm"].asString().c_str());
+    assert(false);
+  }
+
+  std::string outputType = _settings["output_type"].asString();
+  if (outputType == "port") {
+    outputTypePort_ = true;
+  } else if (outputType == "vc") {
+    outputTypePort_ = false;
+  } else {
+    fprintf(stderr, "Unknown output type:");
+    fprintf(stderr, " '%s'\n", outputType.c_str());
+    assert(false);
+  }
+
+  maxOutputs_ = _settings["max_outputs"].asUInt();
+}
 
 DimOrderRoutingAlgorithm::~DimOrderRoutingAlgorithm() {}
 
 void DimOrderRoutingAlgorithm::processRequest(
     Flit* _flit, RoutingAlgorithm::Response* _response) {
-  std::unordered_set<u32> outputPorts;
-
-  // ex: [x,y,z]
-  const std::vector<u32>& routerAddress = router_->address();
-  // ex: [c,x,y,z]
   const std::vector<u32>* destinationAddress =
       _flit->packet()->message()->getDestinationAddress();
-  assert(routerAddress.size() == (destinationAddress->size() - 1));
-
-  // determine the next dimension to work on
-  u32 dim;
-  u32 portBase = concentration_;
-  for (dim = 0; dim < routerAddress.size(); dim++) {
-    if (routerAddress.at(dim) != destinationAddress->at(dim+1)) {
-      break;
-    }
-    portBase += ((dimensionWidths_.at(dim) - 1) * dimensionWeights_.at(dim));
-  }
-
-  // test if already at destination router
-  if (dim == routerAddress.size()) {
-    bool res = outputPorts.insert(destinationAddress->at(0)).second;
-    (void)res;
-    assert(res);
+  if (outputTypePort_) {
+    dimOrderPortRoutingOutput(
+        router_, inputPort_, inputVc_, dimensionWidths_, dimensionWeights_,
+        concentration_, destinationAddress, {baseVc_}, 1, baseVc_ + numVcs_,
+        &vcPool_);
+    makeOutputPortSet(&vcPool_, {baseVc_}, 1, baseVc_ + numVcs_, maxOutputs_,
+                      outputAlg_, &outputPorts_);
   } else {
-    // more router-to-router hops needed
-    u32 src = routerAddress.at(dim);
-    u32 dst = destinationAddress->at(dim+1);
-    if (dst < src) {
-      dst += dimensionWidths_.at(dim);
-    }
-    u32 offset = (dst - src - 1) * dimensionWeights_.at(dim);
-    // add all ports where the two routers are connecting
-
-    for (u32 weight = 0; weight < dimensionWeights_.at(dim); weight++) {
-      u32 outputPort = portBase + offset + weight;
-      bool res = outputPorts.insert(outputPort).second;
-      (void)res;
-      assert(res);
-    }
+    dimOrderVcRoutingOutput(
+        router_, inputPort_, inputVc_, dimensionWidths_, dimensionWeights_,
+        concentration_, destinationAddress, {baseVc_}, 1, baseVc_ + numVcs_,
+        &vcPool_);
+    makeOutputVcSet(&vcPool_, maxOutputs_, outputAlg_, &outputPorts_);
   }
 
-  assert(outputPorts.size() > 0);
-  if (dim != routerAddress.size()) {
-    assert(outputPorts.size() == dimensionWeights_.at(dim));
-  }
-  for (auto it = outputPorts.cbegin(); it != outputPorts.cend(); ++it) {
-    u32 outputPort = *it;
-    // select all VCs in the output port
-    for (u32 vc = baseVc_; vc < baseVc_ + numVcs_; vc++) {
-      _response->add(outputPort, vc);
+  if (outputPorts_.empty()) {
+    // we can use any VC to eject packet
+    for (u64 vc = baseVc_; vc < baseVc_ + numVcs_; vc++) {
+      _response->add(destinationAddress->at(0), vc);
+    }
+    return;
+  } else {
+    for (auto& it : outputPorts_) {
+      _response->add(std::get<0>(it), std::get<1>(it));
     }
   }
 }

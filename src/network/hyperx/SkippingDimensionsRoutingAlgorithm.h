@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_HYPERX_DIMORDERROUTINGALGORITHM_H_
-#define NETWORK_HYPERX_DIMORDERROUTINGALGORITHM_H_
+#ifndef NETWORK_HYPERX_SKIPPINGDIMENSIONSROUTINGALGORITHM_H_
+#define NETWORK_HYPERX_SKIPPINGDIMENSIONSROUTINGALGORITHM_H_
 
 #include <colhash/tuplehash.h>
 #include <json/json.h>
@@ -31,15 +31,15 @@
 
 namespace HyperX {
 
-class DimOrderRoutingAlgorithm : public RoutingAlgorithm {
+class SkippingDimensionsRoutingAlgorithm : public RoutingAlgorithm {
  public:
-  DimOrderRoutingAlgorithm(
+  SkippingDimensionsRoutingAlgorithm(
       const std::string& _name, const Component* _parent, Router* _router,
       u32 _baseVc, u32 _numVcs, u32 _inputPort, u32 _inputVc,
       const std::vector<u32>& _dimensionWidths,
-      const std::vector<u32>& _dimensionWeights, u32 _concentration,
-      Json::Value _settings);
-  ~DimOrderRoutingAlgorithm();
+      const std::vector<u32>& _dimensionWeights,
+      u32 _concentration, Json::Value _settings);
+  ~SkippingDimensionsRoutingAlgorithm();
 
  protected:
   void processRequest(Flit* _flit,
@@ -48,11 +48,30 @@ class DimOrderRoutingAlgorithm : public RoutingAlgorithm {
  private:
   u32 maxOutputs_;
   OutputAlg outputAlg_;
+  f64 thresholdMin_;
+  f64 thresholdNonMin_;
+  f64 threshold_;
+  f64 iBias_;
+  f64 cBias_;
+  BiasScheme biasMode_;
+  HopCountMode hopCountMode_;
+  f64 step_;
+
   bool outputTypePort_;
+  SkippingRoutingAlg skippingType_;
+  SkippingRoutingAlg finishingType_;
+  DecisionScheme decisionScheme_;
+  u32 numVcSets_;
+  // u32 finishVcs_;
+  u32 numRounds_;
+
+  std::unordered_set<std::tuple<u32, u32, f64>> outputVcs1_;
+  std::unordered_set<std::tuple<u32, u32, f64>> outputVcs2_;
+  std::unordered_set<std::tuple<u32, u32, f64>> outputVcs3_;
   std::unordered_set<std::tuple<u32, u32, f64>> vcPool_;
   std::unordered_set<std::tuple<u32, u32, f64>> outputPorts_;
 };
 
 }  // namespace HyperX
 
-#endif  // NETWORK_HYPERX_DIMORDERROUTINGALGORITHM_H_
+#endif  // NETWORK_HYPERX_SKIPPINGDIMENSIONSROUTINGALGORITHM_H_

@@ -19,6 +19,31 @@
 
 #include <vector>
 
+#include "event/Simulator.h"
+#include "test/TestSetup_TEST.h"
+
+TEST(CubeUtil, computeNumRoutersAndTerminals) {
+  TestSetup ts(1, 1, 1, 0xDEAFBEEF);
+
+  for (u32 test = 0; test < 1000; test++) {
+    std::vector<u32> widths;
+    u32 dims = gSim->rnd.nextU64(1, 10);
+    for (u32 dim = 0; dim < dims; dim++) {
+      widths.push_back(gSim->rnd.nextU64(2, 6));
+    }
+    u32 concentration = gSim->rnd.nextU64(1, 256);
+
+    // determine expected results
+    u32 expRouters = std::accumulate(
+        std::begin(widths), std::end(widths), 1, std::multiplies<double>());
+    u32 expTerminals = expRouters * concentration;
+
+    // compare against util functions
+    ASSERT_EQ(Cube::computeNumRouters(widths), expRouters);
+    ASSERT_EQ(Cube::computeNumTerminals(widths, concentration), expTerminals);
+  }
+}
+
 TEST(CubeUtil, translateInterfaceIdToAddress) {
   const std::vector<u32> widths({3, 2, 3});
   const u32 concentration = 2;
