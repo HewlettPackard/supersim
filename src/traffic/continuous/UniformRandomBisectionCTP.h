@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_TORUS_DIMORDERROUTINGALGORITHM_H_
-#define NETWORK_TORUS_DIMORDERROUTINGALGORITHM_H_
+#ifndef TRAFFIC_CONTINUOUS_UNIFORMRANDOMBISECTIONCTP_H_
+#define TRAFFIC_CONTINUOUS_UNIFORMRANDOMBISECTIONCTP_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -21,26 +21,20 @@
 #include <string>
 #include <vector>
 
-#include "event/Component.h"
-#include "network/torus/RoutingAlgorithm.h"
-#include "router/Router.h"
+#include "traffic/continuous/ContinuousTrafficPattern.h"
 
-namespace Torus {
-
-class DimOrderRoutingAlgorithm : public RoutingAlgorithm {
+class UniformRandomBisectionCTP : public ContinuousTrafficPattern {
  public:
-  DimOrderRoutingAlgorithm(
-      const std::string& _name, const Component* _parent, Router* _router,
-      u32 _baseVc, u32 _numVcs, u32 _inputPort, u32 _inputVc,
-      const std::vector<u32>& _dimensionWidths, u32 _concentration,
-      Json::Value _settings);
-  ~DimOrderRoutingAlgorithm();
+  UniformRandomBisectionCTP(
+      const std::string& _name, const Component* _parent, u32 _numTerminals,
+      u32 _self, Json::Value _settings);
 
- protected:
-  void processRequest(
-      Flit* _flit, RoutingAlgorithm::Response* _response) override;
+  ~UniformRandomBisectionCTP();
+
+  u32 nextDestination() override;
+
+ private:
+  std::vector<u32> dstVect_;
 };
 
-}  // namespace Torus
-
-#endif  // NETWORK_TORUS_DIMORDERROUTINGALGORITHM_H_
+#endif  // TRAFFIC_CONTINUOUS_UNIFORMRANDOMBISECTIONCTP_H_

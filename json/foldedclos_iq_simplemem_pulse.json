@@ -12,11 +12,21 @@
     "radix": 6,
     "traffic_classes": [
       {
-        "num_vcs": 3,
+        "num_vcs": 2,
         "routing": {
           "algorithm": "common_ancestor",
           "latency": 1,  // cycles
           "least_common_ancestor": false,
+          "mode": "port",
+          "adaptive": true
+        }
+      },
+      {
+        "num_vcs": 1,
+        "routing": {
+          "algorithm": "common_ancestor",
+          "latency": 1,  // cycles
+          "least_common_ancestor": true,
           "mode": "port",
           "adaptive": true
         }
@@ -34,12 +44,14 @@
     "router": {
       "architecture": "input_queued",
       "congestion_status": {
-        "algorithm": "phantom_buffer_occupancy",
+        "algorithm": "buffer_occupancy",
         "latency": 1,
         "granularity": 0,
+        "mode": "vc",
+        "phantom": true,
+        "minimum": 0.0,
         "value_coeff": 1.23,
-        "length_coeff": 2.5,
-        "mode": "vc"
+        "length_coeff": 2.5
       },
       "input_queue_depth": 16,
       "vca_swa_wait": false,
@@ -99,7 +111,7 @@
     }
   },
   "metadata_handler": {
-    "type": "deadline",
+    "type": "creation_timestamp",
     "delay": 10000,
     "algorithm": "transaction"
   },
@@ -118,11 +130,35 @@
         "processor_terminal": {
           "traffic_class": 0,
           "latency": 10,
-          "memory_accesses": 1000
+          "memory_accesses": 500
         },
         "memory_terminal": {
           "traffic_class": 0,
           "latency": 15
+        },
+        "rate_log": {
+          "file": "/dev/null"  // "rates.csv"
+        }
+      },
+      {
+        "type": "pulse",
+        "pulse_terminal": {
+          // requests
+          "request_traffic_class": 1,
+          "request_injection_rate": 0.25,
+          // responses
+          "enable_responses": false,
+          // traffic generation
+          "delay": 1000,
+          "num_transactions": 500,
+          "max_packet_size": 16,
+          "traffic_pattern": {
+            "type": "random_exchange"
+          },
+          "message_size_distribution": {
+            "type": "single",
+            "message_size": 16
+          }
         },
         "rate_log": {
           "file": "/dev/null"  // "rates.csv"

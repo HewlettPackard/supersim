@@ -48,6 +48,10 @@ Router* Router::create(
   return router;
 }
 
-void Router::packetArrival(Packet* _packet) const {
-  metadataHandler_->packetArrival(_packet);
+void Router::packetArrival(u32 _port, Packet* _packet) const {
+  metadataHandler_->packetRouterArrival(this, _port, _packet);
+}
+
+void Router::packetDeparture(u32 _port, Packet* _packet) const {
+  metadataHandler_->packetRouterDeparture(this, _port, _packet);
 }

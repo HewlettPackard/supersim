@@ -26,8 +26,7 @@ class ZeroMetadataHandler : public MetadataHandler {
   explicit ZeroMetadataHandler(Json::Value _settings);
   ~ZeroMetadataHandler();
 
-  void packetInjection(Application* _app, Packet* _packet) override;
-  void packetArrival(Packet* _packet) override;
+  void packetInjection(const Application* _app, Packet* _packet) override;
 };
 
 #endif  // METADATA_ZEROMETADATAHANDLER_H_

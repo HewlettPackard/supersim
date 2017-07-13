@@ -98,7 +98,7 @@ Network::Network(const std::string& _name, const Component* _parent,
     translateInterfaceIdToAddress(id, &interfaceAddress);
     Interface* interface = Interface::create(
         interfaceName, this, id, interfaceAddress, numVcs_, trafficClassVcs_,
-        _settings["interface"]);
+        _metadataHandler, _settings["interface"]);
     interfaces_.at(id) = interface;
 
     // get references to the routers
@@ -152,15 +152,16 @@ Network::~Network() {
 }
 
 ::RoutingAlgorithm* Network::createRoutingAlgorithm(
-     u32 _vc, u32 _port, const std::string& _name, const Component* _parent,
-     Router* _router) {
+     u32 _inputPort, u32 _inputVc, const std::string& _name,
+     const Component* _parent, Router* _router) {
   // get the info
-  const Network::RoutingAlgorithmInfo& info = routingAlgorithmInfo_.at(_vc);
+  const Network::RoutingAlgorithmInfo& info =
+      routingAlgorithmInfo_.at(_inputVc);
 
   // call the routing algorithm factory
   return RoutingAlgorithm::create(
-      _name, _parent, _router, info.baseVc, info.numVcs, routerRadix_,
-      numStages_, tmpStage_, info.settings);
+      _name, _parent, _router, info.baseVc, info.numVcs, _inputPort, _inputVc,
+      routerRadix_, numStages_, tmpStage_, info.settings);
 }
 
 u32 Network::numRouters() const {

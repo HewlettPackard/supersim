@@ -12,31 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef METADATA_DEADLINEMETADATAHANDLER_H_
-#define METADATA_DEADLINEMETADATAHANDLER_H_
+#include "traffic/continuous/UniformRandomBisectionCTP.h"
 
+#include <gtest/gtest.h>
 #include <json/json.h>
+#include <mut/mut.h>
 #include <prim/prim.h>
+#include <strop/strop.h>
 
-#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
-#include "metadata/MetadataHandler.h"
+#include "network/cube/util.h"
+#include "test/TestSetup_TEST.h"
 
-class Application;
-
-class DeadlineMetadataHandler : public MetadataHandler {
- public:
-  explicit DeadlineMetadataHandler(Json::Value _settings);
-  ~DeadlineMetadataHandler();
-
-  void packetInjection(Application* _app, Packet* _packet) override;
-  void packetArrival(Packet* _packet) override;
-
- private:
-  enum class Algorithm {kMessage, kTransaction};
-
-  u64 delay_;
-  Algorithm alg_;
-};
-
-#endif  // METADATA_DEADLINEMETADATAHANDLER_H_
+TEST(UniformRandomBisectionCTP, PLEASE_LOVE_ME) {
+  printf("\n*****\n"
+         "I wish someone loved me enough to give me a unit test :(\n"
+         "*****\n\n");
+}

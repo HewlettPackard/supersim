@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "metadata/DeadlineMetadataHandler.h"
+#include "metadata/CreationTimestampMetadataHandler.h"
 
 #include <factory/Factory.h>
 
@@ -25,7 +25,8 @@
 #include "types/Message.h"
 #include "types/Packet.h"
 
-DeadlineMetadataHandler::DeadlineMetadataHandler(Json::Value _settings)
+CreationTimestampMetadataHandler::CreationTimestampMetadataHandler(
+    Json::Value _settings)
     : MetadataHandler(_settings) {
   assert(_settings.isMember("delay"));
   delay_ = _settings["delay"].asUInt64();
@@ -35,15 +36,15 @@ DeadlineMetadataHandler::DeadlineMetadataHandler(Json::Value _settings)
   } else if (alg == "transaction") {
     alg_ = Algorithm::kTransaction;
   } else {
-    fprintf(stderr, "invalid deadline algorithm: %s\n", alg.c_str());
+    fprintf(stderr, "invalid creation timestamp algorithm: %s\n", alg.c_str());
     assert(false);
   }
 }
 
-DeadlineMetadataHandler::~DeadlineMetadataHandler() {}
+CreationTimestampMetadataHandler::~CreationTimestampMetadataHandler() {}
 
-void DeadlineMetadataHandler::packetInjection(Application* _app,
-                                              Packet* _packet) {
+void CreationTimestampMetadataHandler::packetInjection(
+    const Application* _app, Packet* _packet) {
   u64 metadata = U64_MAX;
   switch (alg_) {
     case Algorithm::kMessage:
@@ -60,9 +61,5 @@ void DeadlineMetadataHandler::packetInjection(Application* _app,
   _packet->setMetadata(metadata);
 }
 
-void DeadlineMetadataHandler::packetArrival(Packet* _packet) {
-  // this isn't used in this handler
-}
-
-registerWithFactory("deadline", MetadataHandler,
-                    DeadlineMetadataHandler, METADATAHANDLER_ARGS);
+registerWithFactory("creation_timestamp", MetadataHandler,
+                    CreationTimestampMetadataHandler, METADATAHANDLER_ARGS);

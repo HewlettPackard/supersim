@@ -58,12 +58,11 @@ TEST(BufferOccupancy, statusCheck_VcMode) {
   check.setDebug(debug);
 
   u64 time = 1000;
-  s32 type = CongestionStatus::DECR;
   for (u32 decr = 1; decr <= 2; decr++) {
     for (u32 port = 0; port < numPorts; port++) {
       for (u32 vc = 0; vc < numVcs; vc++) {
         // modify credits
-        crediter.setEvent(port, vc, time, 1, type);
+        crediter.setEvent(port, vc, time, 1, CreditHandler::Type::DECR);
 
         // advance time
         time++;
@@ -77,7 +76,7 @@ TEST(BufferOccupancy, statusCheck_VcMode) {
       // check credits
       u32 max = port * 10 + vc + 2;
       f64 exp = 2.0 / (f64)max;
-      check.setEvent(time, 0, port, vc, exp);
+      check.setEvent(time, 0, 0, 0, port, vc, exp);
     }
   }
 
@@ -121,12 +120,11 @@ TEST(BufferOccupancy, statusCheck_PortMode) {
   check.setDebug(debug);
 
   u64 time = 1000;
-  s32 type = CongestionStatus::DECR;
   for (u32 decr = 1; decr <= 2; decr++) {
     for (u32 port = 0; port < numPorts; port++) {
       for (u32 vc = 0; vc < numVcs; vc++) {
         // modify credits
-        crediter.setEvent(port, vc, time, 1, type);
+        crediter.setEvent(port, vc, time, 1, CreditHandler::Type::DECR);
 
         // advance time
         time++;
@@ -146,9 +144,77 @@ TEST(BufferOccupancy, statusCheck_PortMode) {
         maxSum += max;
       }
       f64 exp = (f64)curSum / (f64)maxSum;
-      check.setEvent(time, 0, port, vc, exp);
+      check.setEvent(time, 0, 0, 0, port, vc, exp);
     }
   }
 
   gSim->simulate();
+}
+
+TEST(BufferOccupancy, phantomStatusCheck) {
+  const bool debug = false;
+  const u32 numPorts = 1;
+  const u32 numVcs = 1;
+  const u32 statusLatency = 1;
+  const u32 bufferDepth = 200;
+
+  const u32 granularity = 0;
+
+  for (f64 valueCoeff = 0.5; valueCoeff < 3.0; valueCoeff += 0.34) {
+    for (f64 lengthCoeff = 0.5; lengthCoeff < 3.0; lengthCoeff += 0.34) {
+      for (u32 channelLatency = 3; channelLatency <= 40; channelLatency += 3) {
+        TestSetup test(1, 1, 1234);
+
+        Json::Value routerSettings;
+        CongestionTestRouter router(
+            "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, nullptr,
+            routerSettings);
+        router.setDebug(debug);
+
+        Json::Value channelSettings;
+        channelSettings["latency"] = channelLatency;
+        Channel channel("Channel", nullptr, 8, channelSettings);
+        router.setOutputChannel(0, &channel);
+
+        Json::Value statusSettings;
+        statusSettings["latency"] = statusLatency;
+        statusSettings["granularity"] = granularity;
+        statusSettings["phantom"] = true;
+        statusSettings["value_coeff"] = valueCoeff;
+        statusSettings["length_coeff"] = lengthCoeff;
+        statusSettings["mode"] = "vc";
+        BufferOccupancy status("CongestionStatus", &router, &router,
+                               statusSettings);
+        status.setDebug(debug);
+
+        status.initCredits(router.vcIndex(0, 0), bufferDepth);
+
+        CreditHandler crediter("CreditHandler", nullptr, &status, &router);
+        crediter.setDebug(debug);
+
+        StatusCheck check("StatusCheck", nullptr, &status);
+        check.setDebug(debug);
+
+        // send flits (decrement credits)
+        u64 time = 1000;
+        for (u32 flit = 0; flit < bufferDepth; flit++) {
+          crediter.setEvent(0, 0, time, 1, CreditHandler::Type::DECR);
+          time++;
+        }
+
+        // create events for status checking
+        for (u32 ch = 0; ch < 100; ch++) {
+          f64 inWindow = (f64)(u32)(channelLatency * lengthCoeff) -
+              std::min((u32)(channelLatency * lengthCoeff), ch);
+          f64 exp = ((f64)bufferDepth - inWindow * valueCoeff) /
+              (f64)bufferDepth;
+          exp = std::min(1.0, std::max(0.0, exp));
+          check.setEvent(time, 0, 0, 0, 0, 0, exp);
+          time++;
+        }
+
+        gSim->simulate();
+      }
+    }
+  }
 }

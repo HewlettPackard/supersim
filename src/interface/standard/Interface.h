@@ -43,7 +43,7 @@ class Interface : public ::Interface {
   Interface(const std::string& _name, const Component* _parent, u32 _id,
             const std::vector<u32>& _address, u32 _numVcs,
             const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
-            Json::Value _settings);
+            MetadataHandler* _metadataHandler, Json::Value _settings);
   ~Interface();
 
   void setInputChannel(u32 _port, Channel* _channel) override;

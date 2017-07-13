@@ -34,9 +34,9 @@ Interface::Interface(
     const std::string& _name, const Component* _parent, u32 _id,
     const std::vector<u32>& _address, u32 _numVcs,
     const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
-    Json::Value _settings)
+    MetadataHandler* _metadataHandler, Json::Value _settings)
     : ::Interface(_name, _parent, _id, _address, _numVcs, _trafficClassVcs,
-                  _settings) {
+                  _metadataHandler, _settings) {
   u32 initCredits = _settings["init_credits"].asUInt();
   assert(initCredits > 0);
 
@@ -125,6 +125,7 @@ void Interface::receiveMessage(Message* _message) {
   // mark all flit send times
   for (u32 p = 0; p < _message->numPackets(); p++) {
     Packet* packet = _message->packet(p);
+    packetArrival(packet);  // inform the base class of arrival
     for (u32 f = 0; f < packet->numFlits(); f++) {
       Flit* flit = packet->getFlit(f);
       flit->setSendTime(now);
@@ -192,6 +193,11 @@ void Interface::sendFlit(u32 _port, Flit* _flit) {
   assert(_port == 0);
   assert(outputChannel_->getNextFlit() == nullptr);
   outputChannel_->setNextFlit(_flit);
+
+  // inform the base class of departure
+  if (_flit->isHead()) {
+    packetDeparture(_flit->packet());
+  }
 
   // check source is correct
   u32 src = _flit->packet()->message()->getSourceId();

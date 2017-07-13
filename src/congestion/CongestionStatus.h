@@ -37,37 +37,21 @@ class CongestionStatus : public Component, public CreditWatcher {
   // this is a congestion status factory
   static CongestionStatus* create(CONGESTIONSTATUS_ARGS);
 
-  // CreditWatcher interface
-  void initCredits(u32 _vcIdx, u32 _credits) override;  // called per source
-  void incrementCredit(u32 _vcIdx) override;  // a credit came from downstream
-  void decrementCredit(u32 _vcIdx) override;  // a credit was consumed locally
-
   // this returns congestion status (i.e. 0=empty 1=congested)
-  f64 status(u32 _port, u32 _vc) const;  // (must be epsilon >= 1)
-
-  void processEvent(void* _event, s32 _type);
-
-  // this class NEEDS to use these two event types. subclasses also using
-  //  events must pass these two types on to this class.
-  static const s32 INCR = 0x50;
-  static const s32 DECR = 0xAF;
+  f64 status(u32 _inputPort, u32 _inputVc, u32 _outputPort,
+             u32 _outputVc) const;  // (must be epsilon >= 1)
 
  protected:
-  virtual void performInitCredits(u32 _port, u32 _vc, u32 _credits) = 0;
-  virtual void performIncrementCredit(u32 _port, u32 _vc) = 0;
-  virtual void performDecrementCredit(u32 _port, u32 _vc) = 0;
-
-  // this MUST return a value >= 0.0 and <= 1.0
-  virtual f64 computeStatus(u32 _port, u32 _vc) const = 0;
+  // this must be implemented by subclasses to yield the congestion status
+  //   this MUST return a value >= 0.0 and <= 1.0
+  virtual f64 computeStatus(u32 _inputPort, u32 _inputVc,
+                            u32 _outputPort, u32 _outputVc) const = 0;
 
   PortedDevice* device_;
   const u32 numPorts_;
   const u32 numVcs_;
 
  private:
-  void createEvent(u32 _vcIdx, s32 _type);
-
-  const u32 latency_;
   const u32 granularity_;
 };
 

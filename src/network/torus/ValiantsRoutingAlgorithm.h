@@ -30,8 +30,9 @@ class ValiantsRoutingAlgorithm : public RoutingAlgorithm {
  public:
   ValiantsRoutingAlgorithm(
       const std::string& _name, const Component* _parent, Router* _router,
-      u32 _baseVc, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
-      u32 _concentration, u32 _inputPort, Json::Value _settings);
+      u32 _baseVc, u32 _numVcs, u32 _inputPort, u32 _inputVc,
+      const std::vector<u32>& _dimensionWidths, u32 _concentration,
+      Json::Value _settings);
   ~ValiantsRoutingAlgorithm();
 
  protected:

@@ -12,36 +12,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_UNO_DIRECTROUTINGALGORITHM_H_
-#define NETWORK_UNO_DIRECTROUTINGALGORITHM_H_
+#ifndef METADATA_CREATIONTIMESTAMPMETADATAHANDLER_H_
+#define METADATA_CREATIONTIMESTAMPMETADATAHANDLER_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
 
-#include <string>
+#include <unordered_map>
 
-#include "event/Component.h"
-#include "network/uno/RoutingAlgorithm.h"
-#include "router/Router.h"
+#include "metadata/MetadataHandler.h"
 
-namespace Uno {
+class Application;
 
-class DirectRoutingAlgorithm : public Uno::RoutingAlgorithm {
+class CreationTimestampMetadataHandler : public MetadataHandler {
  public:
-  DirectRoutingAlgorithm(
-      const std::string& _name, const Component* _parent, Router* _router,
-      u32 _baseVc, u32 _numVcs, u32 _inputPort, u32 _inputVc,
-      u32 _concentration, Json::Value _settings);
-  ~DirectRoutingAlgorithm();
+  explicit CreationTimestampMetadataHandler(Json::Value _settings);
+  ~CreationTimestampMetadataHandler();
 
- protected:
-  void processRequest(
-      Flit* _flit, RoutingAlgorithm::Response* _response) override;
+  void packetInjection(const Application* _app, Packet* _packet) override;
 
  private:
-  const bool adaptive_;
+  enum class Algorithm {kMessage, kTransaction};
+
+  u64 delay_;
+  Algorithm alg_;
 };
 
-}  // namespace Uno
-
-#endif  // NETWORK_UNO_DIRECTROUTINGALGORITHM_H_
+#endif  // METADATA_CREATIONTIMESTAMPMETADATAHANDLER_H_

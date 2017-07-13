@@ -27,12 +27,13 @@ namespace HyperX {
 
 DimOrderRoutingAlgorithm::DimOrderRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
-    u32 _baseVc, u32 _numVcs, const std::vector<u32>& _dimensionWidths,
+    u32 _baseVc, u32 _numVcs, u32 _inputPort, u32 _inputVc,
+    const std::vector<u32>& _dimensionWidths,
     const std::vector<u32>& _dimensionWeights, u32 _concentration,
-    u32 _inputPort, Json::Value _settings)
-    : RoutingAlgorithm(_name, _parent, _router, _baseVc, _numVcs,
-                       _dimensionWidths, _dimensionWeights, _concentration,
-                       _inputPort, _settings) {}
+    Json::Value _settings)
+    : RoutingAlgorithm(_name, _parent, _router, _baseVc, _numVcs, _inputPort,
+                       _inputVc, _dimensionWidths, _dimensionWeights,
+                       _concentration, _settings) {}
 
 DimOrderRoutingAlgorithm::~DimOrderRoutingAlgorithm() {}
 

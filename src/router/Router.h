@@ -47,9 +47,14 @@ class Router : public Component, public PortedDevice, public FlitSender,
 
   // this must be called by all subclasses when a packet's head flit arrives
   //  on an input port.
-  void packetArrival(Packet* _packet) const;
+  void packetArrival(u32 _port, Packet* _packet) const;
 
-  virtual f64 congestionStatus(u32 _port, u32 _vc) const = 0;
+  // this must be called by all subclasses when a packet's head flit departs
+  //  on an output port.
+  void packetDeparture(u32 _port, Packet* _packet) const;
+
+  virtual f64 congestionStatus(u32 _inputPort, u32 _inputVc,
+                               u32 _outputPort, u32 _outputVc) const = 0;
 
  protected:
   Network* network_;
