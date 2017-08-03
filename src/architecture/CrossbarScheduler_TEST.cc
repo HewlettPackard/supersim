@@ -61,7 +61,7 @@ class CrossbarSchedulerTestClient : public CrossbarScheduler::Client,
       case GiveBackCreditEvent:
         vcPtr = reinterpret_cast<u32*>(_event);
         assert(*vcPtr < totalVcs_);
-        xbarSch_->incrementCreditCount(*vcPtr);
+        xbarSch_->incrementCredit(*vcPtr);
         delete vcPtr;
         break;
       default:
@@ -116,7 +116,7 @@ class CrossbarSchedulerTestClient : public CrossbarScheduler::Client,
 
       // use credit
       dbgprintf("using %u (via port %u)", vcIdx, port);
-      xbarSch_->decrementCreditCount(vcIdx);
+      xbarSch_->decrementCredit(vcIdx);
       remaining_--;
 
       // release later
@@ -186,7 +186,7 @@ TEST(CrossbarScheduler, basic) {
           assert(xbarSch->totalVcs() == V);
           assert(xbarSch->crossbarPorts() == P);
           for (u32 v = 0; v < V; v++) {
-            xbarSch->initCreditCount(v, 3);
+            xbarSch->initCredits(v, 3);
           }
 
           std::vector<CrossbarSchedulerTestClient*> clients(C);

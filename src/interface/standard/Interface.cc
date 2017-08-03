@@ -58,7 +58,7 @@ Interface::Interface(
   queueOccupancy_.resize(numVcs_, 0);
   for (u32 vc = 0; vc < numVcs_; vc++) {
     // initialize the credit count in the CrossbarScheduler
-    crossbarScheduler_->initCreditCount(vc, initCredits);
+    crossbarScheduler_->initCredits(vc, initCredits);
 
     // create the output queue
     outputQueues_.at(vc) = new OutputQueue(
@@ -250,7 +250,7 @@ void Interface::receiveCredit(u32 _port, Credit* _credit) {
   while (_credit->more()) {
     u32 vc = _credit->getNum();
     // dbgprintf("port = %u, vc = %u", _port, vc);
-    crossbarScheduler_->incrementCreditCount(vc);
+    crossbarScheduler_->incrementCredit(vc);
   }
   delete _credit;
 }

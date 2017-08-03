@@ -147,7 +147,7 @@ void CrossbarScheduler::request(u32 _client, u32 _port, u32 _vcIdx,
   }
 }
 
-void CrossbarScheduler::initCreditCount(u32 _vcIdx, u32 _credits) {
+void CrossbarScheduler::initCredits(u32 _vcIdx, u32 _credits) {
   assert(_vcIdx < totalVcs_);
   credits_[_vcIdx] = _credits;
   maxCredits_[_vcIdx] = _credits;
@@ -158,7 +158,7 @@ void CrossbarScheduler::initCreditCount(u32 _vcIdx, u32 _credits) {
   }
 }
 
-void CrossbarScheduler::incrementCreditCount(u32 _vcIdx) {
+void CrossbarScheduler::incrementCredit(u32 _vcIdx) {
   assert(gSim->epsilon() >= 1);
   assert(_vcIdx < totalVcs_);
 
@@ -177,7 +177,7 @@ void CrossbarScheduler::incrementCreditCount(u32 _vcIdx) {
   }
 }
 
-void CrossbarScheduler::decrementCreditCount(u32 _vcIdx) {
+void CrossbarScheduler::decrementCredit(u32 _vcIdx) {
   assert(_vcIdx < totalVcs_);
 
   // decrement the credit count

@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "event/Component.h"
+#include "architecture/CreditWatcher.h"
 #include "architecture/Crossbar.h"
 #include "architecture/CrossbarScheduler.h"
 #include "types/Flit.h"
@@ -39,8 +40,8 @@ class OutputQueue : public Component, public FlitReceiver,
               CrossbarScheduler* _outputCrossbarScheduler,
               u32 _crossbarSchedulerIndex,
               Crossbar* _crossbar, u32 _crossbarIndex,
-              CrossbarScheduler* _mainCrossbarScheduler,
-              u32 _mainCrossbarVcId);
+              CreditWatcher* _creditWatcher,
+              u32 _creditWatcherVcId);
   ~OutputQueue();
 
   // called by main router crossbar
@@ -66,8 +67,8 @@ class OutputQueue : public Component, public FlitReceiver,
   const u32 crossbarSchedulerIndex_;
   Crossbar* crossbar_;
   const u32 crossbarIndex_;
-  CrossbarScheduler* mainCrossbarScheduler_;
-  const u32 mainCrossbarVcId_;
+  CreditWatcher* creditWatcher_;
+  const u32 creditWatcherVcId_;
 
   // single flit per clock input limit assurance
   u64 lastReceivedTime_;

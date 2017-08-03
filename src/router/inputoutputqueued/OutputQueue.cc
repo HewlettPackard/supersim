@@ -33,14 +33,12 @@ OutputQueue::OutputQueue(
     const std::string& _name, const Component* _parent, u32 _depth, u32 _port,
     u32 _vc, CrossbarScheduler* _outputCrossbarScheduler,
     u32 _crossbarSchedulerIndex, Crossbar* _crossbar, u32 _crossbarIndex,
-    CrossbarScheduler* _mainCrossbarScheduler, u32 _mainCrossbarVcId)
+    CreditWatcher* _creditWatcher, u32 _creditWatcherVcId)
     : Component(_name, _parent), depth_(_depth), port_(_port), vc_(_vc),
       outputCrossbarScheduler_(_outputCrossbarScheduler),
       crossbarSchedulerIndex_(_crossbarSchedulerIndex), crossbar_(_crossbar),
-      crossbarIndex_(_crossbarIndex),
-      mainCrossbarScheduler_(_mainCrossbarScheduler),
-      mainCrossbarVcId_(_mainCrossbarVcId),
-      lastReceivedTime_(U64_MAX) {
+      crossbarIndex_(_crossbarIndex), creditWatcher_(_creditWatcher),
+      creditWatcherVcId_(_creditWatcherVcId), lastReceivedTime_(U64_MAX) {
   // ensure the buffer is empty
   assert(buffer_.size() == 0);
 
@@ -75,7 +73,7 @@ void OutputQueue::receiveFlit(u32 _port, Flit* _flit) {
   // queue an event to be notified about the injected flit
   //  this synchronized the two clock domains
   addEvent(gSim->futureCycle(Simulator::Clock::CHANNEL, 1),
-           1, _flit, INJECTED_FLIT);
+           1, nullptr, INJECTED_FLIT);
 }
 
 void OutputQueue::processEvent(void* _event, s32 _type) {
@@ -131,7 +129,7 @@ void OutputQueue::processPipeline() {
 
     // send the flit on the crossbar
     crossbar_->inject(swa_.flit, crossbarIndex_, 0);
-    outputCrossbarScheduler_->decrementCreditCount(vc_);
+    outputCrossbarScheduler_->decrementCredit(vc_);
 
     // clear SWA info
     swa_.fsm = ePipelineFsm::kEmpty;
@@ -150,7 +148,7 @@ void OutputQueue::processPipeline() {
     // pull out the front flit
     Flit* flit = buffer_.front();
     buffer_.pop();
-    mainCrossbarScheduler_->incrementCreditCount(mainCrossbarVcId_);
+    creditWatcher_->incrementCredit(creditWatcherVcId_);
 
     // put it in this pipeline stage
     swa_.flit = flit;

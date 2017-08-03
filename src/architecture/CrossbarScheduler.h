@@ -27,7 +27,7 @@
 #include "event/Component.h"
 #include "types/Flit.h"
 
-class CrossbarScheduler : public Component {
+class CrossbarScheduler : public Component, public CreditWatcher {
  public:
   /*
    * This class defines the interface required to interact with the
@@ -35,7 +35,7 @@ class CrossbarScheduler : public Component {
    *  CrossbarScheduler using the crossbarSchedulerResponse() function.
    *  If a crossbar output port was allocated, it will be given. If no
    *  port was allocated, U32_MAX is returned. If the client will use the
-   *  port allocated, then decrementCreditCount() should be called during
+   *  port allocated, then decrementCredit() should be called during
    *  the same cycle after/during crossbarSchedulerResponse().
    */
   class Client {
@@ -67,9 +67,9 @@ class CrossbarScheduler : public Component {
   void request(u32 _client, u32 _port, u32 _vcIdx, Flit* _flit);
 
   // credit counts
-  void initCreditCount(u32 _vcIdx, u32 _credits);
-  void incrementCreditCount(u32 _vcIdx);
-  void decrementCreditCount(u32 _vcIdx);
+  void initCredits(u32 _vcIdx, u32 _credits) override;
+  void incrementCredit(u32 _vcIdx) override;
+  void decrementCredit(u32 _vcIdx) override;
   u32 getCreditCount(u32 _vcIdx) const;
 
   // event processing

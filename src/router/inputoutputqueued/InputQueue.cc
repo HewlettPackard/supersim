@@ -90,7 +90,7 @@ void InputQueue::receiveFlit(u32 _port, Flit* _flit) {
   // queue an event to be notified about the injected flit
   //  this synchronized the two clock domains
   addEvent(gSim->futureCycle(Simulator::Clock::CORE, 1),
-           1, _flit, INJECTED_FLIT);
+           1, nullptr, INJECTED_FLIT);
 }
 
 void InputQueue::processEvent(void* _event, s32 _type) {
@@ -173,7 +173,7 @@ void InputQueue::processPipeline() {
 
     // send the flit on the crossbar, consume a credit
     crossbar_->inject(swa_.flit, crossbarIndex_, swa_.allocatedPort);
-    crossbarScheduler_->decrementCreditCount(swa_.allocatedVcIdx);
+    crossbarScheduler_->decrementCredit(swa_.allocatedVcIdx);
 
     // if this is a tail flit, release the VC
     /** NOTE: this causes a stall when there are back-to-back

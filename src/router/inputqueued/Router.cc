@@ -71,7 +71,7 @@ Router::Router(
       u32 vcIdx = vcIndex(port, vc);
 
       // initialize the credit count in the CrossbarScheduler
-      crossbarScheduler_->initCreditCount(vcIdx, inputQueueDepth);
+      crossbarScheduler_->initCredits(vcIdx, inputQueueDepth);
 
       // create the name suffix
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
@@ -164,7 +164,7 @@ void Router::receiveCredit(u32 _port, Credit* _credit) {
   while (_credit->more()) {
     u32 vc = _credit->getNum();
     u32 vcIdx = vcIndex(_port, vc);
-    crossbarScheduler_->incrementCreditCount(vcIdx);
+    crossbarScheduler_->incrementCredit(vcIdx);
   }
   delete _credit;
 }

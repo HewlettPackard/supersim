@@ -67,7 +67,7 @@ void OutputQueue::receiveFlit(u32 _port, Flit* _flit) {
   u64 now = gSim->time();
   if (now != lastReceivedTime_) {
     addEvent(gSim->futureCycle(Simulator::Clock::CHANNEL, 1),
-             1, _flit, INJECTED_FLIT);
+             1, nullptr, INJECTED_FLIT);
     lastReceivedTime_ = now;
   }
 }
@@ -126,7 +126,7 @@ void OutputQueue::processPipeline() {
 
     // send the flit on the crossbar
     crossbar_->inject(swa_.flit, crossbarIndex_, 0);
-    crossbarScheduler_->decrementCreditCount(vc_);
+    crossbarScheduler_->decrementCredit(vc_);
 
     // clear SWA info
     swa_.fsm = ePipelineFsm::kEmpty;

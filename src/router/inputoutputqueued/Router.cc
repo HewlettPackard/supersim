@@ -75,7 +75,7 @@ Router::Router(
       u32 vcIdx = vcIndex(port, vc);
 
       // initialize the credit count in the CrossbarScheduler
-      crossbarScheduler_->initCreditCount(vcIdx, outputQueueDepth);
+      crossbarScheduler_->initCredits(vcIdx, outputQueueDepth);
 
       // create the name suffix
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
@@ -134,7 +134,7 @@ Router::Router(
     // queues
     for (u32 vc = 0; vc < numVcs_; vc++) {
       // initialize the credit count in the OutputCrossbarScheduler
-      outputCrossbarSchedulers_.at(port)->initCreditCount(vc, inputQueueDepth);
+      outputCrossbarSchedulers_.at(port)->initCredits(vc, inputQueueDepth);
 
       // create the name suffix
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
@@ -217,7 +217,7 @@ void Router::receiveFlit(u32 _port, Flit* _flit) {
 void Router::receiveCredit(u32 _port, Credit* _credit) {
   while (_credit->more()) {
     u32 vc = _credit->getNum();
-    outputCrossbarSchedulers_.at(_port)->incrementCreditCount(vc);
+    outputCrossbarSchedulers_.at(_port)->incrementCredit(vc);
   }
   delete _credit;
 }
