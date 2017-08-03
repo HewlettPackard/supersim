@@ -97,6 +97,22 @@ void BufferOccupancy::processEvent(void* _event, s32 _type) {
   }
 }
 
+CongestionStatus::Style BufferOccupancy::style() const {
+  switch (mode_) {
+    case BufferOccupancy::Mode::kVcNorm:
+    case BufferOccupancy::Mode::kPortNorm:
+      return CongestionStatus::Style::kNormalized;
+      break;
+    case BufferOccupancy::Mode::kVcAbs:
+    case BufferOccupancy::Mode::kPortAbs:
+      return CongestionStatus::Style::kAbsolute;
+      break;
+    default:
+      assert(false);
+      break;
+  }
+}
+
 f64 BufferOccupancy::computeStatus(
     u32 _inputPort, u32 _inputVc, u32 _outputPort, u32 _outputVc) const {
   switch (mode_) {
