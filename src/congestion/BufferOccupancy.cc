@@ -100,7 +100,7 @@ void BufferOccupancy::processEvent(void* _event, s32 _type) {
 f64 BufferOccupancy::computeStatus(
     u32 _inputPort, u32 _inputVc, u32 _outputPort, u32 _outputVc) const {
   switch (mode_) {
-     case BufferOccupancy::Mode::kVcNorm: {
+    case BufferOccupancy::Mode::kVcNorm: {
       return vcStatusNorm(_outputPort, _outputVc);
       break;
     }
@@ -205,8 +205,8 @@ f64 BufferOccupancy::vcStatusAbs(u32 _outputPort, u32 _outputVc) const {
   if (!phantom_) {
     statusAbs = (f64)flitsOutstanding_.at(vcIdx);
   } else {
-    statusAbs = (f64)flitsOutstanding_.at(vcIdx) - ((f64)windows_.at(vcIdx)
-                                               * valueCoeff_);
+    statusAbs = (f64)flitsOutstanding_.at(vcIdx) -
+        ((f64)windows_.at(vcIdx) * valueCoeff_);
   }
   return std::max(0.0, statusAbs);
 }
@@ -236,8 +236,8 @@ f64 BufferOccupancy::portAverageStatusAbs(u32 _outputPort) const {
     if (!phantom_) {
       curSum += (f64)flitsOutstanding_.at(vcIdx);
     } else {
-      curSum += (f64)flitsOutstanding_.at(vcIdx) - ((f64)windows_.at(vcIdx)
-                                            * valueCoeff_);
+      curSum += (f64)flitsOutstanding_.at(vcIdx) -
+          ((f64)windows_.at(vcIdx) * valueCoeff_);
     }
   }
   return std::max(0.0, (f64)curSum);
