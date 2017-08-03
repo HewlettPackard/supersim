@@ -57,7 +57,7 @@ f64 CongestionStatus::status(
   assert(gSim->epsilon() == 0);
   f64 value = computeStatus(_inputPort, _inputVc, _outputPort, _outputVc);
   assert(value >= 0.0);
-  assert(value <= 1.0);
+  // assert(value <= 1.0); // no longer valid for abs format
   if (granularity_ > 0) {
     value = round(value * granularity_) / granularity_;
   }

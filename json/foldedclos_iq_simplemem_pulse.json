@@ -47,7 +47,7 @@
         "algorithm": "buffer_occupancy",
         "latency": 1,
         "granularity": 0,
-        "mode": "vc",
+        "mode": "normalized_vc", //(normalized_port/vc absolute_port/vc)
         "phantom": true,
         "minimum": 0.0,
         "value_coeff": 1.23,

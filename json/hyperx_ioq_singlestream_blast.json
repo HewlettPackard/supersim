@@ -35,7 +35,7 @@
         "algorithm": "buffer_occupancy",
         "latency": 1,
         "granularity": 0,
-        "mode": "vc"
+        "mode": "normalized_vc" //(normalized_port/vc absolute_port/vc)
       },
       "input_queue_depth": 12,
       "vca_swa_wait": true,

@@ -35,8 +35,9 @@ BufferOccupancy::BufferOccupancy(
       mode_(parseMode(_settings["mode"].asString())) {
   assert(latency_ > 0);
   u32 totalVcs = numPorts_ * numVcs_;
-  maximums_.resize(totalVcs, 0);
-  counts_.resize(totalVcs, 0);
+  creditMaximums_.resize(totalVcs, 0);
+  creditCounts_.resize(totalVcs, 0);
+  flitsOutstanding_.resize(totalVcs, 0);
 
   // phantom is an optional setting
   phantom_ = false;
@@ -65,9 +66,9 @@ void BufferOccupancy::initCredits(u32 _vcIdx, u32 _credits) {
   assert(vc < numVcs_);
   assert(_credits > 0);
 
-  maximums_.at(_vcIdx) += _credits;
-  counts_.at(_vcIdx) += _credits;
-  dbgprintf("max & count on %u is now %u", _vcIdx, counts_.at(_vcIdx));
+  creditMaximums_.at(_vcIdx) += _credits;
+  creditCounts_.at(_vcIdx) += _credits;
+  dbgprintf("max & count on %u is now %u", _vcIdx, creditCounts_.at(_vcIdx));
 }
 
 void BufferOccupancy::incrementCredit(u32 _vcIdx) {
@@ -99,40 +100,22 @@ void BufferOccupancy::processEvent(void* _event, s32 _type) {
 f64 BufferOccupancy::computeStatus(
     u32 _inputPort, u32 _inputVc, u32 _outputPort, u32 _outputVc) const {
   switch (mode_) {
-    case BufferOccupancy::Mode::kVc: {
-      // return this VC's status
-      u32 vcIdx = device_->vcIndex(_outputPort, _outputVc);
-      f64 status;
-      if (!phantom_) {
-        status = ((f64)maximums_.at(vcIdx) - (f64)counts_.at(vcIdx)) /
-            (f64)maximums_.at(vcIdx);
-      } else {
-        status = (((f64)maximums_.at(vcIdx) - (f64)counts_.at(vcIdx) -
-                   (f64)windows_.at(vcIdx) * valueCoeff_) /
-                  (f64)maximums_.at(vcIdx));
-      }
-      return std::min(1.0, std::max(0.0, status));
+     case BufferOccupancy::Mode::kVcNorm: {
+      return vcStatusNorm(_outputPort, _outputVc);
       break;
     }
-
-    case BufferOccupancy::Mode::kPort: {
-      // return the average status of all VCs in this port
-      u32 curSum = 0;
-      u32 maxSum = 0;
-      for (u32 vc = 0; vc < numVcs_; vc++) {
-        u32 vcIdx = device_->vcIndex(_outputPort, vc);
-        if (!phantom_) {
-          curSum += maximums_.at(vcIdx) - counts_.at(vcIdx);
-        } else {
-          curSum += ((f64)maximums_.at(vcIdx) - (f64)counts_.at(vcIdx) -
-                     (f64)windows_.at(vcIdx) * valueCoeff_);
-        }
-        maxSum += (f64)maximums_.at(vcIdx);
-      }
-      return std::min(1.0, std::max(0.0, (f64)curSum / (f64)maxSum));
+    case BufferOccupancy::Mode::kVcAbs: {
+      return vcStatusAbs(_outputPort, _outputVc);
       break;
     }
-
+    case BufferOccupancy::Mode::kPortNorm: {
+      return portAverageStatusNorm(_outputPort);
+      break;
+    }
+    case BufferOccupancy::Mode::kPortAbs: {
+      return portAverageStatusAbs(_outputPort);
+      break;
+    }
     default:
       assert(false);
       break;
@@ -140,10 +123,14 @@ f64 BufferOccupancy::computeStatus(
 }
 
 BufferOccupancy::Mode BufferOccupancy::parseMode(const std::string& _mode) {
-  if (_mode == "vc") {
-    return BufferOccupancy::Mode::kVc;
-  } else if (_mode == "port") {
-    return  BufferOccupancy::Mode::kPort;
+  if (_mode == "normalized_vc") {
+    return BufferOccupancy::Mode::kVcNorm;
+  } else if (_mode == "absolute_vc") {
+    return  BufferOccupancy::Mode::kVcAbs;
+  } else if (_mode == "normalized_port") {
+    return  BufferOccupancy::Mode::kPortNorm;
+  } else if (_mode == "absolute_port") {
+    return  BufferOccupancy::Mode::kPortAbs;
   } else {
     assert(false);
   }
@@ -157,15 +144,25 @@ void BufferOccupancy::createEvent(u32 _vcIdx, s32 _type) {
 }
 
 void BufferOccupancy::performIncrementCredit(u32 _vcIdx) {
-  dbgprintf("incr %u from %u", _vcIdx, counts_.at(_vcIdx));
-  assert(counts_.at(_vcIdx) < maximums_.at(_vcIdx));
-  counts_.at(_vcIdx)++;
+  // dbgprintf("incr %u from %u", _vcIdx, creditCounts_.at(_vcIdx));
+  assert(creditCounts_.at(_vcIdx) < creditMaximums_.at(_vcIdx));
+  creditCounts_.at(_vcIdx)++;
+  flitsOutstanding_.at(_vcIdx)--;
+
+  dbgprintf("(Inc) VcIdx %u credits: %u flits: %u [%u]", _vcIdx,
+            creditCounts_.at(_vcIdx), flitsOutstanding_.at(_vcIdx),
+            creditMaximums_.at(_vcIdx));
 }
 
 void BufferOccupancy::performDecrementCredit(u32 _vcIdx) {
-  dbgprintf("decr %u from %u", _vcIdx, counts_.at(_vcIdx));
-  assert(counts_.at(_vcIdx) > 0);
-  counts_.at(_vcIdx)--;
+  // dbgprintf("decr %u from %u", _vcIdx, creditCounts_.at(_vcIdx));
+  assert(creditCounts_.at(_vcIdx) > 0);
+  creditCounts_.at(_vcIdx)--;
+  flitsOutstanding_.at(_vcIdx)++;
+
+  dbgprintf("(Dec) VcIdx %u credits: %u flits: %u [%u]", _vcIdx,
+            creditCounts_.at(_vcIdx), flitsOutstanding_.at(_vcIdx),
+            creditMaximums_.at(_vcIdx));
 
   if (phantom_) {
     windows_.at(_vcIdx)++;
@@ -183,6 +180,67 @@ void BufferOccupancy::performDecrementWindow(u32 _vcIdx) {
   dbgprintf("-window %u from %u", _vcIdx, windows_.at(_vcIdx));
   assert(windows_.at(_vcIdx) > 0);
   windows_.at(_vcIdx)--;
+}
+
+f64 BufferOccupancy::vcStatusNorm(u32 _outputPort, u32 _outputVc) const {
+  // return this VC's status (normalized)
+  u32 vcIdx = device_->vcIndex(_outputPort, _outputVc);
+  f64 status;
+  if (!phantom_) {
+    status = ((f64)creditMaximums_.at(vcIdx) - (f64)creditCounts_.at(vcIdx)) /
+        (f64)creditMaximums_.at(vcIdx);
+  } else {
+    status = (((f64)creditMaximums_.at(vcIdx) - (f64)creditCounts_.at(vcIdx) -
+               (f64)windows_.at(vcIdx) * valueCoeff_) /
+              (f64)creditMaximums_.at(vcIdx));
+  }
+
+  return std::min(1.0, std::max(0.0, status));
+}
+
+f64 BufferOccupancy::vcStatusAbs(u32 _outputPort, u32 _outputVc) const {
+  // return this VC's status (absolute)
+  u32 vcIdx = device_->vcIndex(_outputPort, _outputVc);
+  f64 statusAbs;
+  if (!phantom_) {
+    statusAbs = (f64)flitsOutstanding_.at(vcIdx);
+  } else {
+    statusAbs = (f64)flitsOutstanding_.at(vcIdx) - ((f64)windows_.at(vcIdx)
+                                               * valueCoeff_);
+  }
+  return std::max(0.0, statusAbs);
+}
+
+f64 BufferOccupancy::portAverageStatusNorm(u32 _outputPort) const {
+  // return the average status of all VCs in this port (normalized)
+  u32 curSum = 0;
+  u32 maxSum = 0;
+  for (u32 vc = 0; vc < numVcs_; vc++) {
+    u32 vcIdx = device_->vcIndex(_outputPort, vc);
+    if (!phantom_) {
+      curSum += creditMaximums_.at(vcIdx) - creditCounts_.at(vcIdx);
+    } else {
+      curSum += ((f64)creditMaximums_.at(vcIdx) - (f64)creditCounts_.at(vcIdx) -
+                 (f64)windows_.at(vcIdx) * valueCoeff_);
+    }
+    maxSum += (f64)creditMaximums_.at(vcIdx);
+  }
+  return std::min(1.0, std::max(0.0, (f64)curSum / (f64)maxSum));
+}
+
+f64 BufferOccupancy::portAverageStatusAbs(u32 _outputPort) const {
+  // return the average status of all VCs in this port (absolute)
+  u32 curSum = 0;
+  for (u32 vc = 0; vc < numVcs_; vc++) {
+    u32 vcIdx = device_->vcIndex(_outputPort, vc);
+    if (!phantom_) {
+      curSum += (f64)flitsOutstanding_.at(vcIdx);
+    } else {
+      curSum += (f64)flitsOutstanding_.at(vcIdx) - ((f64)windows_.at(vcIdx)
+                                            * valueCoeff_);
+    }
+  }
+  return std::max(0.0, (f64)curSum);
 }
 
 registerWithFactory("buffer_occupancy", CongestionStatus,

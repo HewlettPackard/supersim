@@ -44,17 +44,24 @@ class BufferOccupancy : public CongestionStatus {
                     u32 _outputVc) const override;
 
  private:
-  enum class Mode {kVc, kPort};
+  enum class Mode {kVcNorm, kPortNorm, kVcAbs, kPortAbs};
   static Mode parseMode(const std::string& _mode);
   void createEvent(u32 _vcIdx, s32 _type);
   void performIncrementCredit(u32 _vcIdx);
   void performDecrementCredit(u32 _vcIdx);
   void performDecrementWindow(u32 _vcIdx);
 
+  f64 vcStatusNorm(u32 _outputPort, u32 _outputVc) const;
+  f64 vcStatusAbs(u32 _outputPort, u32 _outputVc) const;
+  f64 portAverageStatusNorm(u32 _outputPort) const;
+  f64 portAverageStatusAbs(u32 _outputPort) const;
+
   const u32 latency_;
   const Mode mode_;
-  std::vector<u32> maximums_;
-  std::vector<u32> counts_;
+
+  std::vector<u32> creditMaximums_;
+  std::vector<u32> creditCounts_;
+  std::vector<u32> flitsOutstanding_;
 
   // phantom congestion awareness
   bool phantom_;
