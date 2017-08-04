@@ -51,6 +51,7 @@ Application::Application(
   // initialize counters
   completedTerminals_ = 0;
   doneTerminals_ = 0;
+  atBarrierTerminals_ = 0;
   allDone_ = false;
 
   // this application is immediately ready
