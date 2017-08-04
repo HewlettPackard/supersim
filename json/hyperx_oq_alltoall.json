@@ -37,64 +37,36 @@
       "file": "/dev/null"  // "channels.csv"
     },
     "router": {
-      "architecture": "input_queued",
+      "architecture": "output_queued",
       "congestion_status": {
         "algorithm": "buffer_occupancy",
         "latency": 1,
         "granularity": 0,
-        "mode": "normalized_vc" //(normalized_port/vc absolute_port/vc)
+        "mode": "absolute_port" //(normalized_port/vc absolute_port/vc)
       },
-      "input_queue_depth": 16,
-      "vca_swa_wait": true,
-      "output_queue_depth": 64,
-      "crossbar": {
+      "input_queue_depth": 16,  // 2x max packet
+      "transfer_latency": 1,
+      "output_crossbar": {
         "latency": 1  // cycles
       },
-      "vc_scheduler": {
-        "allocator": {
-          "type": "rc_separable",
-          "slip_latch": true,
-          "iterations": 2,
-          "resource_arbiter": {
-            "type": "lslp",  // comparing",
-            "greater": false
-          },
-          "client_arbiter": {
-            "type": "lslp"
-          }
-        }
-      },
-      "crossbar_scheduler": {
+      "output_crossbar_scheduler": {
         "allocator": {
           "type": "r_separable",
           "slip_latch": true,
           "resource_arbiter": {
-            "type": "comparing",
-            "greater": false
+            "type": "random"
           }
         },
         "full_packet": true,
         "packet_lock": true,
-        "idle_unlock": true
+        "idle_unlock": false
       }
     },
     "interface": {
       "type": "standard",
       "adaptive": false,
       "fixed_msg_vc": false,
-      "crossbar_scheduler": {
-        "allocator": {
-          "type": "r_separable",
-          "slip_latch": true,
-          "resource_arbiter": {
-            "type": "comparing",
-            "greater": false
-          }
-        },
-        "full_packet": true,
-        "packet_lock": true,
-        "idle_unlock": true
-      },
+      "crossbar_scheduler": "$&(network.router.output_crossbar_scheduler)&$",
       "init_credits": "$&(network.router.input_queue_depth)&$",
       "crossbar": {
         "latency": 1  // cycles
@@ -122,7 +94,7 @@
           "response_traffic_class": 1,
           // traffic generation
           "delay": 1,
-          "num_iterations": 40,
+          "num_iterations": 100,
           "perform_barriers": true,
           "max_packet_size": 16,
           "traffic_pattern": {
@@ -131,7 +103,7 @@
           },
           "message_size_distribution": {
             "type": "single",
-            "message_size": 8,
+            "message_size": 16,
             "dependent_message_size": 1
           }
         },

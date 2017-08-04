@@ -213,6 +213,7 @@ void CreditHandler::processEvent(void* _event, s32 _type) {
     default:
       assert(false);
   }
+  delete evt;
 }
 
 /************************* StatusCheck utility class **************************/
