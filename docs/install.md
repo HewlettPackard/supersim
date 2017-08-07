@@ -108,6 +108,7 @@ ls -1 ~/ssdev
   percentile
   sslatency
   ssplot
+  sssweep
   supersim
   taskrun
 ```
