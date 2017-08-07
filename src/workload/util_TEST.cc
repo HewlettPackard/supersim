@@ -97,7 +97,7 @@ TEST(WorkloadUtil, cyclesToSend_multiple) {
 TEST(WorkloadUtil, cyclesToSend_probabilistic) {
   TestSetup ts(123, 123, 123);
 
-  const u32 kTests = 500;
+  const u32 kTests = 50;
   const u32 kRounds = 1000000;
 
   for (u32 t = 0; t < kTests; t++) {
