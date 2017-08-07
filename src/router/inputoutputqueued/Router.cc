@@ -32,7 +32,9 @@ Router::Router(
     u32 _id, const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
     MetadataHandler* _metadataHandler, Json::Value _settings)
     : ::Router(_name, _parent, _network, _id, _address, _numPorts, _numVcs,
-               _metadataHandler, _settings) {
+               _metadataHandler, _settings),
+      congestionMode_(parseCongestionMode(
+          _settings["congestion_mode"].asString())) {
   // determine the size of credits
   creditSize_ = numVcs_ * (u32)std::ceil(
       (f64)gSim->cycleTime(Simulator::Clock::CHANNEL) /
@@ -63,8 +65,10 @@ Router::Router(
       numPorts_ * numVcs_, 0, Simulator::Clock::CORE,
       _settings["crossbar_scheduler"]);
 
-  // set the congestion status to watch the credits of the main scheduler
-  crossbarScheduler_->addCreditWatcher(congestionStatus_);
+  // determine the credit updates the input queue will need to provide
+  bool iqDecrWatcher =
+      ((congestionMode_ == Router::CongestionMode::kOutput) ||
+       (congestionMode_ == Router::CongestionMode::kOutputAndDownstream));
 
   // create routing algorithms, input queues, link to routing algorithm,
   //  crossbar, and schedulers
@@ -76,6 +80,13 @@ Router::Router(
 
       // initialize the credit count in the CrossbarScheduler
       crossbarScheduler_->initCredits(vcIdx, outputQueueDepth);
+
+      // initialize the credit count in the CongestionStatus for downstream
+      //  queues
+      if ((congestionMode_ == Router::CongestionMode::kDownstream) ||
+          (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
+        congestionStatus_->initCredits(vcIdx, inputQueueDepth);
+      }
 
       // create the name suffix
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
@@ -95,7 +106,7 @@ Router::Router(
       InputQueue* iq = new InputQueue(
           iqName, this, this, inputQueueDepth, port, numVcs_, vc, vcaSwaWait,
           rf, vcScheduler_, clientIndex, crossbarScheduler_, clientIndex,
-          crossbar_, clientIndex);
+          crossbar_, clientIndex, congestionStatus_, iqDecrWatcher);
       inputQueues_.at(vcIdx) = iq;
 
       // register the input queue with VC and crossbar schedulers
@@ -103,6 +114,10 @@ Router::Router(
       crossbarScheduler_->setClient(clientIndex, iq);
     }
   }
+
+  // determine the credit updates the output queue will need to provide
+  bool oqIncrWatcher = congestionMode_ == Router::CongestionMode::kOutput;
+  bool oqDecrWatcher = congestionMode_ == Router::CongestionMode::kDownstream;
 
   // output queues, schedulers, and crossbar
   outputQueues_.resize(numPorts_ * numVcs_, nullptr);
@@ -117,9 +132,6 @@ Router::Router(
         outputCrossbarSchedulerName, this, numVcs_, numVcs_, 1, port * numVcs_,
         Simulator::Clock::CHANNEL, _settings["output_crossbar_scheduler"]);
 
-    // set the congestion status to watch the credits of the output scheduler
-    outputCrossbarSchedulers_.at(port)->addCreditWatcher(congestionStatus_);
-
     // output crossbar
     std::string outputCrossbarName = "OutputCrossbar_" + std::to_string(port);
     outputCrossbars_.at(port) = new Crossbar(
@@ -133,8 +145,16 @@ Router::Router(
 
     // queues
     for (u32 vc = 0; vc < numVcs_; vc++) {
+      u32 vcIdx = vcIndex(port, vc);
+
       // initialize the credit count in the OutputCrossbarScheduler
       outputCrossbarSchedulers_.at(port)->initCredits(vc, inputQueueDepth);
+
+      // initialize the credit count in the CongestionStatus for output queues
+      if ((congestionMode_ == Router::CongestionMode::kOutput) ||
+          (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
+        congestionStatus_->initCredits(vcIdx, outputQueueDepth);
+      }
 
       // create the name suffix
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
@@ -142,15 +162,16 @@ Router::Router(
 
       // compute the client indexes
       u32 clientIndexOut = vc;  // sw alloc and output crossbar
-      u32 clientIndexMain = vcIndex(port, vc);  // main crossbar
+      u32 clientIndexMain = vcIdx;  // main crossbar
 
       // output queue
       std::string oqName = "OutputQueue" + nameSuffix;
       OutputQueue* oq = new OutputQueue(
           oqName, this, outputQueueDepth, port, vc,
           outputCrossbarSchedulers_.at(port), clientIndexOut,
-          outputCrossbars_.at(port), clientIndexOut,
-          crossbarScheduler_, clientIndexMain);
+          outputCrossbars_.at(port), clientIndexOut, crossbarScheduler_,
+          clientIndexMain, congestionStatus_, clientIndexMain, oqIncrWatcher,
+          oqDecrWatcher);
       outputQueues_.at(clientIndexMain) = oq;
 
       // register the output queue with switch allocator
@@ -217,7 +238,17 @@ void Router::receiveFlit(u32 _port, Flit* _flit) {
 void Router::receiveCredit(u32 _port, Credit* _credit) {
   while (_credit->more()) {
     u32 vc = _credit->getNum();
+
+    // give the output crossbar a credit
     outputCrossbarSchedulers_.at(_port)->incrementCredit(vc);
+
+    // if the downstream credits are part of congestion, give the congestion
+    //  status module a credit
+    if ((congestionMode_ == Router::CongestionMode::kDownstream) ||
+        (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
+      u32 vcIdx = vcIndex(_port, vc);
+      congestionStatus_->incrementCredit(vcIdx);
+    }
   }
   delete _credit;
 }
@@ -251,6 +282,19 @@ f64 Router::congestionStatus(u32 _inputPort, u32 _inputVc,
                              u32 _outputPort, u32 _outputVc) const {
   return congestionStatus_->status(_inputPort, _inputVc, _outputPort,
                                    _outputVc);
+}
+
+Router::CongestionMode Router::parseCongestionMode(const std::string& _mode) {
+  if (_mode == "output") {
+    return Router::CongestionMode::kOutput;
+  } else if (_mode == "downstream") {
+    return Router::CongestionMode::kDownstream;
+  } else if (_mode == "output_and_downstream") {
+    return Router::CongestionMode::kOutputAndDownstream;
+  } else {
+    fprintf(stderr, "invalid congestion mode: %s\n", _mode.c_str());
+    assert(false);
+  }
 }
 
 }  // namespace InputOutputQueued

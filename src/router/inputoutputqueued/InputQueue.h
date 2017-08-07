@@ -23,6 +23,7 @@
 
 #include "event/Component.h"
 #include "network/RoutingAlgorithm.h"
+#include "architecture/CreditWatcher.h"
 #include "architecture/Crossbar.h"
 #include "architecture/CrossbarScheduler.h"
 #include "architecture/VcScheduler.h"
@@ -43,7 +44,8 @@ class InputQueue : public Component, public FlitReceiver,
              bool _vcaSwaWait, RoutingAlgorithm* _routingAlgorithm,
              VcScheduler* _vcScheduler, u32 _vcSchedulerIndex,
              CrossbarScheduler* _crossbarScheduler, u32 _crossbarSchedulerIndex,
-             Crossbar* _crossbar, u32 _crossbarIndex);
+             Crossbar* _crossbar, u32 _crossbarIndex,
+             CreditWatcher* _creditWatcher, bool _decrCreditWatcher);
   ~InputQueue();
 
   // called by next higher router (FlitReceiver)
@@ -83,6 +85,8 @@ class InputQueue : public Component, public FlitReceiver,
   const u32 crossbarSchedulerIndex_;
   Crossbar* crossbar_;
   const u32 crossbarIndex_;
+  CreditWatcher* creditWatcher_;
+  const bool decrCreditWatcher_;
 
   // single flit per clock input limit assurance
   u64 lastReceivedTime_;

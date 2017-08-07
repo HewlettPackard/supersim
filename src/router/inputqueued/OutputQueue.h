@@ -21,6 +21,7 @@
 #include <queue>
 #include <vector>
 
+#include "architecture/CreditWatcher.h"
 #include "event/Component.h"
 #include "types/Flit.h"
 #include "types/FlitReceiver.h"
@@ -32,7 +33,8 @@ class Router;
 class OutputQueue : public Component, public FlitReceiver {
  public:
   OutputQueue(const std::string& _name, const Component* _parent,
-              Router* _router, u32 _depth, u32 _port);
+              Router* _router, u32 _depth, u32 _port,
+              CreditWatcher* _creditWatcher, bool _incrCreditWatcher);
   ~OutputQueue();
 
   // called by main router crossbar
@@ -50,6 +52,8 @@ class OutputQueue : public Component, public FlitReceiver {
 
   // external components
   Router* router_;
+  CreditWatcher* creditWatcher_;
+  const bool incrCreditWatcher_;
 
   // single flit per clock input limit assurance
   u64 lastReceivedTime_;

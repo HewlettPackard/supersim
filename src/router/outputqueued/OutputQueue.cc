@@ -33,12 +33,15 @@ OutputQueue::OutputQueue(
     const std::string& _name, const Component* _parent, u32 _port, u32 _vc,
     CrossbarScheduler* _outputCrossbarScheduler,
     u32 _crossbarSchedulerIndex, Crossbar* _crossbar, u32 _crossbarIndex,
-    CreditWatcher* _creditWatcher, u32 _creditWatcherVcId)
+    CreditWatcher* _creditWatcher, u32 _creditWatcherVcId,
+    bool _incrCreditWatcher, bool _decrCreditWatcher)
     : Component(_name, _parent), port_(_port), vc_(_vc),
       outputCrossbarScheduler_(_outputCrossbarScheduler),
       crossbarSchedulerIndex_(_crossbarSchedulerIndex), crossbar_(_crossbar),
       crossbarIndex_(_crossbarIndex), creditWatcher_(_creditWatcher),
-      creditWatcherVcId_(_creditWatcherVcId) {
+      creditWatcherVcId_(_creditWatcherVcId),
+      incrCreditWatcher_(_incrCreditWatcher),
+      decrCreditWatcher_(_decrCreditWatcher) {
   // ensure the buffer is empty
   assert(buffer_.size() == 0);
 
@@ -125,7 +128,12 @@ void OutputQueue::processPipeline() {
     // send the flit on the crossbar
     crossbar_->inject(swa_.flit, crossbarIndex_, 0);
     outputCrossbarScheduler_->decrementCredit(vc_);
-    creditWatcher_->incrementCredit(creditWatcherVcId_);
+    if (incrCreditWatcher_) {
+      creditWatcher_->incrementCredit(creditWatcherVcId_);
+    }
+    if (decrCreditWatcher_) {
+      creditWatcher_->decrementCredit(creditWatcherVcId_);
+    }
 
     // clear SWA info
     swa_.fsm = ePipelineFsm::kEmpty;

@@ -38,8 +38,9 @@ class BufferOccupancy : public CongestionStatus {
   //  input and output ports (IOW, input port and VC are ignored in the calc).
   void processEvent(void* _event, s32 _type);
 
-  // style reporting
+  // style and mode reporting
   CongestionStatus::Style style() const override;
+  CongestionStatus::Mode mode() const override;
 
  protected:
   // see CongestionStatus::computeStatus

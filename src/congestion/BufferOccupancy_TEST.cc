@@ -70,13 +70,26 @@ TEST(BufferOccupancy, normVc) {
     }
   }
 
-  time = 1000000;
+  time = 10000;
   for (u32 port = 0; port < numPorts; port++) {
     for (u32 vc = 0; vc < numVcs; vc++) {
       // check credits
       u32 max = port * 10 + vc + 2;
       f64 exp = 2.0 / (f64)max;
       check.setEvent(time, 0, 0, 0, port, vc, exp);
+    }
+  }
+
+  time = 100000;
+  for (u32 incr = 1; incr <= 2; incr++) {
+    for (u32 port = 0; port < numPorts; port++) {
+      for (u32 vc = 0; vc < numVcs; vc++) {
+        // modify credits
+        crediter.setEvent(port, vc, time, 1, CreditHandler::Type::INCR);
+
+        // advance time
+        time++;
+      }
     }
   }
 
@@ -132,12 +145,25 @@ TEST(BufferOccupancy, absVc) {
     }
   }
 
-  time = 1000000;
+  time = 10000;
   for (u32 port = 0; port < numPorts; port++) {
     for (u32 vc = 0; vc < numVcs; vc++) {
       // check credits
       f64 exp = 2.0;
       check.setEvent(time, 0, 0, 0, port, vc, exp);
+    }
+  }
+
+  time = 100000;
+  for (u32 incr = 1; incr <= 2; incr++) {
+    for (u32 port = 0; port < numPorts; port++) {
+      for (u32 vc = 0; vc < numVcs; vc++) {
+        // modify credits
+        crediter.setEvent(port, vc, time, 1, CreditHandler::Type::INCR);
+
+        // advance time
+        time++;
+      }
     }
   }
 
@@ -193,7 +219,7 @@ TEST(BufferOccupancy, normPort) {
     }
   }
 
-  time = 1000000;
+  time = 10000;
   for (u32 port = 0; port < numPorts; port++) {
     for (u32 vc = 0; vc < numVcs; vc++) {
       // check credits
@@ -206,6 +232,19 @@ TEST(BufferOccupancy, normPort) {
       }
       f64 exp = (f64)curSum / (f64)maxSum;
       check.setEvent(time, 0, 0, 0, port, vc, exp);
+    }
+  }
+
+  time = 100000;
+  for (u32 incr = 1; incr <= 2; incr++) {
+    for (u32 port = 0; port < numPorts; port++) {
+      for (u32 vc = 0; vc < numVcs; vc++) {
+        // modify credits
+        crediter.setEvent(port, vc, time, 1, CreditHandler::Type::INCR);
+
+        // advance time
+        time++;
+      }
     }
   }
 
@@ -261,7 +300,7 @@ TEST(BufferOccupancy, absPort) {
     }
   }
 
-  time = 1000000;
+  time = 10000;
   for (u32 port = 0; port < numPorts; port++) {
     for (u32 vc = 0; vc < numVcs; vc++) {
       // check credits
@@ -271,6 +310,19 @@ TEST(BufferOccupancy, absPort) {
       }
       f64 exp = (f64)curSum;
       check.setEvent(time, 0, 0, 0, port, vc, exp);
+    }
+  }
+
+  time = 10000;
+  for (u32 incr = 1; incr <= 2; incr++) {
+    for (u32 port = 0; port < numPorts; port++) {
+      for (u32 vc = 0; vc < numVcs; vc++) {
+        // modify credits
+        crediter.setEvent(port, vc, time, 1, CreditHandler::Type::INCR);
+
+        // advance time
+        time++;
+      }
     }
   }
 
@@ -339,6 +391,10 @@ TEST(BufferOccupancy, phantomNormVc) {
           time++;
         }
 
+        for (u32 flit = 0; flit < bufferDepth; flit++) {
+          crediter.setEvent(0, 0, time, 1, CreditHandler::Type::INCR);
+        }
+
         gSim->simulate();
       }
     }
@@ -404,6 +460,10 @@ TEST(BufferOccupancy, phantomAbsVc) {
           exp = std::max(0.0, exp);
           check.setEvent(time, 0, 0, 0, 0, 0, exp);
           time++;
+        }
+
+        for (u32 flit = 0; flit < bufferDepth; flit++) {
+          crediter.setEvent(0, 0, time, 1, CreditHandler::Type::INCR);
         }
 
         gSim->simulate();

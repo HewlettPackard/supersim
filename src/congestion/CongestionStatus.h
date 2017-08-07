@@ -34,6 +34,10 @@ class CongestionStatus : public Component, public CreditWatcher {
   // normalized - values range from 0.0 to 1.0
   enum class Style {kAbsolute, kNormalized};
 
+  // vc - values specified per VC
+  // port - values specified per port (_outputVc is meaningless)
+  enum class Mode {kVc, kPort};
+
   CongestionStatus(const std::string& _name, const Component* _parent,
                    PortedDevice* _device, Json::Value _settings);
   virtual ~CongestionStatus();
@@ -45,8 +49,9 @@ class CongestionStatus : public Component, public CreditWatcher {
   f64 status(u32 _inputPort, u32 _inputVc, u32 _outputPort,
              u32 _outputVc) const;  // (must be epsilon >= 1)
 
-  // must tell your style
+  // must tell your style and mode
   virtual Style style() const = 0;
+  virtual Mode mode() const = 0;
 
  protected:
   // this must be implemented by subclasses to yield the congestion status

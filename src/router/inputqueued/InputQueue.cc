@@ -32,7 +32,8 @@ InputQueue::InputQueue(
     u32 _depth, u32 _port, u32 _numVcs, u32 _vc, bool _vcaSwaWait,
     RoutingAlgorithm* _routingAlgorithm, VcScheduler* _vcScheduler,
     u32 _vcSchedulerIndex, CrossbarScheduler* _crossbarScheduler,
-    u32 _crossbarSchedulerIndex, Crossbar* _crossbar, u32 _crossbarIndex)
+    u32 _crossbarSchedulerIndex, Crossbar* _crossbar, u32 _crossbarIndex,
+    CreditWatcher* _creditWatcher)
     : Component(_name, _parent), depth_(_depth), port_(_port), numVcs_(_numVcs),
       vc_(_vc), vcaSwaWait_(_vcaSwaWait), router_(_router),
       routingAlgorithm_(_routingAlgorithm), vcScheduler_(_vcScheduler),
@@ -40,7 +41,7 @@ InputQueue::InputQueue(
       crossbarScheduler_(_crossbarScheduler),
       crossbarSchedulerIndex_(_crossbarSchedulerIndex),
       crossbar_(_crossbar), crossbarIndex_(_crossbarIndex),
-      lastReceivedTime_(U64_MAX) {
+      creditWatcher_(_creditWatcher), lastReceivedTime_(U64_MAX) {
   // ensure the buffer is empty
   assert(buffer_.size() == 0);
 
@@ -174,6 +175,7 @@ void InputQueue::processPipeline() {
     // send the flit on the crossbar, consume a credit
     crossbar_->inject(swa_.flit, crossbarIndex_, swa_.allocatedPort);
     crossbarScheduler_->decrementCredit(swa_.allocatedVcIdx);
+    creditWatcher_->decrementCredit(swa_.allocatedVcIdx);
 
     // if this is a tail flit, release the VC
     /** NOTE: this causes a stall when there are back-to-back

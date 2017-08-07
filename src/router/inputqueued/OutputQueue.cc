@@ -30,8 +30,10 @@ namespace InputQueued {
 
 OutputQueue::OutputQueue(
     const std::string& _name, const Component* _parent, Router* _router,
-    u32 _depth, u32 _port)
+    u32 _depth, u32 _port, CreditWatcher* _creditWatcher,
+    bool _incrCreditWatcher)
     : Component(_name, _parent), depth_(_depth), port_(_port), router_(_router),
+      creditWatcher_(_creditWatcher), incrCreditWatcher_(_incrCreditWatcher),
       lastReceivedTime_(U64_MAX) {
   // ensure the buffer is empty
   assert(buffer_.size() == 0);
@@ -86,6 +88,10 @@ void OutputQueue::processPipeline() {
   Flit* flit = buffer_.front();
   buffer_.pop();
   router_->sendFlit(port_, flit);
+  if (incrCreditWatcher_) {
+    u32 vcIdx = router_->vcIndex(port_, flit->getVc());
+    creditWatcher_->incrementCredit(vcIdx);
+  }
 
   // clear the eventTime_ variable to indicate no more events are set
   eventTime_ = U64_MAX;

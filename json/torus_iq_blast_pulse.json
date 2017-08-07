@@ -36,6 +36,7 @@
         "granularity": 0,
         "mode": "normalized_vc" //(normalized_port/vc absolute_port/vc)
       },
+      "congestion_mode": "downstream",
       "input_queue_depth": 16,
       "vca_swa_wait": false,
       "output_queue_depth": 16,
@@ -115,7 +116,7 @@
           "warmup_window": 15,
           "warmup_attempts": 20,
           // traffic generation
-          "num_transactions": 1000,
+          "num_transactions": 10000,
           "max_packet_size": 16,
           "traffic_pattern": {
             "type": "uniform_random",
@@ -141,7 +142,7 @@
           "enable_responses": false,
           // traffic generation
           "delay": 1000,
-          "num_transactions": 200,
+          "num_transactions": 2000,
           "max_packet_size": 16,
           "traffic_pattern": {
             "type": "uniform_random",
@@ -159,6 +160,8 @@
     ]
   },
   "debug": [
-    "Workload"
+    "Workload",
+    "Workload.Application_0",
+    "Workload.Application_1"
   ]
 }

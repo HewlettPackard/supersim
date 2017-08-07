@@ -34,7 +34,9 @@ Router::Router(
     MetadataHandler* _metadataHandler, Json::Value _settings)
     : ::Router(_name, _parent, _network, _id, _address, _numPorts, _numVcs,
                _metadataHandler, _settings),
-      transferLatency_(_settings["transfer_latency"].asUInt()) {
+      transferLatency_(_settings["transfer_latency"].asUInt()),
+      congestionMode_(parseCongestionMode(
+          _settings["congestion_mode"].asString())) {
   assert(!_settings["transfer_latency"].isNull());
   assert(transferLatency_ > 0);
 
@@ -58,9 +60,13 @@ Router::Router(
   congestionStatus_ = CongestionStatus::create(
       "CongestionStatus", this, this, _settings["congestion_status"]);
 
-  // ensure the congestion status module is operating in absolute mode because
-  //  the output queues are infinite and relative occupancy will always be zero
-  assert(congestionStatus_->style() == CongestionStatus::Style::kAbsolute);
+  // when running in one type of output mode, ensure the congestion status
+  //  module is operating in absolute mode because the output queues are
+  //  infinite and relative occupancy will always be zero
+  if ((congestionMode_ == Router::CongestionMode::kOutput) ||
+      (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
+    assert(congestionStatus_->style() == CongestionStatus::Style::kAbsolute);
+  }
 
   // create routing algorithms, input queues, link to routing algorithm,
   //  crossbar, and schedulers
@@ -85,8 +91,18 @@ Router::Router(
       InputQueue* iq = new InputQueue(
           iqName, this, this, inputQueueDepth, port, numVcs_, vc, rf);
       inputQueues_.at(vcIdx) = iq;
+
+      // tell the congestion status module of the number of credits in IQ
+      if ((congestionMode_ == Router::CongestionMode::kDownstream) ||
+          (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
+        congestionStatus_->initCredits(vcIdx, inputQueueDepth);
+      }
     }
   }
+
+  // determine the credit updates the output queue will need to provide
+  bool oqIncrWatcher = congestionMode_ == Router::CongestionMode::kOutput;
+  bool oqDecrWatcher = congestionMode_ == Router::CongestionMode::kDownstream;
 
   // output queues, schedulers, and crossbar
   outputQueues_.resize(numPorts_ * numVcs_, nullptr);
@@ -100,9 +116,6 @@ Router::Router(
     outputCrossbarSchedulers_.at(port) = new CrossbarScheduler(
         outputCrossbarSchedulerName, this, numVcs_, numVcs_, 1, port * numVcs_,
         Simulator::Clock::CHANNEL, _settings["output_crossbar_scheduler"]);
-
-    // set the congestion status to watch the credits of the output scheduler
-    // outputCrossbarSchedulers_.at(port)->addCreditWatcher(congestionStatus_);
 
     // output crossbar
     std::string outputCrossbarName = "OutputCrossbar_" + std::to_string(port);
@@ -133,15 +146,18 @@ Router::Router(
       OutputQueue* oq = new OutputQueue(
           oqName, this, port, vc,
           outputCrossbarSchedulers_.at(port), clientIndexOut,
-          outputCrossbars_.at(port), clientIndexOut,
-          congestionStatus_, clientIndexMain);
+          outputCrossbars_.at(port), clientIndexOut, congestionStatus_,
+          clientIndexMain, oqIncrWatcher, oqDecrWatcher);
       outputQueues_.at(clientIndexMain) = oq;
 
       // register the output queue with switch allocator
       outputCrossbarSchedulers_.at(port)->setClient(clientIndexOut, oq);
 
       // tell the congestion status module of the number of credits (infinite)
-      congestionStatus_->initCredits(clientIndexMain, U32_MAX);
+      if ((congestionMode_ == Router::CongestionMode::kOutput) ||
+          (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
+        congestionStatus_->initCredits(clientIndexMain, U32_MAX);
+      }
     }
   }
 
@@ -231,6 +247,12 @@ void Router::receiveCredit(u32 _port, Credit* _credit) {
   while (_credit->more()) {
     u32 vc = _credit->getNum();
     outputCrossbarSchedulers_.at(_port)->incrementCredit(vc);
+
+    if ((congestionMode_ == Router::CongestionMode::kDownstream) ||
+        (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
+      u32 vcIdx = vcIndex(_port, vc);
+      congestionStatus_->incrementCredit(vcIdx);
+    }
   }
   delete _credit;
 }
@@ -270,8 +292,11 @@ void Router::transferPacket(Flit* _headFlit, u32 _outputPort, u32 _outputVc) {
     Flit* flit = packet->getFlit(f);
     flit->setVc(_outputVc);
 
-    // decrement credit in the congestion status module
-    congestionStatus_->decrementCredit(vcIdx);
+    // decrement credit in the congestion status module, if appropriate
+    if ((congestionMode_ == Router::CongestionMode::kOutput) ||
+        (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
+      congestionStatus_->decrementCredit(vcIdx);
+    }
   }
 
   // determine the time of arrival at the output queue
@@ -290,6 +315,19 @@ void Router::processEvent(void* _event, s32 _type) {
   OutputQueue* outputQueue = outputQueues_.at(vcIdx);
   Packet* packet = reinterpret_cast<Packet*>(_event);
   outputQueue->receivePacket(packet);
+}
+
+Router::CongestionMode Router::parseCongestionMode(const std::string& _mode) {
+  if (_mode == "output") {
+    return Router::CongestionMode::kOutput;
+  } else if (_mode == "downstream") {
+    return Router::CongestionMode::kDownstream;
+  } else if (_mode == "output_and_downstream") {
+    return Router::CongestionMode::kOutputAndDownstream;
+  } else {
+    fprintf(stderr, "invalid congestion mode: %s\n", _mode.c_str());
+    assert(false);
+  }
 }
 
 }  // namespace OutputQueued

@@ -63,6 +63,12 @@ class Router : public ::Router {
                        u32 _outputVc) const override;
 
  private:
+  enum class CongestionMode {kOutput, kDownstream, kOutputAndDownstream};
+
+  static CongestionMode parseCongestionMode(const std::string& _mode);
+
+  const CongestionMode congestionMode_;
+
   u32 creditSize_;
 
   std::vector<InputQueue*> inputQueues_;

@@ -60,9 +60,6 @@ class CrossbarScheduler : public Component, public CreditWatcher {
   // links a client to the scheduler
   void setClient(u32 _id, Client* _client);
 
-  // sets a credit watcher
-  void addCreditWatcher(CreditWatcher* _watcher);
-
   // requests to send a flit to a VC
   void request(u32 _client, u32 _port, u32 _vcIdx, Flit* _flit);
 
@@ -86,8 +83,6 @@ class CrossbarScheduler : public Component, public CreditWatcher {
   std::vector<u32> clientRequestPorts_;
   std::vector<u32> clientRequestVcs_;
   std::vector<const Flit*> clientRequestFlits_;
-
-  std::vector<CreditWatcher*> watchers_;
 
   std::vector<u32> credits_;
   std::vector<u32> maxCredits_;

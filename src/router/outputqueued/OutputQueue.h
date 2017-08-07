@@ -37,7 +37,8 @@ class OutputQueue : public Component,
               u32 _port, u32 _vc, CrossbarScheduler* _outputCrossbarScheduler,
               u32 _crossbarSchedulerIndex, Crossbar* _crossbar,
               u32 _crossbarIndex, CreditWatcher* _creditWatcher,
-              u32 _creditWatcherVcId);
+              u32 _creditWatcherVcId, bool _incrCreditWatcher,
+              bool _decrCreditWatcher);
   ~OutputQueue();
 
   // called by router
@@ -64,6 +65,8 @@ class OutputQueue : public Component,
   const u32 crossbarIndex_;
   CreditWatcher* creditWatcher_;
   const u32 creditWatcherVcId_;
+  const bool incrCreditWatcher_;
+  const bool decrCreditWatcher_;
 
   // state machine to represent a generic pipeline stage
   enum class ePipelineFsm { kEmpty, kWaitingToRequest, kWaitingForResponse,

@@ -115,10 +115,6 @@ void CrossbarScheduler::setClient(u32 _id, Client* _client) {
   clients_.at(_id) = _client;
 }
 
-void CrossbarScheduler::addCreditWatcher(CreditWatcher* _watcher) {
-  watchers_.push_back(_watcher);
-}
-
 void CrossbarScheduler::request(u32 _client, u32 _port, u32 _vcIdx,
                                 Flit* _flit) {
   assert(gSim->epsilon() >= 1);
@@ -151,11 +147,6 @@ void CrossbarScheduler::initCredits(u32 _vcIdx, u32 _credits) {
   assert(_vcIdx < totalVcs_);
   credits_[_vcIdx] = _credits;
   maxCredits_[_vcIdx] = _credits;
-
-  // update watchers
-  for (CreditWatcher* watcher : watchers_) {
-    watcher->initCredits(globalVcOffset_ + _vcIdx, _credits);
-  }
 }
 
 void CrossbarScheduler::incrementCredit(u32 _vcIdx) {
@@ -170,11 +161,6 @@ void CrossbarScheduler::incrementCredit(u32 _vcIdx) {
     eventAction_ = EventAction::CREDITS;
     addEvent(gSim->futureCycle(clock_, 1), 0, nullptr, 0);
   }
-
-  // update watchers
-  for (CreditWatcher* watcher : watchers_) {
-    watcher->incrementCredit(globalVcOffset_ + _vcIdx);
-  }
 }
 
 void CrossbarScheduler::decrementCredit(u32 _vcIdx) {
@@ -183,11 +169,6 @@ void CrossbarScheduler::decrementCredit(u32 _vcIdx) {
   // decrement the credit count
   assert(credits_[_vcIdx] > 0);
   credits_[_vcIdx]--;
-
-  // update watchers
-  for (CreditWatcher* watcher : watchers_) {
-    watcher->decrementCredit(globalVcOffset_ + _vcIdx);
-  }
 }
 
 u32 CrossbarScheduler::getCreditCount(u32 _vcIdx) const {

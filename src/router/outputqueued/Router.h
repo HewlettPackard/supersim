@@ -67,7 +67,12 @@ class Router : public ::Router {
   void processEvent(void* _event, s32 _type) override;
 
  private:
+  enum class CongestionMode {kOutput, kDownstream, kOutputAndDownstream};
+
+  static CongestionMode parseCongestionMode(const std::string& _mode);
+
   const u32 transferLatency_;
+  const CongestionMode congestionMode_;
   u32 creditSize_;
 
   // this vector is used to keep track of incoming port VC

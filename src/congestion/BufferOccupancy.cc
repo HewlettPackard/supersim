@@ -56,7 +56,14 @@ BufferOccupancy::BufferOccupancy(
   }
 }
 
-BufferOccupancy::~BufferOccupancy() {}
+BufferOccupancy::~BufferOccupancy() {
+  u32 totalVcs = numPorts_ * numVcs_;
+  for (u32 vc = 0; vc < totalVcs; vc++) {
+    assert(creditCounts_.at(vc) == creditMaximums_.at(vc));
+    assert(flitsOutstanding_.at(vc) == 0);
+    assert(!phantom_ || windows_.at(vc) == 0);
+  }
+}
 
 void BufferOccupancy::initCredits(u32 _vcIdx, u32 _credits) {
   u32 port, vc;
@@ -66,8 +73,18 @@ void BufferOccupancy::initCredits(u32 _vcIdx, u32 _credits) {
   assert(vc < numVcs_);
   assert(_credits > 0);
 
-  creditMaximums_.at(_vcIdx) += _credits;
-  creditCounts_.at(_vcIdx) += _credits;
+  // sum the credits, use saturating arithmetic for no overflow
+  if (creditMaximums_.at(_vcIdx) + _credits < creditMaximums_.at(_vcIdx)) {
+    creditMaximums_.at(_vcIdx) = U32_MAX;
+  } else {
+    creditMaximums_.at(_vcIdx) += _credits;
+  }
+  if (creditCounts_.at(_vcIdx) + _credits < creditCounts_.at(_vcIdx)) {
+    creditCounts_.at(_vcIdx) = U32_MAX;
+  } else {
+    creditCounts_.at(_vcIdx) += _credits;
+  }
+
   dbgprintf("max & count on %u is now %u", _vcIdx, creditCounts_.at(_vcIdx));
 }
 
@@ -106,6 +123,22 @@ CongestionStatus::Style BufferOccupancy::style() const {
     case BufferOccupancy::Mode::kVcAbs:
     case BufferOccupancy::Mode::kPortAbs:
       return CongestionStatus::Style::kAbsolute;
+      break;
+    default:
+      assert(false);
+      break;
+  }
+}
+
+CongestionStatus::Mode BufferOccupancy::mode() const {
+  switch (mode_) {
+    case BufferOccupancy::Mode::kVcNorm:
+    case BufferOccupancy::Mode::kVcAbs:
+      return CongestionStatus::Mode::kVc;
+      break;
+    case BufferOccupancy::Mode::kPortNorm:
+    case BufferOccupancy::Mode::kPortAbs:
+      return CongestionStatus::Mode::kPort;
       break;
     default:
       assert(false);

@@ -36,6 +36,7 @@
         "granularity": 0,
         "mode": "absolute_vc" //(normalized_port/vc absolute_port/vc)
       },
+      "congestion_mode": "output_and_downstream",
       "input_queue_depth": 32,  // 2x max packet
       "transfer_latency": 1,
       "output_crossbar": {
