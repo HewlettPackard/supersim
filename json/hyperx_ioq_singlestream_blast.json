@@ -20,6 +20,8 @@
         }
       }
     ],
+    "channel_mode": "scalar",  // "fixed" | "scalar"
+    "channel_scalars": [2.3],  // same size as dimension_widths
     "internal_channel": {
       "latency": 5  // cycles
     },

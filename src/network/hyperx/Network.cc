@@ -54,6 +54,26 @@ Network::Network(const std::string& _name, const Component* _parent,
             strop::vecString<u32>(dimensionWeights_, '-').c_str());
   dbgprintf("concentration_ = %u", concentration_);
 
+  // varying channel latency per dimension
+  std::vector<f64> scalars;
+  assert(_settings.isMember("channel_mode"));
+
+  // scalar
+  if (_settings["channel_mode"].asString() == "scalar") {
+    assert(_settings["channel_scalars"].isArray());
+    assert(_settings["channel_scalars"].size() == dimensions_);
+    scalars.resize(dimensions_);
+    for (u32 i = 0; i < dimensions_; i++) {
+      if ( _settings["channel_scalars"][i].asFloat() > 0.0 ) {
+        scalars.at(i) = _settings["channel_scalars"][i].asFloat();
+      } else {
+        scalars.at(i) = 1.0;
+      }
+    }
+    dbgprintf("scalars = %s",
+              strop::vecString<f64>(scalars, ',').c_str());
+  }
+
   // router radix
   u32 routerRadix = concentration_;
   for (u32 i = 0; i < dimensions_; i++) {
@@ -99,6 +119,20 @@ Network::Network(const std::string& _name, const Component* _parent,
         destinationAddress.at(dim) = (sourceAddress.at(dim) + offset) %
             dimWidth;
 
+        // determine the channel latency for current dim and offset
+        if (_settings["channel_mode"].asString() == "scalar") {
+          f64 link_dist = fabs((s64)sourceAddress.at(dim) -
+                               (s64)destinationAddress.at(dim));
+          u32 channelLatency = (u32)(ceil(scalars[dim] * link_dist));
+          dbgprintf("s=%s d=%s c_dist=%.2f l_val=%.2f latency=%u",
+                    strop::vecString<u32>(sourceAddress, '-').c_str(),
+                    strop::vecString<u32>(destinationAddress, '-').c_str(),
+                    link_dist, scalars[dim], channelLatency);
+
+          // override settings
+          _settings["internal_channel"]["latency"] = channelLatency;
+        }
+
         for (u32 weight = 0; weight < dimWeight; weight++) {
           // create the channel
           std::string channelName = "Channel_" +
@@ -113,12 +147,12 @@ Network::Network(const std::string& _name, const Component* _parent,
           u32 sourcePort = portBase + ((offset - 1) * dimWeight) + weight;
           u32 destinationPort = portBase + ((dimWidth - 1) * dimWeight) -
               (offset * dimWeight) + weight;
-          dbgprintf("linking %s:%u to %s:%u with %s",
+          dbgprintf("s=%s:%u to d=%s:%u with %s latency=%d",
                     strop::vecString<u32>(sourceAddress, '-').c_str(),
                     sourcePort,
                     strop::vecString<u32>(destinationAddress, '-').c_str(),
                     destinationPort,
-                    channelName.c_str());
+                    channelName.c_str(), channel->latency());
 
           // link the routers from source to destination
           routers_.at(sourceAddress)->setOutputChannel(sourcePort, channel);

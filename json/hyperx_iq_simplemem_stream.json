@@ -27,6 +27,8 @@
         }
       }
     ],
+    "channel_mode": "scalar",  // "fixed" | "scalar"
+    "channel_scalars": [1.2, 1.9, 0.5],  // same size as dimension_widths
     "internal_channel": {
       "latency": 1  // cycles
     },
@@ -147,5 +149,7 @@
       }
     ]
   },
-  "debug": []
+  "debug": [
+    "Network"
+  ]
 }
