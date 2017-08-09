@@ -140,13 +140,3 @@ void StatusCheck::processEvent(void* _event, s32 _type) {
   ASSERT_NEAR(sts, evt->exp, 0.002);
   delete evt;
 }
-
-/************************* Basic Base Class Tests *****************************/
-
-f64 expSts(u32 _curr, u32 _max, u32 _gran) {
-  f64 value = ((f64)_max - (f64)_curr) / (f64)_max;
-  if (_gran > 0) {
-    value = round(value * _gran) / _gran;
-  }
-  return value;
-}
