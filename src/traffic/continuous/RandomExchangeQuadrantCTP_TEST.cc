@@ -27,7 +27,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(RandomExchangeQuadrantCTP, evenSpread) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   Json::Value settings;
 
   settings["dimensions"][0] = Json::Value(4);

@@ -184,7 +184,7 @@ TEST(VcScheduler, basic) {
     for (u32 V = 1; V < 16; V += 2) {
       for (u32 R = 1; R < V; R += 2) {
         // setup
-        TestSetup testSetup(12, 12, 0x1234567890abcdf);
+        TestSetup testSetup(12, 12, 12, 0x1234567890abcdf);
         Json::Value arbSettings;
         arbSettings["type"] = "random";
         Json::Value allocSettings;
@@ -196,7 +196,7 @@ TEST(VcScheduler, basic) {
         Json::Value schSettings;
         schSettings["allocator"] = allocSettings;
         VcScheduler* vcSch = new VcScheduler(
-            "VcSch", nullptr, C, V, Simulator::Clock::CORE, schSettings);
+            "VcSch", nullptr, C, V, Simulator::Clock::ROUTER, schSettings);
         assert(vcSch->numClients() == C);
         assert(vcSch->totalVcs() == V);
 
@@ -204,7 +204,7 @@ TEST(VcScheduler, basic) {
         std::unordered_map<u32, u32> holdingCount;
         for (u32 c = 0; c < C; c++) {
           clients[c] = new VcSchedulerTestClient(
-              c, vcSch, V, Simulator::Clock::CORE, ALLOCS_PER_CLIENT, R, {},
+              c, vcSch, V, Simulator::Clock::ROUTER, ALLOCS_PER_CLIENT, R, {},
               &holdingCount);
         }
 
@@ -233,7 +233,7 @@ TEST(VcScheduler, dist) {
 
   for (const std::string& arb : {"random", "comparing", "lslp"}) {
     for (u32 N : {1, 4, 12}) {
-      TestSetup testSetup(12, 12, 0x1234567890abcdf * N);
+      TestSetup testSetup(12, 12, 12, 0x1234567890abcdf * N);
 
       std::unordered_set<u32> requests;
 
@@ -261,7 +261,7 @@ TEST(VcScheduler, dist) {
       Json::Value schSettings;
       schSettings["allocator"] = allocSettings;
       VcScheduler* vcSch = new VcScheduler(
-          "VcSch", nullptr, C, V, Simulator::Clock::CORE, schSettings);
+          "VcSch", nullptr, C, V, Simulator::Clock::ROUTER, schSettings);
       assert(vcSch->numClients() == C);
       assert(vcSch->totalVcs() == V);
 
@@ -269,8 +269,8 @@ TEST(VcScheduler, dist) {
       std::unordered_map<u32, u32> holdingCount;
       for (u32 c = 0; c < C; c++) {
         clients[c] = new VcSchedulerTestClient(
-            c, vcSch, V, Simulator::Clock::CORE, ALLOCS_PER_CLIENT, R, requests,
-            &holdingCount);
+            c, vcSch, V, Simulator::Clock::ROUTER, ALLOCS_PER_CLIENT, R,
+            requests, &holdingCount);
       }
 
       // run the simulator

@@ -82,7 +82,7 @@ TEST(WorkloadUtil, appId) {
 }
 
 TEST(WorkloadUtil, cyclesToSend_multiple) {
-  TestSetup ts(123, 123, 123);
+  TestSetup ts(123, 123, 123, 123);
 
   const u32 kRounds = 1000000;
   for (u32 r = 0; r < kRounds; r++) {
@@ -95,7 +95,7 @@ TEST(WorkloadUtil, cyclesToSend_multiple) {
 }
 
 TEST(WorkloadUtil, cyclesToSend_probabilistic) {
-  TestSetup ts(123, 123, 123);
+  TestSetup ts(123, 123, 123, 123);
 
   const u32 kTests = 50;
   const u32 kRounds = 1000000;

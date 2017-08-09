@@ -43,7 +43,7 @@ void AllocatorTest(Json::Value _settings, AllocatorVerifier _verifier,
                    bool _singleRequest) {
   for (u32 C = 1; C < 16; C++) {
     for (u32 R = 1; R < 16; R++) {
-      TestSetup testSetup(1, 1, 123);
+      TestSetup testSetup(1, 1, 1, 123);
 
       // printf("C=%u R=%u\n", C, R);
       bool* request = new bool[C * R];
@@ -143,7 +143,7 @@ void AllocatorLoadBalanceTest(Json::Value _settings) {
   const u32 C = 16;
   const u32 R = 16;
 
-  TestSetup testSetup(1, 1, 123);
+  TestSetup testSetup(1, 1, 1, 123);
 
   // printf("C=%u R=%u\n", C, R);
   bool* request = new bool[C * R];

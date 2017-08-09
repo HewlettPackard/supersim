@@ -23,7 +23,7 @@
 #include "types/Packet.h"
 
 TEST(ReadWriteMSD, simple) {
-  TestSetup ts(123, 123, 123);
+  TestSetup ts(123, 123, 123, 123);
 
   // size must all be different for this test fixture to work correctly
   const u32 RQ = 2;

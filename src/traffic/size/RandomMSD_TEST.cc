@@ -21,7 +21,7 @@
 #include "traffic/size/MessageSizeDistribution.h"
 
 TEST(RandomMSD, simple) {
-  TestSetup ts(123, 123, 123);
+  TestSetup ts(123, 123, 123, 123);
 
   const u32 MIN = 3;
   const u32 MAX = 8;
@@ -55,7 +55,7 @@ TEST(RandomMSD, simple) {
 }
 
 TEST(RandomMSD, dependent) {
-  TestSetup ts(123, 123, 123);
+  TestSetup ts(123, 123, 123, 123);
 
   const u32 MIN = 3;
   const u32 MAX = 8;

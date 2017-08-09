@@ -23,7 +23,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(DimBisectionStressCTP, parity) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   DimBisectionStressCTP* tp;
@@ -99,7 +99,7 @@ TEST(DimBisectionStressCTP, parity) {
 }
 
 TEST(DimBisectionStressCTP, half) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   DimBisectionStressCTP* tp;
@@ -148,7 +148,7 @@ TEST(DimBisectionStressCTP, half) {
 }
 
 TEST(DimBisectionStressCTP, quadrant) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   DimBisectionStressCTP* tp;

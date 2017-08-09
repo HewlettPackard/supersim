@@ -26,7 +26,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(LruArbiter, full) {
-  TestSetup testSetup(1, 1, 123);
+  TestSetup testSetup(1, 1, 1, 123);
 
   for (u32 size = 1; size < 100; size++) {
     bool* request = new bool[size];
@@ -135,7 +135,7 @@ TEST(LruArbiter, full) {
 TEST(LruArbiter, dist) {
   for (u8 quads = 1; quads <= 4; quads *= 2) {
     for (u32 size = 32; size <= 64; size += 8) {
-      TestSetup testSetup(1, 1, 123);
+      TestSetup testSetup(1, 1, 1, 123);
 
       bool* request = new bool[size];
       u64* metadata = new u64[size];

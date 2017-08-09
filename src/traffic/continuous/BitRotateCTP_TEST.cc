@@ -22,7 +22,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(BitRotateCTP, right) {
-  TestSetup test(123, 123, 456789);
+  TestSetup test(123, 123, 123, 456789);
 
   const u32 TERMS = 1 << 8;
   for (u32 idx = 0; idx < TERMS; idx++) {
@@ -38,7 +38,7 @@ TEST(BitRotateCTP, right) {
 }
 
 TEST(BitRotateCTP, left) {
-  TestSetup test(123, 123, 456789);
+  TestSetup test(123, 123, 123, 456789);
 
   const u32 TERMS = 1 << 8;
   for (u32 idx = 0; idx < TERMS; idx++) {

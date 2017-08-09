@@ -34,7 +34,7 @@ TEST(RandomDTP, evenSpread) {
   const u32 DUP = 10000;
   const bool DEBUG = false;
 
-  TestSetup test(1234, 1234, 56789);
+  TestSetup test(1234, 1234, 1234, 56789);
 
   Json::Value settings;
   settings["send_to_self"] = true;
@@ -78,7 +78,7 @@ TEST(RandomDTP, evenSpread) {
 }
 
 TEST(RandomDTP, noSelf) {
-  TestSetup test(123, 123, 456789);
+  TestSetup test(123, 123, 123, 456789);
 
   const u32 TOTAL = 5000;
   const u32 ME = 50;
@@ -97,7 +97,7 @@ TEST(RandomDTP, noSelf) {
 }
 
 TEST(RandomDTP, completeDist) {
-  TestSetup test(123, 123, 456789);
+  TestSetup test(123, 123, 123, 456789);
 
   const u32 TOTAL = 5000;
   const u32 ME = 50;

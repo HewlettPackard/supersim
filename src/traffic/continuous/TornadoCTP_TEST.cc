@@ -24,7 +24,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(TornadoCTP, no_dimMask) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   TornadoCTP* tp;
@@ -62,7 +62,7 @@ TEST(TornadoCTP, no_dimMask) {
 }
 
 TEST(TornadoCTP, dimension_0) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   TornadoCTP* tp;
@@ -101,7 +101,7 @@ TEST(TornadoCTP, dimension_0) {
 }
 
 TEST(TornadoCTP, dimension_1) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   TornadoCTP* tp;
@@ -139,7 +139,7 @@ TEST(TornadoCTP, dimension_1) {
 }
 
 TEST(TornadoCTP, dimension_1_3d) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   TornadoCTP* tp;
@@ -178,7 +178,7 @@ TEST(TornadoCTP, dimension_1_3d) {
 }
 
 TEST(TornadoCTP, dimension_1_3d_1) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   TornadoCTP* tp;
@@ -217,7 +217,7 @@ TEST(TornadoCTP, dimension_1_3d_1) {
 }
 
 TEST(TornadoCTP, 2d) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   TornadoCTP* tp;
@@ -270,7 +270,7 @@ TEST(TornadoCTP, 2d) {
 }
 
 TEST(TornadoCTP, 3d) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   TornadoCTP* tp;

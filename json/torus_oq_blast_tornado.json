@@ -1,7 +1,8 @@
 {
   "simulator": {
     "channel_cycle_time": 3,
-    "core_cycle_time": 1,
+    "router_cycle_time": 1,
+    "interface_cycle_time": 1,
     "print_progress": true,
     "print_interval": 1.0,  // seconds
     "random_seed": 12345678

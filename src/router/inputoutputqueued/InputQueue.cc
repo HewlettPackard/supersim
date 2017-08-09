@@ -91,7 +91,7 @@ void InputQueue::receiveFlit(u32 _port, Flit* _flit) {
 
   // queue an event to be notified about the injected flit
   //  this synchronized the two clock domains
-  addEvent(gSim->futureCycle(Simulator::Clock::CORE, 1),
+  addEvent(gSim->futureCycle(Simulator::Clock::ROUTER, 1),
            1, nullptr, INJECTED_FLIT);
 }
 
@@ -165,7 +165,7 @@ void InputQueue::setPipelineEvent() {
 
 void InputQueue::processPipeline() {
   // make sure the pipeline is being processed on clock cycle boundaries
-  assert(gSim->time() % gSim->cycleTime(Simulator::Clock::CORE) == 0);
+  assert(gSim->time() % gSim->cycleTime(Simulator::Clock::ROUTER) == 0);
 
   /*
    * attempt to load the crossbar
@@ -354,7 +354,7 @@ void InputQueue::processPipeline() {
       (rfe_.fsm == ePipelineFsm::kReadyToAdvance) ||    // body flit
       (buffer_.size() > 0)) {   // more flits in buffer
     // set a pipeline event for the next cycle
-    eventTime_ = gSim->futureCycle(Simulator::Clock::CORE, 1);
+    eventTime_ = gSim->futureCycle(Simulator::Clock::ROUTER, 1);
     addEvent(eventTime_, 2, nullptr, PROCESS_PIPELINE);
   }
 }

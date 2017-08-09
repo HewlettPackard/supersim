@@ -24,7 +24,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(NeighborCTP, no_dimMask) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborCTP* tp;
@@ -62,7 +62,7 @@ TEST(NeighborCTP, no_dimMask) {
 }
 
 TEST(NeighborCTP, dimension_0_right) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborCTP* tp;
@@ -101,7 +101,7 @@ TEST(NeighborCTP, dimension_0_right) {
 }
 
 TEST(NeighborCTP, dimension_0_left) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborCTP* tp;
@@ -140,7 +140,7 @@ TEST(NeighborCTP, dimension_0_left) {
 }
 
 TEST(NeighborCTP, dimension_1_left) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborCTP* tp;
@@ -178,7 +178,7 @@ TEST(NeighborCTP, dimension_1_left) {
 }
 
 TEST(NeighborCTP, dimension_1_left_3d) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborCTP* tp;
@@ -217,7 +217,7 @@ TEST(NeighborCTP, dimension_1_left_3d) {
 }
 
 TEST(NeighborCTP, dimension_1_left_3d_1) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborCTP* tp;
@@ -256,7 +256,7 @@ TEST(NeighborCTP, dimension_1_left_3d_1) {
 }
 
 TEST(NeighborCTP, 2d_left) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborCTP* tp;
@@ -302,7 +302,7 @@ TEST(NeighborCTP, 2d_left) {
 }
 
 TEST(NeighborCTP, 2d_right) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborCTP* tp;
@@ -348,7 +348,7 @@ TEST(NeighborCTP, 2d_right) {
 }
 
 TEST(NeighborCTP, 3d_right) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   NeighborCTP* tp;

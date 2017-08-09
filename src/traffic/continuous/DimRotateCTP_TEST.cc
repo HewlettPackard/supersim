@@ -24,7 +24,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(DimRotateCTP, right) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   DimRotateCTP* tp;
@@ -84,7 +84,7 @@ TEST(DimRotateCTP, right) {
 }
 
 TEST(DimRotateCTP, left) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   DimRotateCTP* tp;

@@ -24,7 +24,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(DimTransposeCTP, no_enabled_dims) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   DimTransposeCTP* tp;
@@ -83,7 +83,7 @@ TEST(DimTransposeCTP, no_enabled_dims) {
 }
 
 TEST(DimTransposeCTP, enabled_dims_0_1) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   DimTransposeCTP* tp;
@@ -144,7 +144,7 @@ TEST(DimTransposeCTP, enabled_dims_0_1) {
 }
 
 TEST(DimTransposeCTP, enabled_dims_0_2) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   DimTransposeCTP* tp;

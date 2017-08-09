@@ -26,7 +26,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(RandomPriorityArbiter, full) {
-  TestSetup testSetup(1, 1, 123);
+  TestSetup testSetup(1, 1, 1, 123);
 
   for (u32 size = 1; size < 100; size++) {
     bool* request = new bool[size];

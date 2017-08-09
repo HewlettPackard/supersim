@@ -26,7 +26,7 @@
 
 TEST(DragonflyWorstCaseCTP, permutation) {
   for (u32 net = 0; net < 100; net++) {
-    TestSetup setup(1, 1, 0xDEAD * net + 0xBEEF);
+    TestSetup setup(1, 1, 1, 0xDEAD * net + 0xBEEF);
 
     u32 groupCount = gSim->rnd.nextU64(1, 20);
     u32 groupSize = gSim->rnd.nextU64(1, 20);
@@ -79,7 +79,7 @@ TEST(DragonflyWorstCaseCTP, random) {
   const u32 ROUNDS = 10000;
 
   for (u32 net = 0; net < CONFIGS; net++) {
-    TestSetup setup(1, 1, 0xDEAD * net + 0xBEEF);
+    TestSetup setup(1, 1, 1, 0xDEAD * net + 0xBEEF);
 
     u32 groupCount;
     u32 groupSize;

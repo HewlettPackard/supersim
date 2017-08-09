@@ -124,7 +124,7 @@ TEST(MatrixCTP, full) {
     const f64* testDist = std::get<1>(test);
 
     // set up
-    TestSetup testSetup(1234, 1234, 456789);
+    TestSetup testSetup(1234, 1234, 1234, 456789);
     writeCSV(makeCSV(testDist, testSize).c_str(), TMPFILE);
     Json::Value settings;
     settings["file"] = TMPFILE;

@@ -166,7 +166,7 @@ TEST(CrossbarScheduler, basic) {
           u32 V = P * Vd;
 
           // setup
-          TestSetup testSetup(12, 12, 0x1234567890abcdf);
+          TestSetup testSetup(12, 12, 12, 0x1234567890abcdf);
           Json::Value arbSettings;
           arbSettings["type"] = "random";
           Json::Value allocSettings;
@@ -180,7 +180,7 @@ TEST(CrossbarScheduler, basic) {
           schSettings["idle_unlock"] = std::get<2>(style);
           CrossbarScheduler* xbarSch =
               new CrossbarScheduler(
-                  "XbarSch", nullptr, C, V, P, 0, Simulator::Clock::CORE,
+                  "XbarSch", nullptr, C, V, P, 0, Simulator::Clock::ROUTER,
                   schSettings);
           assert(xbarSch->numClients() == C);
           assert(xbarSch->totalVcs() == V);
@@ -192,7 +192,7 @@ TEST(CrossbarScheduler, basic) {
           std::vector<CrossbarSchedulerTestClient*> clients(C);
           for (u32 c = 0; c < C; c++) {
             clients[c] = new CrossbarSchedulerTestClient(
-                c, xbarSch, V, P, Simulator::Clock::CORE, ALLOCS_PER_CLIENT);
+                c, xbarSch, V, P, Simulator::Clock::ROUTER, ALLOCS_PER_CLIENT);
           }
 
           // run the simulator

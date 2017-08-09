@@ -28,15 +28,18 @@ Simulator::Simulator(Json::Value _settings)
       printInterval_(_settings["print_interval"].asDouble()),
       time_(0), epsilon_(0), quit_(false),
       channelCycleTime_(_settings["channel_cycle_time"].asUInt64()),
-      coreCycleTime_(_settings["core_cycle_time"].asUInt64()),
+      routerCycleTime_(_settings["router_cycle_time"].asUInt64()),
+      interfaceCycleTime_(_settings["interface_cycle_time"].asUInt64()),
       initial_(true), running_(false), net_(nullptr), workload_(nullptr) {
   assert(!_settings["print_progress"].isNull());
   assert(!_settings["print_interval"].isNull());
   assert(!_settings["channel_cycle_time"].isNull());
-  assert(!_settings["core_cycle_time"].isNull());
+  assert(!_settings["router_cycle_time"].isNull());
+  assert(!_settings["interface_cycle_time"].isNull());
   assert(!_settings["random_seed"].isNull());
   assert(channelCycleTime_ > 0);
-  assert(coreCycleTime_ > 0);
+  assert(routerCycleTime_ > 0);
+  assert(interfaceCycleTime_ > 0);
   assert(printInterval_ > 0);
 
   rnd.seed(_settings["random_seed"].asUInt64());
@@ -185,8 +188,16 @@ u8 Simulator::epsilon() const {
 }
 
 u64 Simulator::cycleTime(Simulator::Clock _clock) const {
-  return _clock == Simulator::Clock::CHANNEL ?
-      channelCycleTime_ : coreCycleTime_;
+  switch (_clock) {
+    case Simulator::Clock::CHANNEL:
+      return channelCycleTime_;
+    case Simulator::Clock::ROUTER:
+      return routerCycleTime_;
+    case Simulator::Clock::INTERFACE:
+      return interfaceCycleTime_;
+    default:
+      assert(false);
+  }
 }
 
 u64 Simulator::cycle(Simulator::Clock _clock) const {

@@ -34,7 +34,7 @@ TEST(RandomExchangeCTP, evenSpread) {
   const u32 DUP = 10000;
   const bool DEBUG = false;
 
-  TestSetup test(1234, 1234, 56789);
+  TestSetup test(1234, 1234, 1234, 56789);
 
   Json::Value settings;
   settings["send_to_self"] = true;

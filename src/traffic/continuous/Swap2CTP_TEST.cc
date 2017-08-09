@@ -24,7 +24,7 @@
 #include "test/TestSetup_TEST.h"
 
 TEST(Swap2CTP, no_enabled_dims) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   Swap2CTP* tp;
@@ -91,7 +91,7 @@ TEST(Swap2CTP, no_enabled_dims) {
 }
 
 TEST(Swap2CTP, enabled_dims_0_1) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   Swap2CTP* tp;
@@ -160,7 +160,7 @@ TEST(Swap2CTP, enabled_dims_0_1) {
 }
 
 TEST(Swap2CTP, enabled_dims_1_0_3d) {
-  TestSetup test(1, 1, 0xBAADF00D);
+  TestSetup test(1, 1, 1, 0xBAADF00D);
   u32 src, dst, numTerminals;
   Json::Value settings;
   Swap2CTP* tp;

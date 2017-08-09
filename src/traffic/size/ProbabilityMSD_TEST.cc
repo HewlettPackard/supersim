@@ -21,7 +21,7 @@
 #include "traffic/size/MessageSizeDistribution.h"
 
 TEST(ProbabilityMSD, simple) {
-  TestSetup ts(123, 123, 123);
+  TestSetup ts(123, 123, 123, 123);
 
   Json::Value settings;
   settings["type"] = "probability";
@@ -61,7 +61,7 @@ TEST(ProbabilityMSD, simple) {
 }
 
 TEST(ProbabilityMSD, simple_over1) {
-  TestSetup ts(123, 123, 123);
+  TestSetup ts(123, 123, 123, 123);
 
   Json::Value settings;
   settings["type"] = "probability";
@@ -101,7 +101,7 @@ TEST(ProbabilityMSD, simple_over1) {
 }
 
 TEST(ProbabilityMSD, dependent) {
-  TestSetup ts(123, 123, 123);
+  TestSetup ts(123, 123, 123, 123);
 
   Json::Value settings;
   settings["type"] = "probability";

@@ -36,7 +36,7 @@ Router::Router(
   // determine the size of credits
   creditSize_ = numVcs_ * (u32)std::ceil(
       (f64)gSim->cycleTime(Simulator::Clock::CHANNEL) /
-      (f64)gSim->cycleTime(Simulator::Clock::CORE));
+      (f64)gSim->cycleTime(Simulator::Clock::ROUTER));
 
   // queue depths and pipeline control
   u32 inputQueueDepth = _settings["input_queue_depth"].asUInt();
@@ -63,13 +63,13 @@ Router::Router(
 
   // create the crossbar and schedulers
   crossbar_ = new Crossbar("Crossbar", this, numPorts_ * numVcs_, numPorts_,
-                           Simulator::Clock::CORE, _settings["crossbar"]);
+                           Simulator::Clock::ROUTER, _settings["crossbar"]);
   vcScheduler_ = new VcScheduler(
       "VcScheduler", this, numPorts_ * numVcs_, numPorts_ * numVcs_,
-      Simulator::Clock::CORE, _settings["vc_scheduler"]);
+      Simulator::Clock::ROUTER, _settings["vc_scheduler"]);
   crossbarScheduler_ = new CrossbarScheduler(
       "CrossbarScheduler", this, numPorts_ * numVcs_, numPorts_ * numVcs_,
-      numPorts_, 0, Simulator::Clock::CORE, _settings["crossbar_scheduler"]);
+      numPorts_, 0, Simulator::Clock::ROUTER, _settings["crossbar_scheduler"]);
 
   // create routing algorithms, input queues, link to routing algorithm,
   //  crossbar, and schedulers

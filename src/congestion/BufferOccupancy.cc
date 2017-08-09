@@ -188,7 +188,7 @@ BufferOccupancy::Mode BufferOccupancy::parseMode(const std::string& _mode) {
 void BufferOccupancy::createEvent(u32 _vcIdx, s32 _type) {
   assert(gSim->epsilon() > 0);
   u64 time = latency_ == 1 ? gSim->time() :
-      gSim->futureCycle(Simulator::Clock::CORE, latency_ - 1);
+      gSim->futureCycle(Simulator::Clock::ROUTER, latency_ - 1);
   addEvent(time, gSim->epsilon() + 1, reinterpret_cast<void*>(_vcIdx), _type);
 }
 
