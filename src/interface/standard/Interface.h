@@ -51,6 +51,8 @@ class Interface : public ::Interface {
   void setOutputChannel(u32 _port, Channel* _channel) override;
   Channel* getOutputChannel(u32 _port) const override;
 
+  void initialize() override;
+
   void receiveMessage(Message* _message) override;
 
   void sendFlit(u32 _port, Flit* _flit) override;
@@ -67,6 +69,8 @@ class Interface : public ::Interface {
 
   Channel* inputChannel_;
   Channel* outputChannel_;
+
+  u32 initCredits_;
 
   bool adaptive_;  // choose injection VC adaptively
   bool fixedMsgVc_;  // all pkts of a msg have same VC

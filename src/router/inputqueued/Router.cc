@@ -39,8 +39,8 @@ Router::Router(
       (f64)gSim->cycleTime(Simulator::Clock::ROUTER));
 
   // queue depths and pipeline control
-  u32 inputQueueDepth = _settings["input_queue_depth"].asUInt();
-  assert(inputQueueDepth > 0);
+  inputQueueDepth_ = _settings["input_queue_depth"].asUInt();
+  assert(inputQueueDepth_ > 0);
   assert(_settings.isMember("vca_swa_wait") &&
          _settings["vca_swa_wait"].isBool());
   bool vcaSwaWait = _settings["vca_swa_wait"].asBool();
@@ -79,13 +79,6 @@ Router::Router(
     for (u32 vc = 0; vc < numVcs_; vc++) {
       u32 vcIdx = vcIndex(port, vc);
 
-      // initialize the credit count in the CrossbarScheduler
-      crossbarScheduler_->initCredits(vcIdx, inputQueueDepth);
-
-      // initialize the credit count in the CongestionStatus for downstream
-      //  queues
-      congestionStatus_->initCredits(vcIdx, inputQueueDepth);
-
       // create the name suffix
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
           std::to_string(vc);
@@ -102,7 +95,7 @@ Router::Router(
       // input queue
       std::string iqName = "InputQueue" + nameSuffix;
       InputQueue* iq = new InputQueue(
-          iqName, this, this, inputQueueDepth, port, numVcs_, vc, vcaSwaWait,
+          iqName, this, this, inputQueueDepth_, port, numVcs_, vc, vcaSwaWait,
           rf, vcScheduler_, clientIndex, crossbarScheduler_, clientIndex,
           crossbar_, clientIndex, congestionStatus_);
       inputQueues_.at(vcIdx) = iq;
@@ -165,6 +158,21 @@ void Router::setOutputChannel(u32 _port, Channel* _channel) {
   assert(outputChannels_.at(_port) == nullptr);
   outputChannels_.at(_port) = _channel;
   _channel->setSource(this, _port);
+}
+
+void Router::initialize() {
+  // init credits
+  for (u32 port = 0; port < numPorts_; port++) {
+    for (u32 vc = 0; vc < numVcs_; vc++) {
+      u32 vcIdx = vcIndex(port, vc);
+      // initialize the credit count in the CrossbarScheduler
+      crossbarScheduler_->initCredits(vcIdx, inputQueueDepth_);
+
+      // initialize the credit count in the CongestionStatus for downstream
+      //  queues
+      congestionStatus_->initCredits(vcIdx, inputQueueDepth_);
+    }
+  }
 }
 
 Channel* Router::getOutputChannel(u32 _port) const {

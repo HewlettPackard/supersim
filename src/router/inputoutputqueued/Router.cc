@@ -41,13 +41,13 @@ Router::Router(
       (f64)gSim->cycleTime(Simulator::Clock::ROUTER));
 
   // queue depths and pipeline control
-  u32 inputQueueDepth = _settings["input_queue_depth"].asUInt();
-  assert(inputQueueDepth > 0);
+  inputQueueDepth_ = _settings["input_queue_depth"].asUInt();
+  assert(inputQueueDepth_ > 0);
   assert(_settings.isMember("vca_swa_wait") &&
          _settings["vca_swa_wait"].isBool());
   bool vcaSwaWait = _settings["vca_swa_wait"].asBool();
-  u32 outputQueueDepth = _settings["output_queue_depth"].asUInt();
-  assert(outputQueueDepth > 0);
+  outputQueueDepth_ = _settings["output_queue_depth"].asUInt();
+  assert(outputQueueDepth_ > 0);
 
   // create a congestion status device
   congestionStatus_ = CongestionStatus::create(
@@ -78,16 +78,6 @@ Router::Router(
     for (u32 vc = 0; vc < numVcs_; vc++) {
       u32 vcIdx = vcIndex(port, vc);
 
-      // initialize the credit count in the CrossbarScheduler
-      crossbarScheduler_->initCredits(vcIdx, outputQueueDepth);
-
-      // initialize the credit count in the CongestionStatus for downstream
-      //  queues
-      if ((congestionMode_ == Router::CongestionMode::kDownstream) ||
-          (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
-        congestionStatus_->initCredits(vcIdx, inputQueueDepth);
-      }
-
       // create the name suffix
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
           std::to_string(vc);
@@ -104,7 +94,7 @@ Router::Router(
       // input queue
       std::string iqName = "InputQueue" + nameSuffix;
       InputQueue* iq = new InputQueue(
-          iqName, this, this, inputQueueDepth, port, numVcs_, vc, vcaSwaWait,
+          iqName, this, this, inputQueueDepth_, port, numVcs_, vc, vcaSwaWait,
           rf, vcScheduler_, clientIndex, crossbarScheduler_, clientIndex,
           crossbar_, clientIndex, congestionStatus_, iqDecrWatcher);
       inputQueues_.at(vcIdx) = iq;
@@ -147,15 +137,6 @@ Router::Router(
     for (u32 vc = 0; vc < numVcs_; vc++) {
       u32 vcIdx = vcIndex(port, vc);
 
-      // initialize the credit count in the OutputCrossbarScheduler
-      outputCrossbarSchedulers_.at(port)->initCredits(vc, inputQueueDepth);
-
-      // initialize the credit count in the CongestionStatus for output queues
-      if ((congestionMode_ == Router::CongestionMode::kOutput) ||
-          (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
-        congestionStatus_->initCredits(vcIdx, outputQueueDepth);
-      }
-
       // create the name suffix
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
           std::to_string(vc);
@@ -167,7 +148,7 @@ Router::Router(
       // output queue
       std::string oqName = "OutputQueue" + nameSuffix;
       OutputQueue* oq = new OutputQueue(
-          oqName, this, outputQueueDepth, port, vc,
+          oqName, this, outputQueueDepth_, port, vc,
           outputCrossbarSchedulers_.at(port), clientIndexOut,
           outputCrossbars_.at(port), clientIndexOut, crossbarScheduler_,
           clientIndexMain, congestionStatus_, clientIndexMain, oqIncrWatcher,
@@ -224,6 +205,34 @@ Channel* Router::getOutputChannel(u32 _port) const {
   return outputChannels_.at(_port);
 }
 
+void Router::initialize() {
+  // init credits
+  for (u32 port = 0; port < numPorts_; port++) {
+    for (u32 vc = 0; vc < numVcs_; vc++) {
+      u32 vcIdx = vcIndex(port, vc);
+
+      // initialize the credit count in the CrossbarScheduler
+      crossbarScheduler_->initCredits(vcIdx, outputQueueDepth_);
+
+      // initialize the credit count in the CongestionStatus for downstream
+      //  queues
+      if ((congestionMode_ == Router::CongestionMode::kDownstream) ||
+          (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
+        congestionStatus_->initCredits(vcIdx, inputQueueDepth_);
+      }
+
+      // initialize the credit count in the OutputCrossbarScheduler
+      outputCrossbarSchedulers_.at(port)->initCredits(vc, inputQueueDepth_);
+
+      // initialize the credit count in the CongestionStatus for output queues
+      if ((congestionMode_ == Router::CongestionMode::kOutput) ||
+          (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
+        congestionStatus_->initCredits(vcIdx, outputQueueDepth_);
+      }
+    }
+  }
+}
+
 void Router::receiveFlit(u32 _port, Flit* _flit) {
   u32 vc = _flit->getVc();
   InputQueue* iq = inputQueues_.at(vcIndex(_port, vc));
@@ -254,8 +263,6 @@ void Router::receiveCredit(u32 _port, Credit* _credit) {
 }
 
 void Router::sendCredit(u32 _port, u32 _vc) {
-  dbgprintf("sending credit on port %u vc %u", _port, _vc);
-
   // ensure there is an outgoing credit for the next time slot
   assert(_vc < numVcs_);
   Credit* credit = inputChannels_.at(_port)->getNextCredit();

@@ -52,6 +52,9 @@ class Router : public ::Router {
   void setOutputChannel(u32 _port, Channel* _channel) override;
   Channel* getOutputChannel(u32 _port) const override;
 
+  // override to initialize credits
+  void initialize() override;
+
   void receiveFlit(u32 _port, Flit* _flit) override;
   void receiveCredit(u32 _port, Credit* _credit) override;
 
@@ -68,6 +71,7 @@ class Router : public ::Router {
 
   const CongestionMode congestionMode_;
   u32 creditSize_;
+  u32 inputQueueDepth_;
 
   std::vector<InputQueue*> inputQueues_;
   std::vector<RoutingAlgorithm*> routingAlgorithms_;

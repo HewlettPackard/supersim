@@ -37,8 +37,8 @@ Interface::Interface(
     MetadataHandler* _metadataHandler, Json::Value _settings)
     : ::Interface(_name, _parent, _id, _address, _numVcs, _trafficClassVcs,
                   _metadataHandler, _settings) {
-  u32 initCredits = _settings["init_credits"].asUInt();
-  assert(initCredits > 0);
+  initCredits_ = _settings["init_credits"].asUInt();
+  assert(initCredits_ > 0);
 
   assert(_settings.isMember("adaptive"));
   adaptive_ = _settings["adaptive"].asBool();
@@ -57,9 +57,6 @@ Interface::Interface(
   outputQueues_.resize(numVcs_, nullptr);
   queueOccupancy_.resize(numVcs_, 0);
   for (u32 vc = 0; vc < numVcs_; vc++) {
-    // initialize the credit count in the CrossbarScheduler
-    crossbarScheduler_->initCredits(vc, initCredits);
-
     // create the output queue
     outputQueues_.at(vc) = new OutputQueue(
         "OutputQueue_" + std::to_string(vc), this, crossbarScheduler_, vc,
@@ -187,6 +184,13 @@ void Interface::receiveMessage(Message* _message) {
   // create an event to inject the message into the queues
   assert(gSim->epsilon() == 0);
   addEvent(gSim->time(), 1, _message, INJECT_MESSAGE);
+}
+
+void Interface::initialize() {
+  for (u32 vc = 0; vc < numVcs_; vc++) {
+    // initialize the credit count in the CrossbarScheduler
+    crossbarScheduler_->initCredits(vc, initCredits_);
+  }
 }
 
 void Interface::sendFlit(u32 _port, Flit* _flit) {
