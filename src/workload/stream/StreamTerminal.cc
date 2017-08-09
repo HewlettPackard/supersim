@@ -37,9 +37,9 @@ StreamTerminal::StreamTerminal(
   messageSizeDistribution_ = MessageSizeDistribution::create(
       "MessageSizeDistribution", this, _settings["message_size_distribution"]);
 
-  // traffic class of injection
-  assert(_settings.isMember("traffic_class"));
-  trafficClass_ = _settings["traffic_class"].asUInt();
+  // protocol class of injection
+  assert(_settings.isMember("protocol_class"));
+  protocolClass_ = _settings["protocol_class"].asUInt();
 
   // message quantity limition
   numMessages_ = _settings["num_messages"].asUInt();
@@ -154,7 +154,7 @@ void StreamTerminal::sendNextMessage() {
 
   // create the message object
   Message* message = new Message(numPackets, nullptr);
-  message->setTrafficClass(trafficClass_);
+  message->setProtocolClass(protocolClass_);
   u64 trans = createTransaction();
   message->setTransaction(trans);
   app->workload()->messageLog()->startTransaction(trans);

@@ -18,14 +18,14 @@
 
 #include <cassert>
 
-static u32 computeNumVcs(const Json::Value& _trafficClasses) {
+static u32 computeNumVcs(const Json::Value& _protocolClasses) {
   u32 sum = 0;
-  for (u32 idx = 0; idx < _trafficClasses.size(); idx++) {
-    const Json::Value& trafficClass = _trafficClasses[idx];
-    assert(trafficClass.isMember("num_vcs") &&
-           trafficClass["num_vcs"].isUInt() &&
-           trafficClass["num_vcs"].asUInt() > 0);
-    sum += trafficClass["num_vcs"].asUInt();
+  for (u32 idx = 0; idx < _protocolClasses.size(); idx++) {
+    const Json::Value& protocolClass = _protocolClasses[idx];
+    assert(protocolClass.isMember("num_vcs") &&
+           protocolClass["num_vcs"].isUInt() &&
+           protocolClass["num_vcs"].asUInt() > 0);
+    sum += protocolClass["num_vcs"].asUInt();
   }
   return sum;
 }
@@ -33,7 +33,7 @@ static u32 computeNumVcs(const Json::Value& _trafficClasses) {
 Network::Network(const std::string& _name, const Component* _parent,
                  MetadataHandler* _metadataHandler, Json::Value _settings)
     : Component(_name, _parent),
-      numVcs_(computeNumVcs(_settings["traffic_classes"])),
+      numVcs_(computeNumVcs(_settings["protocol_classes"])),
       metadataHandler_(_metadataHandler),
       monitoring_(false) {
   // check settings
@@ -98,13 +98,13 @@ bool Network::monitoring() const {
   return monitoring_;
 }
 
-void Network::loadTrafficClassInfo(Json::Value _settings) {
-  // parse the traffic classes description
-  std::vector<std::tuple<u32, u32> > trafficClassVcs;
+void Network::loadProtocolClassInfo(Json::Value _settings) {
+  // parse the protocol classes description
+  std::vector<std::tuple<u32, u32> > protocolClassVcs;
   for (u32 idx = 0, vcs = 0; idx < _settings.size(); idx++) {
     u32 numVcs = _settings[idx]["num_vcs"].asUInt();
     u32 baseVc = vcs;
-    trafficClassVcs_.push_back(std::make_tuple(baseVc, numVcs));
+    protocolClassVcs_.push_back(std::make_tuple(baseVc, numVcs));
     for (u32 vc = 0; vc < numVcs; vc++, vcs++) {
       RoutingAlgorithmInfo info;
       info.baseVc = baseVc;
@@ -116,7 +116,7 @@ void Network::loadTrafficClassInfo(Json::Value _settings) {
   assert(routingAlgorithmInfo_.size() == numVcs_);
 }
 
-void Network::clearTrafficClassInfo() {
-  trafficClassVcs_.clear();
+void Network::clearProtocolClassInfo() {
+  protocolClassVcs_.clear();
   routingAlgorithmInfo_.clear();
 }

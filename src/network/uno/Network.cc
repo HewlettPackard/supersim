@@ -36,8 +36,8 @@ Network::Network(const std::string& _name, const Component* _parent,
   // router radix
   u32 routerRadix = concentration_;
 
-  // parse the traffic classes description
-  loadTrafficClassInfo(_settings["traffic_classes"]);
+  // parse the protocol classes description
+  loadProtocolClassInfo(_settings["protocol_classes"]);
 
   // create the router
   router_ = Router::create(
@@ -50,7 +50,7 @@ Network::Network(const std::string& _name, const Component* _parent,
     // create the interface
     std::string interfaceName = "Interface_" + std::to_string(id);
     Interface* interface = Interface::create(
-        interfaceName, this, id, {id}, numVcs_, trafficClassVcs_,
+        interfaceName, this, id, {id}, numVcs_, protocolClassVcs_,
         _metadataHandler, _settings["interface"]);
     interfaces_.at(id) = interface;
 
@@ -71,8 +71,8 @@ Network::Network(const std::string& _name, const Component* _parent,
     interface->setOutputChannel(0, inChannel);
   }
 
-  // clear the traffic class info
-  clearTrafficClassInfo();
+  // clear the protocol class info
+  clearProtocolClassInfo();
 }
 
 Network::~Network() {

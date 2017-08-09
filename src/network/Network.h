@@ -77,13 +77,13 @@ class Network : public Component {
   virtual void collectChannels(std::vector<Channel*>* _channels) = 0;
 
   // this loads the routing algorithm info vector
-  void loadTrafficClassInfo(Json::Value _settings);
+  void loadProtocolClassInfo(Json::Value _settings);
 
   // this clears the routingAlgorithmInfo_ vector
-  void clearTrafficClassInfo();
+  void clearProtocolClassInfo();
 
   u32 numVcs_;
-  std::vector<std::tuple<u32, u32> > trafficClassVcs_;
+  std::vector<std::tuple<u32, u32> > protocolClassVcs_;
   std::vector<RoutingAlgorithmInfo> routingAlgorithmInfo_;
 
  private:

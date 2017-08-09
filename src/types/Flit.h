@@ -31,7 +31,7 @@ class Flit {
 
   u32 getVc() const;
   void setVc(u32 vc);
-  u32 getTrafficClass() const;
+  u32 getProtocolClass() const;
 
   void setSendTime(u64 time);
   u64 getSendTime() const;

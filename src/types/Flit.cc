@@ -48,8 +48,8 @@ void Flit::setVc(u32 _vc) {
   vc_ = _vc;
 }
 
-u32 Flit::getTrafficClass() const {
-  return packet_->getTrafficClass();
+u32 Flit::getProtocolClass() const {
+  return packet_->getProtocolClass();
 }
 
 void Flit::setSendTime(u64 _time) {

@@ -20,7 +20,7 @@
 #include "types/Packet.h"
 
 Message::Message(u32 _numPackets, void* _data)
-    : data_(_data), transaction_(U32_MAX), trafficClass_(U32_MAX),
+    : data_(_data), transaction_(U32_MAX), protocolClass_(U32_MAX),
       sourceId_(U32_MAX), destinationId_(U32_MAX) {
   packets_.resize(_numPackets);
 }
@@ -85,12 +85,12 @@ void Message::setTransaction(u64 _trans) {
   transaction_ = _trans;
 }
 
-u32 Message::getTrafficClass() const {
-  return trafficClass_;
+u32 Message::getProtocolClass() const {
+  return protocolClass_;
 }
 
-void Message::setTrafficClass(u32 _class) {
-  trafficClass_ = _class;
+void Message::setProtocolClass(u32 _class) {
+  protocolClass_ = _class;
 }
 
 u32 Message::getOpCode() const {

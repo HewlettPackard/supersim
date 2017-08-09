@@ -80,8 +80,8 @@ Network::Network(const std::string& _name, const Component* _parent,
     routerRadix += ((dimensionWidths_.at(i) - 1) * dimensionWeights_.at(i));
   }
 
-  // parse the traffic classes description
-  loadTrafficClassInfo(_settings["traffic_classes"]);
+  // parse the protocol classes description
+  loadProtocolClassInfo(_settings["protocol_classes"]);
 
   // setup a router iterator for looping over the router dimensions
   DimensionIterator routerIterator(dimensionWidths_);
@@ -193,7 +193,7 @@ Network::Network(const std::string& _name, const Component* _parent,
       u32 interfaceId = translateInterfaceAddressToId(&interfaceAddress);
       Interface* interface = Interface::create(
           interfaceName, this, interfaceId, interfaceAddress, numVcs_,
-          trafficClassVcs_, _metadataHandler, _settings["interface"]);
+          protocolClassVcs_, _metadataHandler, _settings["interface"]);
       interfaces_.at(interfaceAddress) = interface;
 
       // create I/O channels
@@ -218,8 +218,8 @@ Network::Network(const std::string& _name, const Component* _parent,
     }
   }
 
-  // clear the traffic class info
-  clearTrafficClassInfo();
+  // clear the protocol class info
+  clearProtocolClassInfo();
 }
 
 Network::~Network() {

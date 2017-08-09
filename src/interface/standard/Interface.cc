@@ -33,9 +33,9 @@ namespace Standard {
 Interface::Interface(
     const std::string& _name, const Component* _parent, u32 _id,
     const std::vector<u32>& _address, u32 _numVcs,
-    const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
+    const std::vector<std::tuple<u32, u32> >& _protocolClassVcs,
     MetadataHandler* _metadataHandler, Json::Value _settings)
-    : ::Interface(_name, _parent, _id, _address, _numVcs, _trafficClassVcs,
+    : ::Interface(_name, _parent, _id, _address, _numVcs, _protocolClassVcs,
                   _metadataHandler, _settings) {
   initCredits_ = _settings["init_credits"].asUInt();
   assert(initCredits_ > 0);
@@ -129,24 +129,24 @@ void Interface::receiveMessage(Message* _message) {
     }
   }
 
-  // retrieve the traffic class of the message
-  u32 trafficClass = _message->getTrafficClass();
-  assert(trafficClass < trafficClassVcs_.size());
+  // retrieve the protocol class of the message
+  u32 protocolClass = _message->getProtocolClass();
+  assert(protocolClass < protocolClassVcs_.size());
 
-  // use the traffic class to set the injection VC(s)
+  // use the protocol class to set the injection VC(s)
   u32 pktVc = U32_MAX;
   for (u32 p = 0; p < _message->numPackets(); p++) {
     Packet* packet = _message->packet(p);
 
     // get the packet's VC
     if (!fixedMsgVc_ || pktVc == U32_MAX) {
-      // retrieve the VC range based on traffic class specification
-      u32 baseVc = std::get<0>(trafficClassVcs_.at(trafficClass));
-      u32 numVcs = std::get<1>(trafficClassVcs_.at(trafficClass));
+      // retrieve the VC range based on protocol class specification
+      u32 baseVc = std::get<0>(protocolClassVcs_.at(protocolClass));
+      u32 numVcs = std::get<1>(protocolClassVcs_.at(protocolClass));
 
       // choose VC
       if (adaptive_) {
-        // find all minimally congested VCs within the traffic class
+        // find all minimally congested VCs within the protocol class
         std::vector<u32> minOccupancyVcs;
         u32 minOccupancy = U32_MAX;
         for (u32 vc = baseVc; vc < baseVc + numVcs; vc++) {
@@ -165,7 +165,7 @@ void Interface::receiveMessage(Message* _message) {
         u32 rnd = gSim->rnd.nextU64(0, minOccupancyVcs.size() - 1);
         pktVc = minOccupancyVcs.at(rnd);
       } else {
-        // choose a random VC within the traffic class
+        // choose a random VC within the protocol class
         pktVc = gSim->rnd.nextU64(baseVc, baseVc + numVcs - 1);
       }
     }

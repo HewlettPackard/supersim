@@ -47,7 +47,7 @@ class MemoryTerminal : public Terminal {
   void startMemoryAccess();
   void sendMemoryResponse();
 
-  u32 trafficClass_;
+  u32 protocolClass_;
 
   u32 memoryOffset_;
   u8* memory_;

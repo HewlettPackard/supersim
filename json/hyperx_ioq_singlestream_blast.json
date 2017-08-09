@@ -12,7 +12,7 @@
     "dimension_widths": [4],
     "dimension_weights": [3],
     "concentration": 3,
-    "traffic_classes": [
+    "protocol_classes": [
       {
         "num_vcs": 8,
         "routing": {
@@ -126,7 +126,7 @@
         "type": "stream",
         "stream_terminal": {
           "injection_rate": 0.85,
-          "traffic_class": 0,
+          "protocol_class": 0,
           "num_messages": 0,
           "max_packet_size": 3000,
           "message_size_distribution": {
@@ -147,7 +147,7 @@
         "log_during_saturation": false,
         "blast_terminal": {
           // requests
-          "request_traffic_class": 0,
+          "request_protocol_class": 0,
           "request_injection_rate": 0.15,
           // responses
           "enable_responses": false,

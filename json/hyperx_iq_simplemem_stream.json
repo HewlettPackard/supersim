@@ -12,7 +12,7 @@
     "dimension_widths": [3, 4, 5],
     "dimension_weights": [2, 2, 1],
     "concentration": 3,
-    "traffic_classes": [
+    "protocol_classes": [
       {
         "num_vcs": 3,
         "routing": {
@@ -118,12 +118,12 @@
         "header_overhead": 16,  // bytes
         "max_packet_size": 16,  // flits
         "processor_terminal": {
-          "traffic_class": 1,
+          "protocol_class": 1,
           "latency": 10,
           "memory_accesses": 20
         },
         "memory_terminal": {
-          "traffic_class": 0,
+          "protocol_class": 0,
           "latency": 15
         },
         "rate_log": {
@@ -134,7 +134,7 @@
         "type": "stream",
         "stream_terminal": {
           "injection_rate": 1.0,
-          "traffic_class": 1,
+          "protocol_class": 1,
           "num_messages": 0,
           "max_packet_size": 1,
           "message_size_distribution": {

@@ -30,9 +30,9 @@ ProcessorTerminal::ProcessorTerminal(
     const std::vector<u32>& _address, ::Application* _app,
     Json::Value _settings)
     : ::Terminal(_name, _parent, _id, _address, _app) {
-  // traffic class of injection
-  assert(_settings.isMember("traffic_class"));
-  trafficClass_ = _settings["traffic_class"].asUInt();
+  // protocol class of injection
+  assert(_settings.isMember("protocol_class"));
+  protocolClass_ = _settings["protocol_class"].asUInt();
 
   // latency and memory access
   latency_ = _settings["latency"].asUInt();
@@ -148,7 +148,7 @@ void ProcessorTerminal::startNextMemoryAccess() {
 
   // create network message, packets, and flits
   Message* message = new Message(numPackets, memOp);
-  message->setTrafficClass(trafficClass_);
+  message->setProtocolClass(protocolClass_);
   u64 trans = createTransaction();
   message->setTransaction(trans);
   app->workload()->messageLog()->startTransaction(trans);

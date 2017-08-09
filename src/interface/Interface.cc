@@ -21,10 +21,10 @@
 Interface::Interface(
     const std::string& _name, const Component* _parent, u32 _id,
     const std::vector<u32>& _address, u32 _numVcs,
-    const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
+    const std::vector<std::tuple<u32, u32> >& _protocolClassVcs,
     MetadataHandler* _metadataHandler, Json::Value _settings)
     : Component(_name, _parent), PortedDevice(_id, _address, 1, _numVcs),
-      trafficClassVcs_(_trafficClassVcs), messageReceiver_(nullptr),
+      protocolClassVcs_(_protocolClassVcs), messageReceiver_(nullptr),
       metadataHandler_(_metadataHandler) {}
 
 Interface::~Interface() {}
@@ -32,14 +32,14 @@ Interface::~Interface() {}
 Interface* Interface::create(
     const std::string& _name, const Component* _parent, u32 _id,
     const std::vector<u32>& _address, u32 _numVcs,
-    const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
+    const std::vector<std::tuple<u32, u32> >& _protocolClassVcs,
     MetadataHandler* _metadataHandler, Json::Value _settings) {
   // retrieve the type
   const std::string& type = _settings["type"].asString();
 
   // attempt to build the interface
   Interface* interface = factory::Factory<Interface, INTERFACE_ARGS>::create(
-      type, _name, _parent, _id, _address, _numVcs, _trafficClassVcs,
+      type, _name, _parent, _id, _address, _numVcs, _protocolClassVcs,
       _metadataHandler, _settings);
 
   // check that the factory had this type

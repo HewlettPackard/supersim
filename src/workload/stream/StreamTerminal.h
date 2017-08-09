@@ -51,7 +51,7 @@ class StreamTerminal : public Terminal {
 
   MessageSizeDistribution* messageSizeDistribution_;
 
-  u32 trafficClass_;
+  u32 protocolClass_;
 
   f64 injectionRate_;
   u32 numMessages_;

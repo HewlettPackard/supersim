@@ -46,8 +46,8 @@ class Message {
   u64 getTransaction() const;
   void setTransaction(u64 _trans);
 
-  u32 getTrafficClass() const;
-  void setTrafficClass(u32 _class);
+  u32 getProtocolClass() const;
+  void setProtocolClass(u32 _class);
 
   u32 getOpCode() const;
   void setOpCode(u32 _opCode);
@@ -70,7 +70,7 @@ class Message {
   std::vector<Packet*> packets_;
   void* data_;
   u64 transaction_;
-  u32 trafficClass_;
+  u32 protocolClass_;
   u32 opCode_;
 
   u32 sourceId_;

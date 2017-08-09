@@ -11,7 +11,7 @@
     "topology": "torus",
     "dimensions": [4, 3, 2],
     "concentration": 2,
-    "traffic_classes": [
+    "protocol_classes": [
       {
         "num_vcs": 2,
         "routing": {
@@ -133,13 +133,13 @@
         "log_during_saturation": false,
         "blast_terminal": {
           // requests
-          "request_traffic_class": 1,
+          "request_protocol_class": 1,
           "request_injection_rate": 0.10,
           // responses
           "enable_responses": true,
           "request_processing_latency": 1,
           "max_outstanding_transactions": 0,
-          "response_traffic_class": 0,
+          "response_protocol_class": 0,
           // warmup
           "warmup_interval": 200,  // delivered flits
           "warmup_window": 10,

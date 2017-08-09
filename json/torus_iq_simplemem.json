@@ -11,7 +11,7 @@
     "topology": "torus",
     "dimensions": [5, 4, 3, 2],
     "concentration": 2,
-    "traffic_classes": [
+    "protocol_classes": [
       {
         "num_vcs": 2,
         "routing": {
@@ -119,12 +119,12 @@
         "header_overhead": 16,  // bytes
         "max_packet_size": 16,  // flits
         "processor_terminal": {
-          "traffic_class": 0,
+          "protocol_class": 0,
           "latency": 10,
           "memory_accesses": 40
         },
         "memory_terminal": {
-          "traffic_class": 1,
+          "protocol_class": 1,
           "latency": 15
         },
         "rate_log": {

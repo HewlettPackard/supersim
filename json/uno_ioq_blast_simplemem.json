@@ -10,7 +10,7 @@
   "network": {
     "topology": "uno",
     "concentration": 16,
-    "traffic_classes": [
+    "protocol_classes": [
       {
         "num_vcs": 2,
         "routing": {
@@ -131,13 +131,13 @@
         "log_during_saturation": false,
         "blast_terminal": {
           // requests
-          "request_traffic_class": 0,
+          "request_protocol_class": 0,
           "request_injection_rate": 0.45,
           // responses
           "enable_responses": true,
           "request_processing_latency": 200,
           "max_outstanding_transactions": 1,
-          "response_traffic_class": 1,
+          "response_protocol_class": 1,
           // warmup
           "warmup_interval": 200,  // delivered flits
           "warmup_window": 15,
@@ -167,12 +167,12 @@
         "header_overhead": 16,  // bytes
         "max_packet_size": 16,  // flits
         "processor_terminal": {
-          "traffic_class": 0,
+          "protocol_class": 0,
           "latency": 3,
           "memory_accesses": 700
         },
         "memory_terminal": {
-          "traffic_class": 1,
+          "protocol_class": 1,
           "latency": 5
         },
         "rate_log": {

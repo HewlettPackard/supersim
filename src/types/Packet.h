@@ -35,7 +35,7 @@ class Packet {
   Flit* getFlit(u32 _index) const;
   void setFlit(u32 _index, Flit* _flit);
 
-  u32 getTrafficClass() const;
+  u32 getProtocolClass() const;
 
   Message* message() const;
 

@@ -77,9 +77,9 @@ AllToAllTerminal::AllToAllTerminal(
   messageSizeDistribution_ = MessageSizeDistribution::create(
       "MessageSizeDistribution", this, _settings["message_size_distribution"]);
 
-  // traffic class of injection of requests
-  assert(_settings.isMember("request_traffic_class"));
-  requestTrafficClass_ = _settings["request_traffic_class"].asUInt();
+  // protocol class of injection of requests
+  assert(_settings.isMember("request_protocol_class"));
+  requestProtocolClass_ = _settings["request_protocol_class"].asUInt();
 
   // limited tracker entries might delay new requests from being generated,
   //  this is the flag if the send operation has been stalled
@@ -101,9 +101,9 @@ AllToAllTerminal::AllToAllTerminal(
   maxOutstandingTransactions_ =
       _settings["max_outstanding_transactions"].asUInt();
 
-  // traffic class of injection of responses
-  assert(!enableResponses_ || _settings.isMember("response_traffic_class"));
-  responseTrafficClass_ = _settings["response_traffic_class"].asUInt();
+  // protocol class of injection of responses
+  assert(!enableResponses_ || _settings.isMember("response_protocol_class"));
+  responseProtocolClass_ = _settings["response_protocol_class"].asUInt();
 
   // start time delay
   assert(_settings.isMember("delay"));
@@ -413,7 +413,7 @@ void AllToAllTerminal::sendNextRequest() {
     // generate a new request
     u32 destination = trafficPattern_->nextDestination();
     u32 messageSize = messageSizeDistribution_->nextMessageSize();
-    u32 trafficClass = requestTrafficClass_;
+    u32 protocolClass = requestProtocolClass_;
     u64 transaction = createTransaction();
     u32 msgType = kRequestMsg;
     u32 sendIteration = sendIteration_;
@@ -448,7 +448,7 @@ void AllToAllTerminal::sendNextRequest() {
 
     // create the message object
     Message* message = new Message(numPackets, nullptr);
-    message->setTrafficClass(trafficClass);
+    message->setProtocolClass(protocolClass);
     message->setTransaction(transaction);
     message->setOpCode(msgType);
 
@@ -501,7 +501,7 @@ void AllToAllTerminal::sendNextResponse(Message* _request) {
   // process the request received to make a response
   u32 destination = _request->getSourceId();
   u32 messageSize = messageSizeDistribution_->nextMessageSize(_request);
-  u32 trafficClass = responseTrafficClass_;
+  u32 protocolClass = responseProtocolClass_;
   u64 transaction = _request->getTransaction();
   // dbgprintf("turning around trans = %lu", transaction);
   u32 msgType = kResponseMsg;
@@ -517,7 +517,7 @@ void AllToAllTerminal::sendNextResponse(Message* _request) {
 
   // create the message object
   Message* message = new Message(numPackets, nullptr);
-  message->setTrafficClass(trafficClass);
+  message->setProtocolClass(protocolClass);
   message->setTransaction(transaction);
   message->setOpCode(msgType);
 

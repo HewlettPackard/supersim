@@ -11,7 +11,7 @@
     "topology": "butterfly",
     "radix": 4,
     "stages": 3,
-    "traffic_classes": [
+    "protocol_classes": [
       {
         "num_vcs": 1,
         "routing": {
@@ -114,7 +114,7 @@
         "log_during_saturation": false,
         "blast_terminal": {
           // requests
-          "request_traffic_class": 0,
+          "request_protocol_class": 0,
           "request_injection_rate": 0.1,
           // responses
           "enable_responses": false,
@@ -142,7 +142,7 @@
         "type": "pulse",
         "pulse_terminal": {
           // requests
-          "request_traffic_class": 1,
+          "request_protocol_class": 1,
           "request_injection_rate": 0.25,
           // responses
           "enable_responses": false,

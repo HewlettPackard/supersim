@@ -42,7 +42,7 @@ class Interface : public ::Interface {
  public:
   Interface(const std::string& _name, const Component* _parent, u32 _id,
             const std::vector<u32>& _address, u32 _numVcs,
-            const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
+            const std::vector<std::tuple<u32, u32> >& _protocolClassVcs,
             MetadataHandler* _metadataHandler, Json::Value _settings);
   ~Interface();
 

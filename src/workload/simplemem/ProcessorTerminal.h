@@ -50,7 +50,7 @@ class ProcessorTerminal : public Terminal {
   void continueProcessing();
   void startNextMemoryAccess();
 
-  u32 trafficClass_;
+  u32 protocolClass_;
 
   u32 totalMemory_;
   u32 memorySlice_;

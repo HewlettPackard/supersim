@@ -32,9 +32,9 @@ MemoryTerminal::MemoryTerminal(
     Json::Value _settings)
     : ::Terminal(_name, _parent, _id, _address, _app),
       fsm_(eState::kWaiting) {
-  // traffic class of injection
-  assert(_settings.isMember("traffic_class"));
-  trafficClass_ = _settings["traffic_class"].asUInt();
+  // protocol class of injection
+  assert(_settings.isMember("protocol_class"));
+  protocolClass_ = _settings["protocol_class"].asUInt();
 
   // memory region and latency
   memoryOffset_ = (_id / 2) * _memorySlice;
@@ -135,7 +135,7 @@ void MemoryTerminal::sendMemoryResponse() {
 
   // create the outgoing message, packets, and flits
   Message* response = new Message(numPackets, memOpResp);
-  response->setTrafficClass(trafficClass_);
+  response->setProtocolClass(protocolClass_);
   response->setTransaction(request->getTransaction());
 
   u32 flitsLeft = messageLength;

@@ -39,8 +39,8 @@ Network::Network(const std::string& _name, const Component* _parent,
   assert(numLevels_ >= 1);
   rowRouters_  = (u32)pow(halfRadix_, numLevels_-1);
 
-  // parse the traffic classes description
-  loadTrafficClassInfo(_settings["traffic_classes"]);
+  // parse the protocol classes description
+  loadProtocolClassInfo(_settings["protocol_classes"]);
 
   // create all routers
   routers_.resize(numLevels_ * rowRouters_, nullptr);
@@ -148,7 +148,7 @@ Network::Network(const std::string& _name, const Component* _parent,
           std::to_string(p);
       Interface* interface = Interface::create(
           interfaceName, this, interfaceId, interfaceAddress, numVcs_,
-          trafficClassVcs_, _metadataHandler, _settings["interface"]);
+          protocolClassVcs_, _metadataHandler, _settings["interface"]);
       interfaces_.at(interfaceId) = interface;
 
       // link to interface
@@ -157,8 +157,8 @@ Network::Network(const std::string& _name, const Component* _parent,
     }
   }
 
-  // clear the traffic class info
-  clearTrafficClassInfo();
+  // clear the protocol class info
+  clearProtocolClassInfo();
 
   for (u32 id = 0; id < numInterfaces(); id++) {
     assert(getInterface(id) != nullptr);

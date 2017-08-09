@@ -12,7 +12,7 @@
     "dimension_widths": [2, 3, 4],
     "dimension_weights": [2, 1, 2],
     "concentration": 1,
-    "traffic_classes": [
+    "protocol_classes": [
       {
         "num_vcs": 3,
         "routing": {
@@ -120,13 +120,13 @@
         "log_during_saturation": false,
         "blast_terminal": {
           // requests
-          "request_traffic_class": 1,
+          "request_protocol_class": 1,
           "request_injection_rate": 0.35,
           // responses
           "enable_responses": true,
           "request_processing_latency": 1000,
           "max_outstanding_transactions": 0,
-          "response_traffic_class": 0,
+          "response_protocol_class": 0,
           // warmup
           "warmup_interval": 200,  // delivered flits
           "warmup_window": 15,

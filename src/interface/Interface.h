@@ -46,7 +46,7 @@ class Interface : public Component, public PortedDevice, public FlitSender,
  public:
   Interface(const std::string& _name, const Component* _parent, u32 _id,
             const std::vector<u32>& _address, u32 _numVcs,
-            const std::vector<std::tuple<u32, u32> >& _trafficClassVcs,
+            const std::vector<std::tuple<u32, u32> >& _protocolClassVcs,
             MetadataHandler* _metadataHandler,
             Json::Value _settings);
   virtual ~Interface();
@@ -66,7 +66,7 @@ class Interface : public Component, public PortedDevice, public FlitSender,
   void packetDeparture(Packet* _packet) const;
 
  protected:
-  const std::vector<std::tuple<u32, u32> > trafficClassVcs_;
+  const std::vector<std::tuple<u32, u32> > protocolClassVcs_;
 
  private:
   MessageReceiver* messageReceiver_;

@@ -36,8 +36,8 @@ Network::Network(const std::string& _name, const Component* _parent,
   assert(numStages_ >= 1);
   stageWidth_ = (u32)pow(routerRadix_, numStages_ - 1);
 
-  // parse the traffic classes description
-  loadTrafficClassInfo(_settings["traffic_classes"]);
+  // parse the protocol classes description
+  loadProtocolClassInfo(_settings["protocol_classes"]);
 
   // create the routers
   routers_.resize(stageWidth_ * numStages_, nullptr);
@@ -97,7 +97,7 @@ Network::Network(const std::string& _name, const Component* _parent,
     std::vector<u32> interfaceAddress;
     translateInterfaceIdToAddress(id, &interfaceAddress);
     Interface* interface = Interface::create(
-        interfaceName, this, id, interfaceAddress, numVcs_, trafficClassVcs_,
+        interfaceName, this, id, interfaceAddress, numVcs_, protocolClassVcs_,
         _metadataHandler, _settings["interface"]);
     interfaces_.at(id) = interface;
 
@@ -126,8 +126,8 @@ Network::Network(const std::string& _name, const Component* _parent,
     outputRouter->setOutputChannel(routerPort, outChannel);
   }
 
-  // clear the traffic class info
-  clearTrafficClassInfo();
+  // clear the protocol class info
+  clearProtocolClassInfo();
 }
 
 Network::~Network() {

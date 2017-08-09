@@ -66,13 +66,13 @@ class AllToAllTerminal : public Terminal {
   bool sendStalled_;
 
   // requests
-  u32 requestTrafficClass_;
+  u32 requestProtocolClass_;
 
   // responses
   bool enableResponses_;
   u32 maxOutstandingTransactions_;  // 0=inf, >0=limit
   std::unordered_set<u64> outstandingTransactions_;
-  u32 responseTrafficClass_;
+  u32 responseProtocolClass_;
   u64 requestProcessingLatency_;  // cycles
 
   // start time delay
