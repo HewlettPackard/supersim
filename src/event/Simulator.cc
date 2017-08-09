@@ -19,6 +19,9 @@
 #include <ctime>
 #include <chrono>
 
+#include <string>
+#include <utility>
+
 #include "network/Network.h"
 #include "workload/Application.h"
 #include "workload/Workload.h"
@@ -30,7 +33,8 @@ Simulator::Simulator(Json::Value _settings)
       channelCycleTime_(_settings["channel_cycle_time"].asUInt64()),
       routerCycleTime_(_settings["router_cycle_time"].asUInt64()),
       interfaceCycleTime_(_settings["interface_cycle_time"].asUInt64()),
-      initial_(true), running_(false), net_(nullptr), workload_(nullptr) {
+      initial_(true), initialized_(false), running_(false), net_(nullptr),
+      workload_(nullptr) {
   assert(!_settings["print_progress"].isNull());
   assert(!_settings["print_interval"].isNull());
   assert(!_settings["channel_cycle_time"].isNull());
@@ -47,7 +51,18 @@ Simulator::Simulator(Json::Value _settings)
 
 Simulator::~Simulator() {}
 
+void Simulator::initialize() {
+  assert(!initialized_);
+
+  for (std::pair<std::string, Component*> comp : Component::components_) {
+    comp.second->initialize();
+  }
+
+  initialized_ = true;
+}
+
 void Simulator::simulate() {
+  assert(initialized_);
   assert(running_ == false);
   initial_ = false;
   running_ = true;

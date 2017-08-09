@@ -242,6 +242,7 @@ TEST(Channel, full) {
 
     EndMonitoring ender(&c, clocks);
 
+    gSim->initialize();
     gSim->simulate();
 
     f64 actUtil = c.utilization(U32_MAX);

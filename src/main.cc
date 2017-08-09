@@ -35,6 +35,7 @@ s32 main(s32 _argc, char** _argv) {
   setbuf(stderr, nullptr);
 
   // get JSON settings
+  printf("Reading settings\n");
   Json::Value settings;
   settings::commandLine(_argc, _argv, &settings);
   printf("%s\n", settings::toString(settings).c_str());
@@ -46,6 +47,7 @@ s32 main(s32 _argc, char** _argv) {
   }
 
   // initialize the discrete event simulator
+  printf("Building components\n");
   gSim = new VectorQueue(settings["simulator"]);
 
   // create a metadata handler
@@ -80,6 +82,10 @@ s32 main(s32 _argc, char** _argv) {
 
   // check that all debug names were authentic
   Component::debugCheck();
+
+  // initialize the components
+  printf("Initializing components\n");
+  gSim->initialize();
 
   // run the simulation!
   printf("Simulation beginning\n");

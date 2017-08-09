@@ -35,6 +35,7 @@ class Simulator {
   // this function must return the current size of the queue
   virtual u64 queueSize() const = 0;
 
+  void initialize();
   void simulate();
   void stop();
   bool initial() const;
@@ -73,6 +74,7 @@ class Simulator {
   const u64 interfaceCycleTime_;
 
   bool initial_;
+  bool initialized_;
   bool running_;
 
   Network* net_;

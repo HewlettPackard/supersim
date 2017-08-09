@@ -345,6 +345,7 @@ f64 expSts(u32 _curr, u32 _max, u32 _gran) {
   }
   }
 
+  gSim->initialize();
   gSim->simulate();
 
   ASSERT_TRUE(status.ok());

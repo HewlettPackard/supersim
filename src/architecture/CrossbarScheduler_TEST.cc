@@ -196,6 +196,7 @@ TEST(CrossbarScheduler, basic) {
           }
 
           // run the simulator
+          gSim->initialize();
           gSim->simulate();
 
           // tear down

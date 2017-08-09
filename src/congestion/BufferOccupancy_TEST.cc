@@ -93,6 +93,7 @@ TEST(BufferOccupancy, normVc) {
     }
   }
 
+  gSim->initialize();
   gSim->simulate();
 }
 
@@ -167,6 +168,7 @@ TEST(BufferOccupancy, absVc) {
     }
   }
 
+  gSim->initialize();
   gSim->simulate();
 }
 
@@ -248,6 +250,7 @@ TEST(BufferOccupancy, normPort) {
     }
   }
 
+  gSim->initialize();
   gSim->simulate();
 }
 
@@ -326,6 +329,7 @@ TEST(BufferOccupancy, absPort) {
     }
   }
 
+  gSim->initialize();
   gSim->simulate();
 }
 
@@ -395,6 +399,7 @@ TEST(BufferOccupancy, phantomNormVc) {
           crediter.setEvent(0, 0, time, 1, CreditHandler::Type::INCR);
         }
 
+        gSim->initialize();
         gSim->simulate();
       }
     }
@@ -466,6 +471,7 @@ TEST(BufferOccupancy, phantomAbsVc) {
           crediter.setEvent(0, 0, time, 1, CreditHandler::Type::INCR);
         }
 
+        gSim->initialize();
         gSim->simulate();
       }
     }

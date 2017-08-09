@@ -209,6 +209,7 @@ TEST(VcScheduler, basic) {
         }
 
         // run the simulator
+        gSim->initialize();
         gSim->simulate();
 
         // tear down
@@ -274,6 +275,7 @@ TEST(VcScheduler, dist) {
       }
 
       // run the simulator
+      gSim->initialize();
       gSim->simulate();
 
       // check

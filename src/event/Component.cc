@@ -83,6 +83,10 @@ void Component::addEvent(u64 _time, u8 _epsilon, void* _event, s32 _type) {
   gSim->addEvent(_time, _epsilon, this, _event, _type);
 }
 
+void Component::initialize() {
+  // this function can be overridden if a component needs to be initialized
+}
+
 void Component::processEvent(void* _event, s32 _type) {
   assert(false);  // this function should be overridden if it is to be used
 }

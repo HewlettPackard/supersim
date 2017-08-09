@@ -34,6 +34,7 @@ class Component {
   std::string fullName() const;
   void setParent(const Component* _parent);
   const Component* getParent() const;
+  virtual void initialize();
   virtual void processEvent(void* _event, s32 _type);
   bool getDebug();
   void setDebug(bool _debug);
@@ -51,6 +52,8 @@ class Component {
   bool debug_;
 
  private:
+  friend class Simulator;
+
   std::string name_;
   const Component* parent_;
 
