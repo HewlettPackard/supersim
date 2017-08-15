@@ -308,7 +308,7 @@ void Router::transferPacket(Flit* _headFlit, u32 _outputPort, u32 _outputVc) {
   }
 
   // determine the time of arrival at the output queue
-  u32 time = gSim->futureCycle(Simulator::Clock::ROUTER, transferLatency_);
+  u64 time = gSim->futureCycle(Simulator::Clock::ROUTER, transferLatency_);
   addEvent(time, 1, packet, static_cast<s32>(vcIdx));
 }
 
