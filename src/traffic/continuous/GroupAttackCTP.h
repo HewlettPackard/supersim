@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef TRAFFIC_CONTINUOUS_DRAGONFLYWORSTCASECTP_H_
-#define TRAFFIC_CONTINUOUS_DRAGONFLYWORSTCASECTP_H_
+#ifndef TRAFFIC_CONTINUOUS_GROUPATTACKCTP_H_
+#define TRAFFIC_CONTINUOUS_GROUPATTACKCTP_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -22,12 +22,12 @@
 
 #include "traffic/continuous/ContinuousTrafficPattern.h"
 
-class DragonflyWorstCaseCTP : public ContinuousTrafficPattern {
+class GroupAttackCTP : public ContinuousTrafficPattern {
  public:
-  DragonflyWorstCaseCTP(
+  GroupAttackCTP(
       const std::string& _name, const Component* _parent,
       u32 _numTerminals, u32 _self, Json::Value _settings);
-  ~DragonflyWorstCaseCTP();
+  ~GroupAttackCTP();
 
   u32 nextDestination() override;
 
@@ -43,4 +43,4 @@ class DragonflyWorstCaseCTP : public ContinuousTrafficPattern {
   u32 destGroup_;
 };
 
-#endif  // TRAFFIC_CONTINUOUS_DRAGONFLYWORSTCASECTP_H_
+#endif  // TRAFFIC_CONTINUOUS_GROUPATTACKCTP_H_

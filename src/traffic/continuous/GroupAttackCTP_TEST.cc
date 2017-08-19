@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "traffic/continuous/DragonflyWorstCaseCTP.h"
+#include "traffic/continuous/GroupAttackCTP.h"
 
 #include <gtest/gtest.h>
 #include <json/json.h>
@@ -24,9 +24,9 @@
 
 #include "test/TestSetup_TEST.h"
 
-TEST(DragonflyWorstCaseCTP, permutation) {
+TEST(GroupAttackCTP, permutation) {
   for (u32 net = 0; net < 100; net++) {
-    TestSetup setup(1, 1, 1, 0xDEAD * net + 0xBEEF);
+    TestSetup ts(1, 1, 1, 0xDEAD * net + 0xBEEF);
 
     u32 groupCount = gSim->rnd.nextU64(1, 20);
     u32 groupSize = gSim->rnd.nextU64(1, 20);
@@ -34,7 +34,6 @@ TEST(DragonflyWorstCaseCTP, permutation) {
 
     for (u32 test = 0; test < 100; test++) {
       Json::Value settings;
-      settings["group_count"] = groupCount;
       settings["group_size"] = groupSize;
       settings["concentration"] = concentration;
       settings["random"] = false;
@@ -47,10 +46,9 @@ TEST(DragonflyWorstCaseCTP, permutation) {
                   (selfLocal * concentration) +
                   (selfConc));
 
-      DragonflyWorstCaseCTP* tp =
-          new DragonflyWorstCaseCTP(
-              "TP", nullptr, groupCount * groupSize * concentration, self,
-              settings);
+      GroupAttackCTP* tp =  new GroupAttackCTP(
+          "TP", nullptr, groupCount * groupSize * concentration, self,
+          settings);
 
       u32 expDestGroup = (selfGroup + (groupCount / 2)) % groupCount;
       u32 expDestLocal = selfLocal;
@@ -69,7 +67,7 @@ TEST(DragonflyWorstCaseCTP, permutation) {
   }
 }
 
-TEST(DragonflyWorstCaseCTP, random) {
+TEST(GroupAttackCTP, random) {
   const u32 DEBUG = 0;  // 0=off 1=min 2=max
 
   f64 wc = 0.0;
@@ -79,7 +77,7 @@ TEST(DragonflyWorstCaseCTP, random) {
   const u32 ROUNDS = 10000;
 
   for (u32 net = 0; net < CONFIGS; net++) {
-    TestSetup setup(1, 1, 1, 0xDEAD * net + 0xBEEF);
+    TestSetup ts(1, 1, 1, 0xDEAD * net + 0xBEEF);
 
     u32 groupCount;
     u32 groupSize;
@@ -97,7 +95,6 @@ TEST(DragonflyWorstCaseCTP, random) {
     }
     for (u32 test = 0; test < TESTS; test++) {
       Json::Value settings;
-      settings["group_count"] = groupCount;
       settings["group_size"] = groupSize;
       settings["concentration"] = concentration;
       settings["random"] = true;
@@ -115,10 +112,9 @@ TEST(DragonflyWorstCaseCTP, random) {
                selfGroup, selfLocal, selfConc, self);
       }
 
-      DragonflyWorstCaseCTP* tp =
-          new DragonflyWorstCaseCTP(
-              "TP", nullptr, groupCount * groupSize * concentration, self,
-              settings);
+      GroupAttackCTP* tp = new GroupAttackCTP(
+          "TP", nullptr, groupCount * groupSize * concentration, self,
+          settings);
 
       u32 expDestGroup = (selfGroup + (groupCount / 2)) % groupCount;
 

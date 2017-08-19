@@ -12,27 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "traffic/continuous/DragonflyWorstCaseCTP.h"
+#include "traffic/continuous/GroupAttackCTP.h"
 
 #include <factory/Factory.h>
 
 #include <cassert>
 
-DragonflyWorstCaseCTP::DragonflyWorstCaseCTP(
+GroupAttackCTP::GroupAttackCTP(
     const std::string& _name, const Component* _parent, u32 _numTerminals,
     u32 _self, Json::Value _settings)
     : ContinuousTrafficPattern(_name, _parent, _numTerminals, _self,
                                _settings) {
   // verify settings exist
-  assert(_settings.isMember("group_count"));
-  assert(_settings.isMember("group_size"));
-  assert(_settings.isMember("concentration"));
+  assert(_settings.isMember("group_size"));  // num routers per group
+  assert(_settings.isMember("concentration"));  // num terminals per router
   assert(_settings.isMember("random"));
 
   // compute fixed values
-  groupCount_ = _settings["group_count"].asUInt();
   groupSize_ = _settings["group_size"].asUInt();
   concentration_ = _settings["concentration"].asUInt();
+  groupCount_ = numTerminals_ / (groupSize_ * concentration_);
   random_ = _settings["random"].asBool();
 
   // verify matching system size
@@ -47,9 +46,9 @@ DragonflyWorstCaseCTP::DragonflyWorstCaseCTP(
   destGroup_ = (selfGroup_ + (groupCount_ / 2)) % groupCount_;
 }
 
-DragonflyWorstCaseCTP::~DragonflyWorstCaseCTP() {}
+GroupAttackCTP::~GroupAttackCTP() {}
 
-u32 DragonflyWorstCaseCTP::nextDestination() {
+u32 GroupAttackCTP::nextDestination() {
   // determine dest address values
   u32 destLocal;
   u32 destConc;
@@ -68,5 +67,5 @@ u32 DragonflyWorstCaseCTP::nextDestination() {
           (destConc));
 }
 
-registerWithFactory("dragonfly_worstcase", ContinuousTrafficPattern,
-                    DragonflyWorstCaseCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithFactory("group_attack", ContinuousTrafficPattern,
+                    GroupAttackCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
