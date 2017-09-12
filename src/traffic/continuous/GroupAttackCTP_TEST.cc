@@ -24,7 +24,7 @@
 
 #include "test/TestSetup_TEST.h"
 
-TEST(GroupAttackCTP, permutation) {
+TEST(GroupAttackCTP, half_permutation) {
   for (u32 net = 0; net < 100; net++) {
     TestSetup ts(1, 1, 1, 0xDEAD * net + 0xBEEF);
 
@@ -37,6 +37,7 @@ TEST(GroupAttackCTP, permutation) {
       settings["group_size"] = groupSize;
       settings["concentration"] = concentration;
       settings["random"] = false;
+      settings["mode"] = "half";
 
       u32 selfGroup = gSim->rnd.nextU64(0, groupCount - 1);
       u32 selfLocal = gSim->rnd.nextU64(0, groupSize - 1);
@@ -63,6 +64,102 @@ TEST(GroupAttackCTP, permutation) {
       }
 
       delete tp;
+    }
+  }
+}
+
+TEST(GroupAttackCTP, opposite_permutation) {
+  for (u32 net = 0; net < 100; net++) {
+    TestSetup ts(1, 1, 1, 0xDEAD * net + 0xBEEF);
+
+    u32 groupCount = gSim->rnd.nextU64(1, 20);
+    u32 groupSize = gSim->rnd.nextU64(1, 20);
+    u32 concentration = gSim->rnd.nextU64(1, 20);
+
+    for (u32 test = 0; test < 100; test++) {
+      Json::Value settings;
+      settings["group_size"] = groupSize;
+      settings["concentration"] = concentration;
+      settings["random"] = false;
+      settings["mode"] = "opposite";
+
+      u32 selfGroup = gSim->rnd.nextU64(0, groupCount - 1);
+      u32 selfLocal = gSim->rnd.nextU64(0, groupSize - 1);
+      u32 selfConc = gSim->rnd.nextU64(0, concentration - 1);
+
+      u32 self = ((selfGroup * groupSize * concentration) +
+                  (selfLocal * concentration) +
+                  (selfConc));
+
+      GroupAttackCTP* tp =  new GroupAttackCTP(
+          "TP", nullptr, groupCount * groupSize * concentration, self,
+          settings);
+
+      u32 expDestGroup = (groupCount - 1) - selfGroup;
+      u32 expDestLocal = selfLocal;
+      u32 expDestConc = selfConc;
+      u32 expDest = ((expDestGroup * groupSize * concentration) +
+                     (expDestLocal * concentration) +
+                     (expDestConc));
+
+      for (u32 cnt = 0; cnt < 100; cnt++) {
+        u32 dest = tp->nextDestination();
+        ASSERT_EQ(dest, expDest);
+      }
+
+      delete tp;
+    }
+  }
+}
+
+
+TEST(GroupAttackCTP, offset_permutation) {
+  for (u32 net = 0; net < 100; net++) {
+    TestSetup ts(1, 1, 1, 0xDEAD * net + 0xBEEF);
+
+    u32 groupCount = gSim->rnd.nextU64(1, 10);
+    u32 groupSize = gSim->rnd.nextU64(1, 10);
+    u32 concentration = gSim->rnd.nextU64(1, 10);
+    for (s32 offset = -1; abs(offset) < groupCount; offset ++) {
+      for (u32 test = 0; test < 100; test++) {
+        Json::Value settings;
+        settings["group_size"] = groupSize;
+        settings["concentration"] = concentration;
+        settings["random"] = false;
+        settings["mode"] = offset;
+
+        u32 selfGroup = gSim->rnd.nextU64(0, groupCount - 1);
+        u32 selfLocal = gSim->rnd.nextU64(0, groupSize - 1);
+        u32 selfConc = gSim->rnd.nextU64(0, concentration - 1);
+
+        u32 self = ((selfGroup * groupSize * concentration) +
+                    (selfLocal * concentration) +
+                    (selfConc));
+
+        GroupAttackCTP* tp =  new GroupAttackCTP(
+            "TP", nullptr, groupCount * groupSize * concentration, self,
+            settings);
+
+        s32 destGroup = ((s32)selfGroup +
+                         ((s32)groupCount + offset)) % (s32)groupCount;
+        if (destGroup < 0) {
+          destGroup += groupCount;
+        }
+
+        u32 expDestGroup = (u32)destGroup;
+        u32 expDestLocal = selfLocal;
+        u32 expDestConc = selfConc;
+        u32 expDest = ((expDestGroup * groupSize * concentration) +
+                       (expDestLocal * concentration) +
+                       (expDestConc));
+
+        for (u32 cnt = 0; cnt < 100; cnt++) {
+          u32 dest = tp->nextDestination();
+          ASSERT_EQ(dest, expDest);
+        }
+
+        delete tp;
+      }
     }
   }
 }
@@ -98,6 +195,7 @@ TEST(GroupAttackCTP, random) {
       settings["group_size"] = groupSize;
       settings["concentration"] = concentration;
       settings["random"] = true;
+      settings["mode"] = "half";
 
       u32 selfGroup = gSim->rnd.nextU64(0, groupCount - 1);
       u32 selfLocal = gSim->rnd.nextU64(0, groupSize - 1);

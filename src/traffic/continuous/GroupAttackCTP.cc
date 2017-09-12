@@ -27,6 +27,7 @@ GroupAttackCTP::GroupAttackCTP(
   assert(_settings.isMember("group_size"));  // num routers per group
   assert(_settings.isMember("concentration"));  // num terminals per router
   assert(_settings.isMember("random"));
+  assert(_settings.isMember("mode"));  // format of destination
 
   // compute fixed values
   groupSize_ = _settings["group_size"].asUInt();
@@ -43,7 +44,26 @@ GroupAttackCTP::GroupAttackCTP(
   u32 localIndex = self_ % termsPerGroup;
   selfLocal_ = localIndex / concentration_;
   selfConc_ = localIndex % concentration_;
-  destGroup_ = (selfGroup_ + (groupCount_ / 2)) % groupCount_;
+
+  // compute destination from mode format
+  if (_settings["mode"].isString()) {
+    if (_settings["mode"].asString() == "half") {
+      destGroup_ = (selfGroup_ + (groupCount_ / 2)) % groupCount_;
+    } else if (_settings["mode"].asString() == "opposite") {
+      destGroup_ = (groupCount_ - 1) - selfGroup_;
+    }
+  } else if (_settings["mode"].isInt()) {
+    s32 offset = _settings["mode"].asInt();
+    // don't rely on loop around
+    assert(abs(offset) < groupCount_);
+    s32 destGroup = ((s32)selfGroup_ +
+                     ((s32)groupCount_ + offset)) % (s32)groupCount_;
+    if (destGroup < 0) {
+      destGroup += groupCount_;
+    }
+    destGroup_ = (u32)destGroup;
+  }
+  assert(destGroup_ < groupCount_);
 }
 
 GroupAttackCTP::~GroupAttackCTP() {}
