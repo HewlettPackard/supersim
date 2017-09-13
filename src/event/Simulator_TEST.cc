@@ -39,6 +39,7 @@ class StatusCheck : public Component {
     Event* evt = reinterpret_cast<Event*>(_event);
     u64 act = gSim->futureCycle(evt->clock, evt->cycles);
     ASSERT_EQ(act, evt->exp);
+    delete evt;
   }
 
  private:

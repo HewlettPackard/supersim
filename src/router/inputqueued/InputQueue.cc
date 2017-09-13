@@ -90,8 +90,12 @@ void InputQueue::receiveFlit(u32 _port, Flit* _flit) {
 
   // queue an event to be notified about the injected flit
   //  this synchronized the two clock domains
-  addEvent(gSim->futureCycle(Simulator::Clock::ROUTER, 1),
-           1, nullptr, INJECTED_FLIT);
+  if (gSim->isCycle(Simulator::Clock::ROUTER)) {
+    setPipelineEvent();
+  } else {
+    addEvent(gSim->futureCycle(Simulator::Clock::ROUTER, 1),
+             1, nullptr, INJECTED_FLIT);
+  }
 }
 
 void InputQueue::processEvent(void* _event, s32 _type) {

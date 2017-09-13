@@ -48,6 +48,7 @@ class Simulator {
 
   u64 cycleTime(Clock _clock) const;
   u64 cycle(Clock _clock) const;
+  bool isCycle(Clock _clock) const;
   u64 futureCycle(Clock _clock, u32 _cycles) const;
 
   void setNetwork(Network* _network);

@@ -70,8 +70,12 @@ void OutputQueue::receivePacket(Packet* _packet) {
 
   // queue an event to be notified about the injected flit
   //  this synchronized the two clock domains
-  addEvent(gSim->futureCycle(Simulator::Clock::CHANNEL, 1),
-           1, nullptr, INJECTED_PACKET);
+  if (gSim->isCycle(Simulator::Clock::CHANNEL)) {
+    setPipelineEvent();
+  } else {
+    addEvent(gSim->futureCycle(Simulator::Clock::CHANNEL, 1),
+             1, nullptr, INJECTED_PACKET);
+  }
 }
 
 void OutputQueue::processEvent(void* _event, s32 _type) {

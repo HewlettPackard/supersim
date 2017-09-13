@@ -219,6 +219,10 @@ u64 Simulator::cycle(Simulator::Clock _clock) const {
   return time_ / cycleTime(_clock);
 }
 
+bool Simulator::isCycle(Clock _clock) const {
+  return time_ % cycleTime(_clock) == 0;
+}
+
 u64 Simulator::futureCycle(Simulator::Clock _clock, u32 _cycles) const {
   assert(_cycles > 0);
 
