@@ -39,12 +39,13 @@ out_dir = 'output'
 # create sweeper
 s = sssweep.Sweeper(supersim_path, settings_path,
                     sslatency_path, out_dir,
-                    parse_scalar=0.001, plot_units='ns',
-                    ymin=0, ymax=500, long_titles=True,
-                    plot_style='colon',
-                    latency_mode='Message', #'Packet', 'Message', 'Transaction'
+                    parse_scalar=0.001, parse_filters=[], latency_units='ns',
+                    latency_ymin=0, latency_ymax=500,
+                    rate_ymin=0, rate_ymax=200,
+                    titles='long', plot_style='colon',
+                    latency_mode='message', # 'packet-header', 'packet', 'message', 'transaction'
                     sim=True, parse=True,
-                    lplot=True, qplot=True, cplot=True,
+                    lplot=True, rplot=True, qplot=True, cplot=True,
                     web_viewer=True, get_resources=get_resources)
 
 # routing variable
