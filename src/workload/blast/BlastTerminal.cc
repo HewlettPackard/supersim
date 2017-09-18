@@ -414,6 +414,7 @@ void BlastTerminal::completeLoggable(Message* _message) {
   // detect when logging complete
   if (loggableCompleteCount_ == numTransactions_) {
     complete();
+    return;  // NOTE: return here to avoid multiple calls to done via recursion
   }
 
   // detect when logging is empty
