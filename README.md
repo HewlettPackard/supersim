@@ -23,6 +23,7 @@ SuperSim has some key advantages in its design and development that make it part
   - [SSLatency][sslatency] is an optimized C++ program that parses the verbose file format output from SuperSim into latency numbers. SSLatency prepares files for analysis and plotting.
   - [SSPlot][ssplot] is a Python plotting tool that generates analyses and plots for individual runs, sweeping runs (e.g., load vs. latency), and comparison against many sweeping runs. SSPlot is a Python package with accompanying command line executable scripts.
   - [TaskRun][taskrun] is an easy-to-use Python package for running tasks with dependencies, conditional execution, resource management, and much more. The process from running simulations, parsing the results, analyzing the data, and plotting the results entails many steps. Each step has dependencies on previous steps. TaskRun scripts make this whole process easy and automated. A simple TaskRun script can elegantly runs thousands of simulations and all required post-simulation tools. TaskRun is also able to interface with batch scheduling systems (e.g., GridEngine, PBS, LFS, etc.).
+  - [sssweep][sssweep] is a flexible python package to automatically generate and perform supersim simulations with one or many sweeping variables. sssweep allows the user to easily add and set simulation variables. sssweep automatically generates a web viewer tailored to your simulation parameters to easily analyse and share your results.
 
 ## Ok, now what?
 Visit the [docs][docs] and have fun simulating!
@@ -37,4 +38,5 @@ Visit the [docs][docs] and have fun simulating!
 [sslatency]: https://github.com/nicmcd/sslatency "SSLatency at GitHub"
 [ssplot]: https://github.com/nicmcd/ssplot "SSPlot at GitHub"
 [taskrun]: https://github.com/nicmcd/taskrun "TaskRun at GitHub"
+[sssweep]: https://github.com/nicmcd/sssweep "sssweep at GitHub"
 [docs]: docs/README.md "SuperSim Documentation"
