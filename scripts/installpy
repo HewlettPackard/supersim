@@ -72,8 +72,8 @@ def delete(loc, url, commit):
 def main(args):
   repos = [('percentile', 'github.com', 'nicmcd/percentile', None),
            ('ssplot', 'github.com', 'nicmcd/ssplot', None),
-           ('sssweep', 'github.com', 'nicmcd/sssweep', None),
-           ('taskrun', 'github.com', 'nicmcd/taskrun', None)]
+           ('taskrun', 'github.com', 'nicmcd/taskrun', None),
+           ('sssweep', 'github.com', 'nicmcd/sssweep', None)]
 
   for command in args.command:
     for repo in repos:
