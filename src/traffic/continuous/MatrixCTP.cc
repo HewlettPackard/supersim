@@ -51,7 +51,11 @@ MatrixCTP::MatrixCTP(
       }
     }
   }
-  assert(lineNum == numTerminals_);
+  if (lineNum != numTerminals_) {
+    fprintf(stderr, "expected %u lines, processed %u lines\n",
+            numTerminals_, lineNum);
+    assert(false);
+  }
 
   // create the cumulative distribution
   mut::generateCumulativeDistribution(
