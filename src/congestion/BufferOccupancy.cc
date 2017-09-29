@@ -84,8 +84,6 @@ void BufferOccupancy::initCredits(u32 _vcIdx, u32 _credits) {
   } else {
     creditCounts_.at(_vcIdx) += _credits;
   }
-
-  dbgprintf("max & count on %u is now %u", _vcIdx, creditCounts_.at(_vcIdx));
 }
 
 void BufferOccupancy::incrementCredit(u32 _vcIdx) {
@@ -193,25 +191,15 @@ void BufferOccupancy::createEvent(u32 _vcIdx, s32 _type) {
 }
 
 void BufferOccupancy::performIncrementCredit(u32 _vcIdx) {
-  // dbgprintf("incr %u from %u", _vcIdx, creditCounts_.at(_vcIdx));
   assert(creditCounts_.at(_vcIdx) < creditMaximums_.at(_vcIdx));
   creditCounts_.at(_vcIdx)++;
   flitsOutstanding_.at(_vcIdx)--;
-
-  dbgprintf("(Inc) VcIdx %u credits: %u flits: %u [%u]", _vcIdx,
-            creditCounts_.at(_vcIdx), flitsOutstanding_.at(_vcIdx),
-            creditMaximums_.at(_vcIdx));
 }
 
 void BufferOccupancy::performDecrementCredit(u32 _vcIdx) {
-  // dbgprintf("decr %u from %u", _vcIdx, creditCounts_.at(_vcIdx));
   assert(creditCounts_.at(_vcIdx) > 0);
   creditCounts_.at(_vcIdx)--;
   flitsOutstanding_.at(_vcIdx)++;
-
-  dbgprintf("(Dec) VcIdx %u credits: %u flits: %u [%u]", _vcIdx,
-            creditCounts_.at(_vcIdx), flitsOutstanding_.at(_vcIdx),
-            creditMaximums_.at(_vcIdx));
 
   if (phantom_) {
     windows_.at(_vcIdx)++;
@@ -226,7 +214,6 @@ void BufferOccupancy::performDecrementCredit(u32 _vcIdx) {
 
 void BufferOccupancy::performDecrementWindow(u32 _vcIdx) {
   assert(phantom_);
-  dbgprintf("-window %u from %u", _vcIdx, windows_.at(_vcIdx));
   assert(windows_.at(_vcIdx) > 0);
   windows_.at(_vcIdx)--;
 }
