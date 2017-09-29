@@ -229,6 +229,12 @@ void Router::initialize() {
           (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
         congestionStatus_->initCredits(vcIdx, outputQueueDepth_);
       }
+
+      // if congestion mode sees output and downstream queues, account for the
+      //  one extra buffer slot in the output queue switch allocation pipeline
+      if (congestionMode_ == Router::CongestionMode::kOutputAndDownstream) {
+        congestionStatus_->initCredits(vcIdx, 1);
+      }
     }
   }
 }
