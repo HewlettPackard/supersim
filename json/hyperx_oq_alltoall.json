@@ -48,8 +48,9 @@
         "mode": "absolute_port" //(normalized_port/vc absolute_port/vc)
       },
       "congestion_mode": "output",
-      "input_queue_depth": 16,  // 2x max packet
+      "input_queue_depth": 16,  // 1x max packet
       "transfer_latency": 1,
+      "output_queue_depth": 16,  // 1x max packet
       "output_crossbar": {
         "latency": 1  // cycles
       },

@@ -40,6 +40,7 @@
       "congestion_mode": "output_and_downstream",
       "input_queue_depth": 32,  // 2x max packet
       "transfer_latency": 1,
+      "output_queue_depth": 100,
       "output_crossbar": {
         "latency": 1  // cycles
       },

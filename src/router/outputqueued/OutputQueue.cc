@@ -30,12 +30,14 @@
 namespace OutputQueued {
 
 OutputQueue::OutputQueue(
-    const std::string& _name, const Component* _parent, u32 _port, u32 _vc,
+    const std::string& _name, const Component* _parent, Router* _router,
+    u32 _depth, u32 _port, u32 _vc,
     CrossbarScheduler* _outputCrossbarScheduler,
     u32 _crossbarSchedulerIndex, Crossbar* _crossbar, u32 _crossbarIndex,
     CreditWatcher* _creditWatcher, u32 _creditWatcherVcId,
     bool _incrCreditWatcher, bool _decrCreditWatcher)
-    : Component(_name, _parent), port_(_port), vc_(_vc),
+    : Component(_name, _parent), depth_(_depth), occupancy_(0),
+      port_(_port), vc_(_vc), router_(_router),
       outputCrossbarScheduler_(_outputCrossbarScheduler),
       crossbarSchedulerIndex_(_crossbarSchedulerIndex), crossbar_(_crossbar),
       crossbarIndex_(_crossbarIndex), creditWatcher_(_creditWatcher),
@@ -53,7 +55,9 @@ OutputQueue::OutputQueue(
   eventTime_ = U64_MAX;
 }
 
-OutputQueue::~OutputQueue() {}
+OutputQueue::~OutputQueue() {
+  assert(occupancy_ == 0);
+}
 
 void OutputQueue::receivePacket(Packet* _packet) {
   assert(gSim->epsilon() == 1);
@@ -66,6 +70,11 @@ void OutputQueue::receivePacket(Packet* _packet) {
 
     // push flit into corresponding buffer
     buffer_.push(flit);
+  }
+
+  // ensure sync between virtual space and real space
+  if (depth_ != U32_MAX) {
+    assert(buffer_.size() <= occupancy_);
   }
 
   // queue an event to be notified about the injected flit
@@ -112,6 +121,24 @@ void OutputQueue::crossbarSchedulerResponse(u32 _port, u32 _vc) {
   setPipelineEvent();
 }
 
+void OutputQueue::reserveSpace(u32 _flits) {
+  occupancy_ += _flits;
+
+  // check for overrun if buffers are not infinite
+  if (depth_ != U32_MAX) {
+    assert(occupancy_ <= depth_);
+  }
+}
+
+u32 OutputQueue::spaceAvailable() const {
+  if (depth_ == U32_MAX) {
+    return U32_MAX;
+  } else {
+    u32 space = depth_ - occupancy_;
+    return space;
+  }
+}
+
 void OutputQueue::setPipelineEvent() {
   if (eventTime_ == U64_MAX) {
     eventTime_ = gSim->time();
@@ -127,8 +154,6 @@ void OutputQueue::processPipeline() {
    * attempt to load the crossbar
    */
   if (swa_.fsm == ePipelineFsm::kReadyToAdvance) {
-    // dbgprintf("loading crossbar");
-
     // send the flit on the crossbar
     crossbar_->inject(swa_.flit, crossbarIndex_, 0);
     outputCrossbarScheduler_->decrementCredit(vc_);
@@ -148,14 +173,15 @@ void OutputQueue::processPipeline() {
    * attempt to load SWA stage
    */
   if ((swa_.fsm == ePipelineFsm::kEmpty) && (buffer_.empty() == false)) {
-    // dbgprintf("loading SWA");
-
     // ensure SWA is empty
     assert(swa_.flit == nullptr);
 
     // pull out the front flit
     Flit* flit = buffer_.front();
     buffer_.pop();
+    assert(occupancy_ > 0);
+    occupancy_--;
+    router_->newSpaceAvailable(port_, vc_);
 
     // put it in this pipeline stage
     swa_.flit = flit;

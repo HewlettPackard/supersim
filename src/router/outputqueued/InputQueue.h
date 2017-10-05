@@ -47,6 +47,9 @@ class InputQueue : public Component, public FlitReceiver,
   // response from routing algorithm
   void routingAlgorithmResponse(RoutingAlgorithm::Response* _response) override;
 
+  // the router calls this to pull the next packet from this queue
+  void pullPacket(Flit* _headFlit);
+
  private:
   void setPipelineEvent();
   void processPipeline();
@@ -61,9 +64,9 @@ class InputQueue : public Component, public FlitReceiver,
   Router* router_;
   RoutingAlgorithm* routingAlgorithm_;
 
-  // state machine to represent a generic pipeline stage
+  // state machine to represent the single RFE stage
   enum class ePipelineFsm { kEmpty, kWaitingToRequest, kWaitingForResponse,
-      kReadyToAdvance };
+      kWaitingForTransfer, kReadyToAdvance };
 
   // remembers if an event is set to process the pipeline
   u64 eventTime_;

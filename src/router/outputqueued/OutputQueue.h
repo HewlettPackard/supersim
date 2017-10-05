@@ -34,7 +34,8 @@ class OutputQueue : public Component,
                     public CrossbarScheduler::Client {
  public:
   OutputQueue(const std::string& _name, const Component* _parent,
-              u32 _port, u32 _vc, CrossbarScheduler* _outputCrossbarScheduler,
+              Router* _router, u32 _depth, u32 _port, u32 _vc,
+              CrossbarScheduler* _outputCrossbarScheduler,
               u32 _crossbarSchedulerIndex, Crossbar* _crossbar,
               u32 _crossbarIndex, CreditWatcher* _creditWatcher,
               u32 _creditWatcherVcId, bool _incrCreditWatcher,
@@ -50,15 +51,24 @@ class OutputQueue : public Component,
   // response from CrossbarScheduler
   void crossbarSchedulerResponse(u32 _port, u32 _vc) override;
 
+  // reserve space in this queue
+  void reserveSpace(u32 _flits);
+
+  // space available to determine if can receive a packet
+  u32 spaceAvailable() const;
+
  private:
   void setPipelineEvent();
   void processPipeline();
 
   // attributes
+  const u32 depth_;
+  u32 occupancy_;
   const u32 port_;
   const u32 vc_;
 
   // external devices
+  Router* router_;
   CrossbarScheduler* outputCrossbarScheduler_;
   const u32 crossbarSchedulerIndex_;
   Crossbar* crossbar_;

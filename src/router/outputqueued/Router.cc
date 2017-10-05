@@ -26,6 +26,9 @@
 #include "router/outputqueued/OutputQueue.h"
 #include "types/Packet.h"
 
+#define PROCESS_TRANSFERS (0xC5)
+#define TRANSFER_PACKET (0x12)
+
 namespace OutputQueued {
 
 Router::Router(
@@ -52,9 +55,17 @@ Router::Router(
   expTimes_.resize(numPorts_, U64_MAX);
   expPackets_.resize(numPorts_, nullptr);
 
-  // queue depths and pipeline control
+  // queue depths
   inputQueueDepth_ = _settings["input_queue_depth"].asUInt();
   assert(inputQueueDepth_ > 0);
+  assert(_settings.isMember("output_queue_depth"));
+  if (_settings["output_queue_depth"].isString()) {
+    assert(_settings["output_queue_depth"].asString() == "infinite");
+    outputQueueDepth_ = U32_MAX;
+  } else {
+    outputQueueDepth_ = _settings["output_queue_depth"].asUInt();
+    assert(outputQueueDepth_ > 0);
+  }
 
   // create a congestion status device
   congestionStatus_ = CongestionStatus::create(
@@ -135,7 +146,7 @@ Router::Router(
       // output queue
       std::string oqName = "OutputQueue" + nameSuffix;
       OutputQueue* oq = new OutputQueue(
-          oqName, this, port, vc,
+          oqName, this, this, outputQueueDepth_, port, vc,
           outputCrossbarSchedulers_.at(port), clientIndexOut,
           outputCrossbars_.at(port), clientIndexOut, congestionStatus_,
           clientIndexMain, oqIncrWatcher, oqDecrWatcher);
@@ -149,6 +160,9 @@ Router::Router(
   // allocate slots for I/O channels
   inputChannels_.resize(numPorts_, nullptr);
   outputChannels_.resize(numPorts_, nullptr);
+
+  // initialize waiting packet queues
+  waiting_.resize(numPorts_ * numVcs_);
 }
 
 Router::~Router() {
@@ -288,41 +302,114 @@ void Router::sendFlit(u32 _port, Flit* _flit) {
   }
 }
 
-void Router::transferPacket(Flit* _headFlit, u32 _outputPort, u32 _outputVc) {
-  assert(gSim->epsilon() == 2);
-
-  // get the output queue
-  u32 vcIdx = vcIndex(_outputPort, _outputVc);
-
-  Packet* packet = _headFlit->packet();
-  for (u32 f = 0; f < packet->numFlits(); f++) {
-    // change VCs
-    Flit* flit = packet->getFlit(f);
-    flit->setVc(_outputVc);
-
-    // decrement credit in the congestion status module, if appropriate
-    if ((congestionMode_ == Router::CongestionMode::kOutput) ||
-        (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
-      congestionStatus_->decrementCredit(vcIdx);
-    }
-  }
-
-  // determine the time of arrival at the output queue
-  u64 time = gSim->futureCycle(Simulator::Clock::ROUTER, transferLatency_);
-  addEvent(time, 1, packet, static_cast<s32>(vcIdx));
-}
-
 f64 Router::congestionStatus(u32 _inputPort, u32 _inputVc,
                              u32 _outputPort, u32 _outputVc) const {
   return congestionStatus_->status(_inputPort, _inputVc, _outputPort,
                                    _outputVc);
 }
 
+void Router::registerPacket(u32 _inputPort, u32 _inputVc, Flit* _headFlit,
+                            u32 _outputPort, u32 _outputVc) {
+  assert(gSim->epsilon() == 0);
+  assert(_headFlit->packet()->numFlits() <= outputQueueDepth_);
+
+  // get the output queue index
+  u32 outputVcIdx = vcIndex(_outputPort, _outputVc);
+
+  // put the packet in the waiting list for this
+  waiting_.at(outputVcIdx).push(
+      std::make_tuple(_inputPort, _inputVc, _headFlit, _outputPort, _outputVc));
+
+  // execute the processor on epsilon 2
+  addEvent(gSim->time(), 2, nullptr, static_cast<s32>(outputVcIdx));
+}
+
+void Router::newSpaceAvailable(u32 _outputPort, u32 _outputVc) {
+  // directly call processTransfers since it can occur in the same epsilon
+  processTransfers(vcIndex(_outputPort, _outputVc));
+}
+
 void Router::processEvent(void* _event, s32 _type) {
-  u32 vcIdx = static_cast<u32>(_type);
-  OutputQueue* outputQueue = outputQueues_.at(vcIdx);
-  Packet* packet = reinterpret_cast<Packet*>(_event);
-  outputQueue->receivePacket(packet);
+  // this function hacks the event interface and uses the epsilon to
+  //  dtermine the event type so that it can override the type input
+  switch (gSim->epsilon()) {
+    case 1:
+      // this is a transfer packet event
+      transferPacket(
+          static_cast<u32>(_type),
+          reinterpret_cast<Packet*>(_event));
+      break;
+
+    case 2:
+      // this is process transfers event
+      processTransfers(static_cast<u32>(_type));
+      break;
+
+    default:
+      assert(false);
+  }
+}
+
+void Router::processTransfers(u32 _outputVcIdx) {
+  assert(gSim->epsilon() == 2);
+
+  while (true) {
+    // see if there is any waiting packets
+    if (waiting_.at(_outputVcIdx).empty()) {
+      // nothing to do, just be done
+      break;
+    }
+
+    // get the next waiting packet
+    const std::tuple<u32, u32, Flit*, u32, u32> next =
+        waiting_.at(_outputVcIdx).front();
+
+    // determine if it can fit in the output queue
+    Flit* headFlit = std::get<2>(next);
+    Packet* packet = headFlit->packet();
+    u32 pktSize = packet->numFlits();
+    u32 space = outputQueues_.at(_outputVcIdx)->spaceAvailable();
+    bool canFit = pktSize <= space;
+
+    // if the packet fits, pop and schedule injection, otherwise be done
+    if (canFit) {
+      // reserve the space
+      outputQueues_.at(_outputVcIdx)->reserveSpace(pktSize);
+
+      // change VCs and decrement congestion status credits if needed
+      u32 outputVc = std::get<4>(next);
+      for (u32 f = 0; f < pktSize; f++) {
+        // change VCs
+        Flit* flit = packet->getFlit(f);
+        flit->setVc(outputVc);
+
+        // decrement credit in the congestion status module, if appropriate
+        if ((congestionMode_ == Router::CongestionMode::kOutput) ||
+            (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
+          congestionStatus_->decrementCredit(_outputVcIdx);
+        }
+      }
+
+      // determine the time of arrival at the output queue
+      //  enqueue an event to inject the packet
+      u64 time = gSim->futureCycle(Simulator::Clock::ROUTER, transferLatency_);
+      addEvent(time, 1, packet, static_cast<s32>(_outputVcIdx));
+
+      // inform the input queue
+      u32 inputVcIdx = vcIndex(std::get<0>(next), std::get<1>(next));
+      inputQueues_.at(inputVcIdx)->pullPacket(headFlit);
+
+      // pop the packet out of the waiting list
+      waiting_.at(_outputVcIdx).pop();
+    } else {
+      break;
+    }
+  }
+}
+
+void Router::transferPacket(u32 _outputVcIdx, Packet* _packet) {
+  assert(gSim->epsilon() == 1);
+  outputQueues_.at(_outputVcIdx)->receivePacket(_packet);
 }
 
 Router::CongestionMode Router::parseCongestionMode(const std::string& _mode) {

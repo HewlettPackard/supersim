@@ -80,7 +80,7 @@ void InputQueue::processEvent(void* _event, s32 _type) {
       break;
 
     case (PROCESS_PIPELINE):
-      assert(gSim->epsilon() == 2);
+      assert(gSim->epsilon() == 3);
       processPipeline();
       break;
 
@@ -92,6 +92,29 @@ void InputQueue::processEvent(void* _event, s32 _type) {
 void InputQueue::routingAlgorithmResponse(
     RoutingAlgorithm::Response* _response) {
   assert(rfe_.fsm == ePipelineFsm::kWaitingForResponse);
+  rfe_.fsm = ePipelineFsm::kWaitingForTransfer;
+  assert(gSim->epsilon() == 0);
+
+  // retrieve the routing algorithm outputs, randomly select one
+  u32 routeIndex = gSim->rnd.nextU64(0, rfe_.route.size() - 1);
+  u32 outputPort, outputVc;
+  rfe_.route.get(routeIndex, &outputPort, &outputVc);
+
+  // inform the routing algorithm of vc scheduled
+  routingAlgorithm_->vcScheduled(rfe_.flit, outputPort, outputVc);
+
+  // tell the router that this packet wants to access the output queue
+  router_->registerPacket(port_, vc_, rfe_.flit, outputPort, outputVc);
+
+  // ensure an event is set to process the pipeline
+  setPipelineEvent();
+}
+
+void InputQueue::pullPacket(Flit* _headFlit) {
+  assert(rfe_.fsm == ePipelineFsm::kWaitingForTransfer);
+  assert(_headFlit == rfe_.flit);
+
+  // tell the pipeline this packet can proceed
   rfe_.fsm = ePipelineFsm::kReadyToAdvance;
 
   // ensure an event is set to process the pipeline
@@ -101,7 +124,7 @@ void InputQueue::routingAlgorithmResponse(
 void InputQueue::setPipelineEvent() {
   if (eventTime_ == U64_MAX) {
     eventTime_ = gSim->time();
-    addEvent(gSim->time(), 2, nullptr, PROCESS_PIPELINE);
+    addEvent(gSim->time(), 3, nullptr, PROCESS_PIPELINE);
   }
 }
 
@@ -110,26 +133,10 @@ void InputQueue::processPipeline() {
   assert(gSim->time() % gSim->cycleTime(Simulator::Clock::ROUTER) == 0);
 
   /*
-   * attempt to transfer the next packet to the output queue
+   * register the packet with the router core and wait for the pull
    */
   if (rfe_.fsm == ePipelineFsm::kReadyToAdvance) {
-    // act on head flits, drop body flits (they'll float with the head)
-    if (rfe_.flit->isHead()) {
-      // dbgprintf("transferring packet to output");
-
-      // retrieve the routing algorithm output
-      u32 routeIndex = gSim->rnd.nextU64(0, rfe_.route.size() - 1);
-      u32 outputPort, outputVc;
-      rfe_.route.get(routeIndex, &outputPort, &outputVc);
-
-      // inform the routing algorithm of vc scheduled
-      routingAlgorithm_->vcScheduled(rfe_.flit, outputPort, outputVc);
-
-      // transfer the packet to the output VC
-      router_->transferPacket(rfe_.flit, outputPort, outputVc);
-    }
-
-    // clear RFE info
+    // clear the RFE stage
     rfe_.fsm = ePipelineFsm::kEmpty;
     rfe_.flit = nullptr;
     rfe_.route.clear();
@@ -139,8 +146,6 @@ void InputQueue::processPipeline() {
    * attempt to load RFE stage
    */
   if ((rfe_.fsm == ePipelineFsm::kEmpty) && (buffer_.empty() == false)) {
-    // dbgprintf("loading RFE");
-
     // ensure RFE is empty
     assert(rfe_.flit == nullptr);
 
@@ -165,8 +170,6 @@ void InputQueue::processPipeline() {
   if (rfe_.fsm == ePipelineFsm::kWaitingToRequest) {
     // if this is a head flit, submit a routing request
     if (rfe_.flit->isHead()) {
-      // dbgprintf("[RFE], head flit");
-
       // submit request
       routingAlgorithm_->request(this, rfe_.flit, &rfe_.route);
 
@@ -174,7 +177,6 @@ void InputQueue::processPipeline() {
       rfe_.fsm = ePipelineFsm::kWaitingForResponse;
     } else {
       // not a head flit, set as ready to advance, queue event for this stage
-      // dbgprintf("[RFE], body flit");
       rfe_.fsm = ePipelineFsm::kReadyToAdvance;
     }
   }
@@ -189,10 +191,11 @@ void InputQueue::processPipeline() {
    * if any of these cases are true, create an event to handle the next cycle
    */
   if ((rfe_.fsm == ePipelineFsm::kReadyToAdvance) ||    // body flit
-      (buffer_.size() > 0)) {   // more flits in buffer
+      ((buffer_.size() > 0) &&    // more flits in buffer
+       (rfe_.fsm == ePipelineFsm::kEmpty))) {  // RFE empty
     // set a pipeline event for the next cycle
     eventTime_ = gSim->futureCycle(Simulator::Clock::ROUTER, 1);
-    addEvent(eventTime_, 2, nullptr, PROCESS_PIPELINE);
+    addEvent(eventTime_, 3, nullptr, PROCESS_PIPELINE);
   }
 }
 

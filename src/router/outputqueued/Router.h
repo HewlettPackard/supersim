@@ -18,7 +18,9 @@
 #include <json/json.h>
 #include <prim/prim.h>
 
+#include <queue>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "architecture/Crossbar.h"
@@ -62,10 +64,15 @@ class Router : public ::Router {
   void sendCredit(u32 _port, u32 _vc) override;
   void sendFlit(u32 _port, Flit* _flit) override;
 
-  void transferPacket(Flit* _headFlit, u32 _outputPort, u32 outputVc);
-
   f64 congestionStatus(u32 _inputPort, u32 _inputVc, u32 _outputPort,
                        u32 _outputVc) const override;
+
+  // only called on epsilon 0 from IQ
+  void registerPacket(u32 _inputPort, u32 _inputVc, Flit* _headFlit,
+                      u32 _outputPort, u32 _outputVc);
+
+  // only called on epsilon 2 from OQ
+  void newSpaceAvailable(u32 _outputPort, u32 _outputVc);
 
   void processEvent(void* _event, s32 _type) override;
 
@@ -74,11 +81,18 @@ class Router : public ::Router {
 
   static CongestionMode parseCongestionMode(const std::string& _mode);
 
+  // executes on epsilon 2
+  void processTransfers(u32 _outputVcIdx);
+
+  // executes on epsilon 1
+  void transferPacket(u32 _outputVcIdx, Packet* _packet);
+
   const u32 transferLatency_;
   const CongestionMode congestionMode_;
   u32 creditSize_;
 
   u32 inputQueueDepth_;
+  u32 outputQueueDepth_;  // U32_MAX for infinite
 
   // this vector is used to keep track of incoming port VC
   //  this is needed because of the hyperwarp symptom
@@ -100,6 +114,9 @@ class Router : public ::Router {
 
   std::vector<Channel*> inputChannels_;
   std::vector<Channel*> outputChannels_;
+
+  // this is used to solve any starvation issues
+  std::vector<std::queue<std::tuple<u32, u32, Flit*, u32, u32> > > waiting_;
 };
 
 }  // namespace OutputQueued

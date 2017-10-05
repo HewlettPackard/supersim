@@ -37,6 +37,7 @@
       "congestion_mode": "downstream",
       "input_queue_depth": 64,  // 4x max packet
       "transfer_latency": 100,
+      "output_queue_depth": "infinite",
       "output_crossbar": {
         "latency": 2  // cycles
       },
