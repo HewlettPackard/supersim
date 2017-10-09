@@ -38,11 +38,12 @@
     },
     "router": {
       "architecture": "input_queued",
-      "congestion_status": {
-        "algorithm": "buffer_occupancy",
+      "congestion_sensor": {
+        "algorithm": "null_sensor",
         "latency": 1,
         "granularity": 0,
-        "mode": "normalized_vc" //(normalized_port/vc absolute_port/vc)
+        "minimum": 0.0,
+        "offset": 0.0
       },
       "congestion_mode": "downstream",
       "input_queue_depth": 16,

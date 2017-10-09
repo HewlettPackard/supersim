@@ -28,11 +28,13 @@
     },
     "router": {
       "architecture": "output_queued",
-      "congestion_status": {
+      "congestion_sensor": {
         "algorithm": "buffer_occupancy",
         "latency": 1,
         "granularity": 8,
-        "mode": "normalized_vc" //(normalized_port/vc absolute_port/vc)
+        "minimum": 0.0,
+        "offset": 0.0,
+        "mode": "normalized_vc"  // {normalized,absolute}_{port,vc}
       },
       "congestion_mode": "downstream",
       "input_queue_depth": 64,  // 4x max packet

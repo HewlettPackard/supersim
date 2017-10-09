@@ -24,7 +24,7 @@
 #include "architecture/Crossbar.h"
 #include "architecture/CrossbarScheduler.h"
 #include "architecture/VcScheduler.h"
-#include "congestion/CongestionStatus.h"
+#include "congestion/CongestionSensor.h"
 #include "event/Component.h"
 #include "network/Channel.h"
 #include "network/RoutingAlgorithm.h"
@@ -78,7 +78,7 @@ class Router : public ::Router {
 
   std::vector<InputQueue*> inputQueues_;
   std::vector<RoutingAlgorithm*> routingAlgorithms_;
-  CongestionStatus* congestionStatus_;
+  CongestionSensor* congestionSensor_;
   Crossbar* crossbar_;
   CrossbarScheduler* crossbarScheduler_;
   VcScheduler* vcScheduler_;

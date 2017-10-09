@@ -18,7 +18,7 @@
 
 #include <cassert>
 
-#include "congestion/CongestionStatus.h"
+#include "congestion/CongestionSensor.h"
 #include "network/Network.h"
 #include "router/inputqueued/InputQueue.h"
 #include "router/inputqueued/OutputQueue.h"
@@ -48,17 +48,17 @@ Router::Router(
   assert(outputQueueDepth > 0);
 
   // create a congestion status device
-  congestionStatus_ = CongestionStatus::create(
-      "CongestionStatus", this, this, _settings["congestion_status"]);
+  congestionSensor_ = CongestionSensor::create(
+      "CongestionSensor", this, this, _settings["congestion_sensor"]);
 
   // when running in output mode, ensure the congestion status module is not
   //  operating in normalized mode on a per-VC basis because the output queues
   //  aren't divised per-VC
   if (congestionMode_ == Router::CongestionMode::kOutput) {
-    assert((congestionStatus_->style() !=
-            CongestionStatus::Style::kNormalized) ||
-           (congestionStatus_->mode() !=
-            CongestionStatus::Mode::kVc));
+    assert(
+        (congestionSensor_->style() == CongestionSensor::Style::kNull) ||
+        (congestionSensor_->style() != CongestionSensor::Style::kNormalized) ||
+        (congestionSensor_->mode() != CongestionSensor::Mode::kVc));
   }
 
   // create the crossbar and schedulers
@@ -97,7 +97,7 @@ Router::Router(
       InputQueue* iq = new InputQueue(
           iqName, this, this, inputQueueDepth_, port, numVcs_, vc, vcaSwaWait,
           rf, vcScheduler_, clientIndex, crossbarScheduler_, clientIndex,
-          crossbar_, clientIndex, congestionStatus_);
+          crossbar_, clientIndex, congestionSensor_);
       inputQueues_.at(vcIdx) = iq;
 
       // register the input queue with VC and crossbar schedulers
@@ -117,7 +117,7 @@ Router::Router(
 
     // output queue
     OutputQueue* oq = new OutputQueue(
-        oqName, this, this, outputQueueDepth, port, congestionStatus_,
+        oqName, this, this, outputQueueDepth, port, congestionSensor_,
         oqDecrWatcher);
     outputQueues_.at(port) = oq;
 
@@ -131,7 +131,7 @@ Router::Router(
 }
 
 Router::~Router() {
-  delete congestionStatus_;
+  delete congestionSensor_;
   delete crossbar_;
   delete vcScheduler_;
   delete crossbarScheduler_;
@@ -168,9 +168,9 @@ void Router::initialize() {
       // initialize the credit count in the CrossbarScheduler
       crossbarScheduler_->initCredits(vcIdx, inputQueueDepth_);
 
-      // initialize the credit count in the CongestionStatus for downstream
+      // initialize the credit count in the CongestionSensor for downstream
       //  queues
-      congestionStatus_->initCredits(vcIdx, inputQueueDepth_);
+      congestionSensor_->initCredits(vcIdx, inputQueueDepth_);
     }
   }
 }
@@ -196,7 +196,7 @@ void Router::receiveCredit(u32 _port, Credit* _credit) {
     u32 vcIdx = vcIndex(_port, vc);
     crossbarScheduler_->incrementCredit(vcIdx);
     if (congestionMode_ == Router::CongestionMode::kDownstream) {
-      congestionStatus_->incrementCredit(vcIdx);
+      congestionSensor_->incrementCredit(vcIdx);
     }
   }
   delete _credit;
@@ -227,7 +227,7 @@ void Router::sendFlit(u32 _port, Flit* _flit) {
 
 f64 Router::congestionStatus(u32 _inputPort, u32 _inputVc,
                              u32 _outputPort, u32 _outputVc) const {
-  return congestionStatus_->status(_inputPort, _inputVc, _outputPort,
+  return congestionSensor_->status(_inputPort, _inputVc, _outputPort,
                                    _outputVc);
 }
 

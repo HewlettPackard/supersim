@@ -44,13 +44,14 @@
     },
     "router": {
       "architecture": "input_queued",
-      "congestion_status": {
+      "congestion_sensor": {
         "algorithm": "buffer_occupancy",
         "latency": 1,
         "granularity": 0,
+        "minimum": 0.0,
+        "offset": 0.0,
         "mode": "normalized_vc", //(normalized_port/vc absolute_port/vc)
         "phantom": true,
-        "minimum": 0.0,
         "value_coeff": 1.23,
         "length_coeff": 2.5
       },

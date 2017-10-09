@@ -30,7 +30,7 @@ const s32 PHANTOM = 0x87;
 BufferOccupancy::BufferOccupancy(
     const std::string& _name, const Component* _parent, PortedDevice* _device,
     Json::Value _settings)
-    : CongestionStatus(_name, _parent, _device, _settings),
+    : CongestionSensor(_name, _parent, _device, _settings),
       latency_(_settings["latency"].asUInt()),
       mode_(parseMode(_settings["mode"].asString())) {
   assert(latency_ > 0);
@@ -112,15 +112,15 @@ void BufferOccupancy::processEvent(void* _event, s32 _type) {
   }
 }
 
-CongestionStatus::Style BufferOccupancy::style() const {
+CongestionSensor::Style BufferOccupancy::style() const {
   switch (mode_) {
     case BufferOccupancy::Mode::kVcNorm:
     case BufferOccupancy::Mode::kPortNorm:
-      return CongestionStatus::Style::kNormalized;
+      return CongestionSensor::Style::kNormalized;
       break;
     case BufferOccupancy::Mode::kVcAbs:
     case BufferOccupancy::Mode::kPortAbs:
-      return CongestionStatus::Style::kAbsolute;
+      return CongestionSensor::Style::kAbsolute;
       break;
     default:
       assert(false);
@@ -128,15 +128,15 @@ CongestionStatus::Style BufferOccupancy::style() const {
   }
 }
 
-CongestionStatus::Mode BufferOccupancy::mode() const {
+CongestionSensor::Mode BufferOccupancy::mode() const {
   switch (mode_) {
     case BufferOccupancy::Mode::kVcNorm:
     case BufferOccupancy::Mode::kVcAbs:
-      return CongestionStatus::Mode::kVc;
+      return CongestionSensor::Mode::kVc;
       break;
     case BufferOccupancy::Mode::kPortNorm:
     case BufferOccupancy::Mode::kPortAbs:
-      return CongestionStatus::Mode::kPort;
+      return CongestionSensor::Mode::kPort;
       break;
     default:
       assert(false);
@@ -279,5 +279,5 @@ f64 BufferOccupancy::portAverageStatusAbs(u32 _outputPort) const {
   return std::max(0.0, (f64)curSum);
 }
 
-registerWithFactory("buffer_occupancy", CongestionStatus,
-                    BufferOccupancy, CONGESTIONSTATUS_ARGS);
+registerWithFactory("buffer_occupancy", CongestionSensor,
+                    BufferOccupancy, CONGESTIONSENSOR_ARGS);

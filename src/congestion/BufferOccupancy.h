@@ -21,9 +21,9 @@
 #include <string>
 #include <vector>
 
-#include "congestion/CongestionStatus.h"
+#include "congestion/CongestionSensor.h"
 
-class BufferOccupancy : public CongestionStatus {
+class BufferOccupancy : public CongestionSensor {
  public:
   BufferOccupancy(const std::string& _name, const Component* _parent,
                   PortedDevice* _device, Json::Value _settings);
@@ -39,11 +39,11 @@ class BufferOccupancy : public CongestionStatus {
   void processEvent(void* _event, s32 _type);
 
   // style and mode reporting
-  CongestionStatus::Style style() const override;
-  CongestionStatus::Mode mode() const override;
+  CongestionSensor::Style style() const override;
+  CongestionSensor::Mode mode() const override;
 
  protected:
-  // see CongestionStatus::computeStatus
+  // see CongestionSensor::computeStatus
   f64 computeStatus(u32 _inputPort, u32 _inputVc, u32 _outputPort,
                     u32 _outputVc) const override;
 

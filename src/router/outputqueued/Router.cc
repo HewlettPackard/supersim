@@ -19,7 +19,7 @@
 #include <cassert>
 #include <cmath>
 
-#include "congestion/CongestionStatus.h"
+#include "congestion/CongestionSensor.h"
 #include "network/Network.h"
 #include "router/outputqueued/Ejector.h"
 #include "router/outputqueued/InputQueue.h"
@@ -68,15 +68,16 @@ Router::Router(
   }
 
   // create a congestion status device
-  congestionStatus_ = CongestionStatus::create(
-      "CongestionStatus", this, this, _settings["congestion_status"]);
+  congestionSensor_ = CongestionSensor::create(
+      "CongestionSensor", this, this, _settings["congestion_sensor"]);
 
   // when running in one type of output mode, ensure the congestion status
   //  module is operating in absolute mode because the output queues are
   //  infinite and relative occupancy will always be zero
   if ((congestionMode_ == Router::CongestionMode::kOutput) ||
       (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
-    assert(congestionStatus_->style() == CongestionStatus::Style::kAbsolute);
+    assert((congestionSensor_->style() == CongestionSensor::Style::kNull) ||
+           (congestionSensor_->style() == CongestionSensor::Style::kAbsolute));
   }
 
   // create routing algorithms, input queues, link to routing algorithm,
@@ -148,7 +149,7 @@ Router::Router(
       OutputQueue* oq = new OutputQueue(
           oqName, this, this, outputQueueDepth_, port, vc,
           outputCrossbarSchedulers_.at(port), clientIndexOut,
-          outputCrossbars_.at(port), clientIndexOut, congestionStatus_,
+          outputCrossbars_.at(port), clientIndexOut, congestionSensor_,
           clientIndexMain, oqIncrWatcher, oqDecrWatcher);
       outputQueues_.at(clientIndexMain) = oq;
 
@@ -166,7 +167,7 @@ Router::Router(
 }
 
 Router::~Router() {
-  delete congestionStatus_;
+  delete congestionSensor_;
   for (u32 vc = 0; vc < (numPorts_ * numVcs_); vc++) {
     delete routingAlgorithms_.at(vc);
     delete inputQueues_.at(vc);
@@ -207,7 +208,7 @@ void Router::initialize() {
       // tell the congestion status module of the number of credits in IQ
       if ((congestionMode_ == Router::CongestionMode::kDownstream) ||
           (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
-        congestionStatus_->initCredits(vcIdx, inputQueueDepth_);
+        congestionSensor_->initCredits(vcIdx, inputQueueDepth_);
       }
 
       // initialize the credit count in the OutputCrossbarScheduler
@@ -216,7 +217,7 @@ void Router::initialize() {
       // tell the congestion status module of the number of credits (infinite)
       if ((congestionMode_ == Router::CongestionMode::kOutput) ||
           (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
-        congestionStatus_->initCredits(vcIdx, U32_MAX);
+        congestionSensor_->initCredits(vcIdx, U32_MAX);
       }
     }
   }
@@ -273,7 +274,7 @@ void Router::receiveCredit(u32 _port, Credit* _credit) {
     if ((congestionMode_ == Router::CongestionMode::kDownstream) ||
         (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
       u32 vcIdx = vcIndex(_port, vc);
-      congestionStatus_->incrementCredit(vcIdx);
+      congestionSensor_->incrementCredit(vcIdx);
     }
   }
   delete _credit;
@@ -304,7 +305,7 @@ void Router::sendFlit(u32 _port, Flit* _flit) {
 
 f64 Router::congestionStatus(u32 _inputPort, u32 _inputVc,
                              u32 _outputPort, u32 _outputVc) const {
-  return congestionStatus_->status(_inputPort, _inputVc, _outputPort,
+  return congestionSensor_->status(_inputPort, _inputVc, _outputPort,
                                    _outputVc);
 }
 
@@ -386,7 +387,7 @@ void Router::processTransfers(u32 _outputVcIdx) {
         // decrement credit in the congestion status module, if appropriate
         if ((congestionMode_ == Router::CongestionMode::kOutput) ||
             (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
-          congestionStatus_->decrementCredit(_outputVcIdx);
+          congestionSensor_->decrementCredit(_outputVcIdx);
         }
       }
 

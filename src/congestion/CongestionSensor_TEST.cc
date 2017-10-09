@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "congestion/CongestionStatus_TEST.h"
+#include "congestion/CongestionSensor_TEST.h"
 
 #include <gtest/gtest.h>
 
@@ -30,15 +30,15 @@ CongestionTestRouter::CongestionTestRouter(
     MetadataHandler* _metadataHandler, Json::Value _settings)
     : Router(_name, _parent, _network, _id, _address, _numPorts, _numVcs,
              _metadataHandler, _settings),
-      congestionStatus_(nullptr) {
+      congestionSensor_(nullptr) {
   outputChannels_.resize(numPorts_);
       }
 
 CongestionTestRouter::~CongestionTestRouter() {}
 
-void CongestionTestRouter::setCongestionStatus(
-    CongestionStatus* _congestionStatus) {
-  congestionStatus_ = _congestionStatus;
+void CongestionTestRouter::setCongestionSensor(
+    CongestionSensor* _congestionSensor) {
+  congestionSensor_ = _congestionSensor;
 }
 
 void CongestionTestRouter::setInputChannel(u32 _port, Channel* _channel) {
@@ -75,7 +75,7 @@ void CongestionTestRouter::sendFlit(u32 _port, Flit* _flit) {
 
 f64 CongestionTestRouter::congestionStatus(
     u32 _inputPort, u32 _inputVc, u32 _outputPort, u32 _outputVc) const {
-  return congestionStatus_->status(_inputPort, _inputVc,
+  return congestionSensor_->status(_inputPort, _inputVc,
                                    _outputPort, _outputVc);
 }
 
@@ -83,8 +83,8 @@ f64 CongestionTestRouter::congestionStatus(
 
 CreditHandler::CreditHandler(
     const std::string& _name, const Component* _parent,
-    CongestionStatus* _congestionStatus, PortedDevice* _device)
-    : Component(_name, _parent), congestionStatus_(_congestionStatus),
+    CongestionSensor* _congestionSensor, PortedDevice* _device)
+    : Component(_name, _parent), congestionSensor_(_congestionSensor),
       device_(_device) {}
 
 CreditHandler::~CreditHandler() {}
@@ -101,12 +101,12 @@ void CreditHandler::processEvent(void* _event, s32 _type) {
   switch (evt->type) {
     case CreditHandler::Type::INCR:
       dbgprintf("incrementing port=%u vc=%u", evt->port, evt->vc);
-      congestionStatus_->incrementCredit(vcIdx);
+      congestionSensor_->incrementCredit(vcIdx);
       break;
 
     case CreditHandler::Type::DECR:
       dbgprintf("decrementing port=%u vc=%u", evt->port, evt->vc);
-      congestionStatus_->decrementCredit(vcIdx);
+      congestionSensor_->decrementCredit(vcIdx);
       break;
 
     default:
@@ -118,8 +118,8 @@ void CreditHandler::processEvent(void* _event, s32 _type) {
 /************************* StatusCheck utility class **************************/
 
 StatusCheck::StatusCheck(const std::string& _name, const Component* _parent,
-                         CongestionStatus* _congestionStatus)
-    : Component(_name, _parent), congestionStatus_(_congestionStatus) {}
+                         CongestionSensor* _congestionSensor)
+    : Component(_name, _parent), congestionSensor_(_congestionSensor) {}
 
 StatusCheck::~StatusCheck() {}
 
@@ -132,7 +132,7 @@ void StatusCheck::setEvent(u64 _time, u8 _epsilon, u32 _inputPort, u32 _inputVc,
 
 void StatusCheck::processEvent(void* _event, s32 _type) {
   Event* evt = reinterpret_cast<Event*>(_event);
-  f64 sts = congestionStatus_->status(evt->inputPort, evt->inputVc,
+  f64 sts = congestionSensor_->status(evt->inputPort, evt->inputVc,
                                       evt->outputPort, evt->outputVc);
   if (sts - evt->exp > 0.002) {
     printf("sts=%f exp=%f\n", sts, evt->exp);

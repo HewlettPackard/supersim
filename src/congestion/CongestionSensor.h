@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef CONGESTION_CONGESTIONSTATUS_H_
-#define CONGESTION_CONGESTIONSTATUS_H_
+#ifndef CONGESTION_CONGESTIONSENSOR_H_
+#define CONGESTION_CONGESTIONSENSOR_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -25,25 +25,27 @@
 #include "architecture/PortedDevice.h"
 #include "event/Component.h"
 
-#define CONGESTIONSTATUS_ARGS const std::string&, const Component*, \
+#define CONGESTIONSENSOR_ARGS const std::string&, const Component*, \
     PortedDevice*, Json::Value
 
-class CongestionStatus : public Component, public CreditWatcher {
+class CongestionSensor : public Component, public CreditWatcher {
  public:
+  // null - won't be used
   // absolute - values range from 0.0 to positive infinity
   // normalized - values range from 0.0 to 1.0
-  enum class Style {kAbsolute, kNormalized};
+  enum class Style {kNull, kAbsolute, kNormalized};
 
+  // null - won't be used
   // vc - values specified per VC
   // port - values specified per port (_outputVc is meaningless)
-  enum class Mode {kVc, kPort};
+  enum class Mode {kNull, kVc, kPort};
 
-  CongestionStatus(const std::string& _name, const Component* _parent,
+  CongestionSensor(const std::string& _name, const Component* _parent,
                    PortedDevice* _device, Json::Value _settings);
-  virtual ~CongestionStatus();
+  virtual ~CongestionSensor();
 
   // this is a congestion status factory
-  static CongestionStatus* create(CONGESTIONSTATUS_ARGS);
+  static CongestionSensor* create(CONGESTIONSENSOR_ARGS);
 
   // this returns congestion status (i.e. 0=empty 1=congested)
   f64 status(u32 _inputPort, u32 _inputVc, u32 _outputPort,
@@ -65,6 +67,8 @@ class CongestionStatus : public Component, public CreditWatcher {
 
  private:
   const u32 granularity_;
+  const f64 minimum_;
+  const f64 offset_;
 };
 
-#endif  // CONGESTION_CONGESTIONSTATUS_H_
+#endif  // CONGESTION_CONGESTIONSENSOR_H_

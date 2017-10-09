@@ -17,8 +17,8 @@
 #include <gtest/gtest.h>
 #include <prim/prim.h>
 
-#include "congestion/CongestionStatus.h"
-#include "congestion/CongestionStatus_TEST.h"
+#include "congestion/CongestionSensor.h"
+#include "congestion/CongestionSensor_TEST.h"
 #include "test/TestSetup_TEST.h"
 
 TEST(BufferOccupancy, normVc) {
@@ -36,25 +36,27 @@ TEST(BufferOccupancy, normVc) {
       routerSettings);
   router.setDebug(debug);
 
-  Json::Value statusSettings;
-  statusSettings["latency"] = latency;
-  statusSettings["granularity"] = granularity;
-  statusSettings["mode"] = "normalized_vc";
-  BufferOccupancy status("CongestionStatus", &router, &router,
-                         statusSettings);
-  status.setDebug(debug);
+  Json::Value sensorSettings;
+  sensorSettings["latency"] = latency;
+  sensorSettings["granularity"] = granularity;
+  sensorSettings["mode"] = "normalized_vc";
+  sensorSettings["minimum"] = 0;
+  sensorSettings["offset"] = 0;
+  BufferOccupancy sensor("CongestionSensor", &router, &router,
+                         sensorSettings);
+  sensor.setDebug(debug);
 
   for (u32 port = 0; port < numPorts; port++) {
     for (u32 vc = 0; vc < numVcs; vc++) {
       u32 max = port * 10 + vc + 2;
-      status.initCredits(router.vcIndex(port, vc), max);
+      sensor.initCredits(router.vcIndex(port, vc), max);
     }
   }
 
-  CreditHandler crediter("CreditHandler", nullptr, &status, &router);
+  CreditHandler crediter("CreditHandler", nullptr, &sensor, &router);
   crediter.setDebug(debug);
 
-  StatusCheck check("StatusCheck", nullptr, &status);
+  StatusCheck check("StatusCheck", nullptr, &sensor);
   check.setDebug(debug);
 
   u64 time = 1000;
@@ -112,25 +114,27 @@ TEST(BufferOccupancy, absVc) {
       routerSettings);
   router.setDebug(debug);
 
-  Json::Value statusSettings;
-  statusSettings["latency"] = latency;
-  statusSettings["granularity"] = granularity;
-  statusSettings["mode"] = "absolute_vc";
-  BufferOccupancy status("CongestionStatus", &router, &router,
-                         statusSettings);
-  status.setDebug(debug);
+  Json::Value sensorSettings;
+  sensorSettings["latency"] = latency;
+  sensorSettings["granularity"] = granularity;
+  sensorSettings["mode"] = "absolute_vc";
+  sensorSettings["minimum"] = 0;
+  sensorSettings["offset"] = 0;
+  BufferOccupancy sensor("CongestionSensor", &router, &router,
+                         sensorSettings);
+  sensor.setDebug(debug);
 
   for (u32 port = 0; port < numPorts; port++) {
     for (u32 vc = 0; vc < numVcs; vc++) {
       u32 max = port * 10 + vc + 2;
-      status.initCredits(router.vcIndex(port, vc), max);
+      sensor.initCredits(router.vcIndex(port, vc), max);
     }
   }
 
-  CreditHandler crediter("CreditHandler", nullptr, &status, &router);
+  CreditHandler crediter("CreditHandler", nullptr, &sensor, &router);
   crediter.setDebug(debug);
 
-  StatusCheck check("StatusCheck", nullptr, &status);
+  StatusCheck check("StatusCheck", nullptr, &sensor);
   check.setDebug(debug);
 
   u64 time = 1000;
@@ -187,25 +191,27 @@ TEST(BufferOccupancy, normPort) {
       routerSettings);
   router.setDebug(debug);
 
-  Json::Value statusSettings;
-  statusSettings["latency"] = latency;
-  statusSettings["granularity"] = granularity;
-  statusSettings["mode"] = "normalized_port";
-  BufferOccupancy status("CongestionStatus", &router, &router,
-                         statusSettings);
-  status.setDebug(debug);
+  Json::Value sensorSettings;
+  sensorSettings["latency"] = latency;
+  sensorSettings["granularity"] = granularity;
+  sensorSettings["mode"] = "normalized_port";
+  sensorSettings["minimum"] = 0;
+  sensorSettings["offset"] = 0;
+  BufferOccupancy sensor("CongestionSensor", &router, &router,
+                         sensorSettings);
+  sensor.setDebug(debug);
 
   for (u32 port = 0; port < numPorts; port++) {
     for (u32 vc = 0; vc < numVcs; vc++) {
       u32 max = port * 10 + vc + 2;
-      status.initCredits(router.vcIndex(port, vc), max);
+      sensor.initCredits(router.vcIndex(port, vc), max);
     }
   }
 
-  CreditHandler crediter("CreditHandler", nullptr, &status, &router);
+  CreditHandler crediter("CreditHandler", nullptr, &sensor, &router);
   crediter.setDebug(debug);
 
-  StatusCheck check("StatusCheck", nullptr, &status);
+  StatusCheck check("StatusCheck", nullptr, &sensor);
   check.setDebug(debug);
 
   u64 time = 1000;
@@ -269,25 +275,27 @@ TEST(BufferOccupancy, absPort) {
       routerSettings);
   router.setDebug(debug);
 
-  Json::Value statusSettings;
-  statusSettings["latency"] = latency;
-  statusSettings["granularity"] = granularity;
-  statusSettings["mode"] = "absolute_port";
-  BufferOccupancy status("CongestionStatus", &router, &router,
-                         statusSettings);
-  status.setDebug(debug);
+  Json::Value sensorSettings;
+  sensorSettings["latency"] = latency;
+  sensorSettings["granularity"] = granularity;
+  sensorSettings["mode"] = "absolute_port";
+  sensorSettings["minimum"] = 0;
+  sensorSettings["offset"] = 0;
+  BufferOccupancy sensor("CongestionSensor", &router, &router,
+                         sensorSettings);
+  sensor.setDebug(debug);
 
   for (u32 port = 0; port < numPorts; port++) {
     for (u32 vc = 0; vc < numVcs; vc++) {
       u32 max = port * 10 + vc + 2;
-      status.initCredits(router.vcIndex(port, vc), max);
+      sensor.initCredits(router.vcIndex(port, vc), max);
     }
   }
 
-  CreditHandler crediter("CreditHandler", nullptr, &status, &router);
+  CreditHandler crediter("CreditHandler", nullptr, &sensor, &router);
   crediter.setDebug(debug);
 
-  StatusCheck check("StatusCheck", nullptr, &status);
+  StatusCheck check("StatusCheck", nullptr, &sensor);
   check.setDebug(debug);
 
   u64 time = 1000;
@@ -337,7 +345,7 @@ TEST(BufferOccupancy, phantomNormVc) {
   const bool debug = false;
   const u32 numPorts = 1;
   const u32 numVcs = 1;
-  const u32 statusLatency = 1;
+  const u32 sensorLatency = 1;
   const u32 bufferDepth = 200;
 
   const u32 granularity = 0;
@@ -358,23 +366,25 @@ TEST(BufferOccupancy, phantomNormVc) {
         Channel channel("Channel", nullptr, 8, channelSettings);
         router.setOutputChannel(0, &channel);
 
-        Json::Value statusSettings;
-        statusSettings["latency"] = statusLatency;
-        statusSettings["granularity"] = granularity;
-        statusSettings["phantom"] = true;
-        statusSettings["value_coeff"] = valueCoeff;
-        statusSettings["length_coeff"] = lengthCoeff;
-        statusSettings["mode"] = "normalized_vc";
-        BufferOccupancy status("CongestionStatus", &router, &router,
-                               statusSettings);
-        status.setDebug(debug);
+        Json::Value sensorSettings;
+        sensorSettings["latency"] = sensorLatency;
+        sensorSettings["granularity"] = granularity;
+        sensorSettings["phantom"] = true;
+        sensorSettings["value_coeff"] = valueCoeff;
+        sensorSettings["length_coeff"] = lengthCoeff;
+        sensorSettings["mode"] = "normalized_vc";
+        sensorSettings["minimum"] = 0;
+        sensorSettings["offset"] = 0;
+        BufferOccupancy sensor("CongestionSensor", &router, &router,
+                               sensorSettings);
+        sensor.setDebug(debug);
 
-        status.initCredits(router.vcIndex(0, 0), bufferDepth);
+        sensor.initCredits(router.vcIndex(0, 0), bufferDepth);
 
-        CreditHandler crediter("CreditHandler", nullptr, &status, &router);
+        CreditHandler crediter("CreditHandler", nullptr, &sensor, &router);
         crediter.setDebug(debug);
 
-        StatusCheck check("StatusCheck", nullptr, &status);
+        StatusCheck check("StatusCheck", nullptr, &sensor);
         check.setDebug(debug);
 
         // send flits (decrement credits)
@@ -384,7 +394,7 @@ TEST(BufferOccupancy, phantomNormVc) {
           time++;
         }
 
-        // create events for status checking
+        // create events for sensor checking
         for (u32 ch = 0; ch < 100; ch++) {
           f64 inWindow = (f64)(u32)(channelLatency * lengthCoeff) -
               std::min((u32)(channelLatency * lengthCoeff), ch);
@@ -410,7 +420,7 @@ TEST(BufferOccupancy, phantomAbsVc) {
   const bool debug = false;
   const u32 numPorts = 1;
   const u32 numVcs = 1;
-  const u32 statusLatency = 1;
+  const u32 sensorLatency = 1;
   const u32 bufferDepth = 200;
 
   const u32 granularity = 0;
@@ -431,23 +441,25 @@ TEST(BufferOccupancy, phantomAbsVc) {
         Channel channel("Channel", nullptr, 8, channelSettings);
         router.setOutputChannel(0, &channel);
 
-        Json::Value statusSettings;
-        statusSettings["latency"] = statusLatency;
-        statusSettings["granularity"] = granularity;
-        statusSettings["phantom"] = true;
-        statusSettings["value_coeff"] = valueCoeff;
-        statusSettings["length_coeff"] = lengthCoeff;
-        statusSettings["mode"] = "absolute_vc";
-        BufferOccupancy status("CongestionStatus", &router, &router,
-                               statusSettings);
-        status.setDebug(debug);
+        Json::Value sensorSettings;
+        sensorSettings["latency"] = sensorLatency;
+        sensorSettings["granularity"] = granularity;
+        sensorSettings["phantom"] = true;
+        sensorSettings["value_coeff"] = valueCoeff;
+        sensorSettings["length_coeff"] = lengthCoeff;
+        sensorSettings["mode"] = "absolute_vc";
+        sensorSettings["minimum"] = 0;
+        sensorSettings["offset"] = 0;
+        BufferOccupancy sensor("CongestionSensor", &router, &router,
+                               sensorSettings);
+        sensor.setDebug(debug);
 
-        status.initCredits(router.vcIndex(0, 0), bufferDepth);
+        sensor.initCredits(router.vcIndex(0, 0), bufferDepth);
 
-        CreditHandler crediter("CreditHandler", nullptr, &status, &router);
+        CreditHandler crediter("CreditHandler", nullptr, &sensor, &router);
         crediter.setDebug(debug);
 
-        StatusCheck check("StatusCheck", nullptr, &status);
+        StatusCheck check("StatusCheck", nullptr, &sensor);
         check.setDebug(debug);
 
         // send flits (decrement credits)
@@ -457,7 +469,7 @@ TEST(BufferOccupancy, phantomAbsVc) {
           time++;
         }
 
-        // create events for status checking
+        // create events for sensor checking
         for (u32 ch = 0; ch < 100; ch++) {
           f64 inWindow = (f64)(u32)(channelLatency * lengthCoeff) -
               std::min((u32)(channelLatency * lengthCoeff), ch);

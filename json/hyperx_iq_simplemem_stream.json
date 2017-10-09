@@ -41,11 +41,13 @@
     },
     "router": {
       "architecture": "input_queued",
-      "congestion_status": {
+      "congestion_sensor": {
         "algorithm": "buffer_occupancy",
         "latency": 1,
         "granularity": 0,
-        "mode": "normalized_port" //(normalized_port/vc absolute_port/vc)
+        "minimum": 0.0,
+        "offset": 0.0,
+        "mode": "normalized_port"  // {normalized,absolute}_{port,vc}
       },
       "congestion_mode": "downstream",
       "input_queue_depth": 16,

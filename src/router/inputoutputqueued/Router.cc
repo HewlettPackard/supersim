@@ -19,7 +19,7 @@
 #include <cassert>
 #include <cmath>
 
-#include "congestion/CongestionStatus.h"
+#include "congestion/CongestionSensor.h"
 #include "network/Network.h"
 #include "router/inputoutputqueued/Ejector.h"
 #include "router/inputoutputqueued/InputQueue.h"
@@ -50,8 +50,8 @@ Router::Router(
   assert(outputQueueDepth_ > 0);
 
   // create a congestion status device
-  congestionStatus_ = CongestionStatus::create(
-      "CongestionStatus", this, this, _settings["congestion_status"]);
+  congestionSensor_ = CongestionSensor::create(
+      "CongestionSensor", this, this, _settings["congestion_sensor"]);
 
   // create crossbar and schedulers
   crossbar_ = new Crossbar(
@@ -96,7 +96,7 @@ Router::Router(
       InputQueue* iq = new InputQueue(
           iqName, this, this, inputQueueDepth_, port, numVcs_, vc, vcaSwaWait,
           rf, vcScheduler_, clientIndex, crossbarScheduler_, clientIndex,
-          crossbar_, clientIndex, congestionStatus_, iqDecrWatcher);
+          crossbar_, clientIndex, congestionSensor_, iqDecrWatcher);
       inputQueues_.at(vcIdx) = iq;
 
       // register the input queue with VC and crossbar schedulers
@@ -151,7 +151,7 @@ Router::Router(
           oqName, this, outputQueueDepth_, port, vc,
           outputCrossbarSchedulers_.at(port), clientIndexOut,
           outputCrossbars_.at(port), clientIndexOut, crossbarScheduler_,
-          clientIndexMain, congestionStatus_, clientIndexMain, oqIncrWatcher,
+          clientIndexMain, congestionSensor_, clientIndexMain, oqIncrWatcher,
           oqDecrWatcher);
       outputQueues_.at(clientIndexMain) = oq;
 
@@ -169,7 +169,7 @@ Router::Router(
 }
 
 Router::~Router() {
-  delete congestionStatus_;
+  delete congestionSensor_;
   delete vcScheduler_;
   delete crossbarScheduler_;
   delete crossbar_;
@@ -214,26 +214,26 @@ void Router::initialize() {
       // initialize the credit count in the CrossbarScheduler
       crossbarScheduler_->initCredits(vcIdx, outputQueueDepth_);
 
-      // initialize the credit count in the CongestionStatus for downstream
+      // initialize the credit count in the CongestionSensor for downstream
       //  queues
       if ((congestionMode_ == Router::CongestionMode::kDownstream) ||
           (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
-        congestionStatus_->initCredits(vcIdx, inputQueueDepth_);
+        congestionSensor_->initCredits(vcIdx, inputQueueDepth_);
       }
 
       // initialize the credit count in the OutputCrossbarScheduler
       outputCrossbarSchedulers_.at(port)->initCredits(vc, inputQueueDepth_);
 
-      // initialize the credit count in the CongestionStatus for output queues
+      // initialize the credit count in the CongestionSensor for output queues
       if ((congestionMode_ == Router::CongestionMode::kOutput) ||
           (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
-        congestionStatus_->initCredits(vcIdx, outputQueueDepth_);
+        congestionSensor_->initCredits(vcIdx, outputQueueDepth_);
       }
 
       // if congestion mode sees output and downstream queues, account for the
       //  one extra buffer slot in the output queue switch allocation pipeline
       if (congestionMode_ == Router::CongestionMode::kOutputAndDownstream) {
-        congestionStatus_->initCredits(vcIdx, 1);
+        congestionSensor_->initCredits(vcIdx, 1);
       }
     }
   }
@@ -262,7 +262,7 @@ void Router::receiveCredit(u32 _port, Credit* _credit) {
     if ((congestionMode_ == Router::CongestionMode::kDownstream) ||
         (congestionMode_ == Router::CongestionMode::kOutputAndDownstream)) {
       u32 vcIdx = vcIndex(_port, vc);
-      congestionStatus_->incrementCredit(vcIdx);
+      congestionSensor_->incrementCredit(vcIdx);
     }
   }
   delete _credit;
@@ -293,7 +293,7 @@ void Router::sendFlit(u32 _port, Flit* _flit) {
 
 f64 Router::congestionStatus(u32 _inputPort, u32 _inputVc,
                              u32 _outputPort, u32 _outputVc) const {
-  return congestionStatus_->status(_inputPort, _inputVc, _outputPort,
+  return congestionSensor_->status(_inputPort, _inputVc, _outputPort,
                                    _outputVc);
 }
 

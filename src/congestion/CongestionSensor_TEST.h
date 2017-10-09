@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef CONGESTION_CONGESTIONSTATUS_TEST_H_
-#define CONGESTION_CONGESTIONSTATUS_TEST_H_
+#ifndef CONGESTION_CONGESTIONSENSOR_TEST_H_
+#define CONGESTION_CONGESTIONSENSOR_TEST_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "architecture/PortedDevice.h"
-#include "congestion/CongestionStatus.h"
+#include "congestion/CongestionSensor.h"
 #include "event/Component.h"
 #include "metadata/MetadataHandler.h"
 #include "network/Channel.h"
@@ -38,7 +38,7 @@ class CongestionTestRouter : public Router {
       MetadataHandler* _metadataHandler, Json::Value _settings);
   ~CongestionTestRouter();
 
-  void setCongestionStatus(CongestionStatus* _congestionStatus);
+  void setCongestionSensor(CongestionSensor* _congestionSensor);
 
   void setInputChannel(u32 _port, Channel* _channel) override;
   Channel* getInputChannel(u32 _port) const override;
@@ -55,7 +55,7 @@ class CongestionTestRouter : public Router {
                        u32 _outputVc) const override;
 
  private:
-  CongestionStatus* congestionStatus_;
+  CongestionSensor* congestionSensor_;
   std::vector<Channel*> outputChannels_;
 };
 
@@ -65,7 +65,7 @@ class CreditHandler : public Component {
   enum class Type {INCR, DECR};
 
   CreditHandler(const std::string& _name, const Component* _parent,
-                CongestionStatus* _congestionStatus, PortedDevice* _device);
+                CongestionSensor* _congestionSensor, PortedDevice* _device);
   ~CreditHandler();
 
   void setEvent(u32 _port, u32 _vc, u64 _time, u8 _epsilon,
@@ -79,7 +79,7 @@ class CreditHandler : public Component {
     u32 vc;
   };
 
-  CongestionStatus* congestionStatus_;
+  CongestionSensor* congestionSensor_;
   PortedDevice* device_;
 };
 
@@ -87,7 +87,7 @@ class CreditHandler : public Component {
 class StatusCheck : public Component {
  public:
   StatusCheck(const std::string& _name, const Component* _parent,
-              CongestionStatus* _congestionStatus);
+              CongestionSensor* _congestionSensor);
   ~StatusCheck();
 
   void setEvent(u64 _time, u8 _epsilon, u32 _inputPort, u32 _inputVc,
@@ -103,7 +103,7 @@ class StatusCheck : public Component {
     f64 exp;
   };
 
-  CongestionStatus* congestionStatus_;
+  CongestionSensor* congestionSensor_;
 };
 
-#endif  // CONGESTION_CONGESTIONSTATUS_TEST_H_
+#endif  // CONGESTION_CONGESTIONSENSOR_TEST_H_
