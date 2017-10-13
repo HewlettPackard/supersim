@@ -23,6 +23,7 @@
 #include <tuple>
 
 #include "network/cube/util.h"
+#include "network/hyperx/util.h"
 #include "network/hyperx/RoutingAlgorithm.h"
 #include "util/DimensionIterator.h"
 
@@ -291,6 +292,11 @@ void Network::translateRouterIdToAddress(
 u32 Network::translateRouterAddressToId(
     const std::vector<u32>* _address) const {
   return Cube::computeRouterId(_address, dimensionWidths_);
+}
+
+u32 Network::computeMinimalHops(const std::vector<u32>* _source,
+                                const std::vector<u32>* _destination) const {
+  return HyperX::computeMinimalHops(_source, _destination, dimensions_);
 }
 
 void Network::collectChannels(std::vector<Channel*>* _channels) {

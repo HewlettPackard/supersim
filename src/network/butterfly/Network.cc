@@ -204,6 +204,11 @@ u32 Network::translateRouterAddressToId(
       routerRadix_, numStages_, stageWidth_, _address);
 }
 
+u32 Network::computeMinimalHops(const std::vector<u32>* _source,
+                                const std::vector<u32>* _destination) const {
+  return Butterfly::computeMinimalHops(numStages_);
+}
+
 void Network::collectChannels(std::vector<Channel*>* _channels) {
   for (auto it = externalChannels_.begin(); it != externalChannels_.end();
        ++it) {

@@ -58,6 +58,9 @@ class Message {
   u32 getDestinationId() const;
   void setDestinationId(u32 _destinationId);
 
+  u32 getMinimalHopCount() const;
+  void setMinimalHopCount(u32 _minimalHopCount);
+
   void setSourceAddress(const std::vector<u32>* _address);
   const std::vector<u32>* getSourceAddress() const;
 
@@ -75,6 +78,7 @@ class Message {
 
   u32 sourceId_;
   u32 destinationId_;
+  u32 minimalHopCount_;
 
   const std::vector<u32>* sourceAddress_;
   const std::vector<u32>* destinationAddress_;

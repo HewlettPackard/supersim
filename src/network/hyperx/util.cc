@@ -12,24 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_TORUS_UTIL_H_
-#define NETWORK_TORUS_UTIL_H_
+#include "network/hyperx/util.h"
 
-#include <prim/prim.h>
+#include <cassert>
 
-#include <vector>
-
-namespace Torus {
-
-// This function determines the dimension correspondance of an input port.
-//  This returns U32_MAX for terminal ports.
-u32 computeInputPortDim(const std::vector<u32>& _dimensionWidths,
-                        u32 _concentration, u32 _inputPort);
+namespace HyperX {
 
 u32 computeMinimalHops(const std::vector<u32>* _source,
                        const std::vector<u32>* _destination,
-                       u32 _dimensions,
-                       const std::vector<u32>& _dimensionWidths);
-}  // namespace Torus
+                       u32 _dimensions) {
+  u32 minHops = 2;
+  for (u32 dim = 0; dim < _dimensions; dim++) {
+    if (_source->at(dim+1) != _destination->at(dim+1)) {
+      minHops += 1;
+    }
+  }
+  return minHops;
+}
 
-#endif  // NETWORK_TORUS_UTIL_H_
+}  // namespace HyperX

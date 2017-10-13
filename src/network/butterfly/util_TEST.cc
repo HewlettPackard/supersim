@@ -154,3 +154,20 @@ TEST(Butterfly, translateRouterAddressToId) {
   ASSERT_EQ(10u, Butterfly::translateRouterAddressToId(
       routerRadix, numStages, stageWidth, &addr));
 }
+
+TEST(Butterfly, computeMinimalHops) {
+  u32 numStages;
+  u32 exp;
+
+  numStages = 3;
+  exp = 4;
+  ASSERT_EQ(exp, Butterfly::computeMinimalHops(numStages));
+
+  numStages = 5;
+  exp = 6;
+  ASSERT_EQ(exp, Butterfly::computeMinimalHops(numStages));
+
+  numStages = 10;
+  exp = 11;
+  ASSERT_EQ(exp, Butterfly::computeMinimalHops(numStages));
+}

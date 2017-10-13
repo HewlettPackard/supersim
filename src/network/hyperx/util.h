@@ -12,31 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_FOLDEDCLOS_UTIL_H_
-#define NETWORK_FOLDEDCLOS_UTIL_H_
+#ifndef NETWORK_HYPERX_UTIL_H_
+#define NETWORK_HYPERX_UTIL_H_
 
 #include <prim/prim.h>
 
 #include <vector>
 
-namespace FoldedClos {
+namespace HyperX {
 
-void translateInterfaceIdToAddress(
-    u32 _halfRadix, u32 _numLevels, u32 _rowRouters,
-    u32 _id, std::vector<u32>* _address);
-u32 translateInterfaceAddressToId(
-    u32 _halfRadix, u32 _numLevels, u32 _rowRouters,
-    const std::vector<u32>* _address);
-void translateRouterIdToAddress(
-    u32 _halfRadix, u32 _numLevels, u32 _rowRouters,
-    u32 _id, std::vector<u32>* _address);
-u32 translateRouterAddressToId(
-    u32 _halfRadix, u32 _numLevels, u32 _rowRouters,
-    const std::vector<u32>* _address);
 u32 computeMinimalHops(const std::vector<u32>* _source,
                        const std::vector<u32>* _destination,
-                       u32 _numLevels);
+                       u32 _dimensions);
+}  // namespace HyperX
 
-}  // namespace FoldedClos
-
-#endif  // NETWORK_FOLDEDCLOS_UTIL_H_
+#endif  // NETWORK_HYPERX_UTIL_H_

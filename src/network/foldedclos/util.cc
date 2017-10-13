@@ -56,4 +56,17 @@ u32 translateRouterAddressToId(
   return _address->at(0) * _rowRouters + _address->at(1);
 }
 
+u32 computeMinimalHops(const std::vector<u32>* _source,
+                       const std::vector<u32>* _destination,
+                       u32 _numLevels) {
+  u32 travLevels;
+  for (travLevels = _numLevels; travLevels > 0; travLevels--) {
+    if (_source->at(travLevels-1) != _destination->at(travLevels-1) ||
+        travLevels == 1) {
+      break;
+    }
+  }
+  return travLevels * 2;
+}
+
 }  // namespace FoldedClos

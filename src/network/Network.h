@@ -59,6 +59,9 @@ class Network : public Component {
       u32 _id, std::vector<u32>* _address) const = 0;
   virtual u32 translateRouterAddressToId(
       const std::vector<u32>* _address) const = 0;
+  virtual u32 computeMinimalHops(
+      const std::vector<u32>* _source,
+      const std::vector<u32>* _destination) const = 0;
   u32 numVcs() const;
   MetadataHandler* metadataHandler() const;
 

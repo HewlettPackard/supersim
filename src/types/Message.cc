@@ -117,6 +117,14 @@ void Message::setDestinationId(u32 _destinationId) {
   destinationId_ = _destinationId;
 }
 
+u32 Message::getMinimalHopCount() const {
+  return minimalHopCount_;
+}
+
+void Message::setMinimalHopCount(u32 _minimalHopCount) {
+  minimalHopCount_ = _minimalHopCount;
+}
+
 void Message::setSourceAddress(const std::vector<u32>* _address) {
   sourceAddress_ = _address;
 }

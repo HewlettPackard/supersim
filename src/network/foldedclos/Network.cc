@@ -245,6 +245,11 @@ u32 Network::translateRouterAddressToId(
                                                 rowRouters_, _address);
 }
 
+u32 Network::computeMinimalHops(const std::vector<u32>* _source,
+                                const std::vector<u32>* _destination) const {
+  return FoldedClos::computeMinimalHops(_source, _destination, numLevels_);
+}
+
 void Network::collectChannels(std::vector<Channel*>* _channels) {
   for (auto it = externalChannels_.begin(); it != externalChannels_.end();
        ++it) {

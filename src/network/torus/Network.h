@@ -55,6 +55,8 @@ class Network : public ::Network {
       u32 _id, std::vector<u32>* _address) const override;
   u32 translateRouterAddressToId(
       const std::vector<u32>* _address) const override;
+  u32 computeMinimalHops(const std::vector<u32>* _source,
+                         const std::vector<u32>* _destination) const override;
 
  protected:
   void collectChannels(std::vector<Channel*>* _channels) override;

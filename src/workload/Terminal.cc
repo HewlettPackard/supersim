@@ -16,6 +16,7 @@
 
 #include <cassert>
 
+#include "network/Network.h"
 #include "workload/Application.h"
 #include "event/Simulator.h"
 #include "metadata/MetadataHandler.h"
@@ -158,6 +159,9 @@ u32 Terminal::sendMessage(Message* _message, u32 _destinationId) {
   _message->setDestinationId(_destinationId);
   Terminal* dest = application()->getTerminal(_destinationId);
   _message->setDestinationAddress(&dest->address_);
+  Network* network = gSim->getNetwork();
+  _message->setMinimalHopCount(network->computeMinimalHops(&address_,
+                                                           &dest->address_));
 
   // track the message as an outstanding message
   bool res = outstandingMessages_.insert(_message).second;

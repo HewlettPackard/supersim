@@ -33,6 +33,7 @@ void translateRouterIdToAddress(
 u32 translateRouterAddressToId(
     u32 _routerRadix, u32 _numStages, u32 _stageWidth,
     const std::vector<u32>* _address);
+u32 computeMinimalHops(u32 _numStages);
 
 }  // namespace Butterfly
 

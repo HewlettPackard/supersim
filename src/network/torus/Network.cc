@@ -19,6 +19,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <algorithm>
 
 #include <tuple>
 
@@ -260,6 +261,12 @@ void Network::translateRouterIdToAddress(
 u32 Network::translateRouterAddressToId(
     const std::vector<u32>* _address) const {
   return Cube::computeRouterId(_address, dimensionWidths_);
+}
+
+u32 Network::computeMinimalHops(const std::vector<u32>* _source,
+                                const std::vector<u32>* _destination) const {
+  return Torus::computeMinimalHops(_source, _destination, dimensions_,
+                                   dimensionWidths_);
 }
 
 void Network::collectChannels(std::vector<Channel*>* _channels) {

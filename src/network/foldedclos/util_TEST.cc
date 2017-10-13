@@ -134,3 +134,47 @@ TEST(FoldedClos, translateRouterAddressToId) {
   ASSERT_EQ(93u, FoldedClos::translateRouterAddressToId(
       halfRadix, numLevels, rowRouters, &addr));
 }
+
+TEST(FoldedClos, computeMinimalHops) {
+  std::vector<u32> src;
+  std::vector<u32> dst;
+  u32 numLevels;
+  u32 exp;
+
+  src = {0, 0};
+  dst = {0, 1};
+  numLevels = 2;
+  exp = 4;
+  ASSERT_EQ(exp, FoldedClos::computeMinimalHops(&src, &dst, numLevels));
+
+  src = {0, 0};
+  dst = {1, 0};
+  numLevels = 2;
+  exp = 2;
+  ASSERT_EQ(exp, FoldedClos::computeMinimalHops(&src, &dst, numLevels));
+
+  src = {0, 0, 0};
+  dst = {2, 0, 0};
+  numLevels = 3;
+  exp = 2;
+  ASSERT_EQ(exp, FoldedClos::computeMinimalHops(&src, &dst, numLevels));
+
+  src = {0, 0, 0};
+  dst = {2, 2, 0};
+  numLevels = 3;
+  exp = 4;
+  ASSERT_EQ(exp, FoldedClos::computeMinimalHops(&src, &dst, numLevels));
+
+  src = {0, 0, 0};
+  dst = {2, 2, 2};
+  numLevels = 3;
+  exp = 6;
+  ASSERT_EQ(exp, FoldedClos::computeMinimalHops(&src, &dst, numLevels));
+
+
+  src = {0, 0, 0, 0};
+  dst = {2, 2, 2, 2};
+  numLevels = 4;
+  exp = 8;
+  ASSERT_EQ(exp, FoldedClos::computeMinimalHops(&src, &dst, numLevels));
+}

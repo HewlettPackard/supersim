@@ -37,7 +37,8 @@ void MessageLog::logMessage(const Message* _message) {
   ss << _message->getSourceId() << ',';
   ss << _message->getDestinationId() << ',';
   ss << _message->getTransaction() << ',';
-  ss << _message->getProtocolClass() << '\n';
+  ss << _message->getProtocolClass() << ',';
+  ss << _message->getMinimalHopCount()  << '\n';
   for (u32 p = 0; p < _message->numPackets(); p++) {
     Packet* packet = _message->packet(p);
     ss << " +P" << ',';

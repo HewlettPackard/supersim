@@ -12,24 +12,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_TORUS_UTIL_H_
-#define NETWORK_TORUS_UTIL_H_
+#include "network/hyperx/util.h"
 
+#include <gtest/gtest.h>
 #include <prim/prim.h>
 
 #include <vector>
 
-namespace Torus {
+TEST(HyperX, computeMinimalHops) {
+  std::vector<u32> src;
+  std::vector<u32> dst;
+  u32 exp;
+  u32 dimensions;
 
-// This function determines the dimension correspondance of an input port.
-//  This returns U32_MAX for terminal ports.
-u32 computeInputPortDim(const std::vector<u32>& _dimensionWidths,
-                        u32 _concentration, u32 _inputPort);
+  src = {2, 0};
+  dst = {0, 1};
+  dimensions = 1;
+  exp = 3;
+  ASSERT_EQ(exp, HyperX::computeMinimalHops(&src, &dst, dimensions));
 
-u32 computeMinimalHops(const std::vector<u32>* _source,
-                       const std::vector<u32>* _destination,
-                       u32 _dimensions,
-                       const std::vector<u32>& _dimensionWidths);
-}  // namespace Torus
+  src = {0, 0, 0};
+  dst = {0, 2, 2};
+  dimensions = 2;
+  exp = 4;
+  ASSERT_EQ(exp, HyperX::computeMinimalHops(&src, &dst, dimensions));
 
-#endif  // NETWORK_TORUS_UTIL_H_
+  src = {0, 1, 0, 0};
+  dst = {0, 2, 2, 2};
+  dimensions = 3;
+  exp = 5;
+  ASSERT_EQ(exp, HyperX::computeMinimalHops(&src, &dst, dimensions));
+}

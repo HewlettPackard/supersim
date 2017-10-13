@@ -231,6 +231,15 @@ u32 Network::translateRouterAddressToId(
   return _address->at(0);
 }
 
+u32 Network::computeMinimalHops(const std::vector<u32>* _source,
+                                const std::vector<u32>* _destination) const {
+  u32 numr = routers_.size();
+  u32 src = translateRouterAddressToId(_source);
+  u32 myr = src/concentration_;
+  u32 minHops = numr - myr + 1;
+  return minHops;
+}
+
 void Network::collectChannels(std::vector<Channel*>* _channels) {
   for (auto it = externalChannels_.begin(); it != externalChannels_.end();
        ++it) {
