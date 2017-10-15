@@ -2,7 +2,7 @@
 
 ## What is it?
 *SuperSim* is an event-driven cycle-accurate flit-level interconnection network simulator written in C++. SuperSim's highest priority is flexibility. As Professor [Christos Kozyrakis][christos] once said:
-> If a simulator already does what you want it to do, you're most likely asking the wrong questions.
+> If a simulator already does what you want it to do, there's a good chance you aren't asking the right questions.
 
 SuperSim is designed to be a simulation framework, not a ready-to-go simulator for all scenarios. The core of SuperSim is a well-structured abstract class hierarchy that generically represents the interaction between common network components. Specific implementations override the basic abstractions to create the desired functionality without reinventing the wheel for every new model.
 
