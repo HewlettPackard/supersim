@@ -22,11 +22,11 @@ def doit(cmd, failsafe=False, quiet=False):
 def clone(loc, url, commit):
   if not os.path.isdir(loc):
     doit('git clone {0} {1}'.format(url, loc))
+    if commit:
+      doit('cd {0} && git checkout {1}'.format(loc, commit))
   else:
     print('INFO: {0} is already cloned'.format(loc))
     doit('cd {0} && git pull'.format(loc))
-  if commit:
-    doit('cd {0} && git checkout {1}'.format(loc, commit))
 
 def install(loc, url, commit):
   userbin = os.path.join(site.USER_BASE, 'bin')
