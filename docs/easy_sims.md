@@ -82,7 +82,7 @@ Note, we have three different plotting options: load vs. latency plot (lplot), l
 Now you are ready to run large or complex simulations with just a few lines of code. Enjoy!
 
 [TaskRun]: https://github.com/nicmcd/taskrun
-[SSLatency]: https://github.com/nicmcd/sslatency
+[SSparse]: https://github.com/nicmcd/ssparse
 [SSPlot]: https://github.com/nicmcd/ssplot
 [sssweep]: https://github.com/nicmcd/sssweep
 [easy_sims.py]: ../scripts/easy_sims.py

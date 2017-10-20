@@ -48,7 +48,7 @@ for a in ['oblivious', 'adaptive']:
     sim_name = 'sim_' + id
     sim_cmd = ('../supersim/bin/supersim '
                'settings.json '
-               'network.traffic_classes[0].routing.adaptive=bool={0} '
+               'network.protocol_classes[0].routing.adaptive=bool={0} '
                'workload.applications[0].blast_terminal.request_injection_rate=float={1} '
                'workload.applications[0].blast_terminal.enable_responses=bool=false '
                'network.channel_log.file=string={2} '
@@ -78,8 +78,8 @@ for a in ['oblivious', 'adaptive']:
   for l in loads:
     id = a + '_' + l
     parse_name = 'parse_' + id
-    parse_cmd = ('../sslatency/bin/sslatency '
-                 '-a {0}/aggregate_{1}.csv '
+    parse_cmd = ('../ssparse/bin/ssparse '
+                 '-l {0}/latency_{1}.csv '
                  '-m {0}/messages_{1}.csv.gz '
                  '-s 0.001 '
                  '{2}'
@@ -90,7 +90,7 @@ for a in ['oblivious', 'adaptive']:
     parse_task.add_dependency(sim_tasks[id])
     parse_task.add_condition(FileModificationCondition(
       [out_dir +'/messages_' + id + '.mpf.gz'],
-      [out_dir +'/aggregate_' + id + '.csv',
+      [out_dir +'/latency_' + id + '.csv',
        out_dir +'/messages_' + id + '.csv.gz']))
     parse_tasks[id] = parse_task
 
@@ -124,7 +124,7 @@ for a in ['oblivious', 'adaptive']:
                        lplot_title))
   for l in loads:
     id2 = a + '_' + l
-    lplot_cmd += out_dir +'/aggregate_' + id2 + '.csv '
+    lplot_cmd += out_dir +'/latency_' + id2 + '.csv '
   lplot_task = ProcessTask(tm, lplot_name, lplot_cmd)
   lplot_task.resources = {'cpus': 1, 'mem': 3}
   lplot_task.priority = 1
@@ -135,7 +135,7 @@ for a in ['oblivious', 'adaptive']:
     [], [out_dir +'/lplot_' + id + '.png'])
   for l in loads:
     id2 = a + '_' + l
-    lplot_fmc.add_input(out_dir +'/aggregate_' + id2 + '.csv')
+    lplot_fmc.add_input(out_dir +'/latency_' + id2 + '.csv')
   lplot_task.add_condition(lplot_fmc)
 
 # create all sslcp tasks
@@ -149,7 +149,7 @@ for f in ssplot.LoadLatencyStats.FIELDS:
   for a in ['oblivious', 'adaptive']:
     for l in loads:
       id2 = a + '_' + l
-      cplot_cmd += out_dir +'/aggregate_' + id2 + '.csv '
+      cplot_cmd += out_dir +'/latency_' + id2 + '.csv '
   for a in ['oblivious', 'adaptive']:
     cplot_cmd += '--label ' + a + ' '
   cplot_task = ProcessTask(tm, cplot_name, cplot_cmd)
@@ -164,7 +164,7 @@ for f in ssplot.LoadLatencyStats.FIELDS:
   for a in ['oblivious', 'adaptive']:
     for l in loads:
       id2 = a + '_' + l
-      cplot_fmc.add_input(out_dir +'/aggregate_' + id2 + '.csv')
+      cplot_fmc.add_input(out_dir +'/latency_' + id2 + '.csv')
   cplot_task.add_condition(cplot_fmc)
 
 # run the tasks!

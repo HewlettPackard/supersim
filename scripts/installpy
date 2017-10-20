@@ -70,7 +70,8 @@ def delete(loc, url, commit):
 
 
 def main(args):
-  repos = [('percentile', 'github.com', 'nicmcd/percentile', None),
+  repos = [('gridstats', 'github.com', 'nicmcd/gridstats', None),
+           ('percentile', 'github.com', 'nicmcd/percentile', None),
            ('ssplot', 'github.com', 'nicmcd/ssplot', None),
            ('taskrun', 'github.com', 'nicmcd/taskrun', None),
            ('sssweep', 'github.com', 'nicmcd/sssweep', None)]

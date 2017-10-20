@@ -23,35 +23,41 @@ tm = taskrun.TaskManager(resource_manager=rm,
                  observers=[cob, vob],
                  failure_mode=taskrun.FailureMode.ACTIVE_CONTINUE)
 
-# define resource usage
-def get_resources(task_type, config):
+# create task and resources function
+def set_task_function(tm, name, cmd, console_out, task_type, config):
+  task = taskrun.ProcessTask(tm, name, cmd)
+  if console_out:
+    task.stdout_file = console_out
+    task.stderr_file = console_out
   if task_type is 'sim':
-    return {'cpus': 1, 'mem': 5}
+    task.resources = {'cpus': 1, 'mem': 5}
   else:
-    return {'cpus': 1, 'mem': 3}
+    task.resources = {'cpus': 1, 'mem': 3}
+  return task
 
 # paths
 supersim_path = '../supersim/bin/supersim'
 settings_path = 'settings.json'
-sslatency_path = '../sslatency/bin/sslatency'
+ssparse_path = '../ssparse/bin/ssparse'
 out_dir = 'output'
 
 # create sweeper
 s = sssweep.Sweeper(supersim_path, settings_path,
-                    sslatency_path, out_dir,
+                    ssparse_path, set_task_function,
+                    out_dir,
                     parse_scalar=0.001, parse_filters=[], latency_units='ns',
                     latency_ymin=0, latency_ymax=500,
                     rate_ymin=0, rate_ymax=200,
-                    titles='long', plot_style='colon',
+                    titles='long', title_style='colon',
                     latency_mode='message', # 'packet-header', 'packet', 'message', 'transaction'
                     sim=True, parse=True,
                     lplot=True, rplot=True, qplot=True, cplot=True,
-                    web_viewer=True, get_resources=get_resources)
+                    web_viewer=True)
 
 # routing variable
 routing_algorithms = ['oblivious','adaptive']
 def set_ra_cmd(_ra, _config):
-  cmd = ('network.traffic_classes[0].routing.adaptive=bool={0} '
+  cmd = ('network.protocol_classes[0].routing.adaptive=bool={0} '
          .format('true' if _ra == 'adaptive' else 'false'))
   return cmd
 s.add_variable('Routing_Algorithm', 'RA', routing_algorithms, set_ra_cmd, compare=True)

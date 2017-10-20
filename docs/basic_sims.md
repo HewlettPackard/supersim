@@ -76,24 +76,24 @@ to generate all types latency-based analyses.
 
 ## Analyzing the data
 Assuming we care about packet latency as our metric, let's run the parsing
-program [SSLatency][] to get prepared for plotting the results. We can also use
+program [SSparse][] to get prepared for plotting the results. We can also use
 this program to provide a basic analysis. Run the following command:
 
 ``` sh
-../sslatency/bin/sslatency -a aggregate.csv -p packets.csv.gz messages.mpf.gz
+../ssparse/bin/ssparse -l latency.csv -p packets.csv.gz messages.mpf.gz
 ```
 The outputs of this command are 2 files:
-1. aggregate.csv - Simple analysis info in a CSV format
+1. latency.csv - Simple latency analysis info in a CSV format
 2. packets.csv.gz - Packet latency info in a compressed CSV format
 
-Take a look in the aggregate.csv file to discover how our network performed
+Take a look in the latency.csv file to discover how our network performed
 with the specified traffic pattern:
 
 ``` sh
-column -t -s, aggregate.csv
+column -t -s, latency.csv
 ```
 
-Note: you can also tell SSLatency to generate message latency data and
+Note: you can also tell Ssparse to generate message latency data and
 transaction latency data using the `-m` and `-t` flags, respectively.
 
 ## Plotting the resuls
@@ -111,5 +111,5 @@ eog packets.png
 ```
 
 [libsettings]: https://github.com/nicmcd/libsettings
-[SSLatency]: https://github.com/nicmcd/sslatency
+[SSparse]: https://github.com/nicmcd/ssparse
 [SSPlot]: https://github.com/nicmcd/ssplot

@@ -21,7 +21,7 @@ to run all simulations and plot the results.
 We'll compare two routing algorithms: oblivious least common ancestor and
 adaptive least common ancestor. For each configuration we'll sweep the injection
 rate from 0% to 100% in steps of 6%. In total, there will be 34 simulation runs.
-Each simulation result will be parsed by [SSLatency][] and plotted by `sslqp`
+Each simulation result will be parsed by [SSparse][] and plotted by `sslqp`
 ([SSPlot][]). Each injection rate sweep will be plotted by `ssllp`. The
 combination of both injection rate sweeps will be plotted by `sslcp`. In total,
 there are 113 tasks run.
@@ -78,7 +78,7 @@ FileModificationCondition object which tracks the input and output files of the
 task. If the output files don't exist or if the input files are newer than the
 output files, the task will be executed, otherwise it will be bypassed.
 
-The next two sections create the parsing tasks using [SSLatency][] and the
+The next two sections create the parsing tasks using [SSparse][] and the
 latency distribution plotting tasks using `sslqp`. The methodology is very
 similar to creating the simulation task with one exception. The parsing and
 plotting tasks can't begin until the corresponding preceding task has completed.
@@ -155,5 +155,5 @@ eog lplot*png cplot*png
 ```
 
 [TaskRun]: https://github.com/nicmcd/taskrun
-[SSLatency]: https://github.com/nicmcd/sslatency
+[SSparse]: https://github.com/nicmcd/ssparse
 [SSPlot]: https://github.com/nicmcd/ssplot

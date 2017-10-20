@@ -106,7 +106,7 @@ ls -1 ~/ssdev
   libsettings
   libstrop
   percentile
-  sslatency
+  ssparse
   ssplot
   sssweep
   supersim
