@@ -55,7 +55,7 @@ GroupAttackCTP::GroupAttackCTP(
   } else if (_settings["mode"].isInt()) {
     s32 offset = _settings["mode"].asInt();
     // don't rely on loop around
-    assert(abs(offset) < groupCount_);
+    assert((u32)abs(offset) < groupCount_);
     s32 destGroup = ((s32)selfGroup_ +
                      ((s32)groupCount_ + offset)) % (s32)groupCount_;
     if (destGroup < 0) {

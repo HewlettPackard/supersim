@@ -120,7 +120,7 @@ TEST(GroupAttackCTP, offset_permutation) {
     u32 groupCount = gSim->rnd.nextU64(1, 10);
     u32 groupSize = gSim->rnd.nextU64(1, 10);
     u32 concentration = gSim->rnd.nextU64(1, 10);
-    for (s32 offset = -1; abs(offset) < groupCount; offset ++) {
+    for (s32 offset = -1; (u32)abs(offset) < groupCount; offset ++) {
       for (u32 test = 0; test < 100; test++) {
         Json::Value settings;
         settings["group_size"] = groupSize;
