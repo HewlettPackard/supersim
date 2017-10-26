@@ -39,7 +39,7 @@ u32 computeMinimalHops(const std::vector<u32>* _source,
                        const std::vector<u32>* _destination,
                        u32 _dimensions,
                        const std::vector<u32>& _dimensionWidths) {
-  u32 minHops = 2;
+  u32 minHops = 1;
   for (u32 dim = 0; dim < _dimensions; dim++) {
     u32 src = _source->at(dim+1);
     u32 dst = _destination->at(dim+1);

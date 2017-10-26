@@ -235,8 +235,8 @@ u32 Network::computeMinimalHops(const std::vector<u32>* _source,
                                 const std::vector<u32>* _destination) const {
   u32 numr = routers_.size();
   u32 src = translateRouterAddressToId(_source);
-  u32 myr = src/concentration_;
-  u32 minHops = numr - myr + 1;
+  u32 myr = src / concentration_;
+  u32 minHops = numr - myr;
   return minHops;
 }
 

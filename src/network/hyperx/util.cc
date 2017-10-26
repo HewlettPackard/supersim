@@ -21,7 +21,7 @@ namespace HyperX {
 u32 computeMinimalHops(const std::vector<u32>* _source,
                        const std::vector<u32>* _destination,
                        u32 _dimensions) {
-  u32 minHops = 2;
+  u32 minHops = 1;
   for (u32 dim = 0; dim < _dimensions; dim++) {
     if (_source->at(dim+1) != _destination->at(dim+1)) {
       minHops += 1;

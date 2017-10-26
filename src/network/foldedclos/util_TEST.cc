@@ -144,37 +144,37 @@ TEST(FoldedClos, computeMinimalHops) {
   src = {0, 0};
   dst = {0, 1};
   numLevels = 2;
-  exp = 4;
+  exp = 3;
   ASSERT_EQ(exp, FoldedClos::computeMinimalHops(&src, &dst, numLevels));
 
   src = {0, 0};
   dst = {1, 0};
   numLevels = 2;
-  exp = 2;
+  exp = 1;
   ASSERT_EQ(exp, FoldedClos::computeMinimalHops(&src, &dst, numLevels));
 
   src = {0, 0, 0};
   dst = {2, 0, 0};
   numLevels = 3;
-  exp = 2;
+  exp = 1;
   ASSERT_EQ(exp, FoldedClos::computeMinimalHops(&src, &dst, numLevels));
 
   src = {0, 0, 0};
   dst = {2, 2, 0};
   numLevels = 3;
-  exp = 4;
+  exp = 3;
   ASSERT_EQ(exp, FoldedClos::computeMinimalHops(&src, &dst, numLevels));
 
   src = {0, 0, 0};
   dst = {2, 2, 2};
   numLevels = 3;
-  exp = 6;
+  exp = 5;
   ASSERT_EQ(exp, FoldedClos::computeMinimalHops(&src, &dst, numLevels));
 
 
   src = {0, 0, 0, 0};
   dst = {2, 2, 2, 2};
   numLevels = 4;
-  exp = 8;
+  exp = 7;
   ASSERT_EQ(exp, FoldedClos::computeMinimalHops(&src, &dst, numLevels));
 }

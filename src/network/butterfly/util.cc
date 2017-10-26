@@ -59,6 +59,6 @@ u32 translateRouterAddressToId(
 }
 
 u32 computeMinimalHops(u32 _numStages) {
-  return _numStages - 1 + 2;
+  return _numStages;
 }
 }  // namespace Butterfly

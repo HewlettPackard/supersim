@@ -66,7 +66,7 @@ u32 computeMinimalHops(const std::vector<u32>* _source,
       break;
     }
   }
-  return travLevels * 2;
+  return travLevels * 2 - 1;
 }
 
 }  // namespace FoldedClos

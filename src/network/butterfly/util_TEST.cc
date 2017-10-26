@@ -160,14 +160,14 @@ TEST(Butterfly, computeMinimalHops) {
   u32 exp;
 
   numStages = 3;
-  exp = 4;
+  exp = 3;
   ASSERT_EQ(exp, Butterfly::computeMinimalHops(numStages));
 
   numStages = 5;
-  exp = 6;
+  exp = 5;
   ASSERT_EQ(exp, Butterfly::computeMinimalHops(numStages));
 
   numStages = 10;
-  exp = 11;
+  exp = 10;
   ASSERT_EQ(exp, Butterfly::computeMinimalHops(numStages));
 }

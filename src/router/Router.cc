@@ -18,6 +18,8 @@
 
 #include <cassert>
 
+#include "types/Packet.h"
+
 Router::Router(
     const std::string& _name, const Component* _parent, Network* _network,
     u32 _id, const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
@@ -49,6 +51,7 @@ Router* Router::create(
 }
 
 void Router::packetArrival(u32 _port, Packet* _packet) const {
+  _packet->incrementHopCount();
   metadataHandler_->packetRouterArrival(this, _port, _packet);
 }
 

@@ -142,7 +142,7 @@ u32 Network::translateRouterAddressToId(
 
 u32 Network::computeMinimalHops(const std::vector<u32>* _source,
                                 const std::vector<u32>* _destination) const {
-  return 2;
+  return 1;
 }
 
 void Network::collectChannels(std::vector<Channel*>* _channels) {

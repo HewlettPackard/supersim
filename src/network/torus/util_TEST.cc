@@ -30,20 +30,20 @@ TEST(Torus, computeMinimalHops) {
   dst = {0, 1};
   widths = {4};
   dimensions = widths.size();
-  exp = 3;
+  exp = 2;
   ASSERT_EQ(exp, Torus::computeMinimalHops(&src, &dst, dimensions, widths));
 
   src = {0, 0, 0};
   dst = {0, 2, 2};
   widths = {3, 3};
   dimensions = widths.size();
-  exp = 4;
+  exp = 3;
   ASSERT_EQ(exp, Torus::computeMinimalHops(&src, &dst, dimensions, widths));
 
   src = {0, 1, 0, 0};
   dst = {0, 2, 2, 2};
   widths = {3, 3, 3};
   dimensions = widths.size();
-  exp = 5;
+  exp = 4;
   ASSERT_EQ(exp, Torus::computeMinimalHops(&src, &dst, dimensions, widths));
 }

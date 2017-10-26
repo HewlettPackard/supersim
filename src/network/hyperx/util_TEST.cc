@@ -28,18 +28,18 @@ TEST(HyperX, computeMinimalHops) {
   src = {2, 0};
   dst = {0, 1};
   dimensions = 1;
-  exp = 3;
+  exp = 2;
   ASSERT_EQ(exp, HyperX::computeMinimalHops(&src, &dst, dimensions));
 
   src = {0, 0, 0};
   dst = {0, 2, 2};
   dimensions = 2;
-  exp = 4;
+  exp = 3;
   ASSERT_EQ(exp, HyperX::computeMinimalHops(&src, &dst, dimensions));
 
   src = {0, 1, 0, 0};
   dst = {0, 2, 2, 2};
   dimensions = 3;
-  exp = 5;
+  exp = 4;
   ASSERT_EQ(exp, HyperX::computeMinimalHops(&src, &dst, dimensions));
 }
