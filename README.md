@@ -1,7 +1,7 @@
 # SuperSim
 
 ## What is it?
-*SuperSim* is an event-driven cycle-accurate flit-level interconnection network simulator written in C++. SuperSim's highest priority is flexibility. As Professor [Christos Kozyrakis][christos] once said:
+*SuperSim* is an event-driven cycle-accurate flit-level interconnection network simulator written in C++. SuperSim's highest priority is flexibility for programmer productivity. As Professor [Christos Kozyrakis][christos] once said:
 > If a simulator already does what you want it to do, there's a good chance you aren't asking the right questions.
 
 SuperSim is designed to be a simulation framework, not a ready-to-go simulator for all scenarios. The core of SuperSim is a well-structured abstract class hierarchy that generically represents the interaction between common network components. Specific implementations override the basic abstractions to create the desired functionality without reinventing the wheel for every new model.
@@ -9,7 +9,7 @@ SuperSim is designed to be a simulation framework, not a ready-to-go simulator f
 SuperSim is meant to produce very detailed and realistic simulations. While anything can in theory be simulated, the convention of SuperSim thus far is to model the real world on a cycle-by-cycle basis. This provides closer to real life simulation results and better verification for logical designs.
 
 ## Where did it come from?
-SuperSim was developed by [Nic McDonald][nicmcd_hpl] ([github][nicmcd_gh]) at [Hewlett Packard Labs][hpelabs] and was sponsored under the [DARPA POEM][poem] project where it was used to investigate alternative router microarchitectures optimized for very high-radix designs driven by high-bandwidth photonically enabled I/O ports. The architecture designed was called *SuperSwitch*, thus the name of the simulator became *SuperSim*. SuperSim has been and is used for many research projects at Hewlett Packard Labs. It is used academically at Stanford University in the [Interconnection Networks][ee382c] class. Current development of SuperSim is sponsored in part by the [DOE PathForward][pathforward] program where it is being used to explore exascale topologies, routing algorithms, and router microarchitectures.
+SuperSim was developed by [Nic McDonald][nicmcd_gh] at [Hewlett Packard Labs][hpelabs] and was sponsored under the [DARPA POEM][poem] project where it was used to investigate alternative router microarchitectures optimized for very high-radix designs driven by high-bandwidth photonically enabled I/O ports. The architecture designed was called *SuperSwitch*, thus the name of the simulator became *SuperSim*. SuperSim has been and is used for many research projects at Hewlett Packard Labs. It is used academically at Stanford University in the [Interconnection Networks][ee382c] class. Current development of SuperSim is sponsored in part by the [DOE PathForward][pathforward] program where it is being used to explore exascale topologies, routing algorithms, and router microarchitectures.
 
 ## Why use it?
 SuperSim has some key advantages in its design and development that make it particularly useful.
@@ -23,14 +23,17 @@ SuperSim has some key advantages in its design and development that make it part
   - [SSParse][ssparse] is an optimized C++ program that parses the verbose file format output from SuperSim into analyses. SSParse prepares files for analysis and plotting.
   - [SSPlot][ssplot] is a Python plotting tool that generates analyses and plots for individual runs, sweeping runs (e.g., load vs. latency), and comparison against many sweeping runs. SSPlot is a Python package with accompanying command line executable scripts.
   - [TaskRun][taskrun] is an easy-to-use Python package for running tasks with dependencies, conditional execution, resource management, and much more. The process from running simulations, parsing the results, analyzing the data, and plotting the results entails many steps. Each step has dependencies on previous steps. TaskRun scripts make this whole process easy and automated. A simple TaskRun script can elegantly runs thousands of simulations and all required post-simulation tools. TaskRun is also able to interface with batch scheduling systems (e.g., GridEngine, PBS, LFS, etc.).
-  - [sssweep][sssweep] is a flexible python package to automatically generate and perform supersim simulations with one or many sweeping variables. sssweep allows the user to easily add and set simulation variables. sssweep automatically generates a web viewer tailored to your simulation parameters to easily analyse and share your results.
+  - [SSSweep][sssweep] is a flexible python package to automatically generate and perform supersim simulations with one or many sweeping variables. sssweep allows the user to easily add and set simulation variables. sssweep automatically generates a web viewer tailored to your simulation parameters to easily analyse and share your results.
 
 ## Ok, now what?
 Visit the [docs][docs] and have fun simulating!
 
+## Acknowledgements
+This work has been supported in part by:
++ U.S. Defense Advanced Research Projects Agency under Contract N66001-13-2-4003
++ U.S. Department of Energy under LLNS Subcontract B621301.
 
 [christos]: http://csl.stanford.edu/~christos/ "Christos' Home Page"
-[nicmcd_hpl]: http://labs.hpe.com/people/nicmcd/ "Nic's Labs Page"
 [nicmcd_gh]: https://github.com/nicmcd "Nic's GitHub Page"
 [hpelabs]: http://www.labs.hpe.com/ "Hewlett Packard Labs Home"
 [poem]: http://www.darpa.mil/program/photonically-optimized-embedded-microprocessors "DARPA POEM Page"
@@ -39,5 +42,5 @@ Visit the [docs][docs] and have fun simulating!
 [ssparse]: https://github.com/nicmcd/ssparse "SSParse at GitHub"
 [ssplot]: https://github.com/nicmcd/ssplot "SSPlot at GitHub"
 [taskrun]: https://github.com/nicmcd/taskrun "TaskRun at GitHub"
-[sssweep]: https://github.com/nicmcd/sssweep "sssweep at GitHub"
+[sssweep]: https://github.com/nicmcd/sssweep "SSSweep at GitHub"
 [docs]: docs/README.md "SuperSim Documentation"
