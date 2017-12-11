@@ -39,20 +39,33 @@ def set_task_function(tm, name, cmd, console_out, task_type, config):
 supersim_path = '../supersim/bin/supersim'
 settings_path = 'settings.json'
 ssparse_path = '../ssparse/bin/ssparse'
+transient_path = '../ssparse/scripts/transient.py'
 out_dir = 'output'
 
 # create sweeper
 s = sssweep.Sweeper(supersim_path, settings_path,
-                    ssparse_path, set_task_function,
-                    out_dir,
-                    parse_scalar=0.001, parse_filters=[], latency_units='ns',
-                    latency_ymin=0, latency_ymax=500,
-                    rate_ymin=0, rate_ymax=200,
-                    titles='long', title_style='colon',
-                    latency_mode='message', # 'packet-header', 'packet', 'message', 'transaction'
-                    sim=True, parse=True,
-                    lplot=True, rplot=True, qplot=True, cplot=True,
-                    web_viewer=True)
+                    ssparse_path, transient_path,
+                    set_task_function, out_dir, sim=True,
+                    parse_scalar=0.001, latency_units='ns')
+# ssparse
+s.add_plot('load-latency-compare', 'ssparse')
+s.add_plot('load-latency', 'ssparse')
+s.add_plot('load-percent-minimal', 'ssparse', yauto_frame=0.2)
+s.add_plot('load-average-hops', 'ssparse', yauto_frame=0.2)
+s.add_plot('load-rate-percent', 'ssparse')
+
+s.add_plot('latency-pdf', 'ssparse2', ['+app=0'])
+s.add_plot('latency-percentile', 'ssparse2', ['+app=0'])
+s.add_plot('latency-cdf', 'ssparse2', ['+app=0'])
+s.add_plot('time-latency-scatter', 'ssparse2', ['+app=0'])
+
+# none
+s.add_plot('load-rate', 'none')
+
+# transient
+s.add_plot('time-percent-minimal', 'transient', yauto_frame=0.2)
+s.add_plot('time-average-hops', 'transient', non_minimal='n')
+s.add_plot('time-latency', 'transient')
 
 # routing variable
 routing_algorithms = ['oblivious','adaptive']
@@ -60,7 +73,7 @@ def set_ra_cmd(_ra, _config):
   cmd = ('network.protocol_classes[0].routing.adaptive=bool={0} '
          .format('true' if _ra == 'adaptive' else 'false'))
   return cmd
-s.add_variable('Routing_Algorithm', 'RA', routing_algorithms, set_ra_cmd, compare=True)
+s.add_variable('Routing Algorithm', 'RA', routing_algorithms, set_ra_cmd, compare=True)
 
 # loads
 start = 0
