@@ -46,6 +46,7 @@ class Router : public ::Router {
  public:
   Router(const std::string& _name, const Component* _parent, Network* _network,
          u32 _id, const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
+         const std::vector<std::tuple<u32, u32> >& _protocolClassVcs,
          MetadataHandler* _metadataHandler, Json::Value _settings);
   ~Router();
 

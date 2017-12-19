@@ -67,7 +67,7 @@ Network::Network(const std::string& _name, const Component* _parent,
     u32 routerId = translateRouterAddressToId(&routerAddress);
     routers_.at(routerAddress) = Router::create(
         routerName, this, this, routerId, routerAddress, routerRadix, numVcs_,
-        _metadataHandler, _settings["router"]);
+        protocolClassVcs_, _metadataHandler, _settings["router"]);
   }
 
   // link routers via channels

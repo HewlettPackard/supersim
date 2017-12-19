@@ -32,7 +32,7 @@ TEST(BufferOccupancy, normVc) {
 
   Json::Value routerSettings;
   CongestionTestRouter router(
-      "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, nullptr,
+      "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, {}, nullptr,
       routerSettings);
   router.setDebug(debug);
 
@@ -110,7 +110,7 @@ TEST(BufferOccupancy, absVc) {
 
   Json::Value routerSettings;
   CongestionTestRouter router(
-      "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, nullptr,
+      "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, {}, nullptr,
       routerSettings);
   router.setDebug(debug);
 
@@ -187,7 +187,7 @@ TEST(BufferOccupancy, normPort) {
 
   Json::Value routerSettings;
   CongestionTestRouter router(
-      "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, nullptr,
+      "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, {}, nullptr,
       routerSettings);
   router.setDebug(debug);
 
@@ -271,7 +271,7 @@ TEST(BufferOccupancy, absPort) {
 
   Json::Value routerSettings;
   CongestionTestRouter router(
-      "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, nullptr,
+      "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, {}, nullptr,
       routerSettings);
   router.setDebug(debug);
 
@@ -357,7 +357,7 @@ TEST(BufferOccupancy, phantomNormVc) {
 
         Json::Value routerSettings;
         CongestionTestRouter router(
-            "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, nullptr,
+            "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, {}, nullptr,
             routerSettings);
         router.setDebug(debug);
 
@@ -432,7 +432,7 @@ TEST(BufferOccupancy, phantomAbsVc) {
 
         Json::Value routerSettings;
         CongestionTestRouter router(
-            "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, nullptr,
+            "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, {}, nullptr,
             routerSettings);
         router.setDebug(debug);
 

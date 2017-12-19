@@ -19,7 +19,7 @@
 RoutingAlgorithmTestRouter::RoutingAlgorithmTestRouter(
     const std::string& _name, u32 _numPorts, u32 _numVcs)
     : Router(_name, nullptr, nullptr, 0, {}, _numPorts, _numVcs,
-             nullptr, Json::Value()) {}
+             {}, nullptr, Json::Value()) {}
 
 RoutingAlgorithmTestRouter::~RoutingAlgorithmTestRouter() {}
 

@@ -52,7 +52,7 @@ Network::Network(const std::string& _name, const Component* _parent,
     // use the router factory to create a router
     routers_.at(router) = Router::create(
         routerName, this, this, router, {router}, routerRadix, numVcs_,
-        _metadataHandler, _settings["router"]);
+        protocolClassVcs_, _metadataHandler, _settings["router"]);
   }
 
   // link routers via channels

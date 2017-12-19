@@ -52,7 +52,7 @@ Network::Network(const std::string& _name, const Component* _parent,
       u32 routerId = stage * stageWidth_ + column;
       routers_.at(routerId) = Router::create(
           rname, this, this, routerId, {stage, column}, routerRadix_, numVcs_,
-          _metadataHandler, _settings["router"]);
+          protocolClassVcs_, _metadataHandler, _settings["router"]);
     }
   }
 

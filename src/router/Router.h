@@ -19,6 +19,7 @@
 #include <prim/prim.h>
 
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "architecture/PortedDevice.h"
@@ -32,13 +33,15 @@
 class Network;
 
 #define ROUTER_ARGS const std::string&, const Component*, Network*, u32, \
-    const std::vector<u32>&, u32, u32, MetadataHandler*, Json::Value
+    const std::vector<u32>&, u32, u32, \
+    const std::vector<std::tuple<u32, u32> >&, MetadataHandler*, Json::Value
 
 class Router : public Component, public PortedDevice, public FlitSender,
                public FlitReceiver, public CreditSender, public CreditReceiver {
  public:
   Router(const std::string& _name, const Component* _parent, Network* _network,
          u32 _id, const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
+         const std::vector<std::tuple<u32, u32> >& _protocolClassVcs,
          MetadataHandler* _metadataHandler, Json::Value _settings);
   virtual ~Router();
 
@@ -58,6 +61,9 @@ class Router : public Component, public PortedDevice, public FlitSender,
 
  protected:
   Network* network_;
+  const std::vector<std::tuple<u32, u32> > protocolClassVcs_;
+
+ private:
   MetadataHandler* metadataHandler_;
 };
 

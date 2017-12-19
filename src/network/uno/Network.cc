@@ -42,7 +42,7 @@ Network::Network(const std::string& _name, const Component* _parent,
   // create the router
   router_ = Router::create(
       "Router", this, this, 0, std::vector<u32>(), routerRadix, numVcs_,
-      _metadataHandler, _settings["router"]);
+      protocolClassVcs_, _metadataHandler, _settings["router"]);
 
   // create the interfaces and external channels
   interfaces_.resize(concentration_, nullptr);
