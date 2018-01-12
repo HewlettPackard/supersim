@@ -54,7 +54,7 @@ void ValiantsRoutingAlgorithm::processRequest(
   // create the routing extension if needed
   if (packet->getRoutingExtension() == nullptr) {
     // should be first router encountered
-    assert(packet->getHopCount() == 1);
+    assert(packet->getHopCount() == 0);
 
     // create routing extension header
     //  the extension is a vector with one dummy element then the address of the
@@ -82,7 +82,7 @@ void ValiantsRoutingAlgorithm::processRequest(
   //  if this is a terminal port, force to stage 0
   u32 stage;
   if (inputPortDim_ == U32_MAX) {
-    assert(packet->getHopCount() == 1);
+    assert(packet->getHopCount() == 0);
     stage = 0;
   } else {
     stage = (((_flit->getVc() - baseVc_) % 4) < 2) ? 0 : 1;

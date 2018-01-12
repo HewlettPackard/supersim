@@ -54,10 +54,10 @@ Router* Router::create(
 }
 
 void Router::packetArrival(u32 _port, Packet* _packet) const {
-  _packet->incrementHopCount();
   metadataHandler_->packetRouterArrival(this, _port, _packet);
 }
 
 void Router::packetDeparture(u32 _port, Packet* _packet) const {
+  _packet->incrementHopCount();
   metadataHandler_->packetRouterDeparture(this, _port, _packet);
 }
