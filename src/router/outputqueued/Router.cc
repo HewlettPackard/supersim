@@ -14,7 +14,7 @@
  */
 #include "router/outputqueued/Router.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 #include <cmath>
@@ -91,7 +91,7 @@ Router::Router(
 
       // create the name suffix
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
-          std::to_string(vc);
+                               std::to_string(vc);
 
       // routing algorithm
       std::string rfname = "RoutingAlgorithm" + nameSuffix;
@@ -139,7 +139,7 @@ Router::Router(
     for (u32 vc = 0; vc < numVcs_; vc++) {
       // create the name suffix
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
-          std::to_string(vc);
+                               std::to_string(vc);
 
       // compute the client indexes
       u32 clientIndexOut = vc;  // sw alloc and output crossbar
@@ -429,5 +429,5 @@ Router::CongestionMode Router::parseCongestionMode(const std::string& _mode) {
 
 }  // namespace OutputQueued
 
-registerWithFactory("output_queued", ::Router,
-                    OutputQueued::Router, ROUTER_ARGS);
+registerWithObjectFactory("output_queued", ::Router,
+                          OutputQueued::Router, ROUTER_ARGS);

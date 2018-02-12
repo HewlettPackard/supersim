@@ -14,7 +14,7 @@
  */
 #include "allocator/RSeparableAllocator.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -85,5 +85,5 @@ u64 RSeparableAllocator::index(u64 _client, u64 _resource) const {
   return (numClients_ * _resource) + _client;
 }
 
-registerWithFactory("r_separable", Allocator, RSeparableAllocator,
-                    ALLOCATOR_ARGS);
+registerWithObjectFactory("r_separable", Allocator, RSeparableAllocator,
+                          ALLOCATOR_ARGS);

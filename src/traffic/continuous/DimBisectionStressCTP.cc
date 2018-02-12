@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/DimBisectionStressCTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -90,5 +90,5 @@ u32 DimBisectionStressCTP::nextDestination() {
   return dest_;
 }
 
-registerWithFactory("dim_bisection_stress", ContinuousTrafficPattern,
-                    DimBisectionStressCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("dim_bisection_stress", ContinuousTrafficPattern,
+                          DimBisectionStressCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

@@ -14,7 +14,7 @@
  */
 #include "metadata/LocalTimestampMetadataHandler.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -40,5 +40,5 @@ void LocalTimestampMetadataHandler::packetRouterArrival(
   _packet->setMetadata(gSim->time());
 }
 
-registerWithFactory("local_timestamp", MetadataHandler,
-                    LocalTimestampMetadataHandler, METADATAHANDLER_ARGS);
+registerWithObjectFactory("local_timestamp", MetadataHandler,
+                          LocalTimestampMetadataHandler, METADATAHANDLER_ARGS);

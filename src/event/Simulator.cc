@@ -47,7 +47,7 @@ Simulator::Simulator(Json::Value _settings)
   assert(printInterval_ > 0);
 
   rnd.seed(_settings["random_seed"].asUInt64());
-}
+      }
 
 Simulator::~Simulator() {}
 
@@ -164,7 +164,7 @@ void Simulator::simulate() {
           // print the simulation performance
           f64 eventsPerSecond = intervalEvents / elapsedRealTime;
           f64 unitsPerSecond = elapsedSimTime /
-              static_cast<f64>(elapsedRealTime);
+                               static_cast<f64>(elapsedRealTime);
           snprintf(buf + cnt, 256 - cnt, "%lu events : %lu units : "
                    "%.2f events/sec : %.2f units/sec\n", totalEvents, time_,
                    eventsPerSecond, unitsPerSecond);

@@ -14,7 +14,7 @@
  */
 #include "network/uno/Network.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 #include <cmath>
@@ -155,5 +155,5 @@ void Network::collectChannels(std::vector<Channel*>* _channels) {
 
 }  // namespace Uno
 
-registerWithFactory("uno", ::Network,
-                    Uno::Network, NETWORK_ARGS);
+registerWithObjectFactory("uno", ::Network,
+                          Uno::Network, NETWORK_ARGS);

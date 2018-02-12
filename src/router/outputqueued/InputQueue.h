@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "event/Component.h"
-#include "network/RoutingAlgorithm.h"
+#include "routing/RoutingAlgorithm.h"
 #include "types/Flit.h"
 #include "types/FlitReceiver.h"
 

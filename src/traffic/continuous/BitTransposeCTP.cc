@@ -15,7 +15,7 @@
 #include "traffic/continuous/BitTransposeCTP.h"
 
 #include <bits/bits.h>
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -41,5 +41,5 @@ u32 BitTransposeCTP::nextDestination() {
   return dest_;
 }
 
-registerWithFactory("bit_transpose", ContinuousTrafficPattern,
-                    BitTransposeCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("bit_transpose", ContinuousTrafficPattern,
+                          BitTransposeCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

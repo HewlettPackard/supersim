@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "network/foldedclos/RoutingAlgorithm.h"
-#include "network/RoutingAlgorithm_TEST.h"
+#include "routing/RoutingAlgorithm_TEST.h"
 
 TEST(FoldedClos_CommonAncestorRoutingAlgorithm, construct) {
   std::vector<u32> latencies({1, 2, 3});

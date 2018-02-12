@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/MatrixCTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 #include <fio/InFile.h>
 #include <mut/mut.h>
 #include <strop/strop.h>
@@ -69,5 +69,5 @@ u32 MatrixCTP::nextDestination() {
   return mut::searchCumulativeDistribution(cumulativeDistribution_, rnd);
 }
 
-registerWithFactory("matrix", ContinuousTrafficPattern,
-                    MatrixCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("matrix", ContinuousTrafficPattern,
+                          MatrixCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

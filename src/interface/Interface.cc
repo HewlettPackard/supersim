@@ -14,7 +14,7 @@
  */
 #include "interface/Interface.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -38,9 +38,10 @@ Interface* Interface::create(
   const std::string& type = _settings["type"].asString();
 
   // attempt to build the interface
-  Interface* interface = factory::Factory<Interface, INTERFACE_ARGS>::create(
-      type, _name, _parent, _id, _address, _numVcs, _protocolClassVcs,
-      _metadataHandler, _settings);
+  Interface* interface = factory::ObjectFactory<
+    Interface, INTERFACE_ARGS>::create(
+        type, _name, _parent, _id, _address, _numVcs, _protocolClassVcs,
+        _metadataHandler, _settings);
 
   // check that the factory had this type
   if (interface == nullptr) {

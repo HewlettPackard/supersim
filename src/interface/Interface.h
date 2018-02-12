@@ -36,7 +36,7 @@
 class PacketReassembler;
 class MessageReassembler;
 
-#define INTERFACE_ARGS const std::string&, const Component*, u32, \
+#define INTERFACE_ARGS const std::string&, const Component*, u32,       \
     const std::vector<u32>&, u32, const std::vector<std::tuple<u32, u32> >&, \
     MetadataHandler*, Json::Value
 

@@ -14,7 +14,7 @@
  */
 #include "allocator/CrSeparableAllocator.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -147,5 +147,5 @@ u64 CrSeparableAllocator::index(u64 _client, u64 _resource) const {
   return (numResources_ * _client) + _resource;
 }
 
-registerWithFactory("cr_separable", Allocator, CrSeparableAllocator,
-                    ALLOCATOR_ARGS);
+registerWithObjectFactory("cr_separable", Allocator, CrSeparableAllocator,
+                          ALLOCATOR_ARGS);

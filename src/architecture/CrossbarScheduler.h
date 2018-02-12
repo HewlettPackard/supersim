@@ -70,7 +70,7 @@ class CrossbarScheduler : public Component, public CreditWatcher {
   u32 getCreditCount(u32 _vcIdx) const;
 
   // event processing
-  void processEvent(void* _event, s32 _type);
+  void processEvent(void* _event, s32 _type) override;
 
  private:
   const u32 numClients_;

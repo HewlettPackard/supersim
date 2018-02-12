@@ -14,7 +14,7 @@
  */
 #include "traffic/size/SingleMSD.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -55,6 +55,6 @@ u32 SingleMSD::nextMessageSize(const Message* _msg) {
   }
 }
 
-registerWithFactory("single", MessageSizeDistribution,
-                    SingleMSD,
-                    MESSAGESIZEDISTRIBUTION_ARGS);
+registerWithObjectFactory("single", MessageSizeDistribution,
+                          SingleMSD,
+                          MESSAGESIZEDISTRIBUTION_ARGS);

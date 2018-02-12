@@ -22,11 +22,11 @@
 #include <vector>
 
 #include "event/Component.h"
-#include "network/RoutingAlgorithm.h"
+#include "routing/RoutingAlgorithm.h"
 #include "router/Router.h"
 
 #define HYPERX_ROUTINGALGORITHM_ARGS const std::string&, const Component*, \
-    Router*, u32, u32, u32, u32, const std::vector<u32>&, \
+    Router*, u32, u32, u32, u32, const std::vector<u32>&,               \
     const std::vector<u32>&, u32, Json::Value
 
 namespace HyperX {

@@ -14,7 +14,7 @@
  */
 #include "metadata/CreationTimestampMetadataHandler.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -61,5 +61,6 @@ void CreationTimestampMetadataHandler::packetInjection(
   _packet->setMetadata(metadata);
 }
 
-registerWithFactory("creation_timestamp", MetadataHandler,
-                    CreationTimestampMetadataHandler, METADATAHANDLER_ARGS);
+registerWithObjectFactory(
+    "creation_timestamp", MetadataHandler,
+    CreationTimestampMetadataHandler, METADATAHANDLER_ARGS);

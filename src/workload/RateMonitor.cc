@@ -46,7 +46,7 @@ f64 RateMonitor::rate() const {
     return F64_NAN;
   } else {
     f64 cycles = (f64)(endTime_ - startTime_) /
-        gSim->cycleTime(Simulator::Clock::CHANNEL);
+                 gSim->cycleTime(Simulator::Clock::CHANNEL);
     return flitCount_ / cycles;
   }
 }

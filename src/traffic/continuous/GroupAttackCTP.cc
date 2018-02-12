@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/GroupAttackCTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -87,5 +87,5 @@ u32 GroupAttackCTP::nextDestination() {
           (destConc));
 }
 
-registerWithFactory("group_attack", ContinuousTrafficPattern,
-                    GroupAttackCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("group_attack", ContinuousTrafficPattern,
+                          GroupAttackCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

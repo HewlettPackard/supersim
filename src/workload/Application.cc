@@ -14,7 +14,7 @@
  */
 #include "workload/Application.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 #include <cmath>
@@ -46,7 +46,7 @@ Application::Application(
 
   // create the rate log
   rateLog_ = new RateLog(_settings["rate_log"]);
-}
+      }
 
 Application::~Application() {
   for (u32 idx = 0; idx < terminals_.size(); idx++) {
@@ -63,8 +63,9 @@ Application* Application::create(
   const std::string& type = _settings["type"].asString();
 
   // attempt to create the application
-  Application* app = factory::Factory<Application, APPLICATION_ARGS>::create(
-      type, _name, _parent, _id, _workload, _metadataHandler, _settings);
+  Application* app = factory::ObjectFactory<
+    Application, APPLICATION_ARGS>::create(
+        type, _name, _parent, _id, _workload, _metadataHandler, _settings);
 
   // check that the factory has this type of application
   if (app == nullptr) {

@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/TornadoCTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -72,5 +72,5 @@ u32 TornadoCTP::nextDestination() {
   return dest_;
 }
 
-registerWithFactory("tornado", ContinuousTrafficPattern,
-                    TornadoCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("tornado", ContinuousTrafficPattern,
+                          TornadoCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

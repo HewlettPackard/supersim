@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/RandomExchangeQuadrantCTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -80,5 +80,6 @@ u32 RandomExchangeQuadrantCTP::nextDestination() {
   return dstVect_.at(gSim->rnd.nextU64(0, dstVect_.size() - 1));
 }
 
-registerWithFactory("random_exchange_quadrant", ContinuousTrafficPattern,
-                    RandomExchangeQuadrantCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory(
+    "random_exchange_quadrant", ContinuousTrafficPattern,
+    RandomExchangeQuadrantCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

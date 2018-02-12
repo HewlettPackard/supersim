@@ -14,7 +14,7 @@
  */
 #include "arbiter/ComparingArbiter.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 ComparingArbiter::ComparingArbiter(
     const std::string& _name, const Component* _parent,
@@ -64,5 +64,5 @@ u32 ComparingArbiter::arbitrate() {
   return winner;
 }
 
-registerWithFactory("comparing", Arbiter,
-                    ComparingArbiter, ARBITER_ARGS);
+registerWithObjectFactory("comparing", Arbiter,
+                          ComparingArbiter, ARBITER_ARGS);

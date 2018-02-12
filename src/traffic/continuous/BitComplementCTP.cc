@@ -15,7 +15,7 @@
 #include "traffic/continuous/BitComplementCTP.h"
 
 #include <bits/bits.h>
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -34,5 +34,5 @@ u32 BitComplementCTP::nextDestination() {
   return dest_;
 }
 
-registerWithFactory("bit_complement", ContinuousTrafficPattern,
-                    BitComplementCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("bit_complement", ContinuousTrafficPattern,
+                          BitComplementCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

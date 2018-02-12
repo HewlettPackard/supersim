@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/UniformRandomCTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -37,5 +37,5 @@ u32 UniformRandomCTP::nextDestination() {
   return dest;
 }
 
-registerWithFactory("uniform_random", ContinuousTrafficPattern,
-                    UniformRandomCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("uniform_random", ContinuousTrafficPattern,
+                          UniformRandomCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

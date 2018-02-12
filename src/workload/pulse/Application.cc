@@ -14,7 +14,7 @@
  */
 #include "workload/pulse/Application.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -97,5 +97,5 @@ void Application::processEvent(void* _event, s32 _type) {
 
 }  // namespace Pulse
 
-registerWithFactory("pulse", ::Application, Pulse::Application,
-                    APPLICATION_ARGS);
+registerWithObjectFactory("pulse", ::Application, Pulse::Application,
+                          APPLICATION_ARGS);

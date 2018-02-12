@@ -14,7 +14,7 @@
  */
 #include "metadata/MetadataHandler.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -29,8 +29,8 @@ MetadataHandler* MetadataHandler::create(Json::Value _settings) {
   const std::string& type = _settings["type"].asString();
 
   // attempt to create the metadata handler
-  MetadataHandler* mh = factory::Factory<MetadataHandler, METADATAHANDLER_ARGS>
-      ::create(type, _settings);
+  MetadataHandler* mh = factory::ObjectFactory<
+    MetadataHandler, METADATAHANDLER_ARGS>::create(type, _settings);
 
   // check that the factory had this type
   if (mh == nullptr) {

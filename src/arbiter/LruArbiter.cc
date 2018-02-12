@@ -14,7 +14,7 @@
  */
 #include "arbiter/LruArbiter.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <vector>
 
@@ -57,5 +57,5 @@ u32 LruArbiter::arbitrate() {
   return winner;
 }
 
-registerWithFactory("lru", Arbiter,
-                    LruArbiter, ARBITER_ARGS);
+registerWithObjectFactory("lru", Arbiter,
+                          LruArbiter, ARBITER_ARGS);

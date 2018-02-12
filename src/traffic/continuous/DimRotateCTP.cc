@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/DimRotateCTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -78,5 +78,5 @@ u32 DimRotateCTP::nextDestination() {
   return dest_;
 }
 
-registerWithFactory("dim_rotate", ContinuousTrafficPattern,
-                    DimRotateCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("dim_rotate", ContinuousTrafficPattern,
+                          DimRotateCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

@@ -16,6 +16,7 @@ HEADER_DIRS    := \
 	$(LIBS_LOC)libsettings/inc \
 	$(LIBS_LOC)libstrop/inc \
 	$(LIBS_LOC)libfio/inc \
+	$(LIBS_LOC)libcolhash/inc \
 	$(LIBS_LOC)libfactory/inc
 STATIC_LIBS    := \
 	$(LIBS_LOC)libprim/bld/libprim.a \
@@ -26,6 +27,7 @@ STATIC_LIBS    := \
 	$(LIBS_LOC)libsettings/bld/libsettings.a \
 	$(LIBS_LOC)libstrop/bld/libstrop.a \
 	$(LIBS_LOC)libfio/bld/libfio.a \
+	$(LIBS_LOC)libcolhash/bld/libcolhash.a \
 	$(LIBS_LOC)libfactory/bld/libfactory.a
 
 #--------------------- Cpp Lint -----------------------------------------------#

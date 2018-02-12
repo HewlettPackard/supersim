@@ -14,7 +14,7 @@
  */
 #include "network/hyperx/DimOrderRoutingAlgorithm.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -96,6 +96,6 @@ void DimOrderRoutingAlgorithm::processRequest(
 
 }  // namespace HyperX
 
-registerWithFactory("dimension_order", HyperX::RoutingAlgorithm,
-                    HyperX::DimOrderRoutingAlgorithm,
-                    HYPERX_ROUTINGALGORITHM_ARGS);
+registerWithObjectFactory("dimension_order", HyperX::RoutingAlgorithm,
+                          HyperX::DimOrderRoutingAlgorithm,
+                          HYPERX_ROUTINGALGORITHM_ARGS);

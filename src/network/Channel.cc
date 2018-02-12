@@ -43,7 +43,7 @@ Channel::Channel(const std::string& _name, const Component* _parent,
   monitoring_ = false;
   monitorTime_ = U64_MAX;
   monitorCounts_.resize(_numVcs + 1);
-}
+      }
 
 Channel::~Channel() {}
 

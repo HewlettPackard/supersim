@@ -14,7 +14,7 @@
  */
 #include "traffic/distribution/RandomDTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -60,5 +60,5 @@ void RandomDTP::reset() {
   gSim->rnd.shuffle(&destinations_);
 }
 
-registerWithFactory("random", DistributionTrafficPattern,
-                    RandomDTP, DISTRIBUTIONTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("random", DistributionTrafficPattern,
+                          RandomDTP, DISTRIBUTIONTRAFFICPATTERN_ARGS);

@@ -14,7 +14,7 @@
  */
 #include "network/torus/RoutingAlgorithm.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include "network/torus/util.h"
 
@@ -42,7 +42,7 @@ RoutingAlgorithm* RoutingAlgorithm::create(
   const std::string& algorithm = _settings["algorithm"].asString();
 
   // attempt to create the routing algorithm
-  RoutingAlgorithm* ra = factory::Factory<
+  RoutingAlgorithm* ra = factory::ObjectFactory<
     RoutingAlgorithm, TORUS_ROUTINGALGORITHM_ARGS>::create(
         algorithm, _name, _parent, _router, _baseVc, _numVcs, _inputPort,
         _inputVc, _dimensionWidths, _concentration, _settings);

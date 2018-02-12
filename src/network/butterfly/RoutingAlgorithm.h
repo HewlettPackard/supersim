@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "event/Component.h"
-#include "network/RoutingAlgorithm.h"
+#include "routing/RoutingAlgorithm.h"
 #include "router/Router.h"
 
 #define BUTTERFLY_ROUTINGALGORITHM_ARGS const std::string&, const Component*, \

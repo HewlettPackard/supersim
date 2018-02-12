@@ -14,7 +14,7 @@
  */
 #include "traffic/size/MessageSizeDistribution.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 MessageSizeDistribution::MessageSizeDistribution(
     const std::string& _name, const Component* _parent, Json::Value _settings)
@@ -28,7 +28,7 @@ MessageSizeDistribution* MessageSizeDistribution::create(
   const std::string& type = _settings["type"].asString();
 
   // attempt to build the message size distribution
-  MessageSizeDistribution* msg = factory::Factory<
+  MessageSizeDistribution* msg = factory::ObjectFactory<
     MessageSizeDistribution, MESSAGESIZEDISTRIBUTION_ARGS>::create(
         type, _name, _parent, _settings);
 

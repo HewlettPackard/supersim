@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/UniformRandomBisectionCTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -71,7 +71,7 @@ UniformRandomBisectionCTP::UniformRandomBisectionCTP(
     for (u32 i = 0; i < dimensions; i++) {
       if ((!validDest) ||
           ((dstAddr.at(i + 1) != (widths.at(i) - 1 - addr.at(i + 1))) &&
-          dimMask.at(i))) {
+           dimMask.at(i))) {
         validDest = false;
         break;
       }
@@ -89,5 +89,6 @@ u32 UniformRandomBisectionCTP::nextDestination() {
   return dstVect_.at(gSim->rnd.nextU64(0, dstVect_.size() - 1));
 }
 
-registerWithFactory("uniform_random_bisection", ContinuousTrafficPattern,
-                    UniformRandomBisectionCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory(
+    "uniform_random_bisection", ContinuousTrafficPattern,
+    UniformRandomBisectionCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

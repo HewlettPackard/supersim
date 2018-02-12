@@ -14,7 +14,7 @@
  */
 #include "network/uno/DirectRoutingAlgorithm.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -73,5 +73,6 @@ void DirectRoutingAlgorithm::processRequest(
 
 }  // namespace Uno
 
-registerWithFactory("direct", Uno::RoutingAlgorithm,
-                    Uno::DirectRoutingAlgorithm, UNO_ROUTINGALGORITHM_ARGS);
+registerWithObjectFactory(
+    "direct", Uno::RoutingAlgorithm,
+    Uno::DirectRoutingAlgorithm, UNO_ROUTINGALGORITHM_ARGS);

@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/NeighborCTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -85,5 +85,5 @@ u32 NeighborCTP::nextDestination() {
   return dest_;
 }
 
-registerWithFactory("neighbor", ContinuousTrafficPattern,
-                    NeighborCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("neighbor", ContinuousTrafficPattern,
+                          NeighborCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

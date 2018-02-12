@@ -36,7 +36,7 @@ class BufferOccupancy : public CongestionSensor {
 
   // this creates INCR and DECR events to simulate a fixed latency between all
   //  input and output ports (IOW, input port and VC are ignored in the calc).
-  void processEvent(void* _event, s32 _type);
+  void processEvent(void* _event, s32 _type) override;
 
   // style and mode reporting
   CongestionSensor::Style style() const override;

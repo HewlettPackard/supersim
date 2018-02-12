@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/ScanCTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -78,5 +78,5 @@ void ScanCTP::advance() {
   }
 }
 
-registerWithFactory("scan", ContinuousTrafficPattern,
-                    ScanCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("scan", ContinuousTrafficPattern,
+                          ScanCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

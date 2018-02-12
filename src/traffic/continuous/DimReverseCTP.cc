@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/DimReverseCTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -63,5 +63,5 @@ u32 DimReverseCTP::nextDestination() {
   return dest_;
 }
 
-registerWithFactory("dim_reverse", ContinuousTrafficPattern,
-                    DimReverseCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("dim_reverse", ContinuousTrafficPattern,
+                          DimReverseCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

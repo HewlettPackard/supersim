@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/LoopbackCTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -30,5 +30,5 @@ u32 LoopbackCTP::nextDestination() {
   return self_;
 }
 
-registerWithFactory("loopback", ContinuousTrafficPattern,
-                    LoopbackCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("loopback", ContinuousTrafficPattern,
+                          LoopbackCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

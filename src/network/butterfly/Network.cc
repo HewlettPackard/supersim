@@ -14,7 +14,7 @@
  */
 #include "network/butterfly/Network.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 #include <strop/strop.h>
 
 #include <cassert>
@@ -46,7 +46,7 @@ Network::Network(const std::string& _name, const Component* _parent,
     for (u32 column = 0; column < stageWidth_; column++) {
       // create the router name
       std::string rname = "Router_" + std::to_string(stage) + "-" +
-          std::to_string(column);
+                          std::to_string(column);
 
       // create the router
       u32 routerId = stage * stageWidth_ + column;
@@ -68,15 +68,15 @@ Network::Network(const std::string& _name, const Component* _parent,
       u32 cBaseIndex = cColumn % cBaseUnit;
       for (u32 cOutputPort = 0; cOutputPort < routerRadix_; cOutputPort++) {
         u32 nColumn = cBaseOffset + (cBaseIndex % nBaseUnit) +
-            (cOutputPort * nBaseUnit);
+                      (cOutputPort * nBaseUnit);
         u32 destinationId = nStage * stageWidth_ + nColumn;
         Router* destinationRouter = routers_.at(destinationId);
         u32 nInputPort = cBaseIndex / nBaseUnit;  // cBaseIndex / routerRadix_;
 
         // create channel
-        std::string chname = "Channel_" +
-            strop::vecString<u32>(sourceRouter->address(), '-') + "-to-" +
-            strop::vecString<u32>(destinationRouter->address(), '-');
+        std::string chname =
+            "Channel_" + strop::vecString<u32>(sourceRouter->address(), '-') +
+            "-to-" + strop::vecString<u32>(destinationRouter->address(), '-');
         Channel* channel = new Channel(chname, this, numVcs_,
                                        _settings["internal_channel"]);
         internalChannels_.push_back(channel);
@@ -224,5 +224,5 @@ void Network::collectChannels(std::vector<Channel*>* _channels) {
 
 }  // namespace Butterfly
 
-registerWithFactory("butterfly", ::Network,
-                    Butterfly::Network, NETWORK_ARGS);
+registerWithObjectFactory("butterfly", ::Network,
+                          Butterfly::Network, NETWORK_ARGS);

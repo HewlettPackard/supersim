@@ -14,7 +14,7 @@
  */
 #include "traffic/size/RandomMSD.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -34,9 +34,9 @@ RandomMSD::RandomMSD(
   assert(maxMessageSize_ > 0);
   assert(maxMessageSize_ >= minMessageSize_);
   if (doDependent_) {
-      assert(depMinMessageSize_ > 0);
-      assert(depMaxMessageSize_ > 0);
-      assert(depMaxMessageSize_ >= depMinMessageSize_);
+    assert(depMinMessageSize_ > 0);
+    assert(depMaxMessageSize_ > 0);
+    assert(depMaxMessageSize_ >= depMinMessageSize_);
   } else {
     assert(_settings["dependent_min_message_size"].isNull());
     assert(_settings["dependent_max_message_size"].isNull());
@@ -65,6 +65,6 @@ u32 RandomMSD::nextMessageSize(const Message* _msg) {
   }
 }
 
-registerWithFactory("random", MessageSizeDistribution,
-                    RandomMSD,
-                    MESSAGESIZEDISTRIBUTION_ARGS);
+registerWithObjectFactory("random", MessageSizeDistribution,
+                          RandomMSD,
+                          MESSAGESIZEDISTRIBUTION_ARGS);

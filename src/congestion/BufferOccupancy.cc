@@ -14,7 +14,7 @@
  */
 #include "congestion/BufferOccupancy.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 #include <cmath>
@@ -186,7 +186,7 @@ BufferOccupancy::Mode BufferOccupancy::parseMode(const std::string& _mode) {
 void BufferOccupancy::createEvent(u32 _vcIdx, s32 _type) {
   assert(gSim->epsilon() > 0);
   u64 time = latency_ == 1 ? gSim->time() :
-      gSim->futureCycle(Simulator::Clock::ROUTER, latency_ - 1);
+             gSim->futureCycle(Simulator::Clock::ROUTER, latency_ - 1);
   addEvent(time, gSim->epsilon() + 1, reinterpret_cast<void*>(_vcIdx), _type);
 }
 
@@ -224,7 +224,7 @@ f64 BufferOccupancy::vcStatusNorm(u32 _outputPort, u32 _outputVc) const {
   f64 status;
   if (!phantom_) {
     status = ((f64)creditMaximums_.at(vcIdx) - (f64)creditCounts_.at(vcIdx)) /
-        (f64)creditMaximums_.at(vcIdx);
+             (f64)creditMaximums_.at(vcIdx);
   } else {
     status = (((f64)creditMaximums_.at(vcIdx) - (f64)creditCounts_.at(vcIdx) -
                (f64)windows_.at(vcIdx) * valueCoeff_) /
@@ -242,7 +242,7 @@ f64 BufferOccupancy::vcStatusAbs(u32 _outputPort, u32 _outputVc) const {
     statusAbs = (f64)flitsOutstanding_.at(vcIdx);
   } else {
     statusAbs = (f64)flitsOutstanding_.at(vcIdx) -
-        ((f64)windows_.at(vcIdx) * valueCoeff_);
+                ((f64)windows_.at(vcIdx) * valueCoeff_);
   }
   return std::max(0.0, statusAbs);
 }
@@ -273,11 +273,11 @@ f64 BufferOccupancy::portAverageStatusAbs(u32 _outputPort) const {
       curSum += (f64)flitsOutstanding_.at(vcIdx);
     } else {
       curSum += (f64)flitsOutstanding_.at(vcIdx) -
-          ((f64)windows_.at(vcIdx) * valueCoeff_);
+                ((f64)windows_.at(vcIdx) * valueCoeff_);
     }
   }
   return std::max(0.0, (f64)curSum);
 }
 
-registerWithFactory("buffer_occupancy", CongestionSensor,
-                    BufferOccupancy, CONGESTIONSENSOR_ARGS);
+registerWithObjectFactory("buffer_occupancy", CongestionSensor,
+                          BufferOccupancy, CONGESTIONSENSOR_ARGS);

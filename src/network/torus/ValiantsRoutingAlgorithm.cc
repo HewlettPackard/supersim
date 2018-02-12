@@ -14,7 +14,7 @@
  */
 #include "network/torus/ValiantsRoutingAlgorithm.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -210,6 +210,6 @@ void ValiantsRoutingAlgorithm::processRequest(
 
 }  // namespace Torus
 
-registerWithFactory("valiants", Torus::RoutingAlgorithm,
-                    Torus::ValiantsRoutingAlgorithm,
-                    TORUS_ROUTINGALGORITHM_ARGS);
+registerWithObjectFactory("valiants", Torus::RoutingAlgorithm,
+                          Torus::ValiantsRoutingAlgorithm,
+                          TORUS_ROUTINGALGORITHM_ARGS);

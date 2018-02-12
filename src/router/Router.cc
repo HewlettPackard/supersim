@@ -14,7 +14,7 @@
  */
 #include "router/Router.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -41,7 +41,7 @@ Router* Router::create(
   const std::string& architecture = _settings["architecture"].asString();
 
   // attempt to build the router
-  Router* router = factory::Factory<Router, ROUTER_ARGS>::create(
+  Router* router = factory::ObjectFactory<Router, ROUTER_ARGS>::create(
       architecture, _name, _parent, _network, _id, _address, _numPorts, _numVcs,
       _protocolClassVcs, _metadataHandler, _settings);
 

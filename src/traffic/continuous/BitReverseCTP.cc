@@ -15,7 +15,7 @@
 #include "traffic/continuous/BitReverseCTP.h"
 
 #include <bits/bits.h>
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -34,5 +34,5 @@ u32 BitReverseCTP::nextDestination() {
   return dest_;
 }
 
-registerWithFactory("BitReverse", ContinuousTrafficPattern,
-                    BitReverseCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("BitReverse", ContinuousTrafficPattern,
+                          BitReverseCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

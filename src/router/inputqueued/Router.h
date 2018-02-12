@@ -28,7 +28,7 @@
 #include "congestion/CongestionSensor.h"
 #include "event/Component.h"
 #include "network/Channel.h"
-#include "network/RoutingAlgorithm.h"
+#include "routing/RoutingAlgorithm.h"
 #include "router/Router.h"
 #include "types/Credit.h"
 #include "types/Flit.h"

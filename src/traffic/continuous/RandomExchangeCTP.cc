@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/RandomExchangeCTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 RandomExchangeCTP::RandomExchangeCTP(
     const std::string& _name, const Component* _parent, u32 _numTerminals,
@@ -32,5 +32,5 @@ u32 RandomExchangeCTP::nextDestination() {
   return dest;
 }
 
-registerWithFactory("random_exchange", ContinuousTrafficPattern,
-                    RandomExchangeCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("random_exchange", ContinuousTrafficPattern,
+                          RandomExchangeCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

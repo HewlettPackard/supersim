@@ -14,7 +14,7 @@
  */
 #include "network/butterfly/DestTagRoutingAlgorithm.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -49,6 +49,6 @@ void DestTagRoutingAlgorithm::processRequest(
 
 }  // namespace Butterfly
 
-registerWithFactory("dest_tag", Butterfly::RoutingAlgorithm,
-                    Butterfly::DestTagRoutingAlgorithm,
-                    BUTTERFLY_ROUTINGALGORITHM_ARGS);
+registerWithObjectFactory("dest_tag", Butterfly::RoutingAlgorithm,
+                          Butterfly::DestTagRoutingAlgorithm,
+                          BUTTERFLY_ROUTINGALGORITHM_ARGS);

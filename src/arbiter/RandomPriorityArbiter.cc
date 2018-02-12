@@ -14,7 +14,7 @@
  */
 #include "arbiter/RandomPriorityArbiter.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 RandomPriorityArbiter::RandomPriorityArbiter(
     const std::string& _name, const Component* _parent, u32 _size,
@@ -37,5 +37,5 @@ u32 RandomPriorityArbiter::arbitrate() {
   return winner;
 }
 
-registerWithFactory("random_priority", Arbiter,
-                    RandomPriorityArbiter, ARBITER_ARGS);
+registerWithObjectFactory("random_priority", Arbiter,
+                          RandomPriorityArbiter, ARBITER_ARGS);

@@ -18,7 +18,7 @@
 #include <prim/prim.h>
 
 #include "congestion/CongestionSensor.h"
-#include "congestion/CongestionSensor_TEST.h"
+#include "congestion/Congestion_TEST.h"
 #include "test/TestSetup_TEST.h"
 
 TEST(BufferOccupancy, normVc) {
@@ -397,9 +397,9 @@ TEST(BufferOccupancy, phantomNormVc) {
         // create events for sensor checking
         for (u32 ch = 0; ch < 100; ch++) {
           f64 inWindow = (f64)(u32)(channelLatency * lengthCoeff) -
-              std::min((u32)(channelLatency * lengthCoeff), ch);
+                         std::min((u32)(channelLatency * lengthCoeff), ch);
           f64 exp = ((f64)bufferDepth - inWindow * valueCoeff) /
-              (f64)bufferDepth;
+                    (f64)bufferDepth;
           exp = std::min(1.0, std::max(0.0, exp));
           check.setEvent(time, 0, 0, 0, 0, 0, exp);
           time++;
@@ -472,7 +472,7 @@ TEST(BufferOccupancy, phantomAbsVc) {
         // create events for sensor checking
         for (u32 ch = 0; ch < 100; ch++) {
           f64 inWindow = (f64)(u32)(channelLatency * lengthCoeff) -
-              std::min((u32)(channelLatency * lengthCoeff), ch);
+                         std::min((u32)(channelLatency * lengthCoeff), ch);
           f64 exp = (f64)bufferDepth - inWindow * valueCoeff;
           exp = std::max(0.0, exp);
           check.setEvent(time, 0, 0, 0, 0, 0, exp);

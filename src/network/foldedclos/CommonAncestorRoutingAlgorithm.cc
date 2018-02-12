@@ -14,7 +14,7 @@
  */
 #include "network/foldedclos/CommonAncestorRoutingAlgorithm.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -235,6 +235,6 @@ CommonAncestorRoutingAlgorithm::Mode CommonAncestorRoutingAlgorithm::parseMode(
 
 }  // namespace FoldedClos
 
-registerWithFactory("common_ancestor", FoldedClos::RoutingAlgorithm,
-                    FoldedClos::CommonAncestorRoutingAlgorithm,
-                    FOLDEDCLOS_ROUTINGALGORITHM_ARGS);
+registerWithObjectFactory("common_ancestor", FoldedClos::RoutingAlgorithm,
+                          FoldedClos::CommonAncestorRoutingAlgorithm,
+                          FOLDEDCLOS_ROUTINGALGORITHM_ARGS);

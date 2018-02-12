@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/UniformRandomQuadrantCTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -79,5 +79,6 @@ u32 UniformRandomQuadrantCTP::nextDestination() {
   return dstVect_.at(gSim->rnd.nextU64(0, dstVect_.size() - 1));
 }
 
-registerWithFactory("uniform_random_quadrant", ContinuousTrafficPattern,
-                    UniformRandomQuadrantCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory(
+    "uniform_random_quadrant", ContinuousTrafficPattern,
+    UniformRandomQuadrantCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

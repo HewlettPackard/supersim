@@ -14,7 +14,7 @@
  */
 #include "network/torus/DimOrderRoutingAlgorithm.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -128,6 +128,6 @@ void DimOrderRoutingAlgorithm::processRequest(
 
 }  // namespace Torus
 
-registerWithFactory("dimension_order", Torus::RoutingAlgorithm,
-                    Torus::DimOrderRoutingAlgorithm,
-                    TORUS_ROUTINGALGORITHM_ARGS);
+registerWithObjectFactory("dimension_order", Torus::RoutingAlgorithm,
+                          Torus::DimOrderRoutingAlgorithm,
+                          TORUS_ROUTINGALGORITHM_ARGS);

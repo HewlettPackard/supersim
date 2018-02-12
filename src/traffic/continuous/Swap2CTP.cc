@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/Swap2CTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -96,5 +96,5 @@ u32 Swap2CTP::nextDestination() {
   return dest_;
 }
 
-registerWithFactory("swap2", ContinuousTrafficPattern,
-                    Swap2CTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("swap2", ContinuousTrafficPattern,
+                          Swap2CTP, CONTINUOUSTRAFFICPATTERN_ARGS);

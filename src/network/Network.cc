@@ -14,7 +14,7 @@
  */
 #include "network/Network.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -54,7 +54,7 @@ Network* Network::create(
   const std::string& topology = _settings["topology"].asString();
 
   // attempt to build the network topology
-  Network* network = factory::Factory<Network, NETWORK_ARGS>::create(
+  Network* network = factory::ObjectFactory<Network, NETWORK_ARGS>::create(
       topology, _name, _parent, _metadataHandler, _settings);
 
   // check that the factory had the topology

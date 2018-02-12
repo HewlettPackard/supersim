@@ -14,7 +14,7 @@
  */
 #include "router/inputqueued/Router.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -82,7 +82,7 @@ Router::Router(
 
       // create the name suffix
       std::string nameSuffix = "_" + std::to_string(port) + "_" +
-          std::to_string(vc);
+                               std::to_string(vc);
 
       // routing algorithm
       std::string rfname = "RoutingAlgorithm" + nameSuffix;
@@ -245,5 +245,5 @@ Router::CongestionMode Router::parseCongestionMode(const std::string& _mode) {
 
 }  // namespace InputQueued
 
-registerWithFactory("input_queued", ::Router,
-                    InputQueued::Router, ROUTER_ARGS);
+registerWithObjectFactory("input_queued", ::Router,
+                          InputQueued::Router, ROUTER_ARGS);

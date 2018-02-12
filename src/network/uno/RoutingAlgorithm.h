@@ -21,7 +21,7 @@
 #include <string>
 
 #include "event/Component.h"
-#include "network/RoutingAlgorithm.h"
+#include "routing/RoutingAlgorithm.h"
 #include "router/Router.h"
 
 #define UNO_ROUTINGALGORITHM_ARGS const std::string&, const Component*, \

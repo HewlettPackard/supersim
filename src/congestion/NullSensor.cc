@@ -14,7 +14,7 @@
  */
 #include "congestion/NullSensor.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 #include <cmath>
@@ -47,5 +47,5 @@ f64 NullSensor::computeStatus(
   assert(false);  // you can't ask me this!
 }
 
-registerWithFactory("null_sensor", CongestionSensor,
-                    NullSensor, CONGESTIONSENSOR_ARGS);
+registerWithObjectFactory("null_sensor", CongestionSensor,
+                          NullSensor, CONGESTIONSENSOR_ARGS);

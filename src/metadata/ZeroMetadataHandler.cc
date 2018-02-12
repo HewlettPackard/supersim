@@ -14,7 +14,7 @@
  */
 #include "metadata/ZeroMetadataHandler.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include "event/Simulator.h"
 #include "types/Packet.h"
@@ -29,5 +29,5 @@ void ZeroMetadataHandler::packetInjection(
   _packet->setMetadata(0);
 }
 
-registerWithFactory("zero", MetadataHandler,
-                    ZeroMetadataHandler, METADATAHANDLER_ARGS);
+registerWithObjectFactory("zero", MetadataHandler,
+                          ZeroMetadataHandler, METADATAHANDLER_ARGS);

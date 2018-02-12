@@ -14,7 +14,7 @@
  */
 #include "allocator/Allocator.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -35,7 +35,7 @@ Allocator* Allocator::create(
   const std::string& type = _settings["type"].asString();
 
   // try to construct an allocator
-  Allocator* alloc = factory::Factory<Allocator, ALLOCATOR_ARGS>::create(
+  Allocator* alloc = factory::ObjectFactory<Allocator, ALLOCATOR_ARGS>::create(
       type, _name, _parent, _numClients, _numResources, _settings);
 
   // check that the factory had an entry for that type

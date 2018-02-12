@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "congestion/CongestionSensor_TEST.h"
+#include "congestion/Congestion_TEST.h"
 
 #include <gtest/gtest.h>
 
@@ -33,7 +33,7 @@ CongestionTestRouter::CongestionTestRouter(
              _protocolClassVcs, _metadataHandler, _settings),
       congestionSensor_(nullptr) {
   outputChannels_.resize(numPorts_);
-      }
+}
 
 CongestionTestRouter::~CongestionTestRouter() {}
 
@@ -140,4 +140,43 @@ void StatusCheck::processEvent(void* _event, s32 _type) {
   }
   ASSERT_NEAR(sts, evt->exp, 0.002);
   delete evt;
+}
+
+/*********************** CongestionTestSensor class ***************************/
+
+CongestionTestSensor::CongestionTestSensor(
+    const std::string& _name, const Component* _parent, PortedDevice* _device,
+    Json::Value _settings, const std::vector<f64>* _congestion)
+    : CongestionSensor(_name, _parent, _device, _settings),
+      congestion_(_congestion) {}
+
+CongestionTestSensor::~CongestionTestSensor() {}
+
+void CongestionTestSensor::initCredits(u32 _vcIdx, u32 _credits) {
+  assert(false);
+}
+
+void CongestionTestSensor::incrementCredit(u32 _vcIdx) {
+  assert(false);
+}
+
+void CongestionTestSensor::decrementCredit(u32 _vcIdx) {
+  assert(false);
+}
+
+CongestionSensor::Style CongestionTestSensor::style() const {
+  return CongestionSensor::Style::kAbsolute;
+}
+
+CongestionSensor::Mode CongestionTestSensor::mode() const {
+  return CongestionSensor::Mode::kVc;
+}
+
+f64 CongestionTestSensor::computeStatus(
+    u32 _inputPort, u32 _inputVc, u32 _outputPort, u32 _outputVc) const {
+  (void)_inputPort;  // unused
+  (void)_inputVc;  // unused
+  u32 vcIdx = device_->vcIndex(_outputPort, _outputVc);
+  assert(vcIdx < congestion_->size());
+  return congestion_->at(vcIdx);
 }

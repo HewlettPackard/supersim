@@ -14,7 +14,7 @@
  */
 #include "network/parkinglot/Network.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 #include <strop/strop.h>
 
 #include <cassert>
@@ -58,8 +58,8 @@ Network::Network(const std::string& _name, const Component* _parent,
   // link routers via channels
   for (u32 router = 0; router < routers - 1; router++) {
     // create the channel
-    std::string channelName = "Channel_"  +
-        std::to_string(router) + "-" + std::to_string(router + 1);
+    std::string channelName =
+        "Channel_"  + std::to_string(router) + "-" + std::to_string(router + 1);
     Channel* channel = new Channel(channelName, this, numVcs_,
                                    _settings["internal_channel"]);
     internalChannels_.push_back(channel);
@@ -104,7 +104,7 @@ Network::Network(const std::string& _name, const Component* _parent,
       interfaces_.at(interfaceId) = interface;
 
       std::string channelName = "InjChannel_" + std::to_string(interfaceId) +
-          "-to-" + std::to_string(routerId);
+                                "-to-" + std::to_string(routerId);
       Channel* channel = new Channel(channelName, this, numVcs_,
                                      _settings["external_channel"]);
       externalChannels_.push_back(channel);
@@ -140,7 +140,7 @@ Network::Network(const std::string& _name, const Component* _parent,
     interfaces_.at(interfaceId) = interface;
 
     std::string channelName = "EjChannel_" + std::to_string(routerId) +
-        "-to-" + std::to_string(interfaceId);
+                              "-to-" + std::to_string(interfaceId);
     Channel* channel = new Channel(channelName, this, numVcs_,
                                    _settings["external_channel"]);
     externalChannels_.push_back(channel);
@@ -253,5 +253,5 @@ void Network::collectChannels(std::vector<Channel*>* _channels) {
 
 }  // namespace ParkingLot
 
-registerWithFactory("parking_lot", ::Network,
-                    ParkingLot::Network, NETWORK_ARGS);
+registerWithObjectFactory("parking_lot", ::Network,
+                          ParkingLot::Network, NETWORK_ARGS);

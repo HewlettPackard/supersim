@@ -33,7 +33,7 @@
 class Network;
 
 #define ROUTER_ARGS const std::string&, const Component*, Network*, u32, \
-    const std::vector<u32>&, u32, u32, \
+    const std::vector<u32>&, u32, u32,                                  \
     const std::vector<std::tuple<u32, u32> >&, MetadataHandler*, Json::Value
 
 class Router : public Component, public PortedDevice, public FlitSender,

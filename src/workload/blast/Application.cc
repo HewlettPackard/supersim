@@ -14,7 +14,7 @@
  */
 #include "workload/blast/Application.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -153,7 +153,7 @@ void Application::terminalSaturated(u32 _id) {
   dbgprintf("Terminal %u is saturated (%u total)", _id, saturatedTerminals_);
   assert(saturatedTerminals_ <= activeTerminals_);
   f64 percentSaturated = saturatedTerminals_ /
-      static_cast<f64>(activeTerminals_);
+                         static_cast<f64>(activeTerminals_);
   if (percentSaturated > (1.0 - warmupThreshold_)) {
     // the network is saturated
     if (killOnSaturation_) {
@@ -239,5 +239,5 @@ void Application::processEvent(void* _event, s32 _type) {
 
 }  // namespace Blast
 
-registerWithFactory("blast", ::Application, Blast::Application,
-                    APPLICATION_ARGS);
+registerWithObjectFactory("blast", ::Application, Blast::Application,
+                          APPLICATION_ARGS);

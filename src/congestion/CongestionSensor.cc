@@ -14,7 +14,7 @@
  */
 #include "congestion/CongestionSensor.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 #include <cmath>
@@ -47,7 +47,7 @@ CongestionSensor* CongestionSensor::create(
   const std::string& algorithm = _settings["algorithm"].asString();
 
   // attempt to build the congestion status
-  CongestionSensor* cs = factory::Factory<
+  CongestionSensor* cs = factory::ObjectFactory<
     CongestionSensor, CONGESTIONSENSOR_ARGS>::create(
         algorithm, _name, _parent, _device, _settings);
 

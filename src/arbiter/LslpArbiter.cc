@@ -14,7 +14,7 @@
  */
 #include "arbiter/LslpArbiter.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 LslpArbiter::LslpArbiter(const std::string& _name, const Component* _parent,
                          u32 _size, Json::Value _settings)
@@ -43,5 +43,5 @@ u32 LslpArbiter::arbitrate() {
   return winner;
 }
 
-registerWithFactory("lslp", Arbiter,
-                    LslpArbiter, ARBITER_ARGS);
+registerWithObjectFactory("lslp", Arbiter,
+                          LslpArbiter, ARBITER_ARGS);

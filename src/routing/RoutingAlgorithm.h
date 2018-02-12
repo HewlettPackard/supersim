@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_ROUTINGALGORITHM_H_
-#define NETWORK_ROUTINGALGORITHM_H_
+#ifndef ROUTING_ROUTINGALGORITHM_H_
+#define ROUTING_ROUTINGALGORITHM_H_
 
 #include <prim/prim.h>
 #include <json/json.h>
@@ -105,4 +105,4 @@ class RoutingAlgorithm : public Component {
   const u32 latency_;
 };
 
-#endif  // NETWORK_ROUTINGALGORITHM_H_
+#endif  // ROUTING_ROUTINGALGORITHM_H_

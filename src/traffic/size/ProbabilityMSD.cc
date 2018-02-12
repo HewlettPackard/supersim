@@ -15,16 +15,16 @@
 #include "traffic/size/ProbabilityMSD.h"
 
 #include <mut/mut.h>
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <algorithm>
 
 ProbabilityMSD::ProbabilityMSD(
-      const std::string& _name, const Component* _parent,
-      Json::Value _settings)
+    const std::string& _name, const Component* _parent,
+    Json::Value _settings)
     : MessageSizeDistribution(_name, _parent, _settings),
-     doDependent_(_settings.isMember("dependent_message_sizes") &&
-                  _settings.isMember("dependent_size_probabilities")) {
+      doDependent_(_settings.isMember("dependent_message_sizes") &&
+                   _settings.isMember("dependent_size_probabilities")) {
   // verify input settings
   assert(_settings.isMember("message_sizes") &&
          _settings["message_sizes"].isArray());
@@ -112,6 +112,6 @@ u32 ProbabilityMSD::nextMessageSize(const Message* _msg) {
   }
 }
 
-registerWithFactory("probability", MessageSizeDistribution,
-                    ProbabilityMSD,
-                    MESSAGESIZEDISTRIBUTION_ARGS);
+registerWithObjectFactory("probability", MessageSizeDistribution,
+                          ProbabilityMSD,
+                          MESSAGESIZEDISTRIBUTION_ARGS);

@@ -14,7 +14,7 @@
  */
 #include "network/torus/Network.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 #include <strop/strop.h>
 
 #include <cassert>
@@ -61,7 +61,7 @@ Network::Network(const std::string& _name, const Component* _parent,
   routers_.setSize(dimensionWidths_);
   while (routerIterator.next(&routerAddress)) {
     std::string routerName = "Router_" +
-        strop::vecString<u32>(routerAddress, '-');
+                             strop::vecString<u32>(routerAddress, '-');
 
     // use the router factory to create a router
     u32 routerId = translateRouterAddressToId(&routerAddress);
@@ -91,9 +91,9 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // create the channel
       std::string channelName = "RChannel_"  +
-          strop::vecString<u32>(routerAddress, '-') +
-          "-to-" +
-          strop::vecString<u32>(destinationAddress, '-');
+                                strop::vecString<u32>(routerAddress, '-') +
+                                "-to-" +
+                                strop::vecString<u32>(destinationAddress, '-');
       Channel* channel = new Channel(channelName, this, numVcs_,
                                      _settings["internal_channel"]);
       internalChannels_.push_back(channel);
@@ -110,13 +110,13 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // connect to the destination router going right
       destinationAddress.at(dim) = (sourceAddress.at(dim) + dimWidth - 1) %
-          dimWidth;
+                                   dimWidth;
       sourcePort = portBase + 1;
       destinationPort = portBase;
       channelName = "LChannel_" +
-          strop::vecString<u32>(routerAddress, '-') +
-          "-to-" +
-          strop::vecString<u32>(destinationAddress, '-');
+                    strop::vecString<u32>(routerAddress, '-') +
+                    "-to-" +
+                    strop::vecString<u32>(destinationAddress, '-');
       channel = new Channel(channelName, this, numVcs_,
                             _settings["internal_channel"]);
       internalChannels_.push_back(channel);
@@ -157,7 +157,7 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // create an interface name
       std::string interfaceName = "Interface_" +
-          strop::vecString<u32>(interfaceAddress, '-');
+                                  strop::vecString<u32>(interfaceAddress, '-');
 
       // create the interface
       u32 interfaceId = translateInterfaceAddressToId(&interfaceAddress);
@@ -167,11 +167,11 @@ Network::Network(const std::string& _name, const Component* _parent,
       interfaces_.at(interfaceAddress) = interface;
 
       // create I/O channels
-      std::string inChannelName = "Channel_" +
-          strop::vecString<u32>(interfaceAddress, '-') + "-to-" +
+      std::string inChannelName =
+          "Channel_" + strop::vecString<u32>(interfaceAddress, '-') + "-to-" +
           strop::vecString<u32>(routerAddress, '-');
-      std::string outChannelName = "Channel_" +
-          strop::vecString<u32>(routerAddress, '-') + "-to-" +
+      std::string outChannelName =
+          "Channel_" + strop::vecString<u32>(routerAddress, '-') + "-to-" +
           strop::vecString<u32>(interfaceAddress, '-');
       Channel* inChannel = new Channel(inChannelName, this, numVcs_,
                                        _settings["external_channel"]);
@@ -282,5 +282,5 @@ void Network::collectChannels(std::vector<Channel*>* _channels) {
 
 }  // namespace Torus
 
-registerWithFactory("torus", ::Network,
-                    Torus::Network, NETWORK_ARGS);
+registerWithObjectFactory("torus", ::Network,
+                          Torus::Network, NETWORK_ARGS);

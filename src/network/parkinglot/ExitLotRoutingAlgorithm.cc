@@ -14,7 +14,7 @@
  */
 #include "network/parkinglot/ExitLotRoutingAlgorithm.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -67,6 +67,6 @@ void ExitLotRoutingAlgorithm::processRequest(
 
 }  // namespace ParkingLot
 
-registerWithFactory("exit_lot", ParkingLot::RoutingAlgorithm,
-                    ParkingLot::ExitLotRoutingAlgorithm,
-                    PARKINGLOT_ROUTINGALGORITHM_ARGS);
+registerWithObjectFactory("exit_lot", ParkingLot::RoutingAlgorithm,
+                          ParkingLot::ExitLotRoutingAlgorithm,
+                          PARKINGLOT_ROUTINGALGORITHM_ARGS);

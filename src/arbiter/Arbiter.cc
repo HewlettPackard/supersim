@@ -14,7 +14,7 @@
  */
 #include "arbiter/Arbiter.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -37,7 +37,7 @@ Arbiter* Arbiter::create(
   const std::string& type = _settings["type"].asString();
 
   // attempt to create the arbiter
-  Arbiter* arb = factory::Factory<Arbiter, ARBITER_ARGS>::create(
+  Arbiter* arb = factory::ObjectFactory<Arbiter, ARBITER_ARGS>::create(
       type, _name, _parent, _size, _settings);
 
   // check that the factory had this type of arbiter

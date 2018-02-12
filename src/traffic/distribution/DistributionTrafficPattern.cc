@@ -14,7 +14,7 @@
  */
 #include "traffic/distribution/DistributionTrafficPattern.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -35,9 +35,9 @@ DistributionTrafficPattern* DistributionTrafficPattern::create(
   const std::string& type = _settings["type"].asString();
 
   // try to construct a traffic pattern
-  DistributionTrafficPattern* tp = factory::Factory<
-    DistributionTrafficPattern, DISTRIBUTIONTRAFFICPATTERN_ARGS>
-      ::create(type, _name, _parent, _numTerminals, _self, _settings);
+  DistributionTrafficPattern* tp = factory::ObjectFactory<
+    DistributionTrafficPattern, DISTRIBUTIONTRAFFICPATTERN_ARGS>::create(
+        type, _name, _parent, _numTerminals, _self, _settings);
 
   // check that the factory had an entry for that type
   if (tp == nullptr) {

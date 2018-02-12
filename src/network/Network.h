@@ -26,7 +26,7 @@
 #include "interface/Interface.h"
 #include "metadata/MetadataHandler.h"
 #include "network/Channel.h"
-#include "network/RoutingAlgorithm.h"
+#include "routing/RoutingAlgorithm.h"
 #include "router/Router.h"
 #include "stats/ChannelLog.h"
 

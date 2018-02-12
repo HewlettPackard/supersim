@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/ContinuousTrafficPattern.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -35,9 +35,9 @@ ContinuousTrafficPattern* ContinuousTrafficPattern::create(
   const std::string& type = _settings["type"].asString();
 
   // try to construct a traffic pattern
-  ContinuousTrafficPattern* tp = factory::Factory<
-    ContinuousTrafficPattern, CONTINUOUSTRAFFICPATTERN_ARGS>
-      ::create(type, _name, _parent, _numTerminals, _self, _settings);
+  ContinuousTrafficPattern* tp = factory::ObjectFactory<
+    ContinuousTrafficPattern, CONTINUOUSTRAFFICPATTERN_ARGS>::create(
+        type, _name, _parent, _numTerminals, _self, _settings);
 
   // check that the factory had an entry for that type
   if (tp == nullptr) {

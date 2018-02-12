@@ -14,7 +14,7 @@
  */
 #include "arbiter/RandomArbiter.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 RandomArbiter::RandomArbiter(
     const std::string& _name, const Component* _parent, u32 _size,
@@ -41,5 +41,5 @@ u32 RandomArbiter::arbitrate() {
   return winner;
 }
 
-registerWithFactory("random", Arbiter,
-                    RandomArbiter, ARBITER_ARGS);
+registerWithObjectFactory("random", Arbiter,
+                          RandomArbiter, ARBITER_ARGS);

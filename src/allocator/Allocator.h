@@ -24,7 +24,7 @@
 #include "arbiter/Arbiter.h"
 #include "event/Component.h"
 
-#define ALLOCATOR_ARGS const std::string&, const Component*, u32, u32, \
+#define ALLOCATOR_ARGS const std::string&, const Component*, u32, u32,  \
     Json::Value
 
 class Allocator : public Component {

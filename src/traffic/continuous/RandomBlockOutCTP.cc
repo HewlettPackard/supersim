@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/RandomBlockOutCTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -44,5 +44,5 @@ u32 RandomBlockOutCTP::nextDestination() {
   }
 }
 
-registerWithFactory("random_block_out", ContinuousTrafficPattern,
-                    RandomBlockOutCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("random_block_out", ContinuousTrafficPattern,
+                          RandomBlockOutCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

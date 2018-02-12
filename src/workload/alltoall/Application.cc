@@ -14,7 +14,7 @@
  */
 #include "workload/alltoall/Application.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -118,5 +118,5 @@ void Application::processEvent(void* _event, s32 _type) {
 
 }  // namespace AllToAll
 
-registerWithFactory("alltoall", ::Application, AllToAll::Application,
-                    APPLICATION_ARGS);
+registerWithObjectFactory("alltoall", ::Application, AllToAll::Application,
+                          APPLICATION_ARGS);

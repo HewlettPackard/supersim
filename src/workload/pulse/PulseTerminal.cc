@@ -185,7 +185,7 @@ void PulseTerminal::start() {
       u64 cycles = cyclesToSend(requestInjectionRate_, maxMsg);
       cycles = gSim->rnd.nextU64(delay_, delay_ + cycles * 3);
       u64 time = gSim->futureCycle(Simulator::Clock::CHANNEL, 1) +
-          ((cycles - 1) * gSim->cycleTime(Simulator::Clock::CHANNEL));
+                 ((cycles - 1) * gSim->cycleTime(Simulator::Clock::CHANNEL));
       dbgprintf("start time is %lu", time);
       addEvent(time, 0, nullptr, kRequestEvt);
     } else {
@@ -340,7 +340,7 @@ void PulseTerminal::sendNextRequest() {
     u32 flitsLeft = messageSize;
     for (u32 p = 0; p < numPackets; p++) {
       u32 packetLength = flitsLeft > maxPacketSize_ ?
-          maxPacketSize_ : flitsLeft;
+                         maxPacketSize_ : flitsLeft;
 
       Packet* packet = new Packet(p, packetLength, message);
       message->setPacket(p, packet);
@@ -407,7 +407,7 @@ void PulseTerminal::sendNextResponse(Message* _request) {
   u32 flitsLeft = messageSize;
   for (u32 p = 0; p < numPackets; p++) {
     u32 packetLength = flitsLeft > maxPacketSize_ ?
-        maxPacketSize_ : flitsLeft;
+                       maxPacketSize_ : flitsLeft;
 
     Packet* packet = new Packet(p, packetLength, message);
     message->setPacket(p, packet);

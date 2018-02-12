@@ -14,7 +14,7 @@
  */
 #include "network/hyperx/Network.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 #include <strop/strop.h>
 
 #include <cassert>
@@ -93,7 +93,7 @@ Network::Network(const std::string& _name, const Component* _parent,
   routers_.setSize(dimensionWidths_);
   while (routerIterator.next(&routerAddress)) {
     std::string routerName = "Router_" +
-        strop::vecString<u32>(routerAddress, '-');
+                             strop::vecString<u32>(routerAddress, '-');
 
     // use the router factory to create a router
     u32 routerId = translateRouterAddressToId(&routerAddress);
@@ -118,7 +118,7 @@ Network::Network(const std::string& _name, const Component* _parent,
         // determine the destination router
         std::vector<u32> destinationAddress(sourceAddress);
         destinationAddress.at(dim) = (sourceAddress.at(dim) + offset) %
-            dimWidth;
+                                     dimWidth;
 
         // determine the channel latency for current dim and offset
         if (_settings["channel_mode"].asString() == "scalar") {
@@ -136,10 +136,10 @@ Network::Network(const std::string& _name, const Component* _parent,
 
         for (u32 weight = 0; weight < dimWeight; weight++) {
           // create the channel
-          std::string channelName = "Channel_" +
-              strop::vecString<u32>(routerAddress, '-') + "-to-" +
-              strop::vecString<u32>(destinationAddress, '-') +
-              "-" + std::to_string(weight);
+          std::string channelName =
+              "Channel_" + strop::vecString<u32>(routerAddress, '-') + "-to-" +
+              strop::vecString<u32>(destinationAddress, '-') + "-" +
+              std::to_string(weight);
           Channel* channel = new Channel(channelName, this, numVcs_,
                                          _settings["internal_channel"]);
           internalChannels_.push_back(channel);
@@ -147,7 +147,7 @@ Network::Network(const std::string& _name, const Component* _parent,
           // determine the port numbers
           u32 sourcePort = portBase + ((offset - 1) * dimWeight) + weight;
           u32 destinationPort = portBase + ((dimWidth - 1) * dimWeight) -
-              (offset * dimWeight) + weight;
+                                (offset * dimWeight) + weight;
           dbgprintf("s=%s:%u to d=%s:%u with %s latency=%d",
                     strop::vecString<u32>(sourceAddress, '-').c_str(),
                     sourcePort,
@@ -188,7 +188,7 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // create an interface name
       std::string interfaceName = "Interface_" +
-          strop::vecString<u32>(interfaceAddress, '-');
+                                  strop::vecString<u32>(interfaceAddress, '-');
 
       // create the interface
       u32 interfaceId = translateInterfaceAddressToId(&interfaceAddress);
@@ -198,11 +198,11 @@ Network::Network(const std::string& _name, const Component* _parent,
       interfaces_.at(interfaceAddress) = interface;
 
       // create I/O channels
-      std::string inChannelName = "Channel_" +
-          strop::vecString<u32>(interfaceAddress, '-') + "-to-" +
+      std::string inChannelName =
+          "Channel_" + strop::vecString<u32>(interfaceAddress, '-') + "-to-" +
           strop::vecString<u32>(routerAddress, '-');
-      std::string outChannelName = "Channel_" +
-          strop::vecString<u32>(routerAddress, '-') + "-to-" +
+      std::string outChannelName =
+          "Channel_" + strop::vecString<u32>(routerAddress, '-') + "-to-" +
           strop::vecString<u32>(interfaceAddress, '-');
       Channel* inChannel = new Channel(inChannelName, this, numVcs_,
                                        _settings["external_channel"]);
@@ -312,5 +312,5 @@ void Network::collectChannels(std::vector<Channel*>* _channels) {
 
 }  // namespace HyperX
 
-registerWithFactory("hyperx", ::Network,
-                    HyperX::Network, NETWORK_ARGS);
+registerWithObjectFactory("hyperx", ::Network,
+                          HyperX::Network, NETWORK_ARGS);

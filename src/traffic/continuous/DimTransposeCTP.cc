@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/DimTransposeCTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -86,5 +86,5 @@ u32 DimTransposeCTP::nextDestination() {
   return dest_;
 }
 
-registerWithFactory("dim_transpose", ContinuousTrafficPattern,
-                    DimTransposeCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("dim_transpose", ContinuousTrafficPattern,
+                          DimTransposeCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

@@ -14,7 +14,7 @@
  */
 #include "traffic/continuous/RandomExchangeNeighborCTP.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -63,7 +63,7 @@ RandomExchangeNeighborCTP(
       // get self as a vector address
       Cube::computeTerminalAddress(self_, widths, concentration, &addr);
       addr.at(dim + 1) = (addr.at(dim + 1) + widths.at(dim) - 1)
-          % widths.at(dim);
+                         % widths.at(dim);
       if (allTerminals) {
         for (u32 conc = 0; conc < concentration; ++conc) {
           addr.at(0) = conc;
@@ -96,5 +96,6 @@ u32 RandomExchangeNeighborCTP::nextDestination() {
   return dstVect_.at(gSim->rnd.nextU64(0, dstVect_.size() - 1));
 }
 
-registerWithFactory("random_exchange_neighbor", ContinuousTrafficPattern,
-                    RandomExchangeNeighborCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory(
+    "random_exchange_neighbor", ContinuousTrafficPattern,
+    RandomExchangeNeighborCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

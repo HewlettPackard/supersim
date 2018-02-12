@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef CONGESTION_CONGESTIONSENSOR_TEST_H_
-#define CONGESTION_CONGESTIONSENSOR_TEST_H_
+#ifndef CONGESTION_CONGESTION_TEST_H_
+#define CONGESTION_CONGESTION_TEST_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -72,7 +72,7 @@ class CreditHandler : public Component {
 
   void setEvent(u32 _port, u32 _vc, u64 _time, u8 _epsilon,
                 CreditHandler::Type _type);
-  void processEvent(void* _event, s32 _type);
+  void processEvent(void* _event, s32 _type) override;
 
  private:
   struct Event {
@@ -94,7 +94,7 @@ class StatusCheck : public Component {
 
   void setEvent(u64 _time, u8 _epsilon, u32 _inputPort, u32 _inputVc,
                 u32 _outputPort, u32 _outputVc, f64 _expected);
-  void processEvent(void* _event, s32 _type);
+  void processEvent(void* _event, s32 _type) override;
 
  private:
   struct Event {
@@ -108,4 +108,27 @@ class StatusCheck : public Component {
   CongestionSensor* congestionSensor_;
 };
 
-#endif  // CONGESTION_CONGESTIONSENSOR_TEST_H_
+// this is test class for having a straight forward congestion sensor
+class CongestionTestSensor : public CongestionSensor {
+ public:
+  CongestionTestSensor(const std::string& _name, const Component* _parent,
+                       PortedDevice* _device, Json::Value _settings,
+                       const std::vector<f64>* _congestion);
+  ~CongestionTestSensor();
+
+  void initCredits(u32 _vcIdx, u32 _credits) override;
+  void incrementCredit(u32 _vcIdx) override;
+  void decrementCredit(u32 _vcIdx) override;
+
+  Style style() const override;
+  Mode mode() const override;
+
+ protected:
+  f64 computeStatus(u32 _inputPort, u32 _inputVc,
+                    u32 _outputPort, u32 _outputVc) const override;
+
+ private:
+  const std::vector<f64>* congestion_;
+};
+
+#endif  // CONGESTION_CONGESTION_TEST_H_

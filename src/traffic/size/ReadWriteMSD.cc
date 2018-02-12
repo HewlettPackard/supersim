@@ -14,7 +14,7 @@
  */
 #include "traffic/size/ReadWriteMSD.h"
 
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -48,9 +48,9 @@ ReadWriteMSD::ReadWriteMSD(
     maxMessageSize_ = std::max(readRequestSize_, readResponseSize_);
   } else {
     minMessageSize_ = std::min({readRequestSize_, readResponseSize_,
-            writeRequestSize_, writeResponseSize_});
+                      writeRequestSize_, writeResponseSize_});
     maxMessageSize_ = std::max({readRequestSize_, readResponseSize_,
-            writeRequestSize_, writeResponseSize_});
+                      writeRequestSize_, writeResponseSize_});
   }
 }
 
@@ -82,6 +82,6 @@ u32 ReadWriteMSD::nextMessageSize(const Message* _msg) {
   }
 }
 
-registerWithFactory("read_write", MessageSizeDistribution,
-                    ReadWriteMSD,
-                    MESSAGESIZEDISTRIBUTION_ARGS);
+registerWithObjectFactory("read_write", MessageSizeDistribution,
+                          ReadWriteMSD,
+                          MESSAGESIZEDISTRIBUTION_ARGS);

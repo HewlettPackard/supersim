@@ -15,7 +15,7 @@
 #include "traffic/continuous/BitRotateCTP.h"
 
 #include <bits/bits.h>
-#include <factory/Factory.h>
+#include <factory/ObjectFactory.h>
 
 #include <cassert>
 
@@ -44,5 +44,5 @@ u32 BitRotateCTP::nextDestination() {
   return dest_;
 }
 
-registerWithFactory("bit_rotate", ContinuousTrafficPattern,
-                    BitRotateCTP, CONTINUOUSTRAFFICPATTERN_ARGS);
+registerWithObjectFactory("bit_rotate", ContinuousTrafficPattern,
+                          BitRotateCTP, CONTINUOUSTRAFFICPATTERN_ARGS);

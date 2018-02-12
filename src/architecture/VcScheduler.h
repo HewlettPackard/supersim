@@ -58,7 +58,7 @@ class VcScheduler : public Component {
   void releaseVc(u32 _vcIdx);
 
   // event processing
-  void processEvent(void* _event, s32 _type);
+  void processEvent(void* _event, s32 _type) override;
 
  private:
   const u32 numClients_;
