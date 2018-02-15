@@ -24,6 +24,7 @@
 #include <tuple>
 
 #include "network/cube/util.h"
+#include "network/torus/RoutingAlgorithm.h"
 #include "network/torus/util.h"
 #include "util/DimensionIterator.h"
 

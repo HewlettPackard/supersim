@@ -22,6 +22,8 @@
 
 #include <tuple>
 
+#include "network/parkinglot/RoutingAlgorithm.h"
+
 namespace ParkingLot {
 
 Network::Network(const std::string& _name, const Component* _parent,

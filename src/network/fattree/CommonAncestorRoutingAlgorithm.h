@@ -12,26 +12,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_FOLDEDCLOS_COMMONANCESTORROUTINGALGORITHM_H_
-#define NETWORK_FOLDEDCLOS_COMMONANCESTORROUTINGALGORITHM_H_
+#ifndef NETWORK_FATTREE_COMMONANCESTORROUTINGALGORITHM_H_
+#define NETWORK_FATTREE_COMMONANCESTORROUTINGALGORITHM_H_
 
+#include <colhash/tuplehash.h>
 #include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>
+#include <tuple>
+#include <vector>
 
 #include "event/Component.h"
-#include "network/foldedclos/RoutingAlgorithm.h"
+#include "network/fattree/RoutingAlgorithm.h"
 #include "router/Router.h"
+#include "routing/mode.h"
+#include "routing/Reduction.h"
 
-namespace FoldedClos {
+namespace FatTree {
 
 class CommonAncestorRoutingAlgorithm : public RoutingAlgorithm {
  public:
   CommonAncestorRoutingAlgorithm(
       const std::string& _name, const Component* _parent, Router* _router,
-      u32 _baseVc, u32 _numVcs, u32 _inputPort, u32 _inputVc, u32 _numPorts,
-      u32 _numLevels, Json::Value _settings);
+      u32 _baseVc, u32 _numVcs, u32 _inputPort, u32 _inputVc,
+      const std::vector<std::tuple<u32, u32, u32> >* _radices,
+      Json::Value _settings);
   ~CommonAncestorRoutingAlgorithm();
 
  protected:
@@ -39,14 +45,16 @@ class CommonAncestorRoutingAlgorithm : public RoutingAlgorithm {
       Flit* _flit, RoutingAlgorithm::Response* _response) override;
 
  private:
-  enum class Mode : uint8_t { ALL, PORT, VC };
-  Mode parseMode(const std::string& _mode) const;
+  void addPort(u32 _port, u32 _hops);
 
+  const RoutingMode mode_;
   const bool leastCommonAncestor_;
-  const Mode mode_;
-  const bool adaptive_;
+  const bool deterministic_;
+  Reduction* reduction_;
+
+  std::hash<std::tuple<u32, u32> > hasher_;
 };
 
-}  // namespace FoldedClos
+}  // namespace FatTree
 
-#endif  // NETWORK_FOLDEDCLOS_COMMONANCESTORROUTINGALGORITHM_H_
+#endif  // NETWORK_FATTREE_COMMONANCESTORROUTINGALGORITHM_H_

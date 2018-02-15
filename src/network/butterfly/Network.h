@@ -25,7 +25,6 @@
 #include "interface/Interface.h"
 #include "network/Channel.h"
 #include "network/Network.h"
-#include "network/butterfly/RoutingAlgorithm.h"
 #include "router/Router.h"
 
 namespace Butterfly {

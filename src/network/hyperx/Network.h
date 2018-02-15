@@ -25,7 +25,6 @@
 #include "interface/Interface.h"
 #include "network/Channel.h"
 #include "network/Network.h"
-#include "network/hyperx/RoutingAlgorithm.h"
 #include "router/Router.h"
 #include "util/DimensionalArray.h"
 

@@ -12,23 +12,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef NETWORK_FOLDEDCLOS_NETWORK_H_
-#define NETWORK_FOLDEDCLOS_NETWORK_H_
+#ifndef NETWORK_FATTREE_NETWORK_H_
+#define NETWORK_FATTREE_NETWORK_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
 
 #include <string>
 #include <vector>
+#include <tuple>
 
 #include "event/Component.h"
 #include "interface/Interface.h"
 #include "network/Channel.h"
 #include "network/Network.h"
-#include "network/foldedclos/RoutingAlgorithm.h"
 #include "router/Router.h"
 
-namespace FoldedClos {
+namespace FatTree {
 
 class Network : public ::Network {
  public:
@@ -61,18 +61,21 @@ class Network : public ::Network {
   void collectChannels(std::vector<Channel*>* _channels) override;
 
  private:
-  u32 routerRadix_;
-  u32 halfRadix_;
+  u32 numTerminals_;
   u32 numLevels_;
-  u32 rowRouters_;
+  std::vector<u32> routersAtLevel_;
+  std::vector<u32> terminalsPerGroup_;
+  std::vector<u32> routersAtLevelPerGroup_;
+  std::vector<u32> totalGroups_;
+  std::vector<std::tuple<u32, u32, u32> > radices_;  // down, up, total
 
-  std::vector<Router*> routers_;
+  std::vector<std::vector<Router*> > routers_;
   std::vector<Interface*> interfaces_;
 
   std::vector<Channel*> internalChannels_;
   std::vector<Channel*> externalChannels_;
 };
 
-}  // namespace FoldedClos
+}  // namespace FatTree
 
-#endif  // NETWORK_FOLDEDCLOS_NETWORK_H_
+#endif  // NETWORK_FATTREE_NETWORK_H_

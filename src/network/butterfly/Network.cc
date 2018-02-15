@@ -22,6 +22,7 @@
 
 #include <tuple>
 
+#include "network/butterfly/RoutingAlgorithm.h"
 #include "network/butterfly/util.h"
 
 namespace Butterfly {
