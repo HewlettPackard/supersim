@@ -34,7 +34,7 @@ TEST(RandomBlockOutCTP, all) {
   for (u32 ctp = 0; ctp < NUMTERMINALS; ctp++) {
     Json::Value settings;
     settings["block_size"] = BLOCKSIZE;
-    RandomBlockOutCTP* tp =  new RandomBlockOutCTP(
+    RandomBlockOutCTP* tp = new RandomBlockOutCTP(
         "TP_" + std::to_string(ctp), nullptr, NUMTERMINALS, ctp, settings);
     ctps.at(ctp) = tp;
   }
@@ -64,4 +64,8 @@ TEST(RandomBlockOutCTP, all) {
   f64 expMean = COUNT;
   ASSERT_EQ(mean, expMean);
   ASSERT_LE(stddev, expMean * 0.02);
+
+  for (RandomBlockOutCTP* ctp : ctps) {
+    delete ctp;
+  }
 }

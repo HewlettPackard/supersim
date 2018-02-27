@@ -74,7 +74,7 @@ TEST(FatTree, translateInterfaceAddressToId) {
   ASSERT_EQ(35u, FatTree::translateInterfaceAddressToId(
       numLevels, terminalsPerGroup, &addr));
 
-  addr =  {3, 2, 1, 1};
+  addr = {3, 2, 1, 1};
   ASSERT_EQ(47u, FatTree::translateInterfaceAddressToId(
       numLevels, terminalsPerGroup, &addr));
 }

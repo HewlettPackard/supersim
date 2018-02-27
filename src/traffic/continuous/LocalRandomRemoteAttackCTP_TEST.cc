@@ -54,7 +54,7 @@ TEST(LocalRandomRemoteAttackCTP, full) {
     settings["local_probability"] = PROB;
     settings["remote_mode"] = 2;
 
-    LocalRandomRemoteAttackCTP* tp =  new LocalRandomRemoteAttackCTP(
+    LocalRandomRemoteAttackCTP* tp = new LocalRandomRemoteAttackCTP(
         "TP", nullptr, NSIZE, ME, settings);
 
     std::vector<u32> counts(NSIZE, 0);

@@ -52,7 +52,7 @@ TEST(LocalRemoteRandomCTP, full) {
     settings["block_size"] = BSIZE;
     settings["local_probability"] = PROB;
 
-    LocalRemoteRandomCTP* tp =  new LocalRemoteRandomCTP(
+    LocalRemoteRandomCTP* tp = new LocalRemoteRandomCTP(
         "TP", nullptr, NSIZE, ME, settings);
 
     std::vector<u32> counts(NSIZE, 0);

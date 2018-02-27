@@ -32,11 +32,14 @@ class GroupAttackCTP : public ContinuousTrafficPattern {
   u32 nextDestination() override;
 
  private:
+  enum class DestinationMode {kPeer, kRandom, kComplement};
+
   u32 groupCount_;
   u32 groupSize_;
   u32 concentration_;
-  bool random_;
+  DestinationMode destinationMode_;
 
+  u32 selfIndex_;
   u32 selfGroup_;
   u32 selfLocal_;
   u32 selfConc_;

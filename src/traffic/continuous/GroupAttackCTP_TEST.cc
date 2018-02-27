@@ -36,8 +36,8 @@ TEST(GroupAttackCTP, half_permutation) {
       Json::Value settings;
       settings["group_size"] = groupSize;
       settings["concentration"] = concentration;
-      settings["random"] = false;
-      settings["mode"] = "half";
+      settings["destination_mode"] = "peer";
+      settings["group_mode"] = "half";
 
       u32 selfGroup = gSim->rnd.nextU64(0, groupCount - 1);
       u32 selfLocal = gSim->rnd.nextU64(0, groupSize - 1);
@@ -47,7 +47,7 @@ TEST(GroupAttackCTP, half_permutation) {
                   (selfLocal * concentration) +
                   (selfConc));
 
-      GroupAttackCTP* tp =  new GroupAttackCTP(
+      GroupAttackCTP* tp = new GroupAttackCTP(
           "TP", nullptr, groupCount * groupSize * concentration, self,
           settings);
 
@@ -80,8 +80,8 @@ TEST(GroupAttackCTP, opposite_permutation) {
       Json::Value settings;
       settings["group_size"] = groupSize;
       settings["concentration"] = concentration;
-      settings["random"] = false;
-      settings["mode"] = "opposite";
+      settings["destination_mode"] = "peer";
+      settings["group_mode"] = "opposite";
 
       u32 selfGroup = gSim->rnd.nextU64(0, groupCount - 1);
       u32 selfLocal = gSim->rnd.nextU64(0, groupSize - 1);
@@ -91,7 +91,7 @@ TEST(GroupAttackCTP, opposite_permutation) {
                   (selfLocal * concentration) +
                   (selfConc));
 
-      GroupAttackCTP* tp =  new GroupAttackCTP(
+      GroupAttackCTP* tp = new GroupAttackCTP(
           "TP", nullptr, groupCount * groupSize * concentration, self,
           settings);
 
@@ -125,8 +125,8 @@ TEST(GroupAttackCTP, offset_permutation) {
         Json::Value settings;
         settings["group_size"] = groupSize;
         settings["concentration"] = concentration;
-        settings["random"] = false;
-        settings["mode"] = offset;
+        settings["destination_mode"] = "peer";
+        settings["group_mode"] = offset;
 
         u32 selfGroup = gSim->rnd.nextU64(0, groupCount - 1);
         u32 selfLocal = gSim->rnd.nextU64(0, groupSize - 1);
@@ -136,7 +136,7 @@ TEST(GroupAttackCTP, offset_permutation) {
                     (selfLocal * concentration) +
                     (selfConc));
 
-        GroupAttackCTP* tp =  new GroupAttackCTP(
+        GroupAttackCTP* tp = new GroupAttackCTP(
             "TP", nullptr, groupCount * groupSize * concentration, self,
             settings);
 
@@ -194,8 +194,8 @@ TEST(GroupAttackCTP, random) {
       Json::Value settings;
       settings["group_size"] = groupSize;
       settings["concentration"] = concentration;
-      settings["random"] = true;
-      settings["mode"] = "half";
+      settings["destination_mode"] = "random";
+      settings["group_mode"] = "half";
 
       u32 selfGroup = gSim->rnd.nextU64(0, groupCount - 1);
       u32 selfLocal = gSim->rnd.nextU64(0, groupSize - 1);

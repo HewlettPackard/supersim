@@ -1,0 +1,154 @@
+{
+  "simulator": {
+    "channel_cycle_time": 1,
+    "router_cycle_time": 1,
+    "interface_cycle_time": 1,
+    "print_progress": true,
+    "print_interval": 1.0,  // seconds
+    "random_seed": 1234567
+  },
+  "network": {
+    "topology": "dragonfly",
+    "global_width": 8,
+    "global_weight": 1,
+    "local_width": 4,
+    "local_weight": 1,
+    "concentration": 2,
+    "protocol_classes": [
+      {
+        "num_vcs": 5,
+        "routing": {
+          "algorithm": "adaptive",
+          "latency": 1,
+          "mode": "vc", // port_ave, port_min, port_max
+          "progressive_adaptive": true,
+          "valiant_node": true,
+          "reduction": {
+            "algorithm": "weighted",
+            "max_outputs": 1,
+            "congestion_bias": 0.1,
+            "independent_bias": 0.0,
+            "non_minimal_weight_func": "regular"
+          }
+        }
+      }
+    ],
+    "global_channel": {
+      "latency": 1  // cycles
+    },
+    "local_channel": {
+      "latency": 1  // cycles
+    },
+    "external_channel": {
+      "latency": 1  // cycles
+    },
+    "channel_log": {
+      "file": "/dev/null"  // "channels.csv"
+    },
+    "router": {
+      "architecture": "input_output_queued",
+      "congestion_sensor": {
+        "algorithm": "buffer_occupancy",
+        "latency": 1,
+        "granularity": 0,
+        "minimum": 0.0,
+        "offset": 0.1,
+        "mode": "normalized_vc"  // {normalized,absolute}_{port,vc}
+      },
+      "congestion_mode": "output_and_downstream",
+      "input_queue_depth": 16,
+      "vca_swa_wait": true,
+      "output_queue_depth": 8,
+      "crossbar": {
+        "latency": 1  // cycles
+      },
+      "vc_scheduler": {
+        "allocator": {
+          "type": "rc_separable",
+          "slip_latch": true,
+          "iterations": 2,
+          "resource_arbiter": {
+            "type": "lslp"
+          },
+          "client_arbiter": {
+            "type": "lslp"
+          }
+        }
+      },
+      "crossbar_scheduler": {
+        "allocator": {
+          "type": "r_separable",
+          "slip_latch": true,
+          "resource_arbiter": {
+            "type": "lslp"
+          }
+        },
+        "full_packet": true,
+        "packet_lock": true,
+        "idle_unlock": true
+      },
+      "output_crossbar": {
+        "latency": 1  // cycles
+      },
+      "output_crossbar_scheduler": "$&(network.router.crossbar_scheduler)&$"
+    },
+    "interface": {
+      "type": "standard",
+      "adaptive": false,
+      "fixed_msg_vc": false,
+      "crossbar_scheduler": "$&(network.router.crossbar_scheduler)&$",
+      "init_credits": "$&(network.router.input_queue_depth)&$",
+      "crossbar": {
+        "latency": 1  // cycles
+      }
+    }
+  },
+  "metadata_handler": {
+    "type": "zero"
+  },
+  "workload": {
+    "message_log": {
+      "file": "/dev/null"  // "data.mpf.gz"
+    },
+    "applications": [
+      {
+        "type": "blast",
+        "warmup_threshold": 0.90,
+        "kill_on_saturation": false,
+        "log_during_saturation": false,
+        "blast_terminal": {
+          // requests
+          "request_protocol_class": 0,
+          "request_injection_rate": 0.30,
+          // responses
+          "enable_responses": false,
+          // warmup
+          "warmup_interval": 50,  // delivered flits
+          "warmup_window": 15,
+          "warmup_attempts": 12,
+          // traffic generation
+          "num_transactions": 1,
+          "max_packet_size": 16,
+          "traffic_pattern": {
+            "type": "group_attack",
+            "group_size": "$&(network.local_width)&$",
+            "concentration": "$&(network.concentration)&$",
+            "destination_mode": "complement",
+            "group_mode": "half"
+          },
+          "message_size_distribution": {
+            "type": "single",
+            "message_size": 1
+          }
+        },
+        "rate_log": {
+          "file": "/dev/null"  // "rates.csv"
+        }
+      }
+    ]
+  },
+  "debug": [
+    "Workload.Application_0",
+    "Workload.Application_0.BlastTerminal_1"
+  ]
+}
