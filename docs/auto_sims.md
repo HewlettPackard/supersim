@@ -15,16 +15,17 @@ cores, main memory, etc.).
 
 ## Example
 In this document we'll generate a TaskRun script that will investigate adaptive
-routing in a Folded-Clos network topology. With a single command, we'll be able
-to run all simulations and plot the results.
+routing in a Fat-Tree (a.k.a. Folded-Clos) network topology. With a single command,
+we'll be able to run all simulations and plot the results.
 
-We'll compare two routing algorithms: oblivious least common ancestor and
-adaptive least common ancestor. For each configuration we'll sweep the injection
-rate from 0% to 100% in steps of 6%. In total, there will be 34 simulation runs.
-Each simulation result will be parsed by [SSparse][] and plotted by `sslqp`
-([SSPlot][]). Each injection rate sweep will be plotted by `ssllp`. The
-combination of both injection rate sweeps will be plotted by `sslcp`. In total,
-there are 113 tasks run.
+We'll compare three routing algorithms: deterministic least common ancestor,
+oblivious least common ancestor, and adaptive least common ancestor.
+For each configuration we'll sweep the injection
+rate from 0% to 100% in steps of 10%. In total, there will be 33 simulation runs.
+Each simulation result will be parsed by [SSParse][] and plotted by [SSPlot][].
+Each injection rate sweep will also be plotted by [SSPlot][]. The
+combination of both injection rate sweeps will be plotted by [SSPlot][].
+In total, there are 101 tasks performed.
 
 ## Setup
 Let's create a directory to hold this investigation.
@@ -62,7 +63,7 @@ provides a nice command line output while the tasks are running.
 
 The next section creates an array for injection rates to be simulated for all
 configurations. The granularity of the load vs. latency sweeps can be set using
-the `sweep_step` variable.
+the `sweep_step` variable (`--granularity` from the command line).
 
 The next section creates all the simulation tasks. You can see that there is a
 doubly nested for loop. One loop sweeps the configurations and the other sweeps
@@ -78,19 +79,19 @@ FileModificationCondition object which tracks the input and output files of the
 task. If the output files don't exist or if the input files are newer than the
 output files, the task will be executed, otherwise it will be bypassed.
 
-The next two sections create the parsing tasks using [SSparse][] and the
-latency distribution plotting tasks using `sslqp`. The methodology is very
+The next two sections create the parsing tasks using [SSParse][] and the
+latency percentile plotting tasks using [SSPlot][]. The methodology is very
 similar to creating the simulation task with one exception. The parsing and
 plotting tasks can't begin until the corresponding preceding task has completed.
 For this functionality the tasks are given a dependency pointing back to the
 corresponding preceding task.
 
-The next section generates load vs. latency plots using `ssllp`. Again, the
+The next section generates load vs. latency plots using [SSPlot][]. Again, the
 process is similar to the previous description but in this case the results from
 a whole injection rate sweep produce a single plot. Thus, there are many
 dependencies for these tasks not just one.
 
-The last section generates the comparative load vs. latency plots using `sslcp`.
+The last section generates the comparative load vs. latency plots using [SSPlot][].
 This script generates one of these plots for all latency metrics produced by
 SSPlot (Mean, Median, 90th%, 99.99th%, etc.). The dependencies of these tasks
 list all parsing tasks as they use all of them to generate the plots.
@@ -102,13 +103,13 @@ TaskManager object.
 We'll use an example settings file from the SuperSim project.
 
 ``` sh
-cp ../supersim/json/foldedclos_iq_blast.json settings.json
+cp ../supersim/json/fattree_iq_blast.json settings.json
 ```
 
 Now we are ready to run the TaskRun script.
 
 ``` sh
-./auto_sims.py
+./auto_sims.py --directory output --settings settings.json
 ```
 
 As it runs, the VerboseObserver will show you what it going on. It reports when
@@ -125,14 +126,14 @@ successful, bypassed, and failed.
 Take a look at the resulting plots:
 
 ``` sh
-eog lplot*png cplot*png
+eog output/*png
 ```
 
 TaskRun is designed to only run tasks that need to be run. Let's re-run our
 script:
 
 ``` sh
-./auto_sims.py
+./auto_sims.py --directory output --settings settings.json
 ```
 
 TaskRun will check the status of all tasks and determine that all of the tasks
@@ -143,7 +144,7 @@ will be run while the rest of them will be bypassed. Let's increase the
 simulation granularity and re-run the script:
 
 ``` sh
-./auto_sims.py -g 3
+./auto_sims.py --directory output --settings settings.json --granularity 5
 ```
 
 After it completes, you'll see in the summary the prior tasks were bypassed and
@@ -151,9 +152,9 @@ only the new tasks were executed. You can now see the resulting plots have
 higher granularity:
 
 ``` sh
-eog lplot*png cplot*png
+eog output/*png
 ```
 
 [TaskRun]: https://github.com/nicmcd/taskrun
-[SSparse]: https://github.com/nicmcd/ssparse
+[SSParse]: https://github.com/nicmcd/ssparse
 [SSPlot]: https://github.com/nicmcd/ssplot

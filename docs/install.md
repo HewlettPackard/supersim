@@ -92,6 +92,10 @@ This is what your development environment now looks like:
 
 ``` sh
 ls -1 ~/ssdev
+
+```
+
+``` txt
   hyperxsearch
   libbits
   libcolhash

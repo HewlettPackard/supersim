@@ -26,7 +26,7 @@ example settings file from the SuperSim project. We'll modify the settings
 on the command line when we run the simulator.
 
 ``` sh
-cp ../supersim/json/foldedclos_iq_blast.json sample.json
+cp ../supersim/json/fattree_iq_blast.json sample.json
 ```
 
 ## Running the simulator
@@ -98,15 +98,15 @@ transaction latency data using the `-m` and `-t` flags, respectively.
 
 ## Plotting the resuls
 Let's plot the packet latency results using the [SSPlot][] plotting package.
-This package has many executables. The only one we'll use for this example is:
+This package has many commands. The only one we'll use for this example is:
 
-sslqp - Latency quad plot focused on latency distribution
+ssplot time-latency - Time vs. latency scatter plot
 
 Run it and view the plot with the following commands:
 Note: I'm using `eog` image viewer. Any image viewer will do.
 
 ``` sh
-sslqp packets.csv.gz packets.png
+ssplot time-latency packets.csv.gz packets.png
 eog packets.png
 ```
 
