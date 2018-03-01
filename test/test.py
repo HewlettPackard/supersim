@@ -9,6 +9,7 @@ import tempfile
 import time
 
 def main(args):
+  test('Build', build_test)
   test('Unit', unit_test, args.mem_check)
   test('JSON', json_test, args.mem_check)
   test('Install', install_test)
@@ -67,6 +68,12 @@ def markdown_commands(filename, *skip):
   return cmds
 
 # tests below here
+def build_test():
+  res = run('make clean')
+  if res is not None:
+    return res
+  return run('make')
+
 def unit_test(mem_check):
   cmd = 'make check'
   if mem_check:
