@@ -28,13 +28,13 @@
 #include "routing/mode.h"
 
 #define REDUCTION_ARGS const std::string&, const Component*,  \
-    const PortedDevice*, RoutingMode, Json::Value
+    const PortedDevice*, RoutingMode, bool, Json::Value
 
 class Reduction : public Component {
  public:
   Reduction(const std::string& _name, const Component* _parent,
             const PortedDevice* _device, RoutingMode _mode,
-            Json::Value _settings);
+            bool _ignoreDuplicates, Json::Value _settings);
   ~Reduction();
 
   // this is a reduction factory
@@ -63,6 +63,7 @@ class Reduction : public Component {
   const PortedDevice* device_;
   const RoutingMode mode_;
   const u32 maxOutputs_;
+  const bool ignoreDuplicates_;
 
   bool start_;
   std::unordered_set<u32> check_;

@@ -31,7 +31,7 @@ TEST(WeightedReduction, vc) {
     settings["independent_bias"] = 0.0;
     settings["non_minimal_weight_func"] = "regular";
     WeightedReduction red(
-        "Reduction", nullptr, &dev, RoutingMode::kVc, settings);
+        "Reduction", nullptr, &dev, RoutingMode::kVc, false, settings);
 
     {
       red.add(1, 4, 4, 0.666666);  // winner

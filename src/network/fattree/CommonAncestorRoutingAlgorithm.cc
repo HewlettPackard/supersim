@@ -43,7 +43,7 @@ CommonAncestorRoutingAlgorithm::CommonAncestorRoutingAlgorithm(
 
   // create the reduction
   reduction_ = Reduction::create("Reduction", this, _router, mode_,
-                                 _settings["reduction"]);
+                                 false, _settings["reduction"]);
 }
 
 CommonAncestorRoutingAlgorithm::~CommonAncestorRoutingAlgorithm() {

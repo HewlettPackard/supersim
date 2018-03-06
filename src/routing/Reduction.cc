@@ -22,9 +22,10 @@
 
 Reduction::Reduction(const std::string& _name, const Component* _parent,
                      const PortedDevice* _device, RoutingMode _mode,
-                     Json::Value _settings)
+                     bool _ignoreDuplicates, Json::Value _settings)
     : Component(_name, _parent), device_(_device), mode_(_mode),
       maxOutputs_(_settings["max_outputs"].asUInt()),
+      ignoreDuplicates_(_ignoreDuplicates),
       start_(true) {
   // check inputs
   assert(!_settings["max_outputs"].isNull());
@@ -34,14 +35,16 @@ Reduction::~Reduction() {}
 
 Reduction* Reduction::create(
     const std::string& _name, const Component* _parent,
-    const PortedDevice* _device, RoutingMode _mode, Json::Value _settings) {
+    const PortedDevice* _device, RoutingMode _mode, bool _ignoreDuplicates,
+    Json::Value _settings) {
   // retrieve algorithm
   const std::string& algorithm = _settings["algorithm"].asString();
 
   // attempt to build the reduction algorithm
   Reduction* reduction = factory::ObjectFactory<
     Reduction, REDUCTION_ARGS>::create(
-        algorithm, _name, _parent, _device, _mode, _settings);
+        algorithm, _name, _parent, _device, _mode, _ignoreDuplicates,
+        _settings);
 
   // check that the factory had the algorithm
   if (reduction == nullptr) {
@@ -73,7 +76,9 @@ void Reduction::add(u32 _port, u32 _vc, u32 _hops, f64 _congestion) {
     assert(_vc < device_->numVcs());
     input = device_->vcIndex(_port, _vc);
   }
-  assert(check_.count(input) == 0);
+  if (!ignoreDuplicates_) {
+    assert(check_.count(input) == 0);
+  }
   check_.insert(input);
 
   // keep track of the minimum hop entry

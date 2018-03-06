@@ -30,7 +30,7 @@ TEST(LeastCongestedMinimalReduction, vc) {
     Json::Value settings;
     settings["max_outputs"] = 1;
     LeastCongestedMinimalReduction red(
-        "Reduction", nullptr, &dev, RoutingMode::kVc, settings);
+        "Reduction", nullptr, &dev, RoutingMode::kVc, false, settings);
 
     s32 bias = 0;
     for (u32 cnt = 0; cnt < ROUNDS; cnt++) {

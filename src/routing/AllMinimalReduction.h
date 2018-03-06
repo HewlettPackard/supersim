@@ -29,7 +29,8 @@ class AllMinimalReduction : public Reduction {
  public:
   AllMinimalReduction(
       const std::string& _name, const Component* _parent,
-      const PortedDevice* _device, RoutingMode _mode, Json::Value _settings);
+      const PortedDevice* _device, RoutingMode _mode, bool _ignoreDuplicates,
+      Json::Value _settings);
   ~AllMinimalReduction();
 
   void process(

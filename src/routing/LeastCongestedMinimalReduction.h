@@ -29,7 +29,8 @@ class LeastCongestedMinimalReduction : public Reduction {
  public:
   LeastCongestedMinimalReduction(
       const std::string& _name, const Component* _parent,
-      const PortedDevice* _device, RoutingMode _mode, Json::Value _settings);
+      const PortedDevice* _device, RoutingMode _mode, bool _ignoreDuplicates,
+      Json::Value _settings);
   ~LeastCongestedMinimalReduction();
 
   void process(
