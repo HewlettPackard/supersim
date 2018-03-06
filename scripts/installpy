@@ -28,9 +28,9 @@ def clone(loc, url, commit):
     print('INFO: {0} is already cloned'.format(loc))
     doit('cd {0} && git pull'.format(loc))
 
-def install(loc, url, commit):
+def install(loc, url, commit, force):
   userbin = os.path.join(site.USER_BASE, 'bin')
-  if userbin not in os.environ['PATH'].split(':'):
+  if not force and userbin not in os.environ['PATH'].split(':'):
     print(('\nThis environment requires some Python packages installed\n'
            'locally as \'user\' packages. You must add \'{0}\'\n'
            'to your PATH environment variable. Add the following to your\n'
@@ -94,7 +94,7 @@ def main(args):
       elif command == 'clone':
         clone(loc, url, commit)
       elif command == 'install':
-        install(loc, url, commit)
+        install(loc, url, commit, args.force)
       elif command == 'files':
         files(loc, url, commit)
       elif command == 'uninstall':
@@ -115,5 +115,7 @@ if __name__ == '__main__':
                   help='command to be run')
   ap.add_argument('-m', '--mode', choices=['git', 'https'], default='https',
                   help='use https urls (default) or git urls')
+  ap.add_argument('-f', '--force', action='store_true',
+                  help='install even if PATH is set wrong')
   args = ap.parse_args()
   main(args)
