@@ -98,10 +98,7 @@ void Source::load(u32 _count, u64 _totalCycles) {
   // create _count injection events
   while (_count > 0) {
     _count--;
-    auto it = injectCycles.begin();
-    std::advance(it, gSim->rnd.nextU64(0, injectCycles.size() - 1));
-    u64 injectCycle = *it;
-    injectCycles.erase(it);
+    u64 injectCycle = gSim->rnd.remove(&injectCycles);
     u64 injectTime = gSim->futureCycle(Simulator::Clock::CHANNEL, injectCycle);
     dbgprintf("source inject at %lu(%lu)", injectCycle, injectTime);
     addEvent(injectTime, 0, nullptr, 0);
@@ -161,10 +158,7 @@ void Sink::load(u32 _count, u64 _totalCycles) {
   // create _count injection events
   while (_count > 0) {
     _count--;
-    auto it = injectCycles.begin();
-    std::advance(it, gSim->rnd.nextU64(0, injectCycles.size() - 1));
-    u64 injectCycle = *it;
-    injectCycles.erase(it);
+    u64 injectCycle = gSim->rnd.remove(&injectCycles);
     u64 injectTime = gSim->futureCycle(Simulator::Clock::CHANNEL, injectCycle);
     dbgprintf("sink inject at %lu(%lu)", injectCycle, injectTime);
     addEvent(injectTime, 0, nullptr, 0);

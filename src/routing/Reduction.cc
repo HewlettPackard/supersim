@@ -118,10 +118,7 @@ const std::unordered_set<std::tuple<u32, u32> >* Reduction::reduce(
   while ((intermediate_.size() > 0) &&
          (maxOutputs_ == 0 || outputs_.size() < maxOutputs_)) {
     // randomly pull element out
-    auto it = intermediate_.begin();
-    std::advance(it, gSim->rnd.nextU64(0, intermediate_.size() - 1));
-    outputs_.insert(*it);
-    intermediate_.erase(it);
+    outputs_.insert(gSim->rnd.remove(&intermediate_));
   }
 
   // set the minimal flag
