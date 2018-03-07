@@ -66,7 +66,7 @@ class Reduction : public Component {
   const bool ignoreDuplicates_;
 
   bool start_;
-  std::unordered_set<u32> check_;
+  std::unordered_set<std::tuple<u32, u32> > check_;
   std::unordered_set<std::tuple<u32, u32, u32, f64> > minimal_;
   std::unordered_set<std::tuple<u32, u32, u32, f64> > nonMinimal_;
   u32 minHops_;

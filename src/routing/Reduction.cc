@@ -67,14 +67,14 @@ void Reduction::add(u32 _port, u32 _vc, u32 _hops, f64 _congestion) {
   }
 
   // check that this input hasn't already been specified
-  u32 input = U32_MAX;
+  std::tuple<u32, u32> input;
   assert(_port < device_->numPorts());
   if (routingModeIsPort(mode_)) {
     assert(_vc == U32_MAX);
-    input = _port;
+    input = std::make_tuple(_port, _hops);
   } else {
     assert(_vc < device_->numVcs());
-    input = device_->vcIndex(_port, _vc);
+    input = std::make_tuple(device_->vcIndex(_port, _vc), _hops);
   }
   if (!ignoreDuplicates_) {
     assert(check_.count(input) == 0);
