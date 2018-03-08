@@ -28,9 +28,10 @@ def clone(loc, url, commit):
     print('INFO: {0} is already cloned'.format(loc))
     doit('cd {0} && git pull'.format(loc))
 
-def install(loc, url, commit, force):
+def install(loc, url, commit, force_install, system_install):
   userbin = os.path.join(site.USER_BASE, 'bin')
-  if not force and userbin not in os.environ['PATH'].split(':'):
+  if (not system_install and not force_install and
+      userbin not in os.environ['PATH'].split(':')):
     print(('\nThis environment requires some Python packages installed\n'
            'locally as \'user\' packages. You must add \'{0}\'\n'
            'to your PATH environment variable. Add the following to your\n'
@@ -43,8 +44,9 @@ def install(loc, url, commit, force):
            '\n').format(userbin))
     exit(-1)
   if os.path.isdir(loc):
-    doit('cd {0} && python3 setup.py install --user --record files.txt'
-         .format(loc))
+    userFlag = '--user' if not system_install else ''
+    doit('cd {0} && python3 setup.py install {1} --record files.txt'
+         .format(loc, userFlag))
   else:
     print('ERROR: {0} isn\'t cloned'.format(loc))
     exit(-1)
@@ -94,7 +96,7 @@ def main(args):
       elif command == 'clone':
         clone(loc, url, commit)
       elif command == 'install':
-        install(loc, url, commit, args.force)
+        install(loc, url, commit, args.force, args.system)
       elif command == 'files':
         files(loc, url, commit)
       elif command == 'uninstall':
@@ -117,5 +119,7 @@ if __name__ == '__main__':
                   help='use https urls (default) or git urls')
   ap.add_argument('-f', '--force', action='store_true',
                   help='install even if PATH is set wrong')
+  ap.add_argument('-s', '--system', action='store_true',
+                  help='install packages globally in the system')
   args = ap.parse_args()
   main(args)
