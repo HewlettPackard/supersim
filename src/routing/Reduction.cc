@@ -23,10 +23,9 @@
 Reduction::Reduction(const std::string& _name, const Component* _parent,
                      const PortedDevice* _device, RoutingMode _mode,
                      bool _ignoreDuplicates, Json::Value _settings)
-    : Component(_name, _parent), device_(_device), mode_(_mode),
-      maxOutputs_(_settings["max_outputs"].asUInt()),
-      ignoreDuplicates_(_ignoreDuplicates),
-      start_(true) {
+    : Component(_name, _parent), device_(_device),
+      mode_(_mode), maxOutputs_(_settings["max_outputs"].asUInt()),
+      ignoreDuplicates_(_ignoreDuplicates), start_(true) {
   // check inputs
   assert(!_settings["max_outputs"].isNull());
 }
@@ -54,7 +53,7 @@ Reduction* Reduction::create(
   return reduction;
 }
 
-void Reduction::add(u32 _port, u32 _vc, u32 _hops, f64 _congestion) {
+void Reduction::add(u32 _port, u32 _vcRc, u32 _hops, f64 _congestion) {
   // detect restart of state machine
   if (start_) {
     check_.clear();
@@ -70,11 +69,10 @@ void Reduction::add(u32 _port, u32 _vc, u32 _hops, f64 _congestion) {
   std::tuple<u32, u32> input;
   assert(_port < device_->numPorts());
   if (routingModeIsPort(mode_)) {
-    assert(_vc == U32_MAX);
     input = std::make_tuple(_port, _hops);
   } else {
-    assert(_vc < device_->numVcs());
-    input = std::make_tuple(device_->vcIndex(_port, _vc), _hops);
+    assert(_vcRc < device_->numVcs());
+    input = std::make_tuple(device_->vcIndex(_port, _vcRc), _hops);
   }
   if (!ignoreDuplicates_) {
     assert(check_.count(input) == 0);
@@ -93,13 +91,13 @@ void Reduction::add(u32 _port, u32 _vc, u32 _hops, f64 _congestion) {
     minHops_ = _hops;
 
     // insert the new minimal
-    minimal_.insert(std::make_tuple(_port, _vc, _hops, _congestion));
+    minimal_.insert(std::make_tuple(_port, _vcRc, _hops, _congestion));
   } else if (_hops == minHops_) {
     // minimal route
-    minimal_.insert(std::make_tuple(_port, _vc, _hops, _congestion));
+    minimal_.insert(std::make_tuple(_port, _vcRc, _hops, _congestion));
   } else {
     // non-minimal route
-    nonMinimal_.insert(std::make_tuple(_port, _vc, _hops, _congestion));
+    nonMinimal_.insert(std::make_tuple(_port, _vcRc, _hops, _congestion));
   }
 }
 

@@ -41,7 +41,9 @@ class Reduction : public Component {
   static Reduction* create(REDUCTION_ARGS);
 
   // add an option
-  void add(u32 _port, u32 _vc, u32 _hops, f64 _congestion);
+  //  if the routing mode is VC, then _vcRc is a VC
+  //  if the routing mode is port, then _vcRc is an RC
+  void add(u32 _port, u32 _vcRc, u32 _hops, f64 _congestion);
 
   // compute the results
   //  'allMinimal' can be nullptr if the user doesn't care. The flag indicates
@@ -50,8 +52,8 @@ class Reduction : public Component {
 
  protected:
   // subclasses must implement this function
-  //  _inputs  = {port, vc, hops, congestion}
-  //  _outputs = {port, vc}
+  //  _inputs  = {port, vcRc, hops, congestion}
+  //  _outputs = {port, vcRc}
   virtual void process(
       u32 _minHops,
       const std::unordered_set<std::tuple<u32, u32, u32, f64> >& _minimal,
