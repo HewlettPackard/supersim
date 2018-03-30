@@ -50,9 +50,9 @@ class CommonAncestorRoutingAlgorithm : public RoutingAlgorithm {
   const RoutingMode mode_;
   const bool leastCommonAncestor_;
   const bool deterministic_;
+  const u64 random_;
   Reduction* reduction_;
-
-  std::hash<std::tuple<u32, u32> > hasher_;
+  std::hash<std::tuple<u32, u32, u32> > hasher_;
 };
 
 }  // namespace FatTree

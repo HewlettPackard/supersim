@@ -15,6 +15,7 @@
 #include "network/fattree/CommonAncestorRoutingAlgorithm.h"
 
 #include <factory/ObjectFactory.h>
+#include <strop/strop.h>
 
 #include <cassert>
 
@@ -36,7 +37,8 @@ CommonAncestorRoutingAlgorithm::CommonAncestorRoutingAlgorithm(
                        _inputVc, _radices, _settings),
       mode_(parseRoutingMode(_settings["mode"].asString())),
       leastCommonAncestor_(_settings["least_common_ancestor"].asBool()),
-      deterministic_(_settings["deterministic"].asBool()) {
+      deterministic_(_settings["deterministic"].asBool()),
+      random_(gSim->rnd.nextU64(0, 0xdeadbeef)) {
   assert(!_settings["least_common_ancestor"].isNull());
   assert(!_settings["mode"].isNull());
   assert(!_settings["deterministic"].isNull());
@@ -69,6 +71,9 @@ void CommonAncestorRoutingAlgorithm::processRequest(
   bool atTopLevel = (level == (numLevels - 1));
   bool movingUpward = (!atTopLevel) && (inputPort_ < downPorts);
   u32 lca = leastCommonAncestor(sourceAddress, destinationAddress);
+  // u64 uniqueId = _flit->packet()->message()->getTransaction();
+  // std::vector<u32> thisRouter = router_->address();
+  // std::vector<u32> wanted = {1, 3};
 
   // determine if an early turn around will occur
   if (movingUpward && leastCommonAncestor_) {
@@ -103,8 +108,13 @@ void CommonAncestorRoutingAlgorithm::processRequest(
       // hash the source and destination to find the one path up
       u32 sourceId = _flit->packet()->message()->getSourceId();
       u32 destinationId = _flit->packet()->message()->getDestinationId();
-      u32 hash = hasher_(std::make_tuple(sourceId, destinationId));
+      u32 hash = hasher_(std::make_tuple(sourceId, destinationId, random_));
       u32 port = downPorts + (hash % upPorts);
+      /*
+      if (thisRouter == wanted) {
+         printf("port: %u\n", port);
+      }
+      */
       addPort(port, hops);
     } else {
       // choose all upward ports

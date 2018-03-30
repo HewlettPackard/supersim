@@ -9,18 +9,18 @@
   },
   "network": {
     "topology": "fat_tree",
-    "down_up": [[4, 2], [3,4], [2,3], [2]],
+    "down_up": [[7, 7], [7,7], [14]],
     "protocol_classes": [
       {
-        "num_vcs": 4,
+        "num_vcs": 1,
         "routing": {
           "algorithm": "common_ancestor",
+          "deterministic": true,
           "latency": 1,  // cycles
-          "least_common_ancestor": false,
+          "least_common_ancestor": true,
           "mode": "vc", // port_ave, port_min, port_max
-          "deterministic": false,
           "reduction": {
-            "algorithm": "least_congested_minimal",
+            "algorithm": "all_minimal",
             "max_outputs": 1
           }
         }
@@ -116,15 +116,15 @@
         "blast_terminal": {
           // requests
           "request_protocol_class": 0,
-          "request_injection_rate": 0.25,
+          "request_injection_rate": 0.20,
           // responses
           "enable_responses": false,
           "request_processing_latency": 10,
           "max_outstanding_transactions": 0,
           // warmup
-          "warmup_interval": 200,  // delivered flits
+          "warmup_interval": 100,  // delivered flits
           "warmup_window": 15,
-          "warmup_attempts": 20,
+          "warmup_attempts": 15,
           // traffic generation
           "num_transactions": 150,
           "max_packet_size": 10000,
@@ -146,7 +146,7 @@
   },
   "debug": [
     "Workload",
-    "Workload.Application_0"//,
-    //"Workload.Application_0.BlastTerminal_0"
+    "Workload.Application_0",
+    "Workload.Application_0.BlastTerminal_0"
   ]
 }
