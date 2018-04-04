@@ -127,7 +127,7 @@ BlastTerminal::BlastTerminal(const std::string& _name, const Component* _parent,
   // warmup/saturation detector
   fsm_ = BlastTerminal::Fsm::WARMING;
   warmupInterval_ = _settings["warmup_interval"].asUInt();
-  assert(warmupInterval_ > 0);
+  assert(!_settings["warmup_interval"].isNull());  // 0 turns off warmup
   warmupFlitsReceived_ = 0;
   warmupWindow_ = _settings["warmup_window"].asUInt();
   assert(warmupWindow_ >= 5);
@@ -307,6 +307,12 @@ void BlastTerminal::handleReceivedMessage(Message* _message) {
 }
 
 void BlastTerminal::warmDetector(Message* _message) {
+  // early warm
+  if (warmupInterval_ == 0) {
+    warm(false);
+    return;
+  }
+
   // count flits received
   warmupFlitsReceived_ += _message->numFlits();
   if (warmupFlitsReceived_ >= warmupInterval_) {
