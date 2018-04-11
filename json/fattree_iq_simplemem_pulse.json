@@ -88,8 +88,17 @@
           "type": "r_separable",
           "slip_latch": true,
           "resource_arbiter": {
-            "type": "comparing",
-            "greater": false
+            "type": "dual_stage_class",
+            "classes": 2,
+            "class_map": [0, 0, 1],  // maps to the TCs of the 3 VCs
+            "metadata_func": "none",  // "none", "min", or "max"
+            "stage1_arbiter": {
+              "type": "lslp"
+            },
+            "stage2_arbiter": {
+              "type": "comparing",
+              "greater": false
+            }
           }
         },
         "full_packet": false,
