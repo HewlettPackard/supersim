@@ -163,6 +163,21 @@ f64 BufferOccupancy::computeStatus(
       return portAverageStatusAbs(_outputPort);
       break;
     }
+    case BufferOccupancy::Mode::kBimodalNorm: {
+      // return the congestion status according to a bimodal combination
+      f64 vcSts = vcStatusNorm(_outputPort, _outputVc);
+      f64 portSts = portAverageStatusNorm(_outputPort);
+      return vcSts * vcSts + (1 - vcSts) * portSts;
+      break;
+    }
+    case BufferOccupancy::Mode::kBimodalAbs: {
+      // return the congestion status according to a bimodal combination
+      f64 vcSts = vcStatusAbs(_outputPort, _outputVc);
+      f64 vcStsNorm = vcStatusNorm(_outputPort, _outputVc);
+      f64 portSts = portAverageStatusAbs(_outputPort);
+      return vcStsNorm * vcSts + (1 - vcStsNorm) * portSts;
+      break;
+    }
     default:
       assert(false);
       break;
@@ -178,6 +193,10 @@ BufferOccupancy::Mode BufferOccupancy::parseMode(const std::string& _mode) {
     return  BufferOccupancy::Mode::kPortNorm;
   } else if (_mode == "absolute_port") {
     return  BufferOccupancy::Mode::kPortAbs;
+  } else if (_mode == "absolute_bimodal") {
+    return  BufferOccupancy::Mode::kBimodalAbs;
+  } else if (_mode == "normalized_bimodal") {
+    return  BufferOccupancy::Mode::kBimodalNorm;
   } else {
     assert(false);
   }
@@ -219,7 +238,7 @@ void BufferOccupancy::performDecrementWindow(u32 _vcIdx) {
 }
 
 f64 BufferOccupancy::vcStatusNorm(u32 _outputPort, u32 _outputVc) const {
-  // return this VC's status (normalized)
+  // return this VC's status
   u32 vcIdx = device_->vcIndex(_outputPort, _outputVc);
   f64 status;
   if (!phantom_) {
@@ -230,12 +249,11 @@ f64 BufferOccupancy::vcStatusNorm(u32 _outputPort, u32 _outputVc) const {
                (f64)windows_.at(vcIdx) * valueCoeff_) /
               (f64)creditMaximums_.at(vcIdx));
   }
-
   return std::min(1.0, std::max(0.0, status));
 }
 
 f64 BufferOccupancy::vcStatusAbs(u32 _outputPort, u32 _outputVc) const {
-  // return this VC's status (absolute)
+  // return this VC's status in absolute format
   u32 vcIdx = device_->vcIndex(_outputPort, _outputVc);
   f64 statusAbs;
   if (!phantom_) {
@@ -265,7 +283,7 @@ f64 BufferOccupancy::portAverageStatusNorm(u32 _outputPort) const {
 }
 
 f64 BufferOccupancy::portAverageStatusAbs(u32 _outputPort) const {
-  // return the average status of all VCs in this port (absolute)
+  // return the average status of all VCs in this port in abs format
   u32 curSum = 0;
   for (u32 vc = 0; vc < numVcs_; vc++) {
     u32 vcIdx = device_->vcIndex(_outputPort, vc);

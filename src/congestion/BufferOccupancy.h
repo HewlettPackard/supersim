@@ -48,8 +48,11 @@ class BufferOccupancy : public CongestionSensor {
                     u32 _outputVc) const override;
 
  private:
-  enum class Mode {kVcNorm, kPortNorm, kVcAbs, kPortAbs};
+  enum class Mode {kVcNorm, kPortNorm, kBimodalNorm,
+      kVcAbs, kPortAbs, kBimodalAbs};
+
   static Mode parseMode(const std::string& _mode);
+
   void createEvent(u32 _vcIdx, s32 _type);
   void performIncrementCredit(u32 _vcIdx);
   void performDecrementCredit(u32 _vcIdx);
