@@ -31,7 +31,7 @@ LruArbiter::LruArbiter(const std::string& _name, const Component* _parent,
     priority_.push_back(client);
   }
 
-  // artifically set the last winner
+  // artificially set the last winner
   lastWinner_ = priority_.end();
 }
 

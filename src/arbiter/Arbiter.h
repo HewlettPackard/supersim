@@ -38,11 +38,11 @@ class Arbiter : public Component {
   // returns number of inputs & outputs
   u32 size() const;
   // maps the request to the specified port
-  void setRequest(u32 _port, const bool* _request);
+  virtual void setRequest(u32 _port, const bool* _request);
   // maps the metadata to the specified port
-  void setMetadata(u32 _port, const u64* _metadata);
+  virtual void setMetadata(u32 _port, const u64* _metadata);
   // maps the output to the specified port
-  void setGrant(u32 _port, bool* _grant);
+  virtual void setGrant(u32 _port, bool* _grant);
 
   // latches any state from the last cycle
   //  override when necessary

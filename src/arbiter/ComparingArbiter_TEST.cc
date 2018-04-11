@@ -41,11 +41,6 @@ TEST(ComparingArbiter, full) {
           metadata[idx] = 10000 + idx;
         }
       } while (hotCount(request, size) <= size/2);
-      /*putc('=', stdout);
-        for (u32 idx = 0; idx < size; idx++) {
-        putc(request[idx].enable ? '1' : '0', stdout);
-        }
-        putc('\n', stdout);*/
 
       Json::Value asettings;
       asettings["greater"] = greater;

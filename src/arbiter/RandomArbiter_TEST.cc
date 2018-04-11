@@ -38,11 +38,6 @@ TEST(RandomArbiter, full) {
         metadata[idx] = 0;
       }
     } while (hotCount(request, size) <= size/2);
-    /*putc('=', stdout);
-      for (u32 idx = 0; idx < size; idx++) {
-      putc(request[idx] ? '1' : '0', stdout);
-      }
-      putc('\n', stdout);*/
 
     Arbiter* arb = new RandomArbiter(
         "Arb", nullptr, size, Json::Value());
