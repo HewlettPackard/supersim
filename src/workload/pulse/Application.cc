@@ -47,6 +47,7 @@ Application::Application(
       activeTerminals_--;
     }
   }
+  dbgprintf("%u active terminals", activeTerminals_);
 
   // initialize counters
   completedTerminals_ = 0;

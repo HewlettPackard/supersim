@@ -104,6 +104,9 @@ BlastTerminal::BlastTerminal(const std::string& _name, const Component* _parent,
   //  this is the flag if the send operation has been stalled
   sendStalled_ = false;
 
+  // keep track if we've already told the app we are done
+  notifiedDone_ = false;
+
   // enablement of request/response flows
   assert(_settings.isMember("enable_responses") &&
          _settings["enable_responses"].isBool());
@@ -183,7 +186,7 @@ void BlastTerminal::processEvent(void* _event, s32 _type) {
 }
 
 f64 BlastTerminal::percentComplete() const {
-  if (fsm_ >= BlastTerminal::Fsm::LOGGING) {
+  if (fsm_ >= BlastTerminal::Fsm::LOGGING && requestInjectionRate_ > 0.0) {
     if (numTransactions_ == 0) {
       return 1.0;
     } else {
@@ -392,8 +395,11 @@ void BlastTerminal::complete() {
 }
 
 void BlastTerminal::done() {
-  Application* app = reinterpret_cast<Application*>(application());
-  app->terminalDone(id_);
+  if (!notifiedDone_) {
+    notifiedDone_ = true;
+    Application* app = reinterpret_cast<Application*>(application());
+    app->terminalDone(id_);
+  }
 }
 
 void BlastTerminal::completeTracking(Message* _message) {

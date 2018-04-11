@@ -58,7 +58,7 @@ class BlastTerminal : public Terminal {
   // BLABBING = sending messages not marked to be logged
   // DRAINING = not sending messages
   enum class Fsm : u8 {WARMING = 0, WARM_BLABBING = 1, LOGGING = 2,
-      LOG_BLABBING = 3 , DRAINING = 4};
+      LOG_BLABBING = 3, DRAINING = 4};
 
   void warmDetector(Message* _message);
   void warm(bool _saturated);
@@ -72,6 +72,7 @@ class BlastTerminal : public Terminal {
   // state machine
   Fsm fsm_;
   bool sendStalled_;
+  bool notifiedDone_;
 
   // traffic generation
   f64 requestInjectionRate_;

@@ -84,7 +84,39 @@
         "blast_terminal": {
           // requests
           "request_protocol_class": 0,
-          "request_injection_rate": 0.9,
+          "request_injection_rate": 0.45,
+          // responses
+          "enable_responses": false,
+          // warmup
+          "warmup_interval": 200,  // no warmup
+          "warmup_window": 15,
+          "warmup_attempts": 20,
+          // traffic generation
+          "num_transactions": 2000,
+          "max_packet_size": 16,
+          "traffic_pattern": {
+            "type": "uniform_random",
+            "send_to_self": true
+          },
+          "message_size_distribution": {
+            "type": "random",
+            "min_message_size": 1,
+            "max_message_size": 64
+          }
+        },
+        "rate_log": {
+          "file": "/dev/null"  // "rates.csv"
+        }
+      },
+      {
+        "type": "blast",
+        "warmup_threshold": 0.99,
+        "kill_on_saturation": false,
+        "log_during_saturation": false,
+        "blast_terminal": {
+          // requests
+          "request_protocol_class": 0,
+          "request_injection_rate": 0.45,
           "relative_injection": "json/relativeinjection.csv",
           // responses
           "enable_responses": false,
@@ -93,7 +125,7 @@
           "warmup_window": 15,
           "warmup_attempts": 20,
           // traffic generation
-          "num_transactions": 2000,
+          "num_transactions": 0,
           "max_packet_size": 16,
           "traffic_pattern": {
             "type": "matrix",
@@ -111,5 +143,10 @@
       }
     ]
   },
-  "debug": []
+  "debug": [
+    "Workload.Application_0",
+    "Workload.Application_0.BlastTerminal_0",
+    "Workload.Application_1",
+    "Workload.Application_1.BlastTerminal_0"
+  ]
 }

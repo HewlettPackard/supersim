@@ -65,6 +65,7 @@ Application::Application(
       activeTerminals_--;
     }
   }
+  dbgprintf("%u active terminals", activeTerminals_);
 
   // initialize state machine
   fsm_ = Application::Fsm::WARMING;
@@ -132,7 +133,8 @@ void Application::terminalWarmed(u32 _id) {
   if (_id != U32_MAX) {
     warmedTerminals_++;
   }
-  dbgprintf("Terminal %u is warmed (%u total)", _id, warmedTerminals_);
+  dbgprintf("Terminal %u is warmed (%u of %u)", _id, warmedTerminals_,
+            activeTerminals_);
   assert(warmedTerminals_ <= activeTerminals_);
   f64 percentWarmed = warmedTerminals_ / static_cast<f64>(activeTerminals_);
   if (percentWarmed >= warmupThreshold_) {
@@ -150,7 +152,8 @@ void Application::terminalWarmed(u32 _id) {
 void Application::terminalSaturated(u32 _id) {
   assert(fsm_ == Application::Fsm::WARMING);
   saturatedTerminals_++;
-  dbgprintf("Terminal %u is saturated (%u total)", _id, saturatedTerminals_);
+  dbgprintf("Terminal %u is saturated (%u of %u)", _id, saturatedTerminals_,
+            activeTerminals_);
   assert(saturatedTerminals_ <= activeTerminals_);
   f64 percentSaturated = saturatedTerminals_ /
                          static_cast<f64>(activeTerminals_);
@@ -195,8 +198,8 @@ void Application::terminalSaturated(u32 _id) {
 
 void Application::terminalComplete(u32 _id) {
   completedTerminals_++;
-  dbgprintf("Terminal %u is done logging (%u total)",
-            _id, completedTerminals_);
+  dbgprintf("Terminal %u is done logging (%u of %u)",
+            _id, completedTerminals_, activeTerminals_);
   assert(completedTerminals_ <= activeTerminals_);
   if ((completedTerminals_ == activeTerminals_) &&
       (fsm_ == Application::Fsm::LOGGING)) {
@@ -208,7 +211,8 @@ void Application::terminalComplete(u32 _id) {
 
 void Application::terminalDone(u32 _id) {
   doneTerminals_++;
-  dbgprintf("Terminal %u is done sending (%u total)", _id, doneTerminals_);
+  dbgprintf("Terminal %u is done sending (%u of %u)", _id, doneTerminals_,
+            activeTerminals_);
   assert(doneTerminals_ <= activeTerminals_);
   if (doneTerminals_ == activeTerminals_) {
     dbgprintf("All terminals are done sending");
