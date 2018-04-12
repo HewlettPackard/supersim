@@ -94,6 +94,8 @@ Network::Network(const std::string& _name, const Component* _parent,
     }
   }
 
+  assert(_settings["internal_channels"].isArray());
+  assert(_settings["internal_channels"].size() == numLevels_ - 1);
   // create internal channels, link routers via channels
   for (u32 level = 0; level < numLevels_ - 1; level++) {
     for (u32 col = 0; col < routersAtLevel_.at(level); col++) {
@@ -138,14 +140,13 @@ Network::Network(const std::string& _name, const Component* _parent,
         std::string upChannelName = "UpChannel_" + std::to_string(level) +
             ":" + std::to_string(col) + ":" + std::to_string(p);
         Channel* up = new Channel(upChannelName, this, numVcs_,
-                                  _settings["internal_channel"]);
+                                  _settings["internal_channels"][level]);
         internalChannels_.push_back(up);
         std::string downChannelName = "DownChannel_" + std::to_string(level) +
             ":" + std::to_string(col) + ":" + std::to_string(p);
         Channel* down = new Channel(downChannelName, this, numVcs_,
-                                    _settings["internal_channel"]);
+                                    _settings["internal_channels"][level]);
         internalChannels_.push_back(down);
-
         // link routers
         thisRouter->setInputChannel(thisPort, down);
         thisRouter->setOutputChannel(thisPort, up);
