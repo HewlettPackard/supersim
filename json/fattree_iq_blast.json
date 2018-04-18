@@ -9,7 +9,7 @@
   },
   "network": {
     "topology": "fat_tree",
-    "down_up": [[7, 7], [7,7], [14]],
+    "down_up": [[4, 3], [3, 5], [5]],
     "protocol_classes": [
       {
         "num_vcs": 1,
@@ -28,14 +28,14 @@
     ],
     "internal_channels": [
       {
-        "latency": 20  // cycles
+        "latency": 4  // cycles
       },
       {
-        "latency": 10  // cycles
+        "latency": 2  // cycles
       }
     ],
     "external_channel": {
-      "latency": 10  // cycles
+      "latency": 1  // cycles
     },
     "channel_log": {
       "file": "/dev/null"  // "channels.csv"
@@ -131,7 +131,7 @@
           "warmup_window": 15,
           "warmup_attempts": 15,
           // traffic generation
-          "num_transactions": 150,
+          "num_transactions": 500,
           "max_packet_size": 10000,
           "traffic_pattern": {
             "type": "uniform_random",

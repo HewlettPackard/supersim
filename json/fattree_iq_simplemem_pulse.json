@@ -40,9 +40,14 @@
         }
       }
     ],
-    "internal_channel": {
-      "latency": 1  // cycles
-    },
+    "internal_channels": [
+      {
+        "latency": 3  // cycles
+      },
+      {
+        "latency": 2  // cycles
+      }
+    ],
     "external_channel": {
       "latency": 1  // cycles
     },
