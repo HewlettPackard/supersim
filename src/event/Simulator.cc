@@ -92,13 +92,13 @@ void Simulator::simulate() {
         f64 eventsPerUnit = totalEvents / ftime;
         f64 unitsPerSecond = ftime / runTime;
         printf("\n"
-               "Total event count:      %lu\n"
-               "Total simulation units: %lu\n"
-               "Total real seconds:     %.3f\n"
-               "\n"
-               "Events per real seconds:    %.3f\n"
-               "Events per sim units:       %.3f\n"
-               "Sim units per real seconds: %.3f\n"
+               "*** Simulation Summary ***\n"
+               "Total event count:         %lu\n"
+               "Total sim units:           %lu\n"
+               "Total real seconds:        %.3f\n"
+               "Events per real second:    %.3f\n"
+               "Events per sim unit:       %.3f\n"
+               "Sim units per real second: %.3f\n"
                "\n",
                totalEvents, time_, runTime, eventsPerSecond, eventsPerUnit,
                unitsPerSecond);
