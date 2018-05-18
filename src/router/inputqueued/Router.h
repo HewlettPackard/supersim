@@ -74,6 +74,11 @@ class Router : public ::Router {
   const CongestionMode congestionMode_;
   u32 creditSize_;
   u32 inputQueueDepth_;
+  // input queue tailoring
+  bool inputQueueTailored_;
+  f64 inputQueueMult_;
+  u32 inputQueueMax_;
+  u32 inputQueueMin_;
 
   std::vector<InputQueue*> inputQueues_;
   std::vector<RoutingAlgorithm*> routingAlgorithms_;

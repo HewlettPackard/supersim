@@ -51,6 +51,7 @@
         "offset": 0.0
       },
       "congestion_mode": "output_and_downstream",
+      "input_queue_mode": "fixed",  // fixed or tailored
       "input_queue_depth": 32,  // 2x max packet
       "transfer_latency": 1,
       "output_queue_depth": 100,
@@ -75,6 +76,7 @@
       "adaptive": false,
       "fixed_msg_vc": true,
       "crossbar_scheduler": "$&(network.router.output_crossbar_scheduler)&$",
+      "init_credits_mode": "$&(network.router.input_queue_mode)&$",
       "init_credits": "$&(network.router.input_queue_depth)&$",
       "crossbar": {
         "latency": 1  // cycles

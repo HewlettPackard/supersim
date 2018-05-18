@@ -70,7 +70,10 @@
         "mode": "absolute_port"  // {normalized,absolute}_{port,vc}
       },
       "congestion_mode": "output",
-      "input_queue_depth": 16,  // 1x max packet
+      "input_queue_mode": "tailored",  // fixed or tailored
+      "input_queue_depth": 5,
+      "input_queue_max": 32, //  only for tailored mode
+      "input_queue_min": 16, //  only for tailored mode
       "transfer_latency": 1,
       "output_queue_depth": 16,  // 1x max packet
       "output_crossbar": {
@@ -94,7 +97,10 @@
       "adaptive": false,
       "fixed_msg_vc": false,
       "crossbar_scheduler": "$&(network.router.output_crossbar_scheduler)&$",
+      "init_credits_mode": "$&(network.router.input_queue_mode)&$",
       "init_credits": "$&(network.router.input_queue_depth)&$",
+      "credits_max": "$&(network.router.input_queue_max)&$", //  tailored mode
+      "credits_min": "$&(network.router.input_queue_min)&$", //  tailored mode
       "crossbar": {
         "latency": 1  // cycles
       }
@@ -141,30 +147,7 @@
     ]
   },
   "debug": [
-    "Workload.Application_0",
-    "Workload.Application_0.AllToAllTerminal_0",
-    "Workload.Application_0.AllToAllTerminal_1",
-    "Workload.Application_0.AllToAllTerminal_2",
-    "Workload.Application_0.AllToAllTerminal_3",
-    "Workload.Application_0.AllToAllTerminal_4",
-    "Workload.Application_0.AllToAllTerminal_5",
-    "Workload.Application_0.AllToAllTerminal_6",
-    "Workload.Application_0.AllToAllTerminal_7",
-    "Workload.Application_0.AllToAllTerminal_8",
-    "Workload.Application_0.AllToAllTerminal_9",
-    "Workload.Application_0.AllToAllTerminal_10",
-    "Workload.Application_0.AllToAllTerminal_11",
-    "Workload.Application_0.AllToAllTerminal_12",
-    "Workload.Application_0.AllToAllTerminal_13",
-    "Workload.Application_0.AllToAllTerminal_14",
-    "Workload.Application_0.AllToAllTerminal_15",
-    "Workload.Application_0.AllToAllTerminal_16",
-    "Workload.Application_0.AllToAllTerminal_17",
-    "Workload.Application_0.AllToAllTerminal_18",
-    "Workload.Application_0.AllToAllTerminal_19",
-    "Workload.Application_0.AllToAllTerminal_20",
-    "Workload.Application_0.AllToAllTerminal_21",
-    "Workload.Application_0.AllToAllTerminal_22",
-    "Workload.Application_0.AllToAllTerminal_23"
+    "Network.Router_[0-0-0]",
+    "Network.Interface_[0-0-0-0]"
   ]
 }

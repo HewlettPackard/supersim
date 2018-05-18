@@ -18,6 +18,7 @@
 
 #include <cassert>
 
+#include "architecture/util.h"
 #include "workload/Application.h"
 #include "interface/standard/Ejector.h"
 #include "interface/standard/MessageReassembler.h"
@@ -37,8 +38,32 @@ Interface::Interface(
     MetadataHandler* _metadataHandler, Json::Value _settings)
     : ::Interface(_name, _parent, _id, _address, _numVcs, _protocolClassVcs,
                   _metadataHandler, _settings) {
-  initCredits_ = _settings["init_credits"].asUInt();
-  assert(initCredits_ > 0);
+  // init credits
+  initCredits_ = 0;
+  inputQueueTailored_ = false;
+  inputQueueMult_ = 0;
+  inputQueueMax_ = 0;
+  inputQueueMin_ = 0;
+  assert(_settings.isMember("init_credits_mode"));
+
+  if (_settings["init_credits_mode"].asString() == "tailored") {
+    inputQueueTailored_ = true;
+    inputQueueMult_ = _settings["init_credits"].asDouble();
+    assert(inputQueueMult_ > 0.0);
+    // max and min queue depth
+    assert(_settings.isMember("credits_min"));
+    inputQueueMin_ = _settings["credits_min"].asUInt();
+    assert(_settings.isMember("credits_max"));
+    inputQueueMax_ = _settings["credits_max"].asUInt();
+    assert(inputQueueMin_ <= inputQueueMax_);
+  } else if (_settings["init_credits_mode"].asString() == "fixed") {
+    inputQueueTailored_ = false;
+    initCredits_ = _settings["init_credits"].asUInt();
+    assert(initCredits_ > 0);
+  } else {
+    fprintf(stderr, "Wrong init credits mode, options: tailor or fixed\n");
+    assert(false);
+  }
 
   assert(_settings.isMember("adaptive"));
   adaptive_ = _settings["adaptive"].asBool();
@@ -187,9 +212,20 @@ void Interface::receiveMessage(Message* _message) {
 }
 
 void Interface::initialize() {
+  // init credits
+  assert(outputChannel_->latency());
+  // compute tailored queue depth for donwstream channel
+  u32 credits = initCredits_;
+  u32 channelLatency = outputChannel_->latency();
+  if (inputQueueTailored_) {
+    credits = computeTailoredBufferLength(
+            inputQueueMult_, inputQueueMin_, inputQueueMax_, channelLatency);
+  }
+  dbgprintf("INTF out_chan: %u x %.2f = credits %u",
+            channelLatency, inputQueueMult_, credits);
   for (u32 vc = 0; vc < numVcs_; vc++) {
     // initialize the credit count in the CrossbarScheduler
-    crossbarScheduler_->initCredits(vc, initCredits_);
+    crossbarScheduler_->initCredits(vc, credits);
   }
 }
 

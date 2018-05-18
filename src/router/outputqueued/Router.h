@@ -95,6 +95,12 @@ class Router : public ::Router {
   u32 inputQueueDepth_;
   u32 outputQueueDepth_;  // U32_MAX for infinite
 
+  // input queue tailoring
+  bool inputQueueTailored_;
+  f64 inputQueueMult_;
+  u32 inputQueueMax_;
+  u32 inputQueueMin_;
+
   // this vector is used to keep track of incoming port VC
   //  this is needed because of the hyperwarp symptom
   std::vector<u32> portVcs_;

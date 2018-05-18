@@ -71,6 +71,11 @@ class Interface : public ::Interface {
   Channel* outputChannel_;
 
   u32 initCredits_;
+  // input queue tailoring
+  bool inputQueueTailored_;
+  f64 inputQueueMult_;
+  u32 inputQueueMax_;
+  u32 inputQueueMin_;
 
   bool adaptive_;  // choose injection VC adaptively
   bool fixedMsgVc_;  // all pkts of a msg have same VC

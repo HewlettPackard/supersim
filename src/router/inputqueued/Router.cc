@@ -18,6 +18,7 @@
 
 #include <cassert>
 
+#include "architecture/util.h"
 #include "congestion/CongestionSensor.h"
 #include "network/Network.h"
 #include "router/inputqueued/InputQueue.h"
@@ -39,9 +40,34 @@ Router::Router(
       (f64)gSim->cycleTime(Simulator::Clock::CHANNEL) /
       (f64)gSim->cycleTime(Simulator::Clock::ROUTER));
 
-  // queue depths and pipeline control
-  inputQueueDepth_ = _settings["input_queue_depth"].asUInt();
-  assert(inputQueueDepth_ > 0);
+  // queue depths
+  inputQueueDepth_ = 0;
+  inputQueueTailored_ = false;
+  inputQueueMult_ = 0;
+  inputQueueMax_ = 0;
+  inputQueueMin_ = 0;
+  assert(_settings.isMember("input_queue_mode"));
+
+  if (_settings["input_queue_mode"].asString() == "tailored") {
+    inputQueueTailored_ = true;
+    inputQueueMult_ = _settings["input_queue_depth"].asDouble();
+    assert(inputQueueMult_ > 0.0);
+    // max and min queue depth
+    assert(_settings.isMember("input_queue_min"));
+    inputQueueMin_ = _settings["input_queue_min"].asUInt();
+    assert(_settings.isMember("input_queue_max"));
+    inputQueueMax_ = _settings["input_queue_max"].asUInt();
+    assert(inputQueueMin_ <= inputQueueMax_);
+  } else if (_settings["input_queue_mode"].asString() == "fixed") {
+    inputQueueTailored_ = false;
+    inputQueueDepth_ = _settings["input_queue_depth"].asUInt();
+    assert(inputQueueDepth_ > 0);
+  } else {
+    fprintf(stderr, "Wrong input queue mode, options: tailor or fixed\n");
+    assert(false);
+  }
+
+  // pipeline control
   assert(_settings.isMember("vca_swa_wait") &&
          _settings["vca_swa_wait"].isBool());
   bool vcaSwaWait = _settings["vca_swa_wait"].asBool();
@@ -161,23 +187,56 @@ void Router::setOutputChannel(u32 _port, Channel* _channel) {
   _channel->setSource(this, _port);
 }
 
+Channel* Router::getOutputChannel(u32 _port) const {
+  return outputChannels_.at(_port);
+}
+
 void Router::initialize() {
+  // set input queue depth
+  for (u32 port = 0; port < numPorts_; port++) {
+    u32 queueDepth = inputQueueDepth_;
+    if (inputQueueTailored_) {
+      if (inputChannels_.at(port)) {
+        u32 channelLatency = inputChannels_.at(port)->latency();
+        queueDepth = computeTailoredBufferLength(
+            inputQueueMult_, inputQueueMin_, inputQueueMax_, channelLatency);
+      } else {
+        // if no channel, make no queuing and inf credits
+        queueDepth = 0;
+      }
+    }
+    for (u32 vc = 0; vc < numVcs_; vc++) {
+      // set depth
+      u32 vcIdx = vcIndex(port, vc);
+      inputQueues_.at(vcIdx)->setDepth(queueDepth);
+    }
+  }
+
   // init credits
   for (u32 port = 0; port < numPorts_; port++) {
+    // donwstream queue depth
+    u32 credits = inputQueueDepth_;
+    if (inputQueueTailored_) {
+      if (outputChannels_.at(port)) {
+        u32 channelLatency = outputChannels_.at(port)->latency();
+        credits = computeTailoredBufferLength(
+            inputQueueMult_, inputQueueMin_, inputQueueMax_, channelLatency);
+      } else {
+        // if no channel, make no queuing and inf credits
+        credits = U32_MAX;
+      }
+    }
+
     for (u32 vc = 0; vc < numVcs_; vc++) {
       u32 vcIdx = vcIndex(port, vc);
       // initialize the credit count in the CrossbarScheduler
-      crossbarScheduler_->initCredits(vcIdx, inputQueueDepth_);
+      crossbarScheduler_->initCredits(vcIdx, credits);
 
-      // initialize the credit count in the CongestionSensor for downstream
+      // initialize the credit count in the CongestionStatus for downstream
       //  queues
-      congestionSensor_->initCredits(vcIdx, inputQueueDepth_);
+      congestionSensor_->initCredits(vcIdx, credits);
     }
   }
-}
-
-Channel* Router::getOutputChannel(u32 _port) const {
-  return outputChannels_.at(_port);
 }
 
 void Router::receiveFlit(u32 _port, Flit* _flit) {

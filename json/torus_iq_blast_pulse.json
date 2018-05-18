@@ -52,6 +52,7 @@
         "mode": "normalized_vc"  // {normalized,absolute}_{port,vc}
       },
       "congestion_mode": "downstream",
+      "input_queue_mode": "fixed",  // fixed or tailored
       "input_queue_depth": 16,
       "vca_swa_wait": false,
       "output_queue_depth": 16,
@@ -100,6 +101,7 @@
         "packet_lock": false,
         "idle_unlock": false
       },
+      "init_credits_mode": "$&(network.router.input_queue_mode)&$",
       "init_credits": "$&(network.router.input_queue_depth)&$",
       "crossbar": {
         "latency": 1  // cycles

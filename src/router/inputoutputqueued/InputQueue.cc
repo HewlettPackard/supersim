@@ -35,7 +35,7 @@ InputQueue::InputQueue(
     u32 _vcSchedulerIndex, CrossbarScheduler* _crossbarScheduler,
     u32 _crossbarSchedulerIndex, Crossbar* _crossbar, u32 _crossbarIndex,
     CreditWatcher* _creditWatcher, bool _decrCreditWatcher)
-    : Component(_name, _parent), depth_(_depth), port_(_port), numVcs_(_numVcs),
+    : Component(_name, _parent), depth_(0), port_(_port), numVcs_(_numVcs),
       vc_(_vc), vcaSwaWait_(_vcaSwaWait), router_(_router),
       routingAlgorithm_(_routingAlgorithm), vcScheduler_(_vcScheduler),
       vcSchedulerIndex_(_vcSchedulerIndex),
@@ -71,6 +71,10 @@ InputQueue::InputQueue(
 }
 
 InputQueue::~InputQueue() {}
+
+void InputQueue::setDepth(u32 _depth) {
+  depth_ = _depth;
+}
 
 void InputQueue::receiveFlit(u32 _port, Flit* _flit) {
   assert(gSim->epsilon() == 1);

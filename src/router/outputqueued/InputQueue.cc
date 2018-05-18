@@ -32,7 +32,7 @@ InputQueue::InputQueue(
     const std::string& _name, const Component* _parent, Router* _router,
     u32 _depth, u32 _port, u32 _numVcs, u32 _vc,
     RoutingAlgorithm* _routingAlgorithm)
-    : Component(_name, _parent), depth_(_depth), port_(_port), numVcs_(_numVcs),
+    : Component(_name, _parent), depth_(0), port_(_port), numVcs_(_numVcs),
       vc_(_vc), router_(_router), routingAlgorithm_(_routingAlgorithm) {
   // ensure the buffer is empty
   assert(buffer_.size() == 0);
@@ -48,6 +48,10 @@ InputQueue::InputQueue(
 }
 
 InputQueue::~InputQueue() {}
+
+void InputQueue::setDepth(u32 _depth) {
+  depth_ = _depth;
+}
 
 void InputQueue::receiveFlit(u32 _port, Flit* _flit) {
   assert(gSim->epsilon() == 1);

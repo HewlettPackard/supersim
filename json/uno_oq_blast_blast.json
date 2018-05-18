@@ -40,6 +40,7 @@
         "mode": "normalized_vc"  // {normalized,absolute}_{port,vc}
       },
       "congestion_mode": "downstream",
+      "input_queue_mode": "fixed",  // fixed or tailored
       "input_queue_depth": 64,  // 4x max packet
       "transfer_latency": 100,
       "output_queue_depth": "infinite",
@@ -65,6 +66,7 @@
       "adaptive": false,
       "fixed_msg_vc": false,
       "crossbar_scheduler": "$&(network.router.output_crossbar_scheduler)&$",
+      "init_credits_mode": "$&(network.router.input_queue_mode)&$",
       "init_credits": "$&(network.router.input_queue_depth)&$",
       "crossbar": {
         "latency": 1  // cycles
