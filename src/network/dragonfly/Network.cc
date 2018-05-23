@@ -54,9 +54,20 @@ Network::Network(const std::string& _name, const Component* _parent,
   assert(globalWeight_ > 0);
 
   // channels
+  assert(_settings.isMember("channel_mode"));
   assert(_settings.isMember("global_channel"));
   assert(_settings.isMember("local_channel"));
   assert(_settings.isMember("external_channel"));
+
+  // scalars
+  f64 global_scalar = 0.0;
+  f64 local_scalar = 0.0;
+  if (_settings["channel_mode"].asString() == "scalar") {
+    assert(_settings.isMember("global_scalar"));
+    assert(_settings.isMember("local_scalar"));
+    global_scalar = _settings["global_scalar"].asFloat();
+    local_scalar = _settings["local_scalar"].asFloat();
+  }
 
   // radix
   groupRadix_ = ((globalWidth_ - 1) * globalWeight_);
@@ -107,8 +118,18 @@ Network::Network(const std::string& _name, const Component* _parent,
             "GlobalChannel_" +
             strop::vecString<u32>(srcAddress, '-') + "-to-" +
             strop::vecString<u32>(dstAddress, '-');
-        Channel* globalChannel = new Channel(globalChannelName, this, numVcs_,
-                                             _settings["global_channel"]);
+
+        // determine the global channel latency for current src dst group
+        if (_settings["channel_mode"].asString() == "scalar") {
+          f64 link_dist = fabs((s64)srcGroup - (s64)dstGroup);
+          u32 channelLatency = (u32)(ceil(global_scalar * link_dist));
+
+          // override settings
+          _settings["global_channel"]["latency"] = channelLatency;
+        }
+
+        Channel* globalChannel = new Channel(
+            globalChannelName, this, numVcs_, _settings["global_channel"]);
         globalChannels_.push_back(globalChannel);
 
         // link the routers from source to dst
@@ -136,6 +157,15 @@ Network::Network(const std::string& _name, const Component* _parent,
               "LocalChannel_" + strop::vecString<u32>(srcAddress, '-') +
               "-to-" + strop::vecString<u32>(dstAddress, '-') + "-" +
               std::to_string(weight);
+          // determine the local channel latency
+          if (_settings["channel_mode"].asString() == "scalar") {
+            f64 link_dist = fabs((s64)srcRouter - (s64)dstRouter);
+            u32 channelLatency = (u32)(ceil(local_scalar * link_dist));
+
+            // override settings
+            _settings["local_channel"]["latency"] = channelLatency;
+          }
+
           Channel* channel = new Channel(channelName, this, numVcs_,
                                          _settings["local_channel"]);
           localChannels_.push_back(channel);

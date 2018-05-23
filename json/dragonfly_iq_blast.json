@@ -12,7 +12,7 @@
     "global_width": 8,
     "global_weight": 1,
     "local_width": 4,
-    "local_weight": 1,
+    "local_weight": 2,
     "concentration": 2,
     "protocol_classes": [
       {
@@ -33,8 +33,11 @@
         }
       }
     ],
+    "channel_mode": "fixed",  // "fixed" | "scalar"
+    //"global_scalar": 10,
+    //"local_scalar": 1,
     "global_channel": {
-      "latency": 1  // cycles
+      "latency": 2  // cycles
     },
     "local_channel": {
       "latency": 1  // cycles
@@ -148,6 +151,7 @@
     ]
   },
   "debug": [
+    "Network",
     "Workload.Application_0",
     "Workload.Application_0.BlastTerminal_1"
   ]
