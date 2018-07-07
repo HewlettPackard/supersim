@@ -37,12 +37,14 @@ namespace Stencil {
 
 StencilTerminal::StencilTerminal(
     const std::string& _name, const Component* _parent, u32 _id,
-    const std::vector<u32>& _address,
+    const std::vector<u32>& _address, const std::vector<u32>* _termToProc,
+    const std::vector<u32>* _procToTerm,
     const std::vector<std::tuple<u32, u32> >& _exchangeSendMessages,
     u32 _exchangeRecvMessages, ::Application* _app, Json::Value _settings)
     : ::Terminal(_name, _parent, _id, _address, _app),
       numIterations_(_settings["num_iterations"].asUInt()),
       maxPacketSize_(_settings["max_packet_size"].asUInt()),
+      termToProc_(_termToProc), procToTerm_(_procToTerm),
       exchangeSendMessages_(_exchangeSendMessages),
       exchangeRecvMessages_(_exchangeRecvMessages),
       collectiveSize_(_settings["collective_size"].asUInt()),
@@ -63,6 +65,7 @@ StencilTerminal::StencilTerminal(
   collectiveOffset_ = U32_MAX;
 
   dbgprintf("");
+  dbgprintf("Terminal=%u Process=%u", id(), termToProc_->at(id()));
   dbgprintf("Exchange Send Messages:");
   for (const std::tuple<u32, u32>& sm : exchangeSendMessages_) {
     dbgprintf("  Dst=%u Size=%u", std::get<0>(sm), std::get<1>(sm));
@@ -212,9 +215,9 @@ void StencilTerminal::finishCompute() {
 void StencilTerminal::startExchange() {
   // enqueue all messages to be sent
   for (const auto& t : exchangeSendMessages_) {
-    u32 destination = std::get<0>(t);
+    u32 destProc = std::get<0>(t);
     u32 size = std::get<1>(t);
-    generateMessage(destination, size, exchangeProtocolClass_,
+    generateMessage(procToTerm_->at(destProc), size, exchangeProtocolClass_,
                     encodeOp(fsm_, iteration_));
   }
 
@@ -257,7 +260,8 @@ void StencilTerminal::finishExchange() {
 void StencilTerminal::startCollective() {
   // send the first offset
   collectiveOffset_ = 1;
-  generateMessage(collectiveDestination(collectiveOffset_),
+  u32 destProc = collectiveDestination(collectiveOffset_);
+  generateMessage(procToTerm_->at(destProc),
                   collectiveSize_, collectiveProtocolClass_,
                   encodeOp(fsm_, iteration_));
 
@@ -271,7 +275,7 @@ void StencilTerminal::handleCollectiveMessage(Message* _message) {
 
     // stash the message in its iteration
     u32 msgIter = decodeIteration(_message->getOpCode());
-    u32 msgSrc = _message->getSourceId();
+    u32 msgSrc = termToProc_->at(_message->getSourceId());
     bool res = collectiveRecv_[msgIter].insert(msgSrc).second;
     (void)res;  // unused
     assert(res);
@@ -296,7 +300,8 @@ void StencilTerminal::handleCollectiveMessage(Message* _message) {
         }
 
         // send next message
-        generateMessage(collectiveDestination(collectiveOffset_),
+        u32 dstProc = collectiveDestination(collectiveOffset_);
+        generateMessage(procToTerm_->at(dstProc),
                         collectiveSize_, collectiveProtocolClass_,
                         encodeOp(fsm_, iteration_));
       } else {
@@ -319,9 +324,9 @@ void StencilTerminal::finishCollective() {
   advanceFsm();
 }
 
-void StencilTerminal::generateMessage(u32 _destination, u32 _size,
-                                   u32 _protocolClass, u32 _msgType) {
-  u32 destination = _destination;
+void StencilTerminal::generateMessage(u32 _destTerminal, u32 _size,
+                                      u32 _protocolClass, u32 _msgType) {
+  u32 destination = _destTerminal;
   u32 messageSize = _size;
   u32 protocolClass = _protocolClass;
   u64 transaction = createTransaction();
@@ -395,16 +400,18 @@ u32 StencilTerminal::decodeIteration(u32 _opCode) {
 }
 
 u32 StencilTerminal::collectiveDestination(u32 _offset) {
+  u32 myProc = termToProc_->at(id_);
   dbgprintf("sending collective to %u",
-            (id_ + _offset) % application()->numTerminals());
-  return (id_ + _offset) % application()->numTerminals();
+            (myProc + _offset) % application()->numTerminals());
+  return (myProc + _offset) % application()->numTerminals();
 }
 
 u32 StencilTerminal::collectiveSource(u32 _offset) {
-  if (_offset > id_) {
-    return (id_ + application()->numTerminals()) - _offset;
+  u32 myProc = termToProc_->at(id_);
+  if (_offset > myProc) {
+    return (myProc + application()->numTerminals()) - _offset;
   } else {
-    return (id_ - _offset);
+    return (myProc - _offset);
   }
 }
 

@@ -34,7 +34,37 @@ Application::Application(
     Workload* _workload, MetadataHandler* _metadataHandler,
     Json::Value _settings)
     : ::Application(_name, _parent, _id, _workload, _metadataHandler,
-                    _settings) {
+                    _settings),
+      termToProc_(numTerminals(), U32_MAX),
+      procToTerm_(numTerminals(), U32_MAX) {
+  // create map from terminal to process
+  assert(_settings.isMember("process_placement") &&
+         _settings["process_placement"].isString());
+  std::string placementAlg = _settings["process_placement"].asString();
+  if (placementAlg == "linear") {
+    for (u32 t = 0; t < numTerminals(); t++) {
+      termToProc_.at(t) = t;
+    }
+  } else if (placementAlg == "random") {
+    for (u32 t = 0; t < numTerminals(); t++) {
+      termToProc_.at(t) = t;
+    }
+    gSim->rnd.shuffle(&termToProc_);
+  } else {
+    fprintf(stderr, "unsupported node placement policy: %s\n",
+            placementAlg.c_str());
+    assert(false);
+  }
+
+  for (u32 t = 0; t < numTerminals(); t++) {
+    printf("NP %u -> %u\n", t, termToProc_.at(t));
+  }
+
+  // reverse the map to translate process to terminal
+  for (u32 t = 0; t < numTerminals(); t++) {
+    procToTerm_.at(termToProc_.at(t)) = t;
+  }
+
   // read in the exchange matrix
   //  for each terminal, this determines:
   //   1. the destination and sizes of messages to send
@@ -42,9 +72,10 @@ Application::Application(
   assert(_settings.isMember("exchange_messages") &&
          _settings["exchange_messages"].isString());
 
-  // this is the send messages
+  // send message matrix of {dst, size}
   std::vector<std::vector<std::tuple<u32, u32> > > exchangeSendMessages(
       numTerminals());
+
   // this is the recv message counts
   std::vector<u32> exchangeRecvMessages(numTerminals(), 0);
 
@@ -112,8 +143,9 @@ Application::Application(
     gSim->getNetwork()->translateInterfaceIdToAddress(t, &address);
     StencilTerminal* terminal = new StencilTerminal(
         tname, this, t, address,
-        exchangeSendMessages.at(t),
-        exchangeRecvMessages.at(t),
+        &termToProc_, &procToTerm_,
+        exchangeSendMessages.at(termToProc_.at(t)),
+        exchangeRecvMessages.at(termToProc_.at(t)),
         this, _settings["stencil_terminal"]);
     setTerminal(t, terminal);
   }

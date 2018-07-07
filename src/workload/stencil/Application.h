@@ -19,6 +19,7 @@
 #include <prim/prim.h>
 
 #include <string>
+#include <vector>
 
 #include "event/Component.h"
 #include "workload/Application.h"
@@ -46,6 +47,9 @@ class Application : public ::Application {
  private:
   u32 completedTerminals_;
   u32 doneTerminals_;
+
+  std::vector<u32> termToProc_;
+  std::vector<u32> procToTerm_;
 };
 
 }  // namespace Stencil

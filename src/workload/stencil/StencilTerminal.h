@@ -35,7 +35,8 @@ class StencilTerminal : public Terminal {
  public:
   StencilTerminal(
       const std::string& _name, const Component* _parent, u32 _id,
-      const std::vector<u32>& _address,
+      const std::vector<u32>& _address, const std::vector<u32>* _termToProc,
+      const std::vector<u32>* _procToTerm,
       const std::vector<std::tuple<u32, u32> >& _exchangeSendMessages,
       u32 _exchangeRecvMessages, ::Application* _app, Json::Value _settings);
   ~StencilTerminal();
@@ -83,6 +84,8 @@ class StencilTerminal : public Terminal {
   // traffic generation
   const u32 numIterations_;
   const u32 maxPacketSize_;  // flits
+  const std::vector<u32>* termToProc_;  // [term]->proc
+  const std::vector<u32>* procToTerm_;  // [proc]->term
   const std::vector<std::tuple<u32, u32> > exchangeSendMessages_;  // {dst,size}
   const u32 exchangeRecvMessages_;
   const u32 collectiveSize_;
