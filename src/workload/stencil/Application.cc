@@ -56,10 +56,6 @@ Application::Application(
     assert(false);
   }
 
-  for (u32 t = 0; t < numTerminals(); t++) {
-    printf("NP %u -> %u\n", t, termToProc_.at(t));
-  }
-
   // reverse the map to translate process to terminal
   for (u32 t = 0; t < numTerminals(); t++) {
     procToTerm_.at(termToProc_.at(t)) = t;
