@@ -24,6 +24,7 @@ namespace Torus {
 // This function determines the dimension correspondance of an input port.
 //  This returns U32_MAX for terminal ports.
 u32 computeInputPortDim(const std::vector<u32>& _dimensionWidths,
+                        const std::vector<u32>& _dimensionWeights,
                         u32 _concentration, u32 _inputPort);
 
 u32 computeMinimalHops(const std::vector<u32>* _source,

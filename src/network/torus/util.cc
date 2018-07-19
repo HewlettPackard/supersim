@@ -19,6 +19,7 @@
 namespace Torus {
 
 u32 computeInputPortDim(const std::vector<u32>& _dimensionWidths,
+                        const std::vector<u32>& _dimensionWeights,
                         u32 _concentration, u32 _inputPort) {
   // determine which network dimension this port is attached to
   if (_inputPort < _concentration) {
@@ -27,10 +28,11 @@ u32 computeInputPortDim(const std::vector<u32>& _dimensionWidths,
 
   u32 portBase = _concentration;
   for (u32 dim = 0; dim < _dimensionWidths.size(); dim++) {
-    if ((_inputPort >= portBase) && (_inputPort < (portBase + 2))) {
+    u32 dimWeight = _dimensionWeights.at(dim);
+    if ((_inputPort >= portBase) && (_inputPort < (portBase + 2 * dimWeight))) {
       return dim;
     }
-    portBase += 2;
+    portBase += 2 * dimWeight;
   }
   assert(false);
 }
@@ -55,5 +57,4 @@ u32 computeMinimalHops(const std::vector<u32>* _source,
   }
   return minHops;
 }
-
 }  // namespace Torus

@@ -64,6 +64,7 @@ class Network : public ::Network {
   u32 dimensions_;
   u32 concentration_;
   std::vector<u32> dimensionWidths_;
+  std::vector<u32> dimensionWeights_;
   DimensionalArray<Router*> routers_;
   DimensionalArray<Interface*> interfaces_;
   std::vector<Channel*> internalChannels_;

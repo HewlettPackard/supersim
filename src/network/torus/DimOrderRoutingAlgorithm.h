@@ -24,6 +24,8 @@
 #include "event/Component.h"
 #include "network/torus/RoutingAlgorithm.h"
 #include "router/Router.h"
+#include "routing/mode.h"
+#include "routing/Reduction.h"
 
 namespace Torus {
 
@@ -32,13 +34,19 @@ class DimOrderRoutingAlgorithm : public RoutingAlgorithm {
   DimOrderRoutingAlgorithm(
       const std::string& _name, const Component* _parent, Router* _router,
       u32 _baseVc, u32 _numVcs, u32 _inputPort, u32 _inputVc,
-      const std::vector<u32>& _dimensionWidths, u32 _concentration,
+      const std::vector<u32>& _dimensionWidths,
+      const std::vector<u32>& _dimensionWeights, u32 _concentration,
       Json::Value _settings);
   ~DimOrderRoutingAlgorithm();
 
  protected:
   void processRequest(
       Flit* _flit, RoutingAlgorithm::Response* _response) override;
+
+ private:
+  void addPort(u32 _port, u32 _hops, u32 vcSet);
+  const RoutingMode mode_;
+  Reduction* reduction_;
 };
 
 }  // namespace Torus

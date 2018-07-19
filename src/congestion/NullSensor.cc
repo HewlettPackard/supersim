@@ -16,9 +16,6 @@
 
 #include <factory/ObjectFactory.h>
 
-#include <cassert>
-#include <cmath>
-
 #include <algorithm>
 
 NullSensor::NullSensor(
@@ -44,7 +41,10 @@ CongestionSensor::Mode NullSensor::mode() const {
 
 f64 NullSensor::computeStatus(
     u32 _inputPort, u32 _inputVc, u32 _outputPort, u32 _outputVc) const {
-  assert(false);  // you can't ask me this!
+  // asserting false caused problems with least-congested minimal and weighted
+  //  reductions, returning 0.0 instead
+  // assert(false);  // you can't ask me this!
+  return 0.0;
 }
 
 registerWithObjectFactory("null_sensor", CongestionSensor,
