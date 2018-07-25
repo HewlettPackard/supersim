@@ -55,7 +55,7 @@ NeighborCTP::NeighborCTP(
 
   // get self as a vector address
   std::vector<u32> addr;
-  Cube::computeTerminalAddress(self_, widths, concentration, &addr);
+  Cube::translateInterfaceIdToAddress(self_, widths, concentration, &addr);
 
   // compute the destination vector address
   for (u32 dim = 0; dim < dimensions; dim++) {
@@ -76,7 +76,7 @@ NeighborCTP::NeighborCTP(
   }
 
   // compute the  destination id
-  dest_ = Cube::computeTerminalId(&addr, widths, concentration);
+  dest_ = Cube::translateInterfaceAddressToId(&addr, widths, concentration);
 }
 
 NeighborCTP::~NeighborCTP() {}

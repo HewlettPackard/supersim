@@ -67,7 +67,7 @@ Swap2CTP::Swap2CTP(
 
   // get self as a vector address
   std::vector<u32> addr;
-  Cube::computeTerminalAddress(self_, widths, concentration, &addr);
+  Cube::translateInterfaceIdToAddress(self_, widths, concentration, &addr);
 
   // compute the destination vector address
   u32 nodeGroup = _self % 2;
@@ -87,7 +87,7 @@ Swap2CTP::Swap2CTP(
   }
 
   // compute the tornado destination id
-  dest_ = Cube::computeTerminalId(&addr, widths, concentration);
+  dest_ = Cube::translateInterfaceAddressToId(&addr, widths, concentration);
 }
 
 Swap2CTP::~Swap2CTP() {}

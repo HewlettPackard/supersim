@@ -49,7 +49,7 @@ DimRotateCTP::DimRotateCTP(
 
   // get self as a vector address
   std::vector<u32> addr;
-  Cube::computeTerminalAddress(self_, widths, concentration, &addr);
+  Cube::translateInterfaceIdToAddress(self_, widths, concentration, &addr);
 
   if (dir == "left") {
     u32 tmp = addr.at(1);
@@ -69,7 +69,7 @@ DimRotateCTP::DimRotateCTP(
   }
 
   // compute the tornado destination id
-  dest_ = Cube::computeTerminalId(&addr, widths, concentration);
+  dest_ = Cube::translateInterfaceAddressToId(&addr, widths, concentration);
 }
 
 DimRotateCTP::~DimRotateCTP() {}

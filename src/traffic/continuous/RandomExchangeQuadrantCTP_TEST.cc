@@ -65,7 +65,7 @@ TEST(RandomExchangeQuadrantCTP, evenSpread) {
 
     u32 idxQuadrant = 0;
     std::vector<u32> idxAddr;
-    Cube::computeTerminalAddress(idx, widths, concentration, &idxAddr);
+    Cube::translateInterfaceIdToAddress(idx, widths, concentration, &idxAddr);
     for (u32 i = 0; i < dimensions; ++i) {
       if (idxAddr.at(i + 1) >= widths.at(i) / 2) {
         idxQuadrant += (1 << i);
@@ -77,7 +77,7 @@ TEST(RandomExchangeQuadrantCTP, evenSpread) {
     for (u32 bkt = 0; bkt < numTerminals; bkt++) {
       u32 bktQuadrant = 0;
       std::vector<u32> bktAddr;
-      Cube::computeTerminalAddress(bkt, widths, concentration, &bktAddr);
+      Cube::translateInterfaceIdToAddress(bkt, widths, concentration, &bktAddr);
       for (u32 i = 0; i < dimensions; ++i) {
         if (bktAddr.at(i + 1) >= (widths.at(i) / 2)) {
           bktQuadrant += (1 << i);

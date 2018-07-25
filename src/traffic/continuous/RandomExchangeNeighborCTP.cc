@@ -61,28 +61,32 @@ RandomExchangeNeighborCTP(
     if (dimMask.at(dim)) {
       std::vector<u32> addr;
       // get self as a vector address
-      Cube::computeTerminalAddress(self_, widths, concentration, &addr);
+      Cube::translateInterfaceIdToAddress(self_, widths, concentration, &addr);
       addr.at(dim + 1) = (addr.at(dim + 1) + widths.at(dim) - 1)
                          % widths.at(dim);
       if (allTerminals) {
         for (u32 conc = 0; conc < concentration; ++conc) {
           addr.at(0) = conc;
-          u32 dstId = Cube::computeTerminalId(&addr, widths, concentration);
+          u32 dstId = Cube::translateInterfaceAddressToId(&addr, widths,
+                                                          concentration);
           dstVect_.emplace_back(dstId);
         }
       } else {
-        u32 dstId = Cube::computeTerminalId(&addr, widths, concentration);
+        u32 dstId = Cube::translateInterfaceAddressToId(&addr, widths,
+                                                        concentration);
         dstVect_.emplace_back(dstId);
       }
       addr.at(dim + 1) = (addr.at(dim + 1) + 2) % widths.at(dim);
       if (allTerminals) {
         for (u32 conc = 0; conc < concentration; ++conc) {
           addr.at(0) = conc;
-          u32 dstId = Cube::computeTerminalId(&addr, widths, concentration);
+          u32 dstId = Cube::translateInterfaceAddressToId(&addr, widths,
+                                                          concentration);
           dstVect_.emplace_back(dstId);
         }
       } else {
-        u32 dstId = Cube::computeTerminalId(&addr, widths, concentration);
+        u32 dstId = Cube::translateInterfaceAddressToId(&addr, widths,
+                                                        concentration);
         dstVect_.emplace_back(dstId);
       }
     }

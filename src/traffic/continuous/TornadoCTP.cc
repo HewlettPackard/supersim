@@ -51,7 +51,7 @@ TornadoCTP::TornadoCTP(
 
   // get self as a vector address
   std::vector<u32> addr;
-  Cube::computeTerminalAddress(self_, widths, concentration, &addr);
+  Cube::translateInterfaceIdToAddress(self_, widths, concentration, &addr);
 
   // compute the tornado destination vector address
   for (u32 dim = 0; dim < dimensions; dim++) {
@@ -63,7 +63,7 @@ TornadoCTP::TornadoCTP(
   }
 
   // compute the tornado destination id
-  dest_ = Cube::computeTerminalId(&addr, widths, concentration);
+  dest_ = Cube::translateInterfaceAddressToId(&addr, widths, concentration);
 }
 
 TornadoCTP::~TornadoCTP() {}

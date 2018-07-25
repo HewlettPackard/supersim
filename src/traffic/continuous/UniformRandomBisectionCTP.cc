@@ -57,11 +57,12 @@ UniformRandomBisectionCTP::UniformRandomBisectionCTP(
 
   std::vector<u32> addr;
   // get self as a vector address
-  Cube::computeTerminalAddress(self_, widths, concentration, &addr);
+  Cube::translateInterfaceIdToAddress(self_, widths, concentration, &addr);
 
   for (u32 dstIdx = 0; dstIdx < numTerminals_; ++dstIdx) {
     std::vector<u32> dstAddr;
-    Cube::computeTerminalAddress(dstIdx, widths, concentration, &dstAddr);
+    Cube::translateInterfaceIdToAddress(dstIdx, widths, concentration,
+                                        &dstAddr);
 
     bool validDest = true;
     if (dstAddr.at(0) != (concentration - 1 - addr.at(0))) {

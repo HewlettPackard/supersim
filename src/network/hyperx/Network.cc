@@ -276,22 +276,24 @@ Interface* Network::getInterface(u32 _id) const {
 
 void Network::translateInterfaceIdToAddress(
     u32 _id, std::vector<u32>* _address) const {
-  Cube::computeTerminalAddress(_id, dimensionWidths_, concentration_, _address);
+  Cube::translateInterfaceIdToAddress(_id, dimensionWidths_, concentration_,
+                                      _address);
 }
 
 u32 Network::translateInterfaceAddressToId(
     const std::vector<u32>* _address) const {
-  return Cube::computeTerminalId(_address, dimensionWidths_, concentration_);
+  return Cube::translateInterfaceAddressToId(_address, dimensionWidths_,
+                                             concentration_);
 }
 
 void Network::translateRouterIdToAddress(
     u32 _id, std::vector<u32>* _address) const {
-  Cube::computeRouterAddress(_id, dimensionWidths_, _address);
+  Cube::translateRouterIdToAddress(_id, dimensionWidths_, _address);
 }
 
 u32 Network::translateRouterAddressToId(
     const std::vector<u32>* _address) const {
-  return Cube::computeRouterId(_address, dimensionWidths_);
+  return Cube::translateRouterAddressToId(_address, dimensionWidths_);
 }
 
 u32 Network::computeMinimalHops(const std::vector<u32>* _source,

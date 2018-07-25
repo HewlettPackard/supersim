@@ -45,7 +45,7 @@ DimReverseCTP::DimReverseCTP(
 
   // get self as a vector address
   std::vector<u32> addr;
-  Cube::computeTerminalAddress(self_, widths, concentration, &addr);
+  Cube::translateInterfaceIdToAddress(self_, widths, concentration, &addr);
 
   for (u32 dim = 0; dim < dimensions/2; dim++) {
     u32 tmp = addr.at(dim + 1);
@@ -54,7 +54,7 @@ DimReverseCTP::DimReverseCTP(
   }
 
   // compute the tornado destination id
-  dest_ = Cube::computeTerminalId(&addr, widths, concentration);
+  dest_ = Cube::translateInterfaceAddressToId(&addr, widths, concentration);
 }
 
 DimReverseCTP::~DimReverseCTP() {}

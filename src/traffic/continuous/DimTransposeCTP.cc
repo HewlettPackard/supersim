@@ -68,7 +68,7 @@ DimTransposeCTP::DimTransposeCTP(
 
   // get self as a vector address
   std::vector<u32> addr;
-  Cube::computeTerminalAddress(self_, widths, concentration, &addr);
+  Cube::translateInterfaceIdToAddress(self_, widths, concentration, &addr);
 
   u32 idx0 = workingDims.at(0) + 1;
   u32 idx1 = workingDims.at(1) + 1;
@@ -77,7 +77,7 @@ DimTransposeCTP::DimTransposeCTP(
   addr.at(idx1) = tmp;
 
   // compute the tornado destination id
-  dest_ = Cube::computeTerminalId(&addr, widths, concentration);
+  dest_ = Cube::translateInterfaceAddressToId(&addr, widths, concentration);
 }
 
 DimTransposeCTP::~DimTransposeCTP() {}

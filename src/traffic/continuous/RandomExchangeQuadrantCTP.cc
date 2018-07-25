@@ -48,7 +48,7 @@ RandomExchangeQuadrantCTP(
 
   std::vector<u32> addr;
   // get self as a vector address
-  Cube::computeTerminalAddress(self_, widths, concentration, &addr);
+  Cube::translateInterfaceIdToAddress(self_, widths, concentration, &addr);
 
   u32 selfQuadrant = 0;
   for (u32 i = 0; i < dimensions; ++i) {
@@ -59,7 +59,8 @@ RandomExchangeQuadrantCTP(
 
   for (u32 dstIdx = 0; dstIdx < numTerminals_; ++dstIdx) {
     std::vector<u32> dstAddr;
-    Cube::computeTerminalAddress(dstIdx, widths, concentration, &dstAddr);
+    Cube::translateInterfaceIdToAddress(dstIdx, widths, concentration,
+                                        &dstAddr);
     u32 dstQuadrant = 0;
     for (u32 i = 0; i < dimensions; ++i) {
       if (dstAddr.at(i + 1) >= widths.at(i) / 2) {

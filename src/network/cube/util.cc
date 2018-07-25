@@ -18,7 +18,7 @@
 
 namespace Cube {
 
-void computeTerminalAddress(u32 _id, const std::vector<u32>& _widths,
+void translateInterfaceIdToAddress(u32 _id, const std::vector<u32>& _widths,
                             u32 _concentration, std::vector<u32>* _address) {
   u32 dimensions = _widths.size();
   _address->resize(dimensions + 1);
@@ -36,7 +36,7 @@ void computeTerminalAddress(u32 _id, const std::vector<u32>& _widths,
   }
 }
 
-u32 computeTerminalId(const std::vector<u32>* _address,
+u32 translateInterfaceAddressToId(const std::vector<u32>* _address,
                       const std::vector<u32>& _widths,
                       u32 _concentration) {
   u32 dimensions = _widths.size();
@@ -64,7 +64,7 @@ u32 computeTerminalId(const std::vector<u32>* _address,
   return sum;
 }
 
-void computeRouterAddress(const u32 _id, const std::vector<u32>& _widths,
+void translateRouterIdToAddress(const u32 _id, const std::vector<u32>& _widths,
                           std::vector<u32>* _address) {
   u32 dimensions = _widths.size();
   _address->resize(dimensions);
@@ -80,7 +80,7 @@ void computeRouterAddress(const u32 _id, const std::vector<u32>& _widths,
   }
 }
 
-u32 computeRouterId(const std::vector<u32>* _address,
+u32 translateRouterAddressToId(const std::vector<u32>* _address,
                     const std::vector<u32>& _widths) {
   u32 dimensions = _widths.size();
   std::vector<u32> coeff(dimensions);
