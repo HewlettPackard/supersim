@@ -21,18 +21,19 @@
 
 namespace Cube {
 
-void translateInterfaceIdToAddress(u32 _id, const std::vector<u32>& _widths,
-                            u32 _concentration, std::vector<u32>* _address);
+void translateInterfaceIdToAddress(
+    u32 _id, const std::vector<u32>& _widths, u32 _concentration,
+    std::vector<u32>* _address);
 
-u32 translateInterfaceAddressToId(const std::vector<u32>* _address,
-                      const std::vector<u32>& _widths,
-                      u32 _concentration);
+u32 translateInterfaceAddressToId(
+    const std::vector<u32>* _address, const std::vector<u32>& _widths,
+    u32 _concentration);
 
-void translateRouterIdToAddress(const u32 _id, const std::vector<u32>& _widths,
-                          std::vector<u32>* _address);
+void translateRouterIdToAddress(
+    const u32 _id, const std::vector<u32>& _widths, std::vector<u32>* _address);
 
-u32 translateRouterAddressToId(const std::vector<u32>* _address,
-                    const std::vector<u32>& _widths);
+u32 translateRouterAddressToId(
+    const std::vector<u32>* _address, const std::vector<u32>& _widths);
 
 }  // namespace Cube
 

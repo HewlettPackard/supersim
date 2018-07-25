@@ -110,11 +110,6 @@ void CommonAncestorRoutingAlgorithm::processRequest(
       u32 destinationId = _flit->packet()->message()->getDestinationId();
       u32 hash = hasher_(std::make_tuple(sourceId, destinationId, random_));
       u32 port = downPorts + (hash % upPorts);
-      /*
-      if (thisRouter == wanted) {
-         printf("port: %u\n", port);
-      }
-      */
       addPort(port, hops);
     } else {
       // choose all upward ports

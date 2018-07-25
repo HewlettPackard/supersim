@@ -52,7 +52,7 @@ LocalRandomRemoteAttackCTP::LocalRandomRemoteAttackCTP(
     // don't rely on loop around
     assert((u32)abs(offset) < numBlocks_);
     s32 remoteBlock = ((s32)localBlock_ +
-                     ((s32)numBlocks_ + offset)) % (s32)numBlocks_;
+                       ((s32)numBlocks_ + offset)) % (s32)numBlocks_;
     if (remoteBlock < 0) {
       remoteBlock += numBlocks_;
     }

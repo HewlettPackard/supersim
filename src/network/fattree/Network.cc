@@ -137,13 +137,15 @@ Network::Network(const std::string& _name, const Component* _parent,
         // create that router
         Router* thatRouter = routers_.at(thatLevel).at(thatCol);
         // create channels
-        std::string upChannelName = "UpChannel_" + std::to_string(level) +
-            ":" + std::to_string(col) + ":" + std::to_string(p);
+        std::string upChannelName =
+            "UpChannel_" + std::to_string(level) + ":" + std::to_string(col) +
+            ":" + std::to_string(p);
         Channel* up = new Channel(upChannelName, this, numVcs_,
                                   _settings["internal_channels"][level]);
         internalChannels_.push_back(up);
-        std::string downChannelName = "DownChannel_" + std::to_string(level) +
-            ":" + std::to_string(col) + ":" + std::to_string(p);
+        std::string downChannelName =
+            "DownChannel_" + std::to_string(level) + ":" + std::to_string(col) +
+            ":" + std::to_string(p);
         Channel* down = new Channel(downChannelName, this, numVcs_,
                                     _settings["internal_channels"][level]);
         internalChannels_.push_back(down);
@@ -162,13 +164,15 @@ Network::Network(const std::string& _name, const Component* _parent,
   for (u32 col = 0; col < routersAtLevel_.at(level); col++) {
     for (u32 p = 0; p < std::get<0>(radices_.at(level)); p++) {
       // create channels
-      std::string inChannelName = "InChannel_" + std::to_string(level) +
-          ":" + std::to_string(col) + ":" + std::to_string(p);
+      std::string inChannelName =
+          "InChannel_" + std::to_string(level) + ":" + std::to_string(col) +
+          ":" + std::to_string(p);
       Channel* inChannel = new Channel(inChannelName, this, numVcs_,
                                        _settings["external_channel"]);
       externalChannels_.push_back(inChannel);
-      std::string outChannelName = "OutChannel_" + std::to_string(level) +
-          ":" + std::to_string(col) + ":" + std::to_string(p);
+      std::string outChannelName =
+          "OutChannel_" + std::to_string(level) + ":" + std::to_string(col) +
+          ":" + std::to_string(p);
       Channel* outChannel = new Channel(outChannelName, this, numVcs_,
                                         _settings["external_channel"]);
       externalChannels_.push_back(outChannel);
@@ -186,7 +190,7 @@ Network::Network(const std::string& _name, const Component* _parent,
 
       // create interface
       std::string interfaceName = "Interface_" +
-          strop::vecString<u32>(interfaceAddress, '-');
+                                  strop::vecString<u32>(interfaceAddress, '-');
       Interface* interface = Interface::create(
           interfaceName, this, interfaceId, interfaceAddress, numVcs_,
           protocolClassVcs_, _metadataHandler, _settings["interface"]);

@@ -169,7 +169,7 @@ void ValiantsRoutingAlgorithm::processRequest(
     // moving to intermediate node or destination
     assert(newStage == atIntermediate);
     u32 globalOffset = computeOffset(thisGroup, routingToGroup,
-                                      globalWidth_);
+                                     globalWidth_);
 
     // in Terminal
     if (inputPort_ < localPortBase_) {

@@ -114,7 +114,7 @@ void AdaptiveRoutingAlgorithm::processRequest(
   u32 destinationTerminal = destinationAddress->at(0);
 
   u32 destinationGlobalOffset = computeOffset(thisGroup, destinationGroup,
-                                               globalWidth_);
+                                              globalWidth_);
 
   if (inputPort_ < localPortBase_) {
     // in TERMINAL

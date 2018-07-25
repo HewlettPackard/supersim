@@ -26,7 +26,7 @@
 #include "routing/RoutingAlgorithm.h"
 #include "router/Router.h"
 
-#define FATTREE_ROUTINGALGORITHM_ARGS \
+#define FATTREE_ROUTINGALGORITHM_ARGS                                 \
   const std::string&, const Component*, Router*, u32, u32, u32, u32,  \
     const std::vector<std::tuple<u32, u32, u32> >*, Json::Value
 

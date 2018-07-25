@@ -36,19 +36,19 @@ TEST(FatTree, translateInterfaceIdToAddress) {
   id = 1;
   exp = {1, 0, 0, 0};
   FatTree::translateInterfaceIdToAddress(numLevels, terminalsPerGroup,
-                                            id, &act);
+                                         id, &act);
   ASSERT_EQ(act, exp);
 
   id = 20;
   exp = {0, 2, 1, 0};
   FatTree::translateInterfaceIdToAddress(numLevels, terminalsPerGroup,
-                                            id, &act);
+                                         id, &act);
   ASSERT_EQ(act, exp);
 
   id = 47;
   exp = {3, 2, 1, 1};
   FatTree::translateInterfaceIdToAddress(numLevels, terminalsPerGroup,
-                                            id, &act);
+                                         id, &act);
   ASSERT_EQ(act, exp);
 }
 
@@ -90,13 +90,13 @@ TEST(FatTree, translateRouterIdToAddress) {
   id = 0;
   exp = {0, 0};
   FatTree::translateRouterIdToAddress(numLevels, rowRouters,
-                                         id, &act);
+                                      id, &act);
   ASSERT_EQ(act, exp);
 
   id = 1;
   exp = {0, 1};
   FatTree::translateRouterIdToAddress(numLevels, rowRouters,
-                                         id, &act);
+                                      id, &act);
   ASSERT_EQ(act, exp);
 
   id = 130;

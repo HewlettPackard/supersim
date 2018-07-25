@@ -183,4 +183,4 @@ u32 DualStageClassArbiter::arbitrate() {
 }
 
 registerWithObjectFactory("dual_stage_class", Arbiter,
-                    DualStageClassArbiter, ARBITER_ARGS);
+                          DualStageClassArbiter, ARBITER_ARGS);
