@@ -5,7 +5,7 @@ simulations being run. For example, a trace-driven simulation generally is only
 good for a single simulation run per network configuration. In contrast,
 synthetic workloads are often used to generate load vs. latency plots where the
 injection rate is incrementally increased across many simulation runs. As
-described in [Simulation Basics](basics.md), there are many steps needed even
+described in [Simulation Basics](basic_sims.md), there are many steps needed even
 for a sinlge simulation run. If you consider multiple workloads, network
 configurations, injection rates, etc., you might end up with thousands of
 tasks that must be run. Naturally, tasks depend on the completion of previous

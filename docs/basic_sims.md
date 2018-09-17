@@ -63,7 +63,7 @@ column -t -s, rates.csv | less
 
 The time based information related to flits, packets, messages, and transactions
 is contained in the `message_log` which is a custom file format. In this
-example, we've also SuperSim to compress the file by giving it a `.gz` file
+example, we've also told SuperSim to compress the file by giving it a `.gz` file
 extension. View its structure with the following command:
 
 ``` sh
@@ -96,7 +96,7 @@ column -t -s, latency.csv
 Note: you can also tell Ssparse to generate message latency data and
 transaction latency data using the `-m` and `-t` flags, respectively.
 
-## Plotting the resuls
+## Plotting the results
 Let's plot the packet latency results using the [SSPlot][] plotting package.
 This package has many commands. The only one we'll use for this example is:
 

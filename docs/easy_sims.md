@@ -49,7 +49,7 @@ To see a detailed explanation of sssweep, you can see a tutorial in the docs fol
 We'll use an example settings file from the SuperSim project.
 
 ``` sh
-cp ../supersim/json/foldedclos_iq_blast.json settings.json
+cp ../supersim/json/fattree_iq_blast.json settings.json
 ```
 
 Now we are ready to run the sssweep script.
