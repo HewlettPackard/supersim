@@ -20,7 +20,7 @@
           "latency": 1,
           "mode": "vc", // vc, port_ave, port_min, port_max
           "reduction": {
-            "algorithm": "all_minimal", // all_minimal, least_congested_minimal, weighted 
+            "algorithm": "all_minimal", // all_minimal, least_congested_minimal, weighted
             "max_outputs": 0,
             "congestion_bias": 0.1,
             "independent_bias": 0.0,
@@ -35,7 +35,7 @@
           "latency": 1,
           "mode": "vc", // vc, port_ave, port_min, port_max
           "reduction": {
-            "algorithm": "all_minimal", // all_minimal, least_congested_minimal, weighted 
+            "algorithm": "all_minimal", // all_minimal, least_congested_minimal, weighted
             "max_outputs": 0,
             "congestion_bias": 0.1,
             "independent_bias": 0.0,
@@ -52,6 +52,9 @@
     },
     "channel_log": {
       "file": null  // "channels.csv"
+    },
+    "traffic_log": {
+      "file": null  // "traffic.csv"
     },
     "router": {
       "architecture": "input_output_queued",

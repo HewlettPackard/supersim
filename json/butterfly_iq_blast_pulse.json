@@ -36,6 +36,9 @@
     "channel_log": {
       "file": null  // "channels.csv"
     },
+    "traffic_log": {
+      "file": null  // "traffic.csv"
+    },
     "router": {
       "architecture": "input_queued",
       "congestion_sensor": {

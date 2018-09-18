@@ -18,6 +18,7 @@
 
 #include <algorithm>
 
+#include "network/Network.h"
 #include "router/outputqueued/Router.h"
 #include "types/Packet.h"
 
@@ -102,6 +103,11 @@ void InputQueue::routingAlgorithmResponse(
 
   // inform the routing algorithm of vc scheduled
   routingAlgorithm_->vcScheduled(rfe_.flit, outputPort, outputVc);
+
+  // log traffic
+  router_->network()->logTraffic(
+      router_, port_, vc_, outputPort, outputVc,
+      rfe_.flit->packet()->numFlits());
 
   // tell the router that this packet wants to access the output queue
   router_->registerPacket(port_, vc_, rfe_.flit, outputPort, outputVc);

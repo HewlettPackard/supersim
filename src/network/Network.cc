@@ -41,10 +41,14 @@ Network::Network(const std::string& _name, const Component* _parent,
 
   // create a channel log object
   channelLog_ = new ChannelLog(numVcs_, _settings["channel_log"]);
+
+  // create a traffic log object
+  trafficLog_ = new TrafficLog(_settings["traffic_log"]);
 }
 
 Network::~Network() {
   delete channelLog_;
+  delete trafficLog_;
 }
 
 Network* Network::create(
@@ -97,6 +101,15 @@ void Network::endMonitoring() {
 bool Network::monitoring() const {
   return monitoring_;
 }
+
+void Network::logTraffic(const Component* _device, u32 _inputPort, u32 _inputVc,
+                         u32 _outputPort, u32 _outputVc, u32 _flits) {
+  if (monitoring_) {
+    trafficLog_->logTraffic(_device, _inputPort, _inputVc, _outputPort,
+                            _outputVc, _flits);
+  }
+}
+
 
 void Network::loadProtocolClassInfo(Json::Value _settings) {
   // parse the protocol classes description

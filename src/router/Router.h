@@ -48,6 +48,9 @@ class Router : public Component, public PortedDevice, public FlitSender,
   // this is a router factory
   static Router* create(ROUTER_ARGS);
 
+  // return the network of this router
+  Network* network() const;
+
   // this must be called by all subclasses when a packet's head flit arrives
   //  on an input port.
   void packetArrival(u32 _port, Packet* _packet) const;

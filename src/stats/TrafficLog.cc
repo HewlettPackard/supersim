@@ -12,39 +12,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "stats/RateLog.h"
+#include "stats/TrafficLog.h"
 
 #include <cassert>
 
-RateLog::RateLog(Json::Value _settings)
+#include <string>
+#include <sstream>
+
+#include "event/Simulator.h"
+#include "types/Packet.h"
+#include "types/Flit.h"
+
+TrafficLog::TrafficLog(Json::Value _settings)
     : outFile_(nullptr) {
   if (!_settings["file"].isNull()) {
     // create file
     outFile_ = new fio::OutFile(_settings["file"].asString());
 
     // write header
-    outFile_->write("id,name,injection,delivered,ejection\n");
-
-    // set precision
-    ss_.precision(6);
-    ss_.setf(std::ios::fixed, std::ios::floatfield);
+    outFile_->write("time,device,inputPort,inputVc,outputPort,outputVc,"
+                    "flits\n");
   }
 }
 
-RateLog::~RateLog() {
+TrafficLog::~TrafficLog() {
   if (outFile_) {
     delete outFile_;
   }
 }
 
-void RateLog::logRates(u32 _terminalId, const std::string& _terminalName,
-                       f64 _injectionRate, f64 _deliveredRate,
-                       f64 _ejectionRate) {
+void TrafficLog::logTraffic(
+    const Component* _device, u32 _inputPort, u32 _inputVc, u32 _outputPort,
+    u32 _outputVc, u32 _flits) {
   if (outFile_) {
-    ss_ << _terminalId << ',' << _terminalName << ',' << _injectionRate << ','
-        << _deliveredRate << ',' << _ejectionRate << '\n';
-    outFile_->write(ss_.str());
-    ss_.str("");
-    ss_.clear();
+    std::stringstream ss;
+    ss << gSim->time() << ',';
+    ss << _device->name() << ',';
+    ss << _inputPort << ',';
+    ss << _inputVc << ',';
+    ss << _outputPort << ',';
+    ss << _outputVc << ',';
+    ss << _flits << '\n';
+    outFile_->write(ss.str());
   }
 }

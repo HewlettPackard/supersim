@@ -18,6 +18,7 @@
 
 #include <algorithm>
 
+#include "network/Network.h"
 #include "router/inputqueued/Router.h"
 #include "types/Packet.h"
 
@@ -135,6 +136,11 @@ void InputQueue::vcSchedulerResponse(u32 _vcIdx) {
     router_->vcIndexInv(_vcIdx, &vca_.allocatedPort, &vca_.allocatedVc);
     routingAlgorithm_->vcScheduled(vca_.flit, vca_.allocatedPort,
                                    vca_.allocatedVc);
+
+    // log traffic
+    router_->network()->logTraffic(
+        router_, port_, vc_, vca_.allocatedPort, vca_.allocatedVc,
+        vca_.flit->packet()->numFlits());
   } else {
     // denied
     vca_.fsm = ePipelineFsm::kWaitingToRequest;

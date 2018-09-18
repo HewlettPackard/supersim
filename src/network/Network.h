@@ -29,6 +29,7 @@
 #include "routing/RoutingAlgorithm.h"
 #include "router/Router.h"
 #include "stats/ChannelLog.h"
+#include "stats/TrafficLog.h"
 
 #define NETWORK_ARGS const std::string&, const Component*, MetadataHandler*, \
     Json::Value
@@ -69,6 +70,10 @@ class Network : public Component {
   void endMonitoring();
   bool monitoring() const;
 
+  // this function logs traffic
+  void logTraffic(const Component* _device, u32 _inputPort, u32 _inputVc,
+                  u32 _outputPort, u32 _outputVc, u32 _flits);
+
  protected:
   // this is used by network implementations to create routing algorithms
   struct RoutingAlgorithmInfo {
@@ -91,6 +96,7 @@ class Network : public Component {
 
  private:
   ChannelLog* channelLog_;
+  TrafficLog* trafficLog_;
   MetadataHandler* metadataHandler_;
   bool monitoring_;
 };

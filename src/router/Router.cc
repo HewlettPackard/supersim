@@ -15,10 +15,12 @@
 #include "router/Router.h"
 
 #include <factory/ObjectFactory.h>
+#include <strop/strop.h>
 
 #include <cassert>
 
 #include "types/Packet.h"
+#include "workload/Workload.h"
 
 Router::Router(
     const std::string& _name, const Component* _parent, Network* _network,
@@ -51,6 +53,10 @@ Router* Router::create(
     assert(false);
   }
   return router;
+}
+
+Network* Router::network() const {
+  return network_;
 }
 
 void Router::packetArrival(u32 _port, Packet* _packet) const {
