@@ -51,7 +51,7 @@
       "latency": 1  // cycles
     },
     "channel_log": {
-      "file": "/dev/null"  // "channels.csv"
+      "file": null  // "channels.csv"
     },
     "router": {
       "architecture": "input_output_queued",
@@ -142,7 +142,7 @@
   },
   "workload": {
     "message_log": {
-      "file": "/dev/null"  // "data.mpf.gz"
+      "file": null  // "data.mpf.gz"
     },
     "applications": [
       {
@@ -159,7 +159,7 @@
           "compute_delay": 1
         },
         "rate_log": {
-          "file": "/dev/null"  // "rates.csv"
+          "file": null  // "rates.csv"
         }
       }
     ]

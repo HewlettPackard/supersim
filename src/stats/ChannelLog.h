@@ -31,7 +31,7 @@ class ChannelLog {
 
  private:
   const u32 numVcs_;
-  fio::OutFile outFile_;
+  fio::OutFile* outFile_;
   std::stringstream ss_;
 };
 

@@ -17,22 +17,32 @@
 #include <cassert>
 
 RateLog::RateLog(Json::Value _settings)
-    : outFile_(_settings["file"].asString()) {
-  assert(!_settings["file"].isNull());
+    : outFile_(nullptr) {
+  if (!_settings["file"].isNull()) {
+    // create file
+    outFile_ = new fio::OutFile(_settings["file"].asString());
 
-  outFile_.write("id,name,injection,delivered,ejection\n");
-  ss_.precision(6);
-  ss_.setf(std::ios::fixed, std::ios::floatfield);
+    // write header
+    outFile_->write("id,name,injection,delivered,ejection\n");
+    ss_.precision(6);
+    ss_.setf(std::ios::fixed, std::ios::floatfield);
+  }
 }
 
-RateLog::~RateLog() {}
+RateLog::~RateLog() {
+  if (outFile_) {
+    delete outFile_;
+  }
+}
 
 void RateLog::logRates(u32 _terminalId, const std::string& _terminalName,
                        f64 _injectionRate, f64 _deliveredRate,
                        f64 _ejectionRate) {
-  ss_ << _terminalId << ',' << _terminalName << ',' << _injectionRate << ','
-      << _deliveredRate << ',' << _ejectionRate << '\n';
-  outFile_.write(ss_.str());
-  ss_.str("");
-  ss_.clear();
+  if (outFile_) {
+    ss_ << _terminalId << ',' << _terminalName << ',' << _injectionRate << ','
+        << _deliveredRate << ',' << _ejectionRate << '\n';
+    outFile_->write(ss_.str());
+    ss_.str("");
+    ss_.clear();
+  }
 }

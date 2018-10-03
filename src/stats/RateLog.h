@@ -30,7 +30,7 @@ class RateLog {
                 f64 _injectionRate, f64 _deliveredRate, f64 _ejectionRate);
 
  private:
-  fio::OutFile outFile_;
+  fio::OutFile* outFile_;
   std::stringstream ss_;
 };
 

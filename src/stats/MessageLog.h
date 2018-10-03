@@ -30,7 +30,7 @@ class MessageLog {
   void endTransaction(u64 _trans);
 
  private:
-  fio::OutFile outFile_;
+  fio::OutFile* outFile_;
 };
 
 #endif  // STATS_MESSAGELOG_H_
