@@ -88,9 +88,13 @@ s32 main(s32 _argc, char** _argv) {
   gSim->initialize();
 
   // run the simulation!
-  printf("Simulation beginning\n");
-  gSim->simulate();
-  printf("Simulation complete\n");
+  if (!settings.isMember("no_sim") || settings["no_sim"].asBool() == false) {
+    printf("Simulation beginning\n");
+    gSim->simulate();
+    printf("Simulation complete\n");
+  } else {
+    printf("Simulation skipped\n");
+  }
 
   // cleanup the elements created here
   delete network;
