@@ -34,13 +34,13 @@ Network::Network(const std::string& _name, const Component* _parent,
                  MetadataHandler* _metadataHandler, Json::Value _settings)
     : ::Network(_name, _parent, _metadataHandler, _settings) {
   // dimensions and concentration
-  assert(_settings["dimensions"].isArray());
-  dimensions_ = _settings["dimensions"].size();
+  assert(_settings["dimension_widths"].isArray());
+  dimensions_ = _settings["dimension_widths"].size();
   concentration_ = _settings["concentration"].asUInt();
   assert(concentration_ > 0);
   dimensionWidths_.resize(dimensions_);
   for (u32 i = 0; i < dimensions_; i++) {
-    dimensionWidths_.at(i) = _settings["dimensions"][i].asUInt();
+    dimensionWidths_.at(i) = _settings["dimension_widths"][i].asUInt();
   }
 
   assert(_settings["dimension_weights"].size() == dimensions_);

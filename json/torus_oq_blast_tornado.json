@@ -9,7 +9,7 @@
   },
   "network": {
     "topology": "torus",
-    "dimensions": [4, 3, 2],
+    "dimension_widths": [4, 3, 2],
     "dimension_weights": [1, 1, 1],
     "concentration": 2,
     "protocol_classes": [
@@ -110,7 +110,7 @@
           "max_packet_size": 16,
           "traffic_pattern": {
             "type": "tornado",
-            "dimensions": "$&(network.dimensions)&$",
+            "dimensions": "$&(network.dimension_widths)&$",
             "concentration": "$&(network.concentration)&$"
           },
           "message_size_distribution": {

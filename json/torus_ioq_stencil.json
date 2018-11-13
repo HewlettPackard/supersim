@@ -9,7 +9,7 @@
   },
   "network": {
     "topology": "torus",
-    "dimensions": [4, 4],
+    "dimension_widths": [4, 4],
     "dimension_weights": [1, 1],
     "concentration": 4,
     "protocol_classes": [
