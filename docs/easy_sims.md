@@ -4,7 +4,7 @@ In this tutorial we introduce sssweep, a python package that provides a flexible
 In sssweep each simulation variable is independent, the tool automatically generates the permutation of these variables to create the different simulation configurations.
 
 To demonstrate the simplicity of running simulations in sssweep, in this tutorial we perform the exact **same** study as in [Automated Simulations](auto_sims.md).
-To get the details of the study please revise the [Automated Simulation tutorial](auto_sims.md).
+To get the details of the study please review the [Automated Simulation tutorial](auto_sims.md).
 
 ## Setup
 Let's create a directory to hold this investigation.
