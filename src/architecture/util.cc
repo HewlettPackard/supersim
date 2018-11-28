@@ -15,6 +15,8 @@
 #include "architecture/util.h"
 
 #include <cassert>
+#include <cmath>
+
 #include <algorithm>
 
 u32 computeTailoredBufferLength(f64 _inputQueueMult, u32 _inputQueueMin,
