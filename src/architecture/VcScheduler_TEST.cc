@@ -185,6 +185,9 @@ TEST(VcScheduler, basic) {
       for (u32 R = 1; R < V; R += 2) {
         // setup
         TestSetup testSetup(12, 12, 12, 0x1234567890abcdf);
+
+        std::unordered_set<u32> requests;
+
         Json::Value arbSettings;
         arbSettings["type"] = "random";
         Json::Value allocSettings;
@@ -204,8 +207,8 @@ TEST(VcScheduler, basic) {
         std::unordered_map<u32, u32> holdingCount;
         for (u32 c = 0; c < C; c++) {
           clients[c] = new VcSchedulerTestClient(
-              c, vcSch, V, Simulator::Clock::ROUTER, ALLOCS_PER_CLIENT, R, {},
-              &holdingCount);
+              c, vcSch, V, Simulator::Clock::ROUTER, ALLOCS_PER_CLIENT, R,
+              requests, &holdingCount);
         }
 
         // run the simulator

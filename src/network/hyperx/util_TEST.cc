@@ -69,7 +69,8 @@ class TestRouter : public Router {
   TestRouter(const std::vector<u32>& _address, u32 _numPorts, u32 _numVcs,
              const std::unordered_map<u32, f64>& _congStatus)
       : Router("TestRouter " + strop::vecString<u32>(_address), nullptr,
-               nullptr, 0, _address, _numPorts, _numVcs, {}, nullptr,
+               nullptr, 0, _address, _numPorts, _numVcs,
+               std::vector<std::tuple<u32, u32> >(), nullptr,
                makeJSON(_numPorts, _numVcs)) {
     congStatus_ = _congStatus;
   }
@@ -782,7 +783,8 @@ TEST(HyperXUtil, dimOrderVcRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(1u, 0u), std::tuple<u32, u32>(1u, 1u),
                     std::tuple<u32, u32>(1u, 2u), std::tuple<u32, u32>(1u, 3u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::dimOrderVcRoutingOutput, nullptr);
 
   src = {0}; dst = {0, 1}; widths = {2}; weights = {1};
@@ -790,7 +792,8 @@ TEST(HyperXUtil, dimOrderVcRoutingAlgorithm) {
   numOutputs = 1;
   refOutputPorts = {std::tuple<u32, u32>(1u, 0u), std::tuple<u32, u32>(1u, 2u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::dimOrderVcRoutingOutput, nullptr);
 
   src = {0}; dst = {0, 1}; widths = {2}; weights = {1};
@@ -798,7 +801,8 @@ TEST(HyperXUtil, dimOrderVcRoutingAlgorithm) {
   numOutputs = 1;
   refOutputPorts = {std::tuple<u32, u32>(1u, 1u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::dimOrderVcRoutingOutput, nullptr);
 
   src = {0}; dst = {0, 1}; widths = {2}; weights = {1};
@@ -806,7 +810,8 @@ TEST(HyperXUtil, dimOrderVcRoutingAlgorithm) {
   numOutputs = 1;
   refOutputPorts = {std::tuple<u32, u32>(2u, 1u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::dimOrderVcRoutingOutput, nullptr);
 
   src = {0}; dst = {0, 1}; widths = {2}; weights = {2};
@@ -814,7 +819,8 @@ TEST(HyperXUtil, dimOrderVcRoutingAlgorithm) {
   numOutputs = 1;
   refOutputPorts = {std::tuple<u32, u32>(2u, 1u), std::tuple<u32, u32>(3u, 1u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::dimOrderVcRoutingOutput, nullptr);
 
   src = {0}; dst = {0, 1}; widths = {2}; weights = {2};
@@ -822,7 +828,8 @@ TEST(HyperXUtil, dimOrderVcRoutingAlgorithm) {
   numOutputs = 1;
   refOutputPorts = {std::tuple<u32, u32>(2u, 1u), std::tuple<u32, u32>(3u, 1u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::dimOrderVcRoutingOutput, nullptr);
 
   src = {0}; dst = {1, 0}; widths = {2}; weights = {2};
@@ -830,7 +837,8 @@ TEST(HyperXUtil, dimOrderVcRoutingAlgorithm) {
   numOutputs = 0;
   refOutputPorts = {};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::dimOrderVcRoutingOutput, nullptr);
 
   src = {1}; dst = {1, 2}; widths = {4}; weights = {2};
@@ -839,7 +847,8 @@ TEST(HyperXUtil, dimOrderVcRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(2u, 0u), std::tuple<u32, u32>(2u, 2u),
                     std::tuple<u32, u32>(3u, 0u), std::tuple<u32, u32>(3u, 2u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::dimOrderVcRoutingOutput, nullptr);
 
   src = {2}; dst = {1, 1}; widths = {4}; weights = {2};
@@ -848,7 +857,8 @@ TEST(HyperXUtil, dimOrderVcRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(6u, 0u), std::tuple<u32, u32>(6u, 2u),
                     std::tuple<u32, u32>(7u, 0u), std::tuple<u32, u32>(7u, 2u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::dimOrderVcRoutingOutput, nullptr);
 
   src = {0, 0}; dst = {0, 1, 0}; widths = {2, 2}; weights = {2, 1};
@@ -856,7 +866,8 @@ TEST(HyperXUtil, dimOrderVcRoutingAlgorithm) {
   numOutputs = 1;
   refOutputPorts = {std::tuple<u32, u32>(2u, 1u), std::tuple<u32, u32>(3u, 1u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::dimOrderVcRoutingOutput, nullptr);
 
   src = {0, 0}; dst = {0, 0, 1}; widths = {2, 2}; weights = {2, 2};
@@ -864,7 +875,8 @@ TEST(HyperXUtil, dimOrderVcRoutingAlgorithm) {
   numOutputs = 1;
   refOutputPorts = {std::tuple<u32, u32>(4u, 1u), std::tuple<u32, u32>(5u, 1u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::dimOrderVcRoutingOutput, nullptr);
 
   src = {0, 0}; dst = {0, 1, 1}; widths = {2, 2}; weights = {2, 1};
@@ -872,7 +884,8 @@ TEST(HyperXUtil, dimOrderVcRoutingAlgorithm) {
   numOutputs = 1;
   refOutputPorts = {std::tuple<u32, u32>(2u, 1u), std::tuple<u32, u32>(3u, 1u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::dimOrderVcRoutingOutput, nullptr);
 
   src = {0, 0, 0}; dst = {0, 0, 1, 1}; widths = {2, 2, 2}; weights = {3, 2, 1};
@@ -880,7 +893,8 @@ TEST(HyperXUtil, dimOrderVcRoutingAlgorithm) {
   numOutputs = 1;
   refOutputPorts = {std::tuple<u32, u32>(5u, 1u), std::tuple<u32, u32>(6u, 1u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::dimOrderVcRoutingOutput, nullptr);
 
   src = {3, 2}; dst = {0, 1, 1}; widths = {5, 4};  weights = {1, 2};
@@ -888,7 +902,8 @@ TEST(HyperXUtil, dimOrderVcRoutingAlgorithm) {
   numOutputs = 1;
   refOutputPorts = {std::tuple<u32, u32>(4u, 1u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::dimOrderVcRoutingOutput, nullptr);
 }
 
@@ -904,90 +919,104 @@ TEST(HyperXUtil, dimOrderVcRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(1u, 0u), std::tuple<u32, u32>(1u, 1u),
                     std::tuple<u32, u32>(1u, 2u), std::tuple<u32, u32>(1u, 3u)};
   singleRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                    refOutputPorts, {}, HyperX::fullRandMinRoutingOutput);
+                    refOutputPorts, std::vector<std::tuple<u32, u32> >(),
+                    HyperX::fullRandMinRoutingOutput);
 
   src = {0}; dst = {0, 1}; widths = {2}; weights = {1};
   conc = 1; vcSet = 0; numVcSets = 2; numVcs = 3;
   refOutputPorts = {std::tuple<u32, u32>(1u, 0u), std::tuple<u32, u32>(1u, 2u)};
   singleRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                    refOutputPorts, {}, HyperX::fullRandMinRoutingOutput);
+                    refOutputPorts, std::vector<std::tuple<u32, u32> >(),
+                    HyperX::fullRandMinRoutingOutput);
 
   src = {0}; dst = {0, 1}; widths = {2}; weights = {1};
   conc = 1; vcSet = 1; numVcSets = 2; numVcs = 3;
   refOutputPorts = {std::tuple<u32, u32>(1u, 1u)};
   singleRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                    refOutputPorts, {}, HyperX::fullRandMinRoutingOutput);
+                    refOutputPorts, std::vector<std::tuple<u32, u32> >(),
+                    HyperX::fullRandMinRoutingOutput);
 
   src = {0}; dst = {0, 1}; widths = {2}; weights = {1};
   conc = 2; vcSet = 1; numVcSets = 2; numVcs = 3;
   refOutputPorts = {std::tuple<u32, u32>(2u, 1u)};
   singleRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                    refOutputPorts, {}, HyperX::fullRandMinRoutingOutput);
+                    refOutputPorts, std::vector<std::tuple<u32, u32> >(),
+                    HyperX::fullRandMinRoutingOutput);
 
   src = {0}; dst = {0, 1}; widths = {2}; weights = {2};
   conc = 2; vcSet = 1; numVcSets = 2; numVcs = 3;
   refOutputPorts = {std::tuple<u32, u32>(2u, 1u), std::tuple<u32, u32>(3u, 1u)};
   singleRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                    refOutputPorts, {}, HyperX::fullRandMinRoutingOutput);
+                    refOutputPorts, std::vector<std::tuple<u32, u32> >(),
+                    HyperX::fullRandMinRoutingOutput);
 
   src = {0}; dst = {0, 1}; widths = {2}; weights = {2};
   conc = 2; vcSet = 1; numVcSets = 2; numVcs = 3;
   refOutputPorts = {std::tuple<u32, u32>(2u, 1u), std::tuple<u32, u32>(3u, 1u)};
   singleRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                    refOutputPorts, {}, HyperX::fullRandMinRoutingOutput);
+                    refOutputPorts, std::vector<std::tuple<u32, u32> >(),
+                    HyperX::fullRandMinRoutingOutput);
 
   src = {0}; dst = {1, 0}; widths = {2}; weights = {2};
   conc = 2; vcSet = 0; numVcSets = 2; numVcs = 3;
   refOutputPorts = {};
   singleRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                    refOutputPorts, {}, HyperX::fullRandMinRoutingOutput);
+                    refOutputPorts, std::vector<std::tuple<u32, u32> >(),
+                    HyperX::fullRandMinRoutingOutput);
 
   src = {1}; dst = {1, 2}; widths = {4}; weights = {2};
   conc = 2; vcSet = 0; numVcSets = 2; numVcs = 3;
   refOutputPorts = {std::tuple<u32, u32>(2u, 0u), std::tuple<u32, u32>(2u, 2u),
                     std::tuple<u32, u32>(3u, 0u), std::tuple<u32, u32>(3u, 2u)};
   singleRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                    refOutputPorts, {}, HyperX::fullRandMinRoutingOutput);
+                    refOutputPorts, std::vector<std::tuple<u32, u32> >(),
+                    HyperX::fullRandMinRoutingOutput);
 
   src = {2}; dst = {1, 1}; widths = {4}; weights = {2};
   conc = 2; vcSet = 0; numVcSets = 2; numVcs = 3;
   refOutputPorts = {std::tuple<u32, u32>(6u, 0u), std::tuple<u32, u32>(6u, 2u),
                     std::tuple<u32, u32>(7u, 0u), std::tuple<u32, u32>(7u, 2u)};
   singleRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                    refOutputPorts, {}, HyperX::fullRandMinRoutingOutput);
+                    refOutputPorts, std::vector<std::tuple<u32, u32> >(),
+                    HyperX::fullRandMinRoutingOutput);
 
   src = {0, 0}; dst = {0, 1, 0}; widths = {2, 2}; weights = {2, 1};
   conc = 2; vcSet = 1; numVcSets = 2; numVcs = 3;
   refOutputPorts = {std::tuple<u32, u32>(2u, 1u), std::tuple<u32, u32>(3u, 1u)};
   singleRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                    refOutputPorts, {}, HyperX::fullRandMinRoutingOutput);
+                    refOutputPorts, std::vector<std::tuple<u32, u32> >(),
+                    HyperX::fullRandMinRoutingOutput);
 
   src = {0, 0}; dst = {0, 0, 1}; widths = {2, 2}; weights = {2, 2};
   conc = 2; vcSet = 1; numVcSets = 2; numVcs = 3;
   refOutputPorts = {std::tuple<u32, u32>(4u, 1u), std::tuple<u32, u32>(5u, 1u)};
   singleRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                    refOutputPorts, {}, HyperX::fullRandMinRoutingOutput);
+                    refOutputPorts, std::vector<std::tuple<u32, u32> >(),
+                    HyperX::fullRandMinRoutingOutput);
 
   src = {0, 0}; dst = {0, 1, 1}; widths = {2, 2}; weights = {2, 1};
   conc = 2; vcSet = 1; numVcSets = 2; numVcs = 3;
   refOutputPorts = {std::tuple<u32, u32>(2u, 1u), std::tuple<u32, u32>(3u, 1u),
                     std::tuple<u32, u32>(4u, 1u)};
   singleRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                    refOutputPorts, {}, HyperX::fullRandMinRoutingOutput);
+                    refOutputPorts, std::vector<std::tuple<u32, u32> >(),
+                    HyperX::fullRandMinRoutingOutput);
 
   src = {0, 0, 0}; dst = {0, 0, 1, 1}; widths = {2, 2, 2}; weights = {3, 2, 1};
   conc = 2; vcSet = 1; numVcSets = 2; numVcs = 3;
   refOutputPorts = {std::tuple<u32, u32>(5u, 1u), std::tuple<u32, u32>(6u, 1u),
                     std::tuple<u32, u32>(7u, 1u)};
   singleRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                    refOutputPorts, {}, HyperX::fullRandMinRoutingOutput);
+                    refOutputPorts, std::vector<std::tuple<u32, u32> >(),
+                    HyperX::fullRandMinRoutingOutput);
 
   src = {3, 2}; dst = {0, 1, 1}; widths = {5, 4};  weights = {1, 2};
   conc = 2; vcSet = 1; numVcSets = 2; numVcs = 3;
   refOutputPorts = {std::tuple<u32, u32>(4u, 1u), std::tuple<u32, u32>(10u, 1u),
                     std::tuple<u32, u32>(11u, 1u)};
   singleRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                    refOutputPorts, {}, HyperX::fullRandMinRoutingOutput);
+                    refOutputPorts, std::vector<std::tuple<u32, u32> >(),
+                    HyperX::fullRandMinRoutingOutput);
 } */
 
 TEST(HyperXUtil, randMinVcRoutingAlgorithm) {
@@ -1002,7 +1031,8 @@ TEST(HyperXUtil, randMinVcRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(1u, 0u), std::tuple<u32, u32>(1u, 1u),
                     std::tuple<u32, u32>(1u, 2u), std::tuple<u32, u32>(1u, 3u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::randMinVcRoutingOutput, nullptr);
 
   src = {1}; dst = {1, 2}; widths = {4}; weights = {2};
@@ -1011,7 +1041,8 @@ TEST(HyperXUtil, randMinVcRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(2u, 0u), std::tuple<u32, u32>(2u, 2u),
                     std::tuple<u32, u32>(3u, 0u), std::tuple<u32, u32>(3u, 2u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::randMinVcRoutingOutput, nullptr);
 
   src = {0, 0, 0}; dst = {0, 0, 1, 1}; widths = {2, 2, 2}; weights = {3, 2, 1};
@@ -1020,7 +1051,8 @@ TEST(HyperXUtil, randMinVcRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(5u, 1u), std::tuple<u32, u32>(6u, 1u),
                     std::tuple<u32, u32>(7u, 1u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::randMinVcRoutingOutput, nullptr);
 
   src = {3, 2}; dst = {0, 1, 1}; widths = {5, 4};  weights = {1, 2};
@@ -1029,7 +1061,8 @@ TEST(HyperXUtil, randMinVcRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(4u, 1u), std::tuple<u32, u32>(10u, 1u),
                     std::tuple<u32, u32>(11u, 1u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::randMinVcRoutingOutput, nullptr);
 }
 
@@ -1045,7 +1078,8 @@ TEST(HyperXUtil, randMinPortRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(1u, 0u), std::tuple<u32, u32>(1u, 1u),
                     std::tuple<u32, u32>(1u, 2u), std::tuple<u32, u32>(1u, 3u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, false, {},
+                  false, 1, refOutputPorts, numOutputs, false,
+                  std::unordered_map<u32, f64>(),
                   HyperX::randMinPortRoutingOutput, nullptr);
 
   src = {1}; dst = {1, 2}; widths = {4}; weights = {2};
@@ -1054,7 +1088,8 @@ TEST(HyperXUtil, randMinPortRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(2u, 0u), std::tuple<u32, u32>(2u, 2u),
                     std::tuple<u32, u32>(3u, 0u), std::tuple<u32, u32>(3u, 2u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, false, {},
+                  false, 1, refOutputPorts, numOutputs, false,
+                  std::unordered_map<u32, f64>(),
                   HyperX::randMinPortRoutingOutput, nullptr);
 
   src = {0, 0, 0}; dst = {0, 0, 1, 1}; widths = {2, 2, 2}; weights = {3, 2, 1};
@@ -1063,7 +1098,8 @@ TEST(HyperXUtil, randMinPortRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(5u, 1u), std::tuple<u32, u32>(6u, 1u),
                     std::tuple<u32, u32>(7u, 1u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, false, {},
+                  false, 1, refOutputPorts, numOutputs, false,
+                  std::unordered_map<u32, f64>(),
                   HyperX::randMinPortRoutingOutput, nullptr);
 
   src = {3, 2}; dst = {0, 1, 1}; widths = {5, 4};  weights = {1, 2};
@@ -1072,7 +1108,8 @@ TEST(HyperXUtil, randMinPortRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(4u, 1u), std::tuple<u32, u32>(10u, 1u),
                     std::tuple<u32, u32>(11u, 1u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, false, {},
+                  false, 1, refOutputPorts, numOutputs, false,
+                  std::unordered_map<u32, f64>(),
                   HyperX::randMinPortRoutingOutput, nullptr);
 }
 
@@ -1090,7 +1127,8 @@ TEST(HyperXUtil, adaptiveMinVcRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(1u, 0u), std::tuple<u32, u32>(1u, 1u),
                     std::tuple<u32, u32>(1u, 2u), std::tuple<u32, u32>(1u, 3u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::adaptiveMinVcRoutingOutput, nullptr);
 
   src = {1}; dst = {1, 2}; widths = {4}; weights = {2};
@@ -1099,7 +1137,8 @@ TEST(HyperXUtil, adaptiveMinVcRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(2u, 0u), std::tuple<u32, u32>(2u, 2u),
                     std::tuple<u32, u32>(3u, 0u), std::tuple<u32, u32>(3u, 2u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::adaptiveMinVcRoutingOutput, nullptr);
 
   src = {0, 0, 0}; dst = {0, 0, 1, 1}; widths = {2, 2, 2}; weights = {3, 2, 1};
@@ -1108,7 +1147,8 @@ TEST(HyperXUtil, adaptiveMinVcRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(5u, 1u), std::tuple<u32, u32>(6u, 1u),
                     std::tuple<u32, u32>(7u, 1u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::adaptiveMinVcRoutingOutput, nullptr);
 
   src = {3, 2}; dst = {0, 1, 1}; widths = {5, 4};  weights = {1, 2};
@@ -1117,7 +1157,8 @@ TEST(HyperXUtil, adaptiveMinVcRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(4u, 1u), std::tuple<u32, u32>(10u, 1u),
                     std::tuple<u32, u32>(11u, 1u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(),
                   HyperX::adaptiveMinVcRoutingOutput, nullptr);
 
   src = {0, 0}; dst = {0, 1, 1}; widths = {2, 2}; weights = {2, 2};
@@ -1162,7 +1203,8 @@ TEST(HyperXUtil, adaptiveMinPortRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(1u, 0u), std::tuple<u32, u32>(1u, 1u),
                     std::tuple<u32, u32>(1u, 2u), std::tuple<u32, u32>(1u, 3u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, false, {},
+                  false, 1, refOutputPorts, numOutputs, false,
+                  std::unordered_map<u32, f64>(),
                   HyperX::adaptiveMinPortRoutingOutput, nullptr);
 
   src = {1}; dst = {1, 2}; widths = {4}; weights = {2};
@@ -1171,7 +1213,8 @@ TEST(HyperXUtil, adaptiveMinPortRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(2u, 0u), std::tuple<u32, u32>(2u, 2u),
                     std::tuple<u32, u32>(3u, 0u), std::tuple<u32, u32>(3u, 2u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, false, {},
+                  false, 1, refOutputPorts, numOutputs, false,
+                  std::unordered_map<u32, f64>(),
                   HyperX::adaptiveMinPortRoutingOutput, nullptr);
 
   src = {0, 0, 0}; dst = {0, 0, 1, 1}; widths = {2, 2, 2}; weights = {3, 2, 1};
@@ -1180,7 +1223,8 @@ TEST(HyperXUtil, adaptiveMinPortRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(5u, 1u), std::tuple<u32, u32>(6u, 1u),
                     std::tuple<u32, u32>(7u, 1u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, false, {},
+                  false, 1, refOutputPorts, numOutputs, false,
+                  std::unordered_map<u32, f64>(),
                   HyperX::adaptiveMinPortRoutingOutput, nullptr);
 
   src = {3, 2}; dst = {0, 1, 1}; widths = {5, 4};  weights = {1, 2};
@@ -1189,7 +1233,8 @@ TEST(HyperXUtil, adaptiveMinPortRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(4u, 1u), std::tuple<u32, u32>(10u, 1u),
                     std::tuple<u32, u32>(11u, 1u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, false, {},
+                  false, 1, refOutputPorts, numOutputs, false,
+                  std::unordered_map<u32, f64>(),
                   HyperX::adaptiveMinPortRoutingOutput, nullptr);
 
   src = {0, 0}; dst = {0, 1, 1}; widths = {2, 2}; weights = {2, 2};
@@ -1253,8 +1298,9 @@ TEST(HyperXUtil, lcqVcRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(1u, 0u), std::tuple<u32, u32>(1u, 1u),
                     std::tuple<u32, u32>(1u, 2u), std::tuple<u32, u32>(1u, 3u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
-                  nullptr, HyperX::lcqVcRoutingOutput);
+                  false, 1, refOutputPorts, numOutputs,
+                  true, std::unordered_map<u32, f64>(), nullptr,
+                  HyperX::lcqVcRoutingOutput);
 
   src = {1}; dst = {1, 2}; widths = {4}; weights = {2};
   conc = 2; vcSet = 0; numVcSets = 2; numVcs = 3;
@@ -1266,8 +1312,9 @@ TEST(HyperXUtil, lcqVcRoutingAlgorithm) {
                     std::tuple<u32, u32>(6u, 0u), std::tuple<u32, u32>(6u, 2u),
                     std::tuple<u32, u32>(7u, 0u), std::tuple<u32, u32>(7u, 2u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, true, {},
-                  nullptr, HyperX::lcqVcRoutingOutput);
+                  false, 1, refOutputPorts, numOutputs, true,
+                  std::unordered_map<u32, f64>(), nullptr,
+                  HyperX::lcqVcRoutingOutput);
 
   src = {0, 0}; dst = {0, 1, 1}; widths = {2, 2}; weights = {2, 2};
   conc = 2; vcSet = 1; numVcSets = 2; numVcs = 4;
@@ -1311,8 +1358,9 @@ TEST(HyperXUtil, lcqPortRoutingAlgorithm) {
   refOutputPorts = {std::tuple<u32, u32>(1u, 0u), std::tuple<u32, u32>(1u, 1u),
                     std::tuple<u32, u32>(1u, 2u), std::tuple<u32, u32>(1u, 3u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, false, {},
-                  nullptr, HyperX::lcqPortRoutingOutput);
+                  false, 1, refOutputPorts, numOutputs, false,
+                  std::unordered_map<u32, f64>(), nullptr,
+                  HyperX::lcqPortRoutingOutput);
 
   src = {1}; dst = {1, 2}; widths = {4}; weights = {2};
   conc = 2; vcSet = 0; numVcSets = 2; numVcs = 3;
@@ -1324,8 +1372,9 @@ TEST(HyperXUtil, lcqPortRoutingAlgorithm) {
                     std::tuple<u32, u32>(6u, 0u), std::tuple<u32, u32>(6u, 2u),
                     std::tuple<u32, u32>(7u, 0u), std::tuple<u32, u32>(7u, 2u)};
   distRoutingTest(src, &dst, widths, weights, conc, vcSet, numVcSets, numVcs,
-                  false, 1, refOutputPorts, numOutputs, false, {},
-                  nullptr, HyperX::lcqPortRoutingOutput);
+                  false, 1, refOutputPorts, numOutputs, false,
+                  std::unordered_map<u32, f64>(), nullptr,
+                  HyperX::lcqPortRoutingOutput);
 
   src = {0, 0}; dst = {0, 1, 1}; widths = {2, 2}; weights = {2, 2};
   conc = 2; vcSet = 1; numVcSets = 2; numVcs = 4;

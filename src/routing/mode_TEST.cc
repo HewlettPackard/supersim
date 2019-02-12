@@ -29,8 +29,8 @@ TEST(RoutingMode, portAveMinMax) {
 
   Json::Value routerSettings;
   CongestionTestRouter router(
-      "Router", nullptr, nullptr, 0, {}, numPorts, numVcs, {}, nullptr,
-      routerSettings);
+      "Router", nullptr, nullptr, 0, std::vector<u32>(), numPorts, numVcs,
+      std::vector<std::tuple<u32, u32> >(), nullptr, routerSettings);
 
   Json::Value sensorSettings;
   sensorSettings["granularity"] = 0;
