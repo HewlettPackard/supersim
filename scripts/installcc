@@ -52,22 +52,23 @@ def delete(loc, url, commit):
 
 
 def main(args):
-  repos = [('libprim', 'github.com', 'nicmcd/libprim', None),
-           ('libex', 'github.com', 'nicmcd/libex', None),
-           ('librnd', 'github.com', 'nicmcd/librnd', None),
-           ('libmut', 'github.com', 'nicmcd/libmut', None),
-           ('libbits', 'github.com', 'nicmcd/libbits', None),
-           ('libstrop', 'github.com', 'nicmcd/libstrop', None),
-           ('libjson', 'github.com', 'nicmcd/libjson', None),
-           ('libsettings', 'github.com', 'nicmcd/libsettings', None),
-           ('libgrid', 'github.com', 'nicmcd/libgrid', None),
-           ('libcolhash', 'github.com', 'nicmcd/libcolhash', None),
-           ('libfio', 'github.com', 'nicmcd/libfio', None),
-           ('libfactory', 'github.com', 'nicmcd/libfactory', None),
-           ('settingstest', 'github.com', 'nicmcd/settingstest', None),
-           ('supersim', 'github.com', 'hewlettpackard/supersim', None),
-           ('ssparse', 'github.com', 'nicmcd/ssparse', None),
-           ('hyperxsearch', 'github.com', 'nicmcd/hyperxsearch', None)]
+  repos = [
+      ('libcolhash', 'github.com', 'nicmcd/libcolhash', None),
+      ('libprim', 'github.com', 'nicmcd/libprim', None),
+      ('libex', 'github.com', 'nicmcd/libex', None),
+      ('libfactory', 'github.com', 'nicmcd/libfactory', None),
+      ('libjson', 'github.com', 'nicmcd/libjson', None),
+      ('librnd', 'github.com', 'nicmcd/librnd', None),
+      ('libmut', 'github.com', 'nicmcd/libmut', None),
+      ('libbits', 'github.com', 'nicmcd/libbits', None),
+      ('libfio', 'github.com', 'nicmcd/libfio', None),
+      ('libstrop', 'github.com', 'nicmcd/libstrop', None),
+      ('libgrid', 'github.com', 'nicmcd/libgrid', None),
+      ('libsettings', 'github.com', 'nicmcd/libsettings', None),
+      ('settingstest', 'github.com', 'nicmcd/settingstest', None),
+      ('ssparse', 'github.com', 'nicmcd/ssparse', None),
+      ('hyperxsearch', 'github.com', 'nicmcd/hyperxsearch', None),
+      ('supersim', 'github.com', 'hewlettpackard/supersim', None)]
 
   for command in args.command:
     for repo in repos:
