@@ -5,7 +5,10 @@
     "interface_cycle_time": 1,
     "print_progress": true,
     "print_interval": 1.0,  // seconds
-    "random_seed": 1234567
+    "random_seed": 1234567,
+    "info_log": {
+      "file": null  // "info.csv"
+    }
   },
   "network": {
     "topology": "dragonfly",

@@ -27,7 +27,8 @@
 #include "workload/Workload.h"
 
 Simulator::Simulator(Json::Value _settings)
-    : printProgress_(_settings["print_progress"].asBool()),
+    : infoLog(_settings["info_log"]),
+      printProgress_(_settings["print_progress"].asBool()),
       printInterval_(_settings["print_interval"].asDouble()),
       time_(0), epsilon_(0), quit_(false),
       channelCycleTime_(_settings["channel_cycle_time"].asUInt64()),
@@ -47,7 +48,7 @@ Simulator::Simulator(Json::Value _settings)
   assert(printInterval_ > 0);
 
   rnd.seed(_settings["random_seed"].asUInt64());
-      }
+}
 
 Simulator::~Simulator() {}
 
@@ -87,22 +88,22 @@ void Simulator::simulate() {
       f64 runTime = totalElapsedRealTime.count();
       f64 ftime = static_cast<f64>(time_);
 
-      if (printProgress_) {
-        f64 eventsPerSecond = totalEvents / runTime;
-        f64 eventsPerUnit = totalEvents / ftime;
-        f64 unitsPerSecond = ftime / runTime;
-        printf("\n"
-               "*** Simulation Summary ***\n"
-               "Total event count:         %lu\n"
-               "Total sim units:           %lu\n"
-               "Total real seconds:        %.3f\n"
-               "Events per real second:    %.3f\n"
-               "Events per sim unit:       %.3f\n"
-               "Sim units per real second: %.3f\n"
-               "\n",
-               totalEvents, time_, runTime, eventsPerSecond, eventsPerUnit,
-               unitsPerSecond);
-      }
+      f64 eventsPerSecond = totalEvents / runTime;
+      f64 eventsPerUnit = totalEvents / ftime;
+      f64 unitsPerSecond = ftime / runTime;
+
+      infoLog.logInfo("Total event count",
+                      std::to_string(totalEvents));
+      infoLog.logInfo("Total sim units",
+                      std::to_string(time_));
+      infoLog.logInfo("Total real seconds",
+                      std::to_string(runTime));
+      infoLog.logInfo("Events per real second",
+                      std::to_string(eventsPerSecond));
+      infoLog.logInfo("Events per sim unit",
+                      std::to_string(eventsPerUnit));
+      infoLog.logInfo("Sim units per real second",
+                      std::to_string(unitsPerSecond));
       break;
     } else {
       // tell the queue implemention to run the next event

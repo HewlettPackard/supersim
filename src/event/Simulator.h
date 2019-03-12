@@ -19,6 +19,8 @@
 #include <prim/prim.h>
 #include <rnd/Random.h>
 
+#include "stats/InfoLog.h"
+
 class Component;
 class Network;
 class Workload;
@@ -57,6 +59,7 @@ class Simulator {
   Workload* getWorkload() const;
 
   rnd::Random rnd;
+  InfoLog infoLog;
 
  protected:
   // this function must set time_, epsilon_, and quit_ on every call

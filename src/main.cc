@@ -64,16 +64,11 @@ s32 main(s32 _argc, char** _argv) {
   u32 numVcs = network->numVcs();
   u64 numComponents = Component::numComponents();
 
-  printf("Endpoints:    %u\n"
-         "Routers:      %u\n"
-         "Router radix: %u\n"
-         "VCs:          %u\n"
-         "Components:   %lu\n\n",
-         numInterfaces,
-         numRouters,
-         routerRadix,
-         numVcs,
-         numComponents);
+  gSim->infoLog.logInfo("Endpoints", std::to_string(numInterfaces));
+  gSim->infoLog.logInfo("Routers", std::to_string(numRouters));
+  gSim->infoLog.logInfo("Router0 Radix", std::to_string(routerRadix));
+  gSim->infoLog.logInfo("VCs", std::to_string(numVcs));
+  gSim->infoLog.logInfo("Components", std::to_string(numComponents));
 
   // create the workload
   Workload* workload = new Workload(

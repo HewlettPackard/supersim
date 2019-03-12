@@ -12,27 +12,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef STATS_CHANNELLOG_H_
-#define STATS_CHANNELLOG_H_
+#ifndef STATS_INFOLOG_H_
+#define STATS_INFOLOG_H_
 
 #include <fio/OutFile.h>
 #include <json/json.h>
 #include <prim/prim.h>
 
-#include <sstream>
+#include <string>
 
-#include "network/Channel.h"
-
-class ChannelLog {
+class InfoLog {
  public:
-  ChannelLog(u32 _numVcs, Json::Value _settings);
-  ~ChannelLog();
-  void logChannel(const Channel* _channel);
+  explicit InfoLog(Json::Value _settings);
+  ~InfoLog();
+  void logInfo(const std::string& _name, const std::string& _value);
 
  private:
-  const u32 numVcs_;
   fio::OutFile* outFile_;
-  std::stringstream ss_;
 };
 
-#endif  // STATS_CHANNELLOG_H_
+#endif  // STATS_INFOLOG_H_
