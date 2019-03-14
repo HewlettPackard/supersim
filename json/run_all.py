@@ -61,9 +61,14 @@ def main(args):
   settingsFiles = glob.glob('json/{0}.json'.format(args.glob))
   print('config files to test: {0}'.format(settingsFiles))
 
+  # check if binary exists
+  if not os.path.exists('./bazel-bin/bin'):
+    print('./bazel-bin/bin does not exist')
+    return -1
+
   # generate all tasks
   for settingsFile in settingsFiles:
-    cmd = 'bin/supersim {0}'.format(settingsFile)
+    cmd = './bazel-bin/bin {0}'.format(settingsFile)
     if args.check:
       cmd = ('valgrind --log-fd=1 --leak-check=full --show-reachable=yes '
              '--track-origins=yes --track-fds=yes {0}'.format(cmd))

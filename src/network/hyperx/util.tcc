@@ -12,9 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef NETWORK_HYPERX_UTIL_TCC_
+#define NETWORK_HYPERX_UTIL_TCC_
+
 #ifndef NETWORK_HYPERX_UTIL_H_
 #error "don't include this file directly. use the .h file instead"
-#endif  // NETWORK_HYPERX_UTIL_H_
+#else  // NETWORK_HYPERX_UTIL_H_
 
 #include <algorithm>
 #include <tuple>
@@ -47,4 +50,8 @@ const std::tuple<T1, T2, T3>* uSetMinCong(
       min_element(uSet.begin(), uSet.end(), tupleComp2<T1, T2, T3>);
   return &(*it);
 }
+
 }  // namespace HyperX
+
+#endif  // NETWORK_HYPERX_UTIL_H_
+#endif  // NETWORK_HYPERX_UTIL_TCC_

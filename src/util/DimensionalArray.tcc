@@ -12,6 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef UTIL_DIMENSIONALARRAY_TCC_
+#define UTIL_DIMENSIONALARRAY_TCC_
+
+#ifndef UTIL_DIMENSIONALARRAY_H_
+#error "don't include this file directly. use the .h file instead"
+#else  // UTIL_DIMENSIONALARRAY_H_
+
 #include <stdexcept>
 #include <vector>
 
@@ -101,3 +108,6 @@ const T& DimensionalArray<T>::at(u32 _index) const {
   y - 111222111222111222 - 2 - 3
   x - 123123123123123123 - 3 - 1
 */
+
+#endif  // UTIL_DIMENSIONALARRAY_H_
+#endif  // UTIL_DIMENSIONALARRAY_TCC_

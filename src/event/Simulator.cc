@@ -17,7 +17,7 @@
 #include <cassert>
 #include <cstdio>
 #include <ctime>
-#include <chrono>
+#include <chrono>  // NOLINT
 
 #include <string>
 #include <utility>
