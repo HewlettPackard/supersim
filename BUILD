@@ -19,17 +19,17 @@ COPTS = [
 ]
 
 LIBS = [
-  "@libcolhash//:lib",
-  "@libprim//:lib",
-  "@libfactory//:lib",
-  "@librnd//:lib",
-  "@libmut//:lib",
-  "@libbits//:lib",
-  "@libstrop//:lib",
-  "@libfio//:lib",
-  "@libsettings//:lib",
-  "@zlib//:lib",
-  "@jsoncpp//:lib",
+  "@libcolhash//:colhash",
+  "@libprim//:prim",
+  "@libfactory//:factory",
+  "@librnd//:rnd",
+  "@libmut//:mut",
+  "@libbits//:bits",
+  "@libstrop//:strop",
+  "@libfio//:fio",
+  "@libsettings//:settings",
+  "@zlib//:zlib",
+  "@jsoncpp//:jsoncpp",
 ]
 
 cc_library(
@@ -58,7 +58,7 @@ cc_library(
 )
 
 cc_binary(
-  name = "bin",
+  name = "supersim",
   srcs = ["src/main.cc"],
   includes = [
     "src",
@@ -90,7 +90,7 @@ cc_library(
 )
 
 cc_test(
-  name = "test",
+  name = "supersim_test",
   copts = COPTS,
   deps = [
     ":test_lib",

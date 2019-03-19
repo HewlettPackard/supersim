@@ -46,7 +46,7 @@ http_archive(
   build_file = "@jsoncpp_build//file:downloaded",
 )
 
-hash = "9a9c5f7"
+hash = "7257aa6"
 http_archive(
   name = "libprim",
   urls = ["https://github.com/nicmcd/libprim/tarball/" + hash],
@@ -54,7 +54,7 @@ http_archive(
   strip_prefix = "nicmcd-libprim-" + hash,
 )
 
-hash = "bbb48ec"
+hash = "09ed856"
 http_archive(
   name = "libcolhash",
   urls = ["https://github.com/nicmcd/libcolhash/tarball/" + hash],
@@ -62,7 +62,7 @@ http_archive(
   strip_prefix = "nicmcd-libcolhash-" + hash,
 )
 
-hash = "ec2ca9f"
+hash = "b8a5894"
 http_archive(
   name = "libfactory",
   urls = ["https://github.com/nicmcd/libfactory/tarball/" + hash],
@@ -70,7 +70,7 @@ http_archive(
   strip_prefix = "nicmcd-libfactory-" + hash,
 )
 
-hash = "6ddcc9c"
+hash = "cd2e7d9"
 http_archive(
   name = "librnd",
   urls = ["https://github.com/nicmcd/librnd/tarball/" + hash],
@@ -78,7 +78,7 @@ http_archive(
   strip_prefix = "nicmcd-librnd-" + hash,
 )
 
-hash = "1bb781f"
+hash = "d27b8c5"
 http_archive(
   name = "libmut",
   urls = ["https://github.com/nicmcd/libmut/tarball/" + hash],
@@ -86,7 +86,7 @@ http_archive(
   strip_prefix = "nicmcd-libmut-" + hash,
 )
 
-hash = "b385d0d"
+hash = "b50b02d"
 http_archive(
   name = "libbits",
   urls = ["https://github.com/nicmcd/libbits/tarball/" + hash],
@@ -94,7 +94,7 @@ http_archive(
   strip_prefix = "nicmcd-libbits-" + hash,
 )
 
-hash = "574b010"
+hash = "5cf3ada"
 http_archive(
   name = "libstrop",
   urls = ["https://github.com/nicmcd/libstrop/tarball/" + hash],
@@ -102,7 +102,7 @@ http_archive(
   strip_prefix = "nicmcd-libstrop-" + hash,
 )
 
-hash = "6448435"
+hash = "f781c6b"
 http_archive(
   name = "libfio",
   urls = ["https://github.com/nicmcd/libfio/tarball/" + hash],
@@ -110,7 +110,7 @@ http_archive(
   strip_prefix = "nicmcd-libfio-" + hash,
 )
 
-hash = "872b019"
+hash = "267a99d"
 http_archive(
   name = "libsettings",
   urls = ["https://github.com/nicmcd/libsettings/tarball/" + hash],
