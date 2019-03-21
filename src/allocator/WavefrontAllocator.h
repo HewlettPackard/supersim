@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef ALLOCATOR_RSEPARABLEALLOCATOR_H_
-#define ALLOCATOR_RSEPARABLEALLOCATOR_H_
+#ifndef ALLOCATOR_WAVEFRONTALLOCATOR_H_
+#define ALLOCATOR_WAVEFRONTALLOCATOR_H_
 
 #include <json/json.h>
 #include <prim/prim.h>
@@ -22,15 +22,14 @@
 #include <vector>
 
 #include "allocator/Allocator.h"
-#include "arbiter/Arbiter.h"
 #include "event/Component.h"
 
-class RSeparableAllocator : public Allocator {
+class WavefrontAllocator : public Allocator {
  public:
-  RSeparableAllocator(const std::string& _name, const Component* _parent,
-                      u32 _numClients, u32 _numResources,
-                      Json::Value _settings);
-  ~RSeparableAllocator();
+  WavefrontAllocator(const std::string& _name, const Component* _parent,
+                     u32 _numClients, u32 _numResources,
+                     Json::Value _settings);
+  ~WavefrontAllocator();
 
   void setRequest(u32 _client, u32 _resource, bool* _request) override;
   void setMetadata(u32 _client, u32 _resource, u64* _metadata) override;
@@ -38,15 +37,22 @@ class RSeparableAllocator : public Allocator {
   void allocate() override;
 
  private:
-  std::vector<Arbiter*> resourceArbiters_;
+  enum class PriorityScheme {kSequential, kRandom};
+
+  void toRowCol(u32 _client, u32 _resource, u32* _row, u32* _col) const;
+  u32 toIndex(u32 _row, u32 _col) const;
+  u32 toRow(u32 _line, u32 _col) const;
 
   std::vector<bool*> requests_;
-  std::vector<u64*> metadatas_;
   std::vector<bool*> grants_;
 
-  bool slipLatch_;  // iSLIP selective priority latching
+  u32 rows_;
+  u32 cols_;
+  PriorityScheme scheme_;
 
-  u64 index(u64 _client, u64 _resource) const;
+  std::vector<bool> colGrants_;
+  std::vector<bool> rowGrants_;
+  u32 startingLine_;
 };
 
-#endif  // ALLOCATOR_RSEPARABLEALLOCATOR_H_
+#endif  // ALLOCATOR_WAVEFRONTALLOCATOR_H_

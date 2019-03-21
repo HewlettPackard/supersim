@@ -25,9 +25,9 @@ RSeparableAllocator::RSeparableAllocator(
     u32 _numClients, u32 _numResources, Json::Value _settings)
     : Allocator(_name, _parent, _numClients, _numResources, _settings) {
   // pointer arrays
-  requests_ = new bool*[numClients_ * numResources_];
-  metadatas_ = new u64*[numClients_ * numResources_];
-  grants_ = new bool*[numClients_ * numResources_];
+  requests_.resize(numClients_ * numResources_, nullptr);
+  metadatas_.resize(numClients_ * numResources_, nullptr);
+  grants_.resize(numClients_ * numResources_, nullptr);
 
   // use vector to hold arbiter pointers
   resourceArbiters_.resize(numResources_, nullptr);
@@ -47,26 +47,23 @@ RSeparableAllocator::~RSeparableAllocator() {
   for (u32 r = 0; r < numResources_; r++) {
     delete resourceArbiters_[r];
   }
-  delete[] requests_;
-  delete[] metadatas_;
-  delete[] grants_;
 }
 
 void RSeparableAllocator::setRequest(u32 _client, u32 _resource,
                                      bool* _request) {
-  requests_[index(_client, _resource)] = _request;
-  resourceArbiters_[_resource]->setRequest(_client, _request);
+  requests_.at(index(_client, _resource)) = _request;
+  resourceArbiters_.at(_resource)->setRequest(_client, _request);
 }
 
 void RSeparableAllocator::setMetadata(u32 _client, u32 _resource,
                                       u64* _metadata) {
-  metadatas_[index(_client, _resource)] = _metadata;
-  resourceArbiters_[_resource]->setMetadata(_client, _metadata);
+  metadatas_.at(index(_client, _resource)) = _metadata;
+  resourceArbiters_.at(_resource)->setMetadata(_client, _metadata);
 }
 
 void RSeparableAllocator::setGrant(u32 _client, u32 _resource, bool* _grant) {
-  grants_[index(_client, _resource)] = _grant;
-  resourceArbiters_[_resource]->setGrant(_client, _grant);
+  grants_.at(index(_client, _resource)) = _grant;
+  resourceArbiters_.at(_resource)->setGrant(_client, _grant);
 }
 
 void RSeparableAllocator::allocate() {

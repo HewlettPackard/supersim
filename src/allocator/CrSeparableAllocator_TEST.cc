@@ -22,11 +22,6 @@
 
 #include "allocator/Allocator_TEST.h"
 
-static void verify(u32 _numClients, u32 _numResources, const bool* _request,
-                   const u64* _metadata, const bool* _grant) {
-  // TODO(nic): find a good test for this
-}
-
 TEST(CrSeparableAllocator, lslp) {
   // create the allocator settings
   Json::Value arbSettings;
@@ -37,10 +32,9 @@ TEST(CrSeparableAllocator, lslp) {
   allocSettings["iterations"] = 3;
   allocSettings["slip_latch"] = true;
   allocSettings["type"] = "cr_separable";
-  // printf("%s\n", toString(&allocSettings).c_str());
 
   // test
-  AllocatorTest(allocSettings, verify, false);
+  AllocatorTest(allocSettings, nullptr, false);
   AllocatorLoadBalanceTest(allocSettings);
 }
 
@@ -55,10 +49,9 @@ TEST(CrSeparableAllocator, greater) {
   allocSettings["iterations"] = 2;
   allocSettings["slip_latch"] = true;
   allocSettings["type"] = "cr_separable";
-  // printf("%s\n", toString(&allocSettings).c_str());
 
   // test
-  AllocatorTest(allocSettings, verify, false);
+  AllocatorTest(allocSettings, nullptr, false);
   AllocatorLoadBalanceTest(allocSettings);
 }
 
@@ -73,10 +66,9 @@ TEST(CrSeparableAllocator, lesser) {
   allocSettings["iterations"] = 2;
   allocSettings["slip_latch"] = true;
   allocSettings["type"] = "cr_separable";
-  // printf("%s\n", toString(&allocSettings).c_str());
 
   // test
-  AllocatorTest(allocSettings, verify, false);
+  AllocatorTest(allocSettings, nullptr, false);
   AllocatorLoadBalanceTest(allocSettings);
 }
 
@@ -90,9 +82,8 @@ TEST(CrSeparableAllocator, random) {
   allocSettings["iterations"] = 2;
   allocSettings["slip_latch"] = true;
   allocSettings["type"] = "cr_separable";
-  // printf("%s\n", toString(&allocSettings).c_str());
 
   // test
-  AllocatorTest(allocSettings, verify, false);
+  AllocatorTest(allocSettings, nullptr, false);
   AllocatorLoadBalanceTest(allocSettings);
 }

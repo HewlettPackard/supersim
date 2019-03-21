@@ -41,11 +41,9 @@ class Allocator : public Component {
   // returns number of resources
   u32 numResources() const;
   // maps the request to the specified client and resource
-  virtual void setRequest(u32 _client, u32 _resource,
-                          bool* _request) = 0;
+  virtual void setRequest(u32 _client, u32 _resource, bool* _request) = 0;
   // maps the metadata to the specified client and resource
-  virtual void setMetadata(u32 _client, u32 _resource,
-                           u64* _metadata) = 0;
+  virtual void setMetadata(u32 _client, u32 _resource, u64* _metadata) = 0;
   // maps the grant to the specified client and resource
   virtual void setGrant(u32 _client, u32 _resource, bool* _grant) = 0;
 

@@ -25,10 +25,10 @@ CrSeparableAllocator::CrSeparableAllocator(
     u32 _numClients, u32 _numResources, Json::Value _settings)
     : Allocator(_name, _parent, _numClients, _numResources, _settings) {
   // pointer arrays
-  requests_ = new bool*[numClients_ * numResources_];
-  metadatas_ = new u64*[numClients_ * numResources_];
+  requests_.resize(numClients_ * numResources_, nullptr);
+  metadatas_.resize(numClients_ * numResources_, nullptr);
   intermediates_ = new bool[numClients_ * numResources_];
-  grants_ = new bool*[numClients_ * numResources_];
+  grants_.resize(numClients_ * numResources_, nullptr);
 
   // use vector to hold arbiter pointers
   clientArbiters_.resize(numClients_, nullptr);
@@ -70,28 +70,25 @@ CrSeparableAllocator::~CrSeparableAllocator() {
   for (u32 r = 0; r < numResources_; r++) {
     delete resourceArbiters_[r];
   }
-  delete[] requests_;
-  delete[] metadatas_;
   delete[] intermediates_;
-  delete[] grants_;
 }
 
 void CrSeparableAllocator::setRequest(u32 _client, u32 _resource,
                                       bool* _request) {
-  requests_[index(_client, _resource)] = _request;
-  clientArbiters_[_client]->setRequest(_resource, _request);
+  requests_.at(index(_client, _resource)) = _request;
+  clientArbiters_.at(_client)->setRequest(_resource, _request);
 }
 
 void CrSeparableAllocator::setMetadata(u32 _client, u32 _resource,
                                        u64* _metadata) {
-  metadatas_[index(_client, _resource)] = _metadata;
-  clientArbiters_[_client]->setMetadata(_resource, _metadata);
-  resourceArbiters_[_resource]->setMetadata(_client, _metadata);
+  metadatas_.at(index(_client, _resource)) = _metadata;
+  clientArbiters_.at(_client)->setMetadata(_resource, _metadata);
+  resourceArbiters_.at(_resource)->setMetadata(_client, _metadata);
 }
 
 void CrSeparableAllocator::setGrant(u32 _client, u32 _resource, bool* _grant) {
-  grants_[index(_client, _resource)] = _grant;
-  resourceArbiters_[_resource]->setGrant(_client, _grant);
+  grants_.at(index(_client, _resource)) = _grant;
+  resourceArbiters_.at(_resource)->setGrant(_client, _grant);
 }
 
 void CrSeparableAllocator::allocate() {

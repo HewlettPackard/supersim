@@ -32,22 +32,19 @@ class RcSeparableAllocator : public Allocator {
                        Json::Value _settings);
   ~RcSeparableAllocator();
 
-  void setRequest(u32 _client, u32 _resource,
-                  bool* _request) override;
-  void setMetadata(u32 _client, u32 _resource,
-                   u64* _metadata) override;
+  void setRequest(u32 _client, u32 _resource, bool* _request) override;
+  void setMetadata(u32 _client, u32 _resource, u64* _metadata) override;
   void setGrant(u32 _client, u32 _resource, bool* _grant) override;
-
   void allocate() override;
 
  private:
   std::vector<Arbiter*> resourceArbiters_;
   std::vector<Arbiter*> clientArbiters_;
 
-  bool** requests_;
-  u64** metadatas_;
+  std::vector<bool*> requests_;
+  std::vector<u64*> metadatas_;
   bool* intermediates_;
-  bool** grants_;
+  std::vector<bool*> grants_;
 
   u32 iterations_;
   bool slipLatch_;  // iSLIP selective priority latching
