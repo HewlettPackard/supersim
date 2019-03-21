@@ -241,7 +241,6 @@ void Interface::sendFlit(u32 _port, Flit* _flit) {
 
   // check source is correct
   u32 src = _flit->packet()->message()->getSourceId();
-  (void)src;  // unused
   assert(src == id_);
 }
 
@@ -254,7 +253,6 @@ void Interface::receiveFlit(u32 _port, Flit* _flit) {
 
   // check destination is correct
   u32 dest = _flit->packet()->message()->getDestinationId();
-  (void)dest;  // unused
   assert(dest == id_);
 
   // mark the receive time

@@ -99,7 +99,6 @@ u64 Application::createTransaction(u32 _termId, u32 _msgId) {
   u64 trans = transactionId(id_, _termId, _msgId);
   u64 now = gSim->time();
   bool res = transactions_.insert(std::make_pair(trans, now)).second;
-  (void)res;  // unused
   assert(res);
   return trans;
 }
@@ -110,7 +109,6 @@ u64 Application::transactionCreationTime(u64 _trans) const {
 
 void Application::endTransaction(u64 _trans) {
   u64 res = transactions_.erase(_trans);
-  (void)res;  // unused
   assert(res == 1);
 }
 

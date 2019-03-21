@@ -250,7 +250,6 @@ void StencilTerminal::handleExchangeMessage(Message* _message) {
 void StencilTerminal::finishExchange() {
   // remove the receive state for this iteration
   u32 res = exchangeRecvCount_.erase(iteration_);
-  (void)res;  // unused
   assert(res == 1 || exchangeRecvMessages_ == 0);
 
   // advance the state
@@ -277,7 +276,6 @@ void StencilTerminal::handleCollectiveMessage(Message* _message) {
     u32 msgIter = decodeIteration(_message->getOpCode());
     u32 msgSrc = termToProc_->at(_message->getSourceId());
     bool res = collectiveRecv_[msgIter].insert(msgSrc).second;
-    (void)res;  // unused
     assert(res);
 
     // delete the message
@@ -317,7 +315,6 @@ void StencilTerminal::finishCollective() {
   assert(collectiveRecv_.at(iteration_).size() ==
          bits::ceilLog2(application()->numTerminals()));
   u32 res = collectiveRecv_.erase(iteration_);
-  (void)res;  // unused
   assert(res == 1);
 
   // advance the state

@@ -99,7 +99,6 @@ void Terminal::messageDelivered(Message* _message) {
 
   // remove this message from the outstanding list
   u64 res = outstandingMessages_.erase(_message);
-  (void)res;  // unused
   assert(res == 1);
 
   // count the message delivered
@@ -165,7 +164,6 @@ u32 Terminal::sendMessage(Message* _message, u32 _destinationId) {
 
   // track the message as an outstanding message
   bool res = outstandingMessages_.insert(_message).second;
-  (void)res;  // unused
   assert(res);
 
   // pass the message to the next stage

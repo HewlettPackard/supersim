@@ -160,7 +160,6 @@ void intNodeMoveUnaligned(
     }
     if (aligned) {  // not done twice
       bool res = nodesUnAligned.emplace(routerId).second;
-      (void)res;
       assert(res);
     }
   }
@@ -417,7 +416,6 @@ void makeOutputVcSet(
     if (_maxOutputs == 0/*infinite*/) {
       for (auto& it : *_vcPool) {
         bool res = _outputPorts->emplace(it).second;
-        (void)res;
         assert(res);
       }
     } else {
@@ -435,7 +433,6 @@ void makeOutputVcSet(
             assert(false);
           }
           bool res = _outputPorts->emplace(*it).second;
-          (void)res;
           assert(res);
           _vcPool->erase(*it);
         }
@@ -462,7 +459,6 @@ void makeOutputPortSet(
           for (u32 vc = vcSet; vc < _numVcs; vc += _numVcSets) {
             std::tuple<u32, u32, f64> t(port, vc, congestion);
             bool res = _outputPorts->emplace(t).second;
-            (void)res;
             assert(res);
           }
         }
@@ -487,7 +483,6 @@ void makeOutputPortSet(
             for (u32 vc = vcSet; vc < _numVcs; vc += _numVcSets) {
               std::tuple<u32, u32, f64> t(port, vc, congestion);
               bool res = _outputPorts->emplace(t).second;
-              (void)res;
               assert(res);
             }
           }
@@ -564,7 +559,6 @@ void dimOrderVcRoutingOutput(
                                                      port, vc);
           std::tuple<u32, u32, f64> t(port, vc, congestion);
           bool res = _vcPool->emplace(t).second;
-          (void)res;
           assert(res);
         }
       }
@@ -618,7 +612,6 @@ void dimOrderPortRoutingOutput(
 
       std::tuple<u32, u32, f64> t(port, 0, congestion);
       bool res = _vcPool->emplace(t).second;
-      (void)res;
       assert(res);
     }
     // must have at least one route if not at destination
@@ -662,7 +655,6 @@ void randMinVcRoutingOutput(
                                                        port, vc);
             std::tuple<u32, u32, f64> t(port, vc, congestion);
             bool res = _vcPool->emplace(t).second;
-            (void)res;
             assert(res);
           }
         }
@@ -705,7 +697,6 @@ void randMinPortRoutingOutput(
             _router, _inputPort, _inputVc, port, _vcSets, _numVcSets, _numVcs);
         std::tuple<u32, u32, f64> t(port, 0, congestion);
         bool res = _vcPool->emplace(t).second;
-        (void)res;
         assert(res);
       }
     }
@@ -758,7 +749,6 @@ void adaptiveMinVcRoutingOutput(
             }
             std::tuple<u32, u32, f64> t(port, vc, congestion);
             bool res = _vcPool->emplace(t).second;
-            (void)res;
             assert(res);
           }
         }
@@ -809,7 +799,6 @@ void adaptiveMinPortRoutingOutput(
         }
         std::tuple<u32, u32, f64> t(port, 0, congestion);
         bool res = _vcPool->emplace(t).second;
-        (void)res;
         assert(res);
       }
     }
@@ -1113,7 +1102,6 @@ void lcqVcRoutingOutput(
           }
           std::tuple<u32, u32, f64> t(port, vc, congestion);
           bool res = _vcPool->emplace(t).second;
-          (void)res;
           assert(res);
         }
       }
@@ -1157,7 +1145,6 @@ void lcqPortRoutingOutput(
         }
         std::tuple<u32, u32, f64> t(port, 0, congestion);
         bool res = _vcPool->emplace(t).second;
-        (void)res;
         assert(res);
       }
     }
@@ -1216,7 +1203,6 @@ void doalPortRoutingOutput(
                 _numVcs);
             std::tuple<u32, u32, f64> t(outPort, 0, congestion);
             bool res = _outputVcsNonMin->emplace(t).second;
-            (void)res;
             assert(res);
           }
         } else {
@@ -1226,7 +1212,6 @@ void doalPortRoutingOutput(
               {_vcSet}, _numVcSets, _numVcs);
           std::tuple<u32, u32, f64> t(outPort, 0, congestion);
           bool res = _outputVcsMin->emplace(t).second;
-          (void)res;
           assert(res);
         }
       }
@@ -1284,7 +1269,6 @@ void doalVcRoutingOutput(
                                                          outPort, vc);
               std::tuple<u32, u32, f64> t(outPort, vc, congestion);
               bool res = _outputVcsNonMin->emplace(t).second;
-              (void)res;
               assert(res);
             }
           } else {
@@ -1293,7 +1277,6 @@ void doalVcRoutingOutput(
                                                        outPort, vc);
             std::tuple<u32, u32, f64> t(outPort, vc, congestion);
             bool res = _outputVcsMin->emplace(t).second;
-            (void)res;
             assert(res);
           }
         }
@@ -1365,7 +1348,6 @@ void ddalPortRoutingOutput(
                 _numVcs);
             std::tuple<u32, u32, f64> t(outPort, 0, congestion);
             bool res = _outputVcsNonMin->emplace(t).second;
-            (void)res;
             assert(res);
           }
           if ((offset == srcDstOffset) && (derouted > 0)) {
@@ -1375,7 +1357,6 @@ void ddalPortRoutingOutput(
             assert(derouted == 1);
             std::tuple<u32, u32, f64> t(outPort, 0, congestion);
             bool res = _outputVcsMin->emplace(t).second;
-            (void)res;
             assert(res);
           }
           if ((offset == srcDstOffset) && (derouted == 0)) {
@@ -1384,7 +1365,6 @@ void ddalPortRoutingOutput(
                 _numVcs);
             std::tuple<u32, u32, f64> t(outPort, 0, congestion);
             bool res = _outputVcsMin->emplace(t).second;
-            (void)res;
             assert(res);
           }
         }
@@ -1459,7 +1439,6 @@ void ddalVcRoutingOutput(
                                                          outPort, vc);
               std::tuple<u32, u32, f64> t(outPort, vc, congestion);
               bool res = _outputVcsNonMin->emplace(t).second;
-              (void)res;
               assert(res);
             }
             if ((offset == srcDstOffset) && (derouted > 0)) {
@@ -1468,7 +1447,6 @@ void ddalVcRoutingOutput(
                                                          outPort, vc);
               std::tuple<u32, u32, f64> t(outPort, vc, congestion);
               bool res = _outputVcsMin->emplace(t).second;
-              (void)res;
               assert(res);
             }
           }
@@ -1478,7 +1456,6 @@ void ddalVcRoutingOutput(
                                                          outPort, vc);
               std::tuple<u32, u32, f64> t(outPort, vc, congestion);
               bool res = _outputVcsMin->emplace(t).second;
-              (void)res;
               assert(res);
             }
           }
@@ -1563,7 +1540,6 @@ void vdalPortRoutingOutput(
                   _numVcs);
               std::tuple<u32, u32, f64> t(outPort, 0, congestion);
               bool res = _outputVcsNonMin->emplace(t).second;
-              (void)res;
               assert(res);
             }
           } else {
@@ -1573,7 +1549,6 @@ void vdalPortRoutingOutput(
                 _numVcs);
             std::tuple<u32, u32, f64> t(outPort, 0, congestion);
             bool res = _outputVcsMin->emplace(t).second;
-            (void)res;
             assert(res);
           }
         }
@@ -1656,7 +1631,6 @@ void vdalVcRoutingOutput(
                                                            outPort, vc);
                 std::tuple<u32, u32, f64> t(outPort, vc, congestion);
                 bool res = _outputVcsNonMin->emplace(t).second;
-                (void)res;
                 assert(res);
               }
             } else {
@@ -1665,7 +1639,6 @@ void vdalVcRoutingOutput(
                                                          outPort, vc);
               std::tuple<u32, u32, f64> t(outPort, vc, congestion);
               bool res = _outputVcsMin->emplace(t).second;
-              (void)res;
               assert(res);
             }
           }

@@ -189,7 +189,6 @@ void AllocatorLoadBalanceTest(Json::Value _settings) {
         rnd = gSim->rnd.nextU64(0, R-1);
       } while (rndRes.count(rnd) > 0);
       bool res = rndRes.insert(rnd).second;
-      (void)res;
       assert(res);
     }
 

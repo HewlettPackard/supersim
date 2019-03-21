@@ -90,7 +90,6 @@ class VcSchedulerTestClient : public VcScheduler::Client, public Component {
         for (u32 v : fixedRequests_) {
           u64 m = 1000;
           bool res = requests_.insert({v, m}).second;
-          (void)res;
           assert(res);
           vcSch_->request(id_, v, m);
         }
@@ -106,7 +105,6 @@ class VcSchedulerTestClient : public VcScheduler::Client, public Component {
           // submit request
           u64 m = gSim->rnd.nextU64(1000, 2000);
           bool res = requests_.insert({v, m}).second;
-          (void)res;
           assert(res);
           vcSch_->request(id_, v, m);
         }
@@ -247,7 +245,6 @@ TEST(VcScheduler, dist) {
           v = gSim->rnd.nextU64(0, V - 1);
         } while (requests.count(v) > 0);
         bool res = requests.insert(v).second;
-        (void)res;
         assert(res);
       }
       assert(requests.size() == N);

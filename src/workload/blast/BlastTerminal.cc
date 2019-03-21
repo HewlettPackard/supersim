@@ -405,7 +405,6 @@ void BlastTerminal::done() {
 void BlastTerminal::completeTracking(Message* _message) {
   // remove this transaction from the tracker
   u32 res = outstandingTransactions_.erase(_message->getTransaction());
-  (void)res;  // unused
   assert(res == 1);
 
   // end the transaction
@@ -415,7 +414,6 @@ void BlastTerminal::completeTracking(Message* _message) {
 void BlastTerminal::completeLoggable(Message* _message) {
   // clear the logging entry
   u64 res = transactionsToLog_.erase(_message->getTransaction());
-  (void)res;  // unused
   assert(res == 1);
 
   // log the message/transaction
@@ -457,13 +455,11 @@ void BlastTerminal::sendNextRequest() {
     // start tracking the transaction
     // dbgprintf("insert trans = %lu", transaction);
     bool res = outstandingTransactions_.insert(transaction).second;
-    (void)res;  // unused
     assert(res);
 
     // if in logging phase, register the transaction for logging
     if (fsm_ == BlastTerminal::Fsm::LOGGING) {
       bool res2 = transactionsToLog_.insert(transaction).second;
-      (void)res2;  // unused
       assert(res2);
       app->workload()->messageLog()->startTransaction(transaction);
     }

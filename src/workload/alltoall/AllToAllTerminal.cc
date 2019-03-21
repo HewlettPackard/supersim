@@ -258,7 +258,6 @@ void AllToAllTerminal::handleReceivedMessage(Message* _message) {
         iterationReceived_[reqIteration];  // creates if not present
     u32 sourceId = _message->getSourceId();
     bool res = iterationReceivedSet.insert(sourceId).second;
-    (void)res;  // unused
     assert(res);
 
     // try to clean up iterations in order
@@ -272,7 +271,6 @@ void AllToAllTerminal::handleReceivedMessage(Message* _message) {
       if (iterationReceivedSet2.size() == trafficPattern_->size()) {
         // remove the current iteration state
         u32 cnt = iterationReceived_.erase(recvIteration_);
-        (void)cnt;  // unused
         assert(cnt == 1);
 
         // advance to the next iteration
@@ -355,7 +353,6 @@ void AllToAllTerminal::handleReceivedMessage(Message* _message) {
 void AllToAllTerminal::completeTracking(Message* _message) {
   // remove this transaction from the tracker
   u32 res = outstandingTransactions_.erase(_message->getTransaction());
-  (void)res;  // unused
   assert(res == 1);
 
   // end the transaction
@@ -365,7 +362,6 @@ void AllToAllTerminal::completeTracking(Message* _message) {
 void AllToAllTerminal::completeLoggable(Message* _message) {
   // clear the logging entry
   u64 res = transactionsToLog_.erase(_message->getTransaction());
-  (void)res;  // unused
   assert(res == 1);
 
   // log the message/transaction
@@ -431,12 +427,10 @@ void AllToAllTerminal::sendNextRequest() {
     // start tracking the transaction
     // dbgprintf("insert trans = %lu", transaction);
     bool res = outstandingTransactions_.insert(transaction).second;
-    (void)res;  // unused
     assert(res);
 
     // register the transaction for logging
     bool res2 = transactionsToLog_.insert(transaction).second;
-    (void)res2;  // unused
     assert(res2);
     app->workload()->messageLog()->startTransaction(transaction);
 
