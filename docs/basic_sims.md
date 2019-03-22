@@ -14,9 +14,8 @@ This document walks through this process step-by-step with a basic example.
 Let's create a directory to hold this investigation.
 
 ``` sh
-mkdir ~/ssdev/basic_sims
-cd ~/ssdev/basic_sims
-
+mkdir -p ~/sims/basic_sims
+cd ~/sims/basic_sims
 ```
 
 ## Generating the simulation settings
@@ -26,7 +25,7 @@ example settings file from the SuperSim project. We'll modify the settings
 on the command line when we run the simulator.
 
 ``` sh
-cp ../supersim/json/fattree_iq_blast.json sample.json
+cp ~/ssdev/supersim/json/fattree_iq_blast.json sample.json
 ```
 
 ## Running the simulator
@@ -35,7 +34,8 @@ modifications will set the desired output files as well as the traffic
 pattern to use in the simulation.
 
 ``` sh
-../supersim/bin/supersim sample.json \
+~/ssdev/supersim/bazel-bin/supersim sample.json \
+  simulator.info_log.file=string=info.csv \
   network.channel_log.file=string=channels.csv \
   workload.message_log.file=string=messages.mpf.gz \
   workload.applications[0].rate_log.file=string=rates.csv \
@@ -48,6 +48,12 @@ you thought they should be.
 
 As the simulator runs it prints the progress of the simulator. When the
 simulation completes is prints out a statistics summary of the simulation.
+
+You can view the simulator's execution details with the following command:
+
+``` sh
+column -t -s, info.csv | less
+```
 
 You can view the channel utilization with the following command:
 
@@ -76,11 +82,11 @@ to generate all types latency-based analyses.
 
 ## Analyzing the data
 Assuming we care about packet latency as our metric, let's run the parsing
-program [SSparse][] to get prepared for plotting the results. We can also use
+program [SSParse][] to get prepared for plotting the results. We can also use
 this program to provide a basic analysis. Run the following command:
 
 ``` sh
-../ssparse/bin/ssparse -l latency.csv -p packets.csv.gz messages.mpf.gz
+~/ssdev/ssparse/bazel-bin/ssparse -l latency.csv -p packets.csv.gz messages.mpf.gz
 ```
 The outputs of this command are 2 files:
 1. latency.csv - Simple latency analysis info in a CSV format
@@ -93,23 +99,23 @@ with the specified traffic pattern:
 column -t -s, latency.csv
 ```
 
-Note: you can also tell Ssparse to generate message latency data and
+Note: you can also tell SSParse to generate message latency data and
 transaction latency data using the `-m` and `-t` flags, respectively.
 
 ## Plotting the results
 Let's plot the packet latency results using the [SSPlot][] plotting package.
 This package has many commands. The only one we'll use for this example is:
 
-ssplot time-latency - Time vs. latency scatter plot
+ssplot time-latency-scatter - Time vs. latency scatter plot
 
 Run it and view the plot with the following commands:
 Note: I'm using `eog` image viewer. Any image viewer will do.
 
 ``` sh
-ssplot time-latency packets.csv.gz packets.png
+ssplot time-latency-scatter packets.csv.gz packets.png
 eog packets.png
 ```
 
 [libsettings]: https://github.com/nicmcd/libsettings
-[SSparse]: https://github.com/nicmcd/ssparse
+[SSParse]: https://github.com/nicmcd/ssparse
 [SSPlot]: https://github.com/nicmcd/ssplot

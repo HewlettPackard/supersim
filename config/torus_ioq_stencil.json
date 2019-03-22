@@ -156,7 +156,7 @@
       {
         "type": "stencil",
         "process_placement": "random",
-        "exchange_messages": "json/halo_exchange_64.csv",
+        "exchange_messages": "config/halo_exchange_64.csv",
         "send_order": "random",  // ascending, descending
         "stencil_terminal": {
           "num_iterations": 3,

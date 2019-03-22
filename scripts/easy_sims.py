@@ -4,7 +4,6 @@ import argparse
 import os
 import sssweep
 import taskrun
-import tempfile
 
 
 ###############################################################################
@@ -20,8 +19,7 @@ ap.add_argument('ssparse', type=str,
 ap.add_argument('transient', type=str,
                 help='transient script')
 ap.add_argument('settings', type=str,
-                help='settings file to use')
-                # 'json/fattree_iq_blast.json'
+                help='settings file to use (fattree_iq_blast.json)')
 ap.add_argument('-g', '--granularity', type=int, default=6,
                 help='the granularity of the injection rate sweeps')
 args = ap.parse_args()
@@ -54,7 +52,7 @@ def create_task(tm, name, cmd, console_out, task_type, config):
   elif task_type is 'parse':
     task.resources = {'cpus': 1, 'mem': 0.5}
   else:
-    task.resources = {'cpus': 1, 'mem': 2.1}
+    task.resources = {'cpus': 1, 'mem': 1.1}
   return task
 
 # create sweeper

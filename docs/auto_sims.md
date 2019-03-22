@@ -5,7 +5,7 @@ simulations being run. For example, a trace-driven simulation generally is only
 good for a single simulation run per network configuration. In contrast,
 synthetic workloads are often used to generate load vs. latency plots where the
 injection rate is incrementally increased across many simulation runs. As
-described in [Simulation Basics](basic_sims.md), there are many steps needed even
+described in [Basic Simulation](basic_sims.md), there are many steps needed even
 for a sinlge simulation run. If you consider multiple workloads, network
 configurations, injection rates, etc., you might end up with thousands of
 tasks that must be run. Naturally, tasks depend on the completion of previous
@@ -31,15 +31,15 @@ In total, there are 101 tasks performed.
 Let's create a directory to hold this investigation.
 
 ``` sh
-mkdir ~/ssdev/auto_sims
-cd ~/ssdev/auto_sims
+mkdir -p ~/sims/auto_sims
+cd ~/sims/auto_sims
 
 ```
 
 Now fetch the TaskRun script that we'll use for automated simulations.
 
 ``` sh
-cp ../supersim/scripts/auto_sims.py .
+cp ~/ssdev/supersim/scripts/auto_sims.py .
 ```
 
 Let's look through this script to get a better understanding of how TaskRun
@@ -103,13 +103,16 @@ TaskManager object.
 We'll use an example settings file from the SuperSim project.
 
 ``` sh
-cp ../supersim/json/fattree_iq_blast.json settings.json
+cp ~/ssdev/supersim/json/fattree_iq_blast.json settings.json
 ```
 
 Now we are ready to run the TaskRun script.
 
 ``` sh
-./auto_sims.py --directory output --settings settings.json
+./auto_sims.py output \
+  ~/ssdev/supersim/bazel-bin/supersim \
+  ~/ssdev/ssparse/bazel-bin/ssparse \
+  settings.json
 ```
 
 As it runs, the VerboseObserver will show you what it going on. It reports when
@@ -133,7 +136,10 @@ TaskRun is designed to only run tasks that need to be run. Let's re-run our
 script:
 
 ``` sh
-./auto_sims.py --directory output --settings settings.json
+./auto_sims.py output \
+  ~/ssdev/supersim/bazel-bin/supersim \
+  ~/ssdev/ssparse/bazel-bin/ssparse \
+  settings.json
 ```
 
 TaskRun will check the status of all tasks and determine that all of the tasks
@@ -144,7 +150,10 @@ will be run while the rest of them will be bypassed. Let's increase the
 simulation granularity and re-run the script:
 
 ``` sh
-./auto_sims.py --directory output --settings settings.json --granularity 5
+./auto_sims.py output \
+  ~/ssdev/supersim/bazel-bin/supersim \
+  ~/ssdev/ssparse/bazel-bin/ssparse \
+  settings.json -g 3
 ```
 
 After it completes, you'll see in the summary the prior tasks were bypassed and

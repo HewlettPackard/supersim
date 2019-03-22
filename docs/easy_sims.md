@@ -3,28 +3,28 @@
 In this tutorial we introduce sssweep, a python package that provides a flexible and easy-to-use system to design, run, parse and plot SuperSim simulations with any number of variables and network configurations. Sssweep auto-creates a web-viewer to help view and analyse your results, the web-viewer is tailored to the specific parameters of your simulation.
 In sssweep each simulation variable is independent, the tool automatically generates the permutation of these variables to create the different simulation configurations.
 
-To demonstrate the simplicity of running simulations in sssweep, in this tutorial we perform the exact **same** study as in [Automated Simulations](auto_sims.md).
+To demonstrate the simplicity of running simulations in sssweep, in this tutorial we perform the **same** simulation study as in [Automated Simulations](auto_sims.md) except we generate many more analysis plots.
 To get the details of the study please review the [Automated Simulation tutorial](auto_sims.md).
 
 ## Setup
 Let's create a directory to hold this investigation.
 
 ``` sh
-mkdir ~/ssdev/easy_sims
-cd ~/ssdev/easy_sims
+mkdir -p ~/sims/easy_sims
+cd ~/sims/easy_sims
 
 ```
 
 Now fetch the sssweep script that we'll use for automated simulations.
 
 ``` sh
-cp ../supersim/scripts/easy_sims.py .
+cp ~/ssdev/supersim/scripts/easy_sims.py .
 ```
 
 Now let's compare the two scripts for automated simulations to see how sssweep simplifies simulation configuration.
 
 ``` sh
-emacs easy_sims.py ../supersim/scripts/auto_sims.py
+emacs easy_sims.py ~/ssdev/supersim/scripts/auto_sims.py
 ```
 Both scripts start by setting and building taskrun and resources followed by the definition of some simulation settings, such a load settings in the case of [auto_sims.py][] and simulation paths for [easy_sims.py][].
 At this point the two scripts diverge, [auto_sims.py][] creates the simulation, parsing and plotting tasks by looping *multiple* times through the simulation variables load and routing algorithms.
@@ -49,13 +49,17 @@ To see a detailed explanation of sssweep, you can see a tutorial in the docs fol
 We'll use an example settings file from the SuperSim project.
 
 ``` sh
-cp ../supersim/json/fattree_iq_blast.json settings.json
+cp ~/ssdev/supersim/json/fattree_iq_blast.json settings.json
 ```
 
 Now we are ready to run the sssweep script.
 
 ``` sh
-./easy_sims.py
+./easy_sims.py output \
+  ~/ssdev/supersim/bazel-bin/supersim \
+  ~/ssdev/ssparse/bazel-bin/ssparse \
+  ~/ssdev/ssparse/scripts/transient.py \
+  settings.json -g 3
 ```
 
 ## Web plot viewer

@@ -11,32 +11,20 @@
     }
   },
   "network": {
-    "topology": "torus",
-    "dimension_widths": [3, 3, 3],
-    "dimension_weights": [1, 1, 1],
-    "concentration": 2,
+    "topology": "uno",
+    "concentration": 16,
     "protocol_classes": [
       {
-        "num_vcs": 2,
+        "num_vcs": 4,
         "routing": {
-          "algorithm": "dimension_order",
+          "algorithm": "direct",
           "latency": 1,
-          "mode": "vc", // vc, port_ave, port_min, port_max
-          "reduction": {
-            "algorithm": "all_minimal", // all_minimal, least_congested_minimal, weighted
-            "max_outputs": 0,
-            "congestion_bias": 0.1,
-            "independent_bias": 0.0,
-            "non_minimal_weight_func": "regular" // regular, always_nonmin
-          }
+          "adaptive": false
         }
       }
     ],
-    "internal_channel": {
-      "latency": 1  // cycles
-    },
     "external_channel": {
-      "latency": 1  // cycles
+      "latency": 4  // cycles
     },
     "channel_log": {
       "file": null  // "channels.csv"
@@ -45,46 +33,34 @@
       "file": null  // "traffic.csv"
     },
     "router": {
-      "architecture": "input_queued",
+      "architecture": "output_queued",
       "congestion_sensor": {
         "algorithm": "buffer_occupancy",
         "latency": 1,
-        "granularity": 0,
+        "granularity": 8,
         "minimum": 0.0,
         "offset": 0.0,
         "mode": "normalized_vc"  // {normalized,absolute}_{port,vc}
       },
       "congestion_mode": "downstream",
       "input_queue_mode": "fixed",  // fixed or tailored
-      "input_queue_depth": 16,
-      "vca_swa_wait": false,
-      "output_queue_depth": 16,
-      "crossbar": {
-        "latency": 1  // cycles
+      "input_queue_depth": 64,  // 4x max packet
+      "transfer_latency": 100,
+      "output_queue_depth": "infinite",
+      "output_crossbar": {
+        "latency": 2  // cycles
       },
-      "vc_scheduler": {
-        "allocator": {
-          "type": "rc_separable",
-          "slip_latch": true,
-          "iterations": 1,
-          "resource_arbiter": {
-            "type": "lru"
-          },
-          "client_arbiter": {
-            "type": "lru"
-          }
-        }
-      },
-      "crossbar_scheduler": {
+      "output_crossbar_scheduler": {
         "allocator": {
           "type": "r_separable",
           "slip_latch": true,
           "resource_arbiter": {
-            "type": "lru"
+            "type": "comparing",
+            "greater": false
           }
         },
-        "full_packet": false,
-        "packet_lock": false,
+        "full_packet": true,
+        "packet_lock": true,
         "idle_unlock": false
       }
     },
@@ -92,18 +68,7 @@
       "type": "standard",
       "adaptive": false,
       "fixed_msg_vc": false,
-      "crossbar_scheduler": {
-        "allocator": {
-          "type": "r_separable",
-          "slip_latch": true,
-          "resource_arbiter": {
-            "type": "lru"
-          }
-        },
-        "full_packet": false,
-        "packet_lock": false,
-        "idle_unlock": false
-      },
+      "crossbar_scheduler": "$&(network.router.output_crossbar_scheduler)&$",
       "init_credits_mode": "$&(network.router.input_queue_mode)&$",
       "init_credits": "$&(network.router.input_queue_depth)&$",
       "crossbar": {
@@ -112,7 +77,7 @@
     }
   },
   "metadata_handler": {
-    "type": "zero"
+    "type": "local_timestamp"
   },
   "workload": {
     "message_log": {
@@ -127,41 +92,14 @@
         "blast_terminal": {
           // requests
           "request_protocol_class": 0,
-          "request_injection_rate": 0.5,
-          "relative_injection": "json/7_of_54_inj.csv",
+          "request_injection_rate": 0.45,
           // responses
           "enable_responses": false,
           // warmup
-          "warmup_interval": 200,  // delivered flits
+          "warmup_interval": 200,  // no warmup
           "warmup_window": 15,
           "warmup_attempts": 20,
           // traffic generation
-          "num_transactions": 10000,
-          "max_packet_size": 16,
-          "traffic_pattern": {
-            "type": "uniform_random",
-            "send_to_self": true
-          },
-          "message_size_distribution": {
-            "type": "single",
-            "message_size": 4
-          }
-        },
-        "rate_log": {
-          "file": null  // "rates.csv"
-        }
-      },
-      {
-        "type": "pulse",
-        "pulse_terminal": {
-          // requests
-          "request_protocol_class": 0,
-          "request_injection_rate": 0.50,
-          "relative_injection": "json/4_of_54_inj.csv",
-          // responses
-          "enable_responses": false,
-          // traffic generation
-          "delay": 1000,
           "num_transactions": 2000,
           "max_packet_size": 16,
           "traffic_pattern": {
@@ -169,8 +107,42 @@
             "send_to_self": true
           },
           "message_size_distribution": {
-            "type": "single",
-            "message_size": 16
+            "type": "random",
+            "min_message_size": 1,
+            "max_message_size": 64
+          }
+        },
+        "rate_log": {
+          "file": null  // "rates.csv"
+        }
+      },
+      {
+        "type": "blast",
+        "warmup_threshold": 0.99,
+        "kill_on_saturation": false,
+        "log_during_saturation": false,
+        "blast_terminal": {
+          // requests
+          "request_protocol_class": 0,
+          "request_injection_rate": 0.45,
+          "relative_injection": "config/relativeinjection.csv",
+          // responses
+          "enable_responses": false,
+          // warmup
+          "warmup_interval": 0,  // no warmup
+          "warmup_window": 15,
+          "warmup_attempts": 20,
+          // traffic generation
+          "num_transactions": 0,
+          "max_packet_size": 16,
+          "traffic_pattern": {
+            "type": "matrix",
+            "file": "config/trafficmatrix.csv.gz"
+          },
+          "message_size_distribution": {
+            "type": "random",
+            "min_message_size": 1,
+            "max_message_size": 64
           }
         },
         "rate_log": {
@@ -180,8 +152,9 @@
     ]
   },
   "debug": [
-    "Workload",
     "Workload.Application_0",
-    "Workload.Application_1"
+    "Workload.Application_0.BlastTerminal_0",
+    "Workload.Application_1",
+    "Workload.Application_1.BlastTerminal_0"
   ]
 }

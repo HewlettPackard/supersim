@@ -58,7 +58,7 @@ def main(args):
                            failure_mode='passive_fail')
 
   # find all files
-  settingsFiles = glob.glob('json/{0}.json'.format(args.glob))
+  settingsFiles = glob.glob('config/{0}.json'.format(args.glob))
   print('config files to test: {0}'.format(settingsFiles))
 
   # check if binary exists
@@ -80,7 +80,7 @@ def main(args):
         pass
     cmd = '{0} 2>&1 | tee {1}'.format(cmd, log)
     task = taskrun.ProcessTask(tm, settingsFile, cmd)
-    task.resources = {'cpu': 1, 'mem': 10 if args.check else 3}
+    task.resources = {'cpu': 1, 'mem': 10 if args.check else 1}
 
   # run tasks
   if args.skip:
