@@ -103,7 +103,7 @@ TaskManager object.
 We'll use an example settings file from the SuperSim project.
 
 ``` sh
-cp ~/ssdev/supersim/json/fattree_iq_blast.json settings.json
+cp ~/ssdev/supersim/config/fattree_iq_blast.json settings.json
 ```
 
 Now we are ready to run the TaskRun script.

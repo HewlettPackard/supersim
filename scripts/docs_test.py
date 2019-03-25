@@ -34,26 +34,16 @@ def main(args):
       error = True
       break
 
-  try:
-    # run local tests
-    if not args.skip_local:
-      test('Build', build_test)
-      test('Unit', unit_test, args.memcheck)
-      test('JSON', json_test, args.memcheck)
-  except RuntimeError:
-    error = True
-
   if not error:
     # create a temporary directory for an installation
     tmpd = tempfile.mkdtemp(prefix='supersim_regression_')
 
     try:
       # run tests within the temporary directory
-      if not args.skip_remote:
-        test('Install', install_test, tmpd)
-        test('Basic sims', basic_sims_test, tmpd)
-        test('Auto sims', auto_sims_test, tmpd)
-        test('Easy sims', easy_sims_test, tmpd)
+      test('Install', install_test, args.verbose, tmpd)
+      test('Basic sims', basic_sims_test, args.verbose, tmpd)
+      test('Auto sims', auto_sims_test, args.verbose, tmpd)
+      test('Easy sims', easy_sims_test, args.verbose, tmpd)
     except RuntimeError:
       error = True
 
@@ -68,11 +58,11 @@ def main(args):
   print('Total time: {:.2f}s'.format(end_time - start_time))
 
 # utility functions
-def test(name, func, *args):
+def test(name, func, verbose, *args):
   start_time = time.time()
   print('{} test running ... '.format(name))
   sys.stdout.flush()
-  res = func(*args)
+  res = func(verbose, *args)
   end_time = time.time()
   if res == None:
     msg = '  passed {:.2f}s'.format(end_time - start_time)
@@ -86,9 +76,12 @@ def test(name, func, *args):
     print(msg)
     raise RuntimeError()
 
-def run(cmd):
-  proc = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE,
-                        stderr=subprocess.STDOUT)
+def run(cmd, verbose):
+  if not verbose:
+    proc = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE,
+                          stderr=subprocess.STDOUT)
+  else:
+    proc = subprocess.run(cmd, shell=True)
   if proc.returncode != 0:
     return proc.stdout.decode('utf-8')
   return None
@@ -118,27 +111,9 @@ def markdown_commands(filename, *skip):
   return cmds
 
 # tests below here
-def build_test():
-  res = run('bazel clean')
-  if res is not None:
-    return res
-  return run('bazel build -c opt :supersim :supersim_test :lint')
-
-def unit_test(mem_check):
-  cmd = 'bazel run :supersim_test'
-  if mem_check:
-    cmd = ('valgrind --leak-check=full --show-reachable=yes --track-fds=yes {}'
-           .format(cmd))
-  return run(cmd)
-
-def json_test(mem_check):
-  cmd = 'scripts/run_examples.py'
-  if mem_check:
-    cmd += ' -m'
-  return run(cmd)
-
-def install_test(tmpd):
-  cmds = markdown_commands('docs/install.md', 'sudo', 'pip3')
+def install_test(verbose, tmpd):
+  cmds = markdown_commands('docs/install.md', 'sudo', 'pip3',
+                           '~/ssdev/supersim/bazel-bin/supersim')
   replace = [('~/ssdev', os.path.join(tmpd, 'ssdev')),
              ('for prj in supersim ssparse', 'for prj in ssparse')]
   for idx in range(len(cmds)):
@@ -149,11 +124,13 @@ def install_test(tmpd):
   with open(sourcefile, 'w') as fd:
     ssdir = os.path.join(tmpd, 'ssdev', 'supersim')
     print('mkdir -p {}'.format(ssdir), file=fd)
-    print('cp -R src json BUILD WORKSPACE {}'.format(ssdir), file=fd)
+    print('cp -R src config BUILD WORKSPACE {}'.format(ssdir), file=fd)
     for cmd in cmds:
       print(cmd, file=fd)
     print('cd {}'.format(ssdir), file=fd)
     print('bazel build -c opt :supersim :supersim_test :lint', file=fd)
+    print('{} --help'.format(os.path.join(
+      tmpd, 'ssdev/supersim/bazel-bin/supersim')), file=fd)
   with open(runfile, 'w') as fd:
     print('#!/bin/bash', file=fd)
     print('set -e errexit', file=fd)
@@ -161,14 +138,15 @@ def install_test(tmpd):
     print('python3 -c "import setuptools; import numpy; import matplotlib;"',
           file=fd)
     print('source {}'.format(sourcefile), file=fd)
-  assert run('chmod +x {}'.format(runfile)) == None
-  res = run(runfile)
+  assert run('chmod +x {}'.format(runfile), verbose) == None
+  res = run(runfile, verbose)
   return res
 
-def basic_sims_test(tmpd):
+def basic_sims_test(verbose, tmpd):
   cmds = markdown_commands('docs/basic_sims.md', 'eog')
   replace = [('~/ssdev', os.path.join(tmpd, 'ssdev')),
-             ('~/sims', os.path.join(tmpd, 'sims'))]
+             ('~/sims', os.path.join(tmpd, 'sims')),
+             ('| less', '')]
   for idx in range(len(cmds)):
     for rpl in replace:
       cmds[idx] = cmds[idx].replace(*rpl)
@@ -181,11 +159,11 @@ def basic_sims_test(tmpd):
     print('#!/bin/bash', file=fd)
     print('set -e errexit', file=fd)
     print('source {}'.format(sourcefile), file=fd)
-  assert run('chmod +x {}'.format(runfile)) == None
-  res = run(runfile)
+  assert run('chmod +x {}'.format(runfile), verbose) == None
+  res = run(runfile, verbose)
   return res
 
-def auto_sims_test(tmpd):
+def auto_sims_test(verbose, tmpd):
   cmds = markdown_commands('docs/auto_sims.md', 'emacs', 'eog')
   replace = [('~/ssdev/supersim/scripts/auto_sims.py',
               os.path.join(os.getcwd(), 'scripts', 'auto_sims.py')),
@@ -203,11 +181,11 @@ def auto_sims_test(tmpd):
     print('#!/bin/bash', file=fd)
     print('set -e errexit', file=fd)
     print('source {}'.format(sourcefile), file=fd)
-  assert run('chmod +x {}'.format(runfile)) == None
-  res = run(runfile)
+  assert run('chmod +x {}'.format(runfile), verbose) == None
+  res = run(runfile, verbose)
   return res
 
-def easy_sims_test(tmpd):
+def easy_sims_test(verbose, tmpd):
   cmds = markdown_commands('docs/easy_sims.md', 'emacs', 'python3')
   replace = [('~/ssdev/supersim/scripts/easy_sims.py',
               os.path.join(os.getcwd(), 'scripts', 'easy_sims.py')),
@@ -225,20 +203,18 @@ def easy_sims_test(tmpd):
     print('#!/bin/bash', file=fd)
     print('set -e errexit', file=fd)
     print('source {}'.format(sourcefile), file=fd)
-  assert run('chmod +x {}'.format(runfile)) == None
-  res = run(runfile)
+  assert run('chmod +x {}'.format(runfile), verbose) == None
+  res = run(runfile, verbose)
   return res
 
 # command line
 if __name__ == '__main__':
   ap = argparse.ArgumentParser()
-  ap.add_argument('--memcheck', action='store_true',
+  ap.add_argument('-m', '--memcheck', action='store_true',
                   help='perform memory checking')
-  ap.add_argument('--skip_clean', action='store_true',
+  ap.add_argument('-s', '--skip_clean', action='store_true',
                   help='skip cleaning up the directory')
-  ap.add_argument('--skip_local', action='store_true',
-                  help='skip local tests')
-  ap.add_argument('--skip_remote', action='store_true',
-                  help='skip remote tests')
+  ap.add_argument('-v', '--verbose', action='store_true',
+                  help='print all output as it runs')
   args = ap.parse_args()
   main(args)

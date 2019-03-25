@@ -44,14 +44,22 @@ they won't effect the system installation. These can be installed with
 following commands:
 
 ``` sh
-for prj in simplecsv percentile ssplot taskrun sssweep; do
+for prj in simplecsv percentile taskrun sssweep ssplot; do
     git clone git://github.com/nicmcd/${prj} ~/ssdev/${prj}
     cd ~/ssdev/${prj}
     python3 setup.py install --user --record files.txt
 done
 ```
 
-If you wanted to, you could uninstall any of these packages by running `rm $(cat files.txt)` inside the package directory.
+If you wanted to, you could uninstall any of these packages by running `rm $(cat files.txt)` inside the package directory. The following commands should all work:
+``` sh
+python3 -c "import simplecsv"
+python3 -c "import percentile"
+python3 -c "import taskrun"
+python3 -c "import sssweep"
+python3 -c "import ssplot"
+ssplot --help
+```
 
 ## Build C++ projects
 The C++ projects use [Bazel][bazel] for building binaries. To install Bazel, follow the directions at [here][bazelinstall].
@@ -66,9 +74,14 @@ for prj in supersim ssparse; do
 done
 ```
 
-By default, Bazel places the binaries in the `bazel-bin` in the project directory.
+By default, Bazel places the binaries in the `bazel-bin` in the project directory. The following commands should all work:
 
-Now you are ready to run your first simulations! Visit the [Basic Simulation][basicsims] guide.
+``` sh
+~/ssdev/supersim/bazel-bin/supersim --help
+~/ssdev/ssparse/bazel-bin/ssparse --help
+```
+
+Now you are ready to run your first simulations! Visit the [Basic Simulations][basicsims] guide.
 
 [bazel]: https://bazel.build/ "Bazel Build"
 [bazelinstall]: https://docs.bazel.build/versions/master/install.html "Bazel Install"

@@ -25,7 +25,7 @@ example settings file from the SuperSim project. We'll modify the settings
 on the command line when we run the simulator.
 
 ``` sh
-cp ~/ssdev/supersim/json/fattree_iq_blast.json sample.json
+cp ~/ssdev/supersim/config/fattree_iq_blast.json sample.json
 ```
 
 ## Running the simulator

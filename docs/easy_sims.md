@@ -49,7 +49,7 @@ To see a detailed explanation of sssweep, you can see a tutorial in the docs fol
 We'll use an example settings file from the SuperSim project.
 
 ``` sh
-cp ~/ssdev/supersim/json/fattree_iq_blast.json settings.json
+cp ~/ssdev/supersim/config/fattree_iq_blast.json settings.json
 ```
 
 Now we are ready to run the sssweep script.
@@ -81,7 +81,7 @@ http://localhost:8888/web_viewer/plots.html
 
 If you are sharing your results to be viewed on another computer, replace `localhost` with the IP of the computer where the simulations reside.
 In the web-viewer select the desired options from the drop-downs to view your plot.
-Note, we have three different plotting options: load vs. latency plot (lplot), load distribution plots with single injection rate (qplot) and comparison plots (cplot).
+Note, we have many different plotting options: load vs. latency plot (lplot), load distribution plots with single injection rate (qplot), comparison plots (cplot), and more.
 
 Now you are ready to run large or complex simulations with just a few lines of code. Enjoy!
 
