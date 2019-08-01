@@ -11,7 +11,7 @@
     }
   },
   "network": {
-    "topology": "torus",
+    "topology": "mesh",
     "dimension_widths": [5, 4, 3, 2],
     "dimension_weights": [1, 1, 1, 1],
     "concentration": 2,

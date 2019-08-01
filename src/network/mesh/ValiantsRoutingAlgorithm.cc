@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "network/torus/ValiantsRoutingAlgorithm.h"
+#include "network/mesh/ValiantsRoutingAlgorithm.h"
 
 #include <factory/ObjectFactory.h>
 
@@ -21,9 +21,9 @@
 
 #include "types/Message.h"
 #include "types/Packet.h"
-#include "network/torus/util.h"
+#include "network/mesh/util.h"
 
-namespace Torus {
+namespace Mesh {
 
 ValiantsRoutingAlgorithm::ValiantsRoutingAlgorithm(
     const std::string& _name, const Component* _parent, Router* _router,
@@ -36,11 +36,9 @@ ValiantsRoutingAlgorithm::ValiantsRoutingAlgorithm(
                        _concentration, _settings),
       mode_(parseRoutingMode(_settings["mode"].asString())) {
   // VC set mapping:
-  //  0 = stage 0 no dateline
-  //  1 = stage 0 dateline
-  //  2 = stage 1 no dateline
-  //  3 = stage 1 dateline
-  assert(numVcs_ >= 4);
+  //  0 = stage 0
+  //  1 = stage 1
+  assert(numVcs_ >= 2);
 
   // create the reduction
   reduction_ = Reduction::create("Reduction", this, _router, mode_, false,
@@ -96,7 +94,7 @@ void ValiantsRoutingAlgorithm::processRequest(
     assert(packet->getHopCount() == 0);
     stage = 0;
   } else {
-    stage = (((_flit->getVc() - baseVc_) % 4) < 2) ? 0 : 1;
+    stage = (_flit->getVc() - baseVc_) % 2;
   }
 
   // intermediate dimension to work on
@@ -168,7 +166,7 @@ void ValiantsRoutingAlgorithm::processRequest(
                                 dimensionWidths_);
 
   // the output port is now determined, now figure out which VC set to use
-  u32 vcSet = (_flit->getVc() - baseVc_) % 4;
+  u32 vcSet = (_flit->getVc() - baseVc_) % 2;
 
   // test if already at destination router
   if (dim == routerAddress.size()) {
@@ -180,8 +178,8 @@ void ValiantsRoutingAlgorithm::processRequest(
       // if routing mode is port then all vcs in the port are already added
       addPort(outputPort, hops, U32_MAX);
     } else {
-      // adding each vcSet (4 for valiants) will allow for all vcs to be used
-      for (u32 vcSetInd = 0; vcSetInd < 4; vcSetInd++) {
+      // adding each vcSet (2 for valiants) will allow for all vcs to be used
+      for (u32 vcSetInd = 0; vcSetInd < 2; vcSetInd++) {
         addPort(outputPort, hops, vcSetInd);
       }
     }
@@ -195,49 +193,26 @@ void ValiantsRoutingAlgorithm::processRequest(
     u32 dst = routingTo->at(dim + 1);
     assert(src != dst);
 
-    // in torus topology, we can get to a destination in two directions,
-    //  this algorithm takes the shortest path, randomized tie breaker
-    u32 rightDelta = ((dst > src) ?
-                      (dst - src) :
-                      (dst + dimensionWidths_.at(dim) - src));
-    u32 leftDelta = ((src > dst) ?
-                     (src - dst) :
-                     (src + dimensionWidths_.at(dim) - dst));
-
     // determine direction
-    bool right;
-    if (rightDelta == leftDelta) {
-      right = gSim->rnd.nextBool();
-    } else if (rightDelta < leftDelta) {
-      right = true;
-    } else {
-      right = false;
-    }
+    bool right = dst > src;
 
     // choose output port, figure out next router in this dimension
     u32 next;
-    bool crossDateline;
     if (right) {
       outputPort = portBase;
-      next = (src + 1) % dimensionWidths_.at(dim);
-      crossDateline = next < src;
+      assert(src < (dimensionWidths_.at(dim) - 1));
+      next = src + 1;
     } else {
       outputPort = portBase + dimWeight;
-      next = src == 0 ? dimensionWidths_.at(dim) - 1 : src - 1;
-      crossDateline = next > src;
+      assert(src > 0);
+      next = src - 1;
     }
     assert(next != src);
 
-    // reset to VC set 0 (stage 0) or 2 (stage 1) when switching dimensions or
-    //  when after a stage transition. this also occurs on an injection port
-    if (dim != inputPortDim_ || stageTransition) {
-      vcSet = stage == 0 ? 0 : 2;
-    }
-
-    // check dateline crossing
-    if (crossDateline) {
-      assert(vcSet == 0 || vcSet == 2);  // only cross once per stage per dim
-      vcSet++;
+    // reset to VC set 0 (stage 0) or 1 (stage 1) after injection or a
+    //  stage transition.
+    if (inputPortDim_ == U32_MAX || stageTransition) {
+      vcSet = stage;  // direct mapping
     }
 
     // add all ports connecting to the destination (based on weight)
@@ -253,7 +228,7 @@ void ValiantsRoutingAlgorithm::processRequest(
     u32 port = std::get<0>(t);
     u32 vc = std::get<1>(t);
     if (vc == U32_MAX) {
-      for (u32 vc = baseVc_ + vcSet; vc < baseVc_ + numVcs_; vc += 4) {
+      for (u32 vc = baseVc_ + vcSet; vc < baseVc_ + numVcs_; vc += 2) {
         _response->add(port, vc);
       }
     } else {
@@ -268,15 +243,15 @@ void ValiantsRoutingAlgorithm::addPort(u32 _port, u32 _hops, u32 vcSet) {
     f64 cong = portCongestion(mode_, router_, inputPort_, inputVc_, _port);
     reduction_->add(_port, U32_MAX, _hops, cong);
   } else {
-    for (u32 vc = baseVc_ + vcSet; vc < baseVc_ + numVcs_; vc += 4) {
+    for (u32 vc = baseVc_ + vcSet; vc < baseVc_ + numVcs_; vc += 2) {
       f64 cong = router_->congestionStatus(inputPort_, inputVc_, _port, vc);
       reduction_->add(_port, vc, _hops, cong);
     }
   }
 }
 
-}  // namespace Torus
+}  // namespace Mesh
 
-registerWithObjectFactory("valiants", Torus::RoutingAlgorithm,
-                          Torus::ValiantsRoutingAlgorithm,
-                          TORUS_ROUTINGALGORITHM_ARGS);
+registerWithObjectFactory("valiants", Mesh::RoutingAlgorithm,
+                          Mesh::ValiantsRoutingAlgorithm,
+                          MESH_ROUTINGALGORITHM_ARGS);

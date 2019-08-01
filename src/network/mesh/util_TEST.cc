@@ -12,14 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "network/torus/util.h"
+#include "network/mesh/util.h"
 
 #include <gtest/gtest.h>
 #include <prim/prim.h>
 
 #include <vector>
 
-TEST(Torus, computeMinimalHops) {
+TEST(Mesh, computeMinimalHops) {
   std::vector<u32> src;
   std::vector<u32> dst;
   std::vector<u32> widths;
@@ -31,33 +31,33 @@ TEST(Torus, computeMinimalHops) {
   widths = {4};
   dimensions = widths.size();
   exp = 1;
-  ASSERT_EQ(exp, Torus::computeMinimalHops(&src, &dst, dimensions, widths));
+  ASSERT_EQ(exp, Mesh::computeMinimalHops(&src, &dst, dimensions, widths));
 
   src = {2, 0};
   dst = {0, 1};
   widths = {4};
   dimensions = widths.size();
   exp = 2;
-  ASSERT_EQ(exp, Torus::computeMinimalHops(&src, &dst, dimensions, widths));
+  ASSERT_EQ(exp, Mesh::computeMinimalHops(&src, &dst, dimensions, widths));
 
   src = {2, 0};
   dst = {0, 3};
   widths = {4};
   dimensions = widths.size();
-  exp = 2;
-  ASSERT_EQ(exp, Torus::computeMinimalHops(&src, &dst, dimensions, widths));
+  exp = 4;
+  ASSERT_EQ(exp, Mesh::computeMinimalHops(&src, &dst, dimensions, widths));
 
   src = {0, 0, 0};
   dst = {0, 2, 2};
   widths = {3, 3};
   dimensions = widths.size();
-  exp = 3;
-  ASSERT_EQ(exp, Torus::computeMinimalHops(&src, &dst, dimensions, widths));
+  exp = 5;
+  ASSERT_EQ(exp, Mesh::computeMinimalHops(&src, &dst, dimensions, widths));
 
   src = {0, 1, 0, 0};
   dst = {0, 2, 2, 2};
   widths = {3, 3, 3};
   dimensions = widths.size();
-  exp = 4;
-  ASSERT_EQ(exp, Torus::computeMinimalHops(&src, &dst, dimensions, widths));
+  exp = 6;
+  ASSERT_EQ(exp, Mesh::computeMinimalHops(&src, &dst, dimensions, widths));
 }

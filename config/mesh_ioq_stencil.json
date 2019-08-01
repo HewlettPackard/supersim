@@ -11,13 +11,13 @@
     }
   },
   "network": {
-    "topology": "torus",
+    "topology": "mesh",
     "dimension_widths": [4, 4],
     "dimension_weights": [1, 1],
     "concentration": 4,
     "protocol_classes": [
       {
-        "num_vcs": 2,
+        "num_vcs": 1,
         "routing": {
           "algorithm": "dimension_order",
           "latency": 1,
@@ -32,7 +32,7 @@
         }
       },
       {
-        "num_vcs": 4,
+        "num_vcs": 2,
         "routing": {
           "algorithm": "valiants",
           "latency": 1,
