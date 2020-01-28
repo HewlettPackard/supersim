@@ -49,8 +49,8 @@ cc_library(
     alwayslink = 1,
 )
 
-cc_binary(
-    name = "supersim",
+cc_library(
+    name = "main",
     srcs = ["src/main.cc"],
     copts = COPTS,
     includes = [
@@ -60,6 +60,18 @@ cc_binary(
     deps = [
         ":lib",
     ] + LIBS,
+)
+
+cc_binary(
+    name = "supersim",
+    copts = COPTS,
+    includes = [
+        "src",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":main",
+    ],
 )
 
 cc_library(
