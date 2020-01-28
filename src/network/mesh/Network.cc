@@ -121,7 +121,8 @@ Network::Network(const std::string& _name, const Component* _parent,
 
           // link the routers from source to destination
           dbgprintf("linking %s:%u to %s:%u with %s",
-                    strop::vecString<u32>(sourceAddress, '-').c_str(), sourcePort,
+                    strop::vecString<u32>(sourceAddress, '-').c_str(),
+                    sourcePort,
                     strop::vecString<u32>(destinationAddress, '-').c_str(),
                     destinationPort,
                     channelName.c_str());
@@ -149,7 +150,8 @@ Network::Network(const std::string& _name, const Component* _parent,
 
           // link the routers from source to destination
           dbgprintf("linking %s:%u to %s:%u with %s",
-                    strop::vecString<u32>(sourceAddress, '-').c_str(), sourcePort,
+                    strop::vecString<u32>(sourceAddress, '-').c_str(),
+                    sourcePort,
                     strop::vecString<u32>(destinationAddress, '-').c_str(),
                     destinationPort,
                     channelName.c_str());

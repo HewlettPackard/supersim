@@ -62,7 +62,7 @@ http_archive(
   strip_prefix = "nicmcd-libcolhash-" + hash,
 )
 
-hash = "8ae921c"
+hash = "46865ff"
 http_archive(
   name = "libfactory",
   urls = ["https://github.com/nicmcd/libfactory/tarball/" + hash],
